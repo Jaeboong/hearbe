@@ -24,7 +24,7 @@ venv\Scripts\activate
 
 # macOS/Linux
 python3 -m venv venv
-source venv/bin/activate
+source venv/Scripts/activate
 ```
 
 ### 3. 의존성 설치
@@ -46,6 +46,7 @@ cp .env.example .env
 ```
 
 주요 설정 항목:
+
 ```env
 # WebSocket 서버 URL (실제 서버 주소로 변경)
 WS_URL=ws://localhost:8000/ws
@@ -103,6 +104,7 @@ mypy .
 3. 테스트 작성: `audio/tests/`
 
 예시:
+
 ```python
 # audio/hotkey.py
 from core.interfaces import IHotkeyManager
@@ -223,16 +225,20 @@ git push origin feature/audio-module
 1. GitHub에서 PR 생성
 2. 제목: `feat(audio): V키 핫키 기능 구현`
 3. 설명:
+
    ```markdown
    ## 변경 사항
+
    - V키 핫키 감지 기능 구현
    - pynput 라이브러리 사용
 
    ## 테스트
+
    - [x] 단위 테스트 통과
    - [x] 수동 테스트 완료
 
    ## 체크리스트
+
    - [x] 코드 포맷팅 완료 (black)
    - [x] 린팅 통과 (flake8)
    - [x] 테스트 작성
