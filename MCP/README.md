@@ -330,3 +330,11 @@ test(network): WebSocket 연결 테스트 추가
 - [전체 기획 문서](../docs/plan%20docs.md)
 - [AI 서버 설계](../AI/README.md)
 - [구현 계획](../../../.claude/plans/modular-splashing-cerf.md)
+
+### 협업 문서
+
+- **[팀 역할 분담 및 일정](docs/TEAM_ASSIGNMENT.md)** ⭐ - 2인 개발 계획 (3주)
+- [이벤트 명세서](docs/EVENT_SPECIFICATION.md) - 모듈 간 통신 이벤트 정의
+- [모듈 통합 가이드](docs/INTEGRATION_GUIDE.md) - main.py 통합 방법
+- [환경 변수 명세서](docs/ENV_SPECIFICATION.md) - .env 설정 가이드
+- [설정 가이드](docs/SETUP_GUIDE.md) - 개발 환경 설정
