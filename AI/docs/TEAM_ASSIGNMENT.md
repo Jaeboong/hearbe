@@ -13,7 +13,7 @@
 
 ## 📋 역할 분담
 
-### 👤 담당자 A: STT & TTS & WebSocket Core
+### 👤 담당자 김민찬: STT & TTS & WebSocket Core
 
 **핵심 역할**: 음성 입출력 및 실시간 통신 담당
 
@@ -45,7 +45,7 @@
 
 ---
 
-### 👤 담당자 B: LLM & Flow Engine & OCR
+### 👤 담당자 김재환: LLM & Flow Engine & OCR
 
 **핵심 역할**: AI 명령 생성 및 플로우 관리
 
@@ -80,7 +80,7 @@
 
 ---
 
-### 👤 담당자 C: WebRTC & HTTP API & 통합
+### 👤 담당자 하주형: WebRTC & HTTP API & 통합
 
 **핵심 역할**: 보호자 원격 제어 및 시스템 통합
 

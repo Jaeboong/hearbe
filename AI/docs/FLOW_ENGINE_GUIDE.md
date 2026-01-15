@@ -17,6 +17,11 @@
 
 ## 플로우 타입
 
+### 0. `visit` - 사이트 접속 시 로그인
+각 쇼핑 사이트에 접속하면 회원인지 묻고 회원이면 로그인 진행
+로그인 정보 저장이 가능하다면 저장을 권장하고 저장 여부 묻기
+저장 시 로그인 정보 저장 버튼 클릭
+
 ### 1. `search` - 상품 검색
 간단한 검색 명령, 플로우 불필요 (LLM 직접 처리)
 
@@ -52,7 +57,7 @@
           "type": "tool_call",
           "tool_name": "navigate_to_url",
           "arguments": {
-            "url": "https://www.coupang.com/cart"
+            "url": "https://cart.coupang.com/cartView.pang?traceId=mkeouvhh"
           }
         }
       ],
