@@ -47,7 +47,6 @@ class MCPConfig:
 class NetworkConfig:
     """네트워크 설정"""
     ws_url: str = "ws://localhost:8000/ws"
-    auth_url: str = "http://localhost:8000/auth"
     reconnect_interval: int = 5
     max_reconnect_attempts: int = 10
 
@@ -56,10 +55,22 @@ class NetworkConfig:
 class LogConfig:
     """로깅 설정"""
     level: str = "INFO"
-    log_dir: str = "logs"
-    log_file: str = "app.log"
+    file_path: str = "./logs/app.log"
     max_bytes: int = 10 * 1024 * 1024  # 10MB
     backup_count: int = 5
+
+
+@dataclass
+class SessionConfig:
+    """세션 설정"""
+    file_path: str = "./session.json"
+    auto_save: bool = True
+
+
+@dataclass
+class DebugConfig:
+    """디버그 설정"""
+    console_enabled: bool = False
 
 
 @dataclass
@@ -70,7 +81,8 @@ class AppConfig:
     mcp: MCPConfig
     network: NetworkConfig
     log: LogConfig
-    session_file: str = "session.json"
+    session: SessionConfig
+    debug: DebugConfig
 
 
 class ConfigManager:
@@ -136,41 +148,50 @@ class ConfigManager:
             sample_rate=self._get_env_int("AUDIO_SAMPLE_RATE", 16000),
             channels=self._get_env_int("AUDIO_CHANNELS", 1),
             chunk_size=self._get_env_int("AUDIO_CHUNK_SIZE", 1024),
-            hotkey=self._get_env("AUDIO_HOTKEY", "v")
+            hotkey=self._get_env("HOTKEY", "v")
         )
 
         # Browser 설정
         browser = BrowserConfig(
-            chrome_path=self._get_env("CHROME_PATH") or None,
-            user_data_dir=self._get_env("CHROME_USER_DATA_DIR") or None,
-            debugging_port=self._get_env_int("CHROME_DEBUG_PORT", 9222),
-            headless=self._get_env_bool("CHROME_HEADLESS", False),
-            window_width=self._get_env_int("CHROME_WINDOW_WIDTH", 1280),
-            window_height=self._get_env_int("CHROME_WINDOW_HEIGHT", 720)
+            chrome_path=self._get_env("BROWSER_EXECUTABLE_PATH") or None,
+            user_data_dir=self._get_env("BROWSER_USER_DATA_DIR", "./chrome_profile"),
+            debugging_port=self._get_env_int("BROWSER_CDP_PORT", 9222),
+            headless=self._get_env_bool("BROWSER_HEADLESS", False),
+            window_width=self._get_env_int("BROWSER_WINDOW_WIDTH", 1280),
+            window_height=self._get_env_int("BROWSER_WINDOW_HEIGHT", 720)
         )
 
         # MCP 설정
         mcp = MCPConfig(
-            server_script=self._get_env("MCP_SERVER_SCRIPT", "mcp/playwright_mcp_server.py"),
+            server_script=self._get_env("MCP_SERVER_COMMAND", "python mcp/playwright_mcp_server.py"),
             python_path=self._get_env("PYTHON_PATH") or None,
-            timeout=self._get_env_int("MCP_TIMEOUT", 30)
+            timeout=self._get_env_int("MCP_SERVER_TIMEOUT", 10)
         )
 
         # Network 설정
         network = NetworkConfig(
             ws_url=self._get_env("WS_URL", "ws://localhost:8000/ws"),
-            auth_url=self._get_env("AUTH_URL", "http://localhost:8000/auth"),
-            reconnect_interval=self._get_env_int("RECONNECT_INTERVAL", 5),
-            max_reconnect_attempts=self._get_env_int("MAX_RECONNECT_ATTEMPTS", 10)
+            reconnect_interval=self._get_env_int("WS_RECONNECT_DELAY", 5),
+            max_reconnect_attempts=self._get_env_int("WS_MAX_RETRIES", 10)
         )
 
         # Log 설정
         log = LogConfig(
             level=self._get_env("LOG_LEVEL", "INFO"),
-            log_dir=self._get_env("LOG_DIR", "logs"),
-            log_file=self._get_env("LOG_FILE", "app.log"),
+            file_path=self._get_env("LOG_FILE_PATH", "./logs/app.log"),
             max_bytes=self._get_env_int("LOG_MAX_BYTES", 10 * 1024 * 1024),
             backup_count=self._get_env_int("LOG_BACKUP_COUNT", 5)
+        )
+
+        # Session 설정
+        session = SessionConfig(
+            file_path=self._get_env("SESSION_FILE_PATH", "./session.json"),
+            auto_save=self._get_env_bool("SESSION_AUTO_SAVE", True)
+        )
+
+        # Debug 설정
+        debug = DebugConfig(
+            console_enabled=self._get_env_bool("DEBUG_CONSOLE_ENABLED", False)
         )
 
         # 전체 설정
@@ -180,7 +201,8 @@ class ConfigManager:
             mcp=mcp,
             network=network,
             log=log,
-            session_file=self._get_env("SESSION_FILE", "session.json")
+            session=session,
+            debug=debug
         )
 
     def get(self) -> AppConfig:
@@ -206,12 +228,11 @@ def get_config() -> AppConfig:
 
 def setup_logging(config: AppConfig):
     """로깅 설정"""
-    # 로그 디렉토리 생성
-    log_dir = Path(config.log.log_dir)
-    log_dir.mkdir(parents=True, exist_ok=True)
-
     # 로그 파일 경로
-    log_file = log_dir / config.log.log_file
+    log_file = Path(config.log.file_path)
+
+    # 로그 디렉토리 생성
+    log_file.parent.mkdir(parents=True, exist_ok=True)
 
     # 로그 레벨 매핑
     level_map = {
