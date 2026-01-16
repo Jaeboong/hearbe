@@ -394,7 +394,7 @@ pytest tests/ -v
 
 - [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)
 
-### 관련 문서
+### 관련 문서 참고
 
 - [MCP 데스크탑 앱 설계](../MCP/README.md)
 - [전체 기획 문서](../docs/plan%20docs.md)
