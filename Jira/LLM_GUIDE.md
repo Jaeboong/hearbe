@@ -1,210 +1,269 @@
 # JIRA CLI Tools - LLM Guide
 
-This directory contains JIRA CLI tools for managing JIRA issues. When the user requests JIRA-related information, use these scripts to fetch or modify data.
+## 🚨 CRITICAL RULES - READ FIRST
 
-## Prerequisites
+### 1. NEVER Read Terminal Output Directly
+**❌ WRONG**: Running scripts and reading from terminal (UTF-8 encoding breaks on Windows)
+**✅ CORRECT**: Always use `search_issues.py` which saves to temp markdown file, then read that file
 
-Before first use, install the required package:
+### 2. Workflow for ALL Read Operations
+```
+1. Run: python search_issues.py [options]
+2. Parse output to get: TEMP_FILE_PATH:/path/to/temp.md
+3. Read the temp file using Read tool
+4. Present results to user
+5. Temp file auto-deletes after session
+```
+
+### 3. Always Change Directory First
+```bash
+cd c:\ssafy\공통\Jira
+```
+
+---
+
+## Setup
+
+### Before First Use
+
+**1. Check Python Installation**
+```bash
+python --version
+```
+If Python is not installed, ask the user to install Python 3.8+ from https://www.python.org/
+
+**2. Install Required Package**
 ```bash
 pip install jira
 ```
 
-## Important Notes
-
-- Always change to the Jira directory before running scripts: `cd c:\ssafy\공통\Jira`
-- **IMPORTANT: Always use search_issues.py instead of read_issues.py** - search_issues.py saves results to a markdown temp file which avoids UTF-8 encoding issues on Windows terminals
-- When using search_issues.py, read the temporary file path from the output (TEMP_FILE_PATH)
-- For multi-step operations, break them into individual script calls
-- Present results in a user-friendly format, not raw JSON
-- Use appropriate parameters based on user's natural language request
-
 ---
 
-## Available Scripts
+## Core Scripts
 
-### 1. search_issues.py - Search and Save to Temp File (PRIMARY TOOL)
+### 🔍 search_issues.py - PRIMARY SEARCH TOOL
 
-**USE THIS SCRIPT FOR ALL SEARCH/READ OPERATIONS**
+**USE THIS FOR ALL SEARCH/READ OPERATIONS**
 
-Searches issues and saves results to a temporary markdown file. Avoids UTF-8 encoding issues.
+Saves results to temp markdown file (avoids encoding issues).
 
-Usage:
 ```bash
-python search_issues.py [--project PROJECT_KEY] [--filter KEYWORD] [--jql JQL_QUERY]
+python search_issues.py [--project PROJECT] [--filter KEYWORD] [--jql JQL_QUERY]
 ```
 
-Parameters:
-- --project: Project key to search in
-- --filter: Keyword filter (searches in summary and description)
-- --jql: Custom JQL query for advanced searches
+**Parameters:**
+- `--project`: Project key (default: S14P11D108)
+- `--filter`: Keyword to search in summary/description
+- `--jql`: Custom JQL query
 
-Output:
-The script prints two lines:
-- TEMP_FILE_PATH:/path/to/temp.md - Path to the generated markdown file
-- ISSUE_COUNT:N - Number of issues found
+**Output Format:**
+```
+TEMP_FILE_PATH:/path/to/temp.md
+ISSUE_COUNT:N
+```
 
-Examples:
+**Examples:**
 ```bash
+# All issues in project
 python search_issues.py --project S14P11D108
-python search_issues.py --project S14P11D108 --filter "MCP"
+
+# Search by keyword
+python search_issues.py --filter "WebSocket"
+
+# Custom JQL
 python search_issues.py --jql "project = S14P11D108 AND issuetype = Epic"
 python search_issues.py --jql "assignee = currentUser()"
 ```
 
-After running, read the temporary file at TEMP_FILE_PATH to get formatted results.
+**Always:**
+1. Run the command
+2. Extract TEMP_FILE_PATH from output
+3. Read that markdown file
+4. Present formatted results to user
 
 ---
 
-### 2. create_issues.py - Create New Issues
+### ➕ create_issues.py - Create Issues
 
-Creates new JIRA issues interactively or programmatically.
-
-Usage:
 ```bash
-python create_issues.py --interactive
+python create_issues.py --project PROJECT --summary "TITLE" --description "DESC" [OPTIONS]
 ```
 
-Interactive mode prompts for:
-- Project key
-- Issue summary (title)
-- Issue description
-- Issue type (Task/Story/Bug)
-- Priority (High/Medium/Low)
-- Story Points
+**Parameters:**
+- `--project`: Project key (required, e.g., S14P11D108)
+- `--summary`: Issue title (required)
+- `--description`: Issue description
+- `--type`: Issue type (Epic/Story/Task/Bug, default: Task)
+- `--priority`: Priority (High/Medium/Low)
+- `--points`: Story Points (integer)
 
-For programmatic creation, modify the script to accept command-line arguments.
-
----
-
-### 3. update_issues.py - Update Existing Issues
-
-Updates issue status, assignee, comments, or priority.
-
-Usage:
+**Examples:**
 ```bash
-python update_issues.py --key ISSUE_KEY [--status STATUS] [--assign ASSIGNEE] [--comment COMMENT] [--priority PRIORITY]
-```
+# Create a story with story points
+python create_issues.py --project S14P11D108 --summary "Feat: New Feature" \
+  --description "## ✅ 완료 조건\n- Item 1" --type Story --priority High --points 8
 
-Parameters:
-- --key: Issue key (required, e.g., MCP-01)
-- --status: New status (e.g., "In Progress", "Done")
-- --assign: Assignee username or "me" for current user
-- --comment: Add a comment to the issue
-- --priority: Set priority (High/Medium/Low)
-
-Examples:
-```bash
-python update_issues.py --key MCP-01 --status "In Progress"
-python update_issues.py --key MCP-01 --assign me --comment "Started working on this"
-python update_issues.py --key MCP-01 --priority High
+# Create an epic
+python create_issues.py --project S14P11D108 --summary "LLM" --type Epic --priority High
 ```
 
 ---
 
-### 4. read_issues.py - Read JIRA Issues (DO NOT USE - UTF-8 ISSUES)
+### ✏️ update_issues.py - Update Issues
 
-**⚠️ DO NOT USE THIS SCRIPT - Use search_issues.py instead**
-
-This script has UTF-8 encoding issues on Windows terminals. Always use search_issues.py.
-
----
-
-### 5. list_all.py - List All Projects and Recent Issues
-
-Lists all available projects and the 20 most recently updated issues across all projects.
-
-Usage:
 ```bash
-python list_all.py
+python update_issues.py --key ISSUE_KEY [OPTIONS]
 ```
 
-No parameters required. Useful for getting an overview of the JIRA workspace.
+**Parameters:**
+- `--key`: Issue key (required, e.g., S14P11D108-82)
+- `--status`: Change status (e.g., "진행 중", "완료", "해야 할 일")
+- `--assign`: Assign to user (`me` = current user, or username)
+- `--comment`: Add comment
+- `--priority`: Set priority (High/Medium/Low)
+- `--points`: Set Story Points (integer)
 
----
-
-### 6. save_issues.py - Save Project Issues to File
-
-Saves all issues from project S14P11D108 to a text file named project_issues.txt.
-
-Usage:
+**Examples:**
 ```bash
-python save_issues.py
+# Assign to yourself
+python update_issues.py --key S14P11D108-82 --assign me
+
+# Update status and add comment
+python update_issues.py --key S14P11D108-82 --status "진행 중" --comment "Started work"
+
+# Set story points
+python update_issues.py --key S14P11D108-82 --points 8
 ```
 
-Output file: project_issues.txt in the current directory.
-
 ---
 
-### 7. view_project.py - View Specific Project Issues
+### 🔗 link_epic.py - Link Issues to Epics
 
-Displays issues for a specific project in the console.
-
-Usage:
 ```bash
-python view_project.py
+python link_epic.py --issue ISSUE_KEY --epic EPIC_KEY
 ```
 
-Modify the script to change the target project.
+**Parameters:**
+- `--issue`: Story/Task issue key (e.g., S14P11D108-82)
+- `--epic`: Epic issue key (e.g., S14P11D108-80)
+
+**Example:**
+```bash
+python link_epic.py --issue S14P11D108-82 --epic S14P11D108-80
+```
 
 ---
 
-## Common Workflow Examples
+## Common Workflows
 
-### 1. User asks: "Show me recent JIRA issues"
-- Run: `python search_issues.py --project S14P11D108`
-- Read the temp file at TEMP_FILE_PATH
-- Present the formatted results from the markdown file
+### 1. "Show me recent issues"
+```bash
+cd c:\ssafy\공통\Jira
+python search_issues.py --project S14P11D108
+# Read TEMP_FILE_PATH, present to user
+```
 
-### 2. User asks: "Search for MCP issues"
-- Run: `python search_issues.py --filter "MCP"`
-- Read the temp file at TEMP_FILE_PATH
-- Present the formatted results from the markdown file
+### 2. "Search for WebSocket issues"
+```bash
+cd c:\ssafy\공통\Jira
+python search_issues.py --filter "WebSocket"
+# Read TEMP_FILE_PATH, present to user
+```
 
-### 3. User asks: "Create a new bug issue"
-- Run: `python create_issues.py --interactive`
-- Prompt user for required fields using the interactive mode
+### 3. "Create a new Story with 8 story points"
+```bash
+cd c:\ssafy\공통\Jira
+python create_issues.py --project S14P11D108 --summary "Feat: Feature Name" \
+  --description "Details here" --type Story --priority High --points 8 --assign me
+```
 
-### 4. User asks: "Update MCP-01 to In Progress"
-- Run: `python update_issues.py --key MCP-01 --status "In Progress"`
-- Confirm the update
+### 4. "Show my assigned issues"
+```bash
+cd c:\ssafy\공통\Jira
+python search_issues.py --jql "assignee = currentUser()"
+# Read TEMP_FILE_PATH, present to user
+```
 
-### 5. User asks: "Show issues assigned to me"
-- Run: `python search_issues.py --jql "assignee = currentUser()"`
-- Read the temp file at TEMP_FILE_PATH
-- Present the formatted results from the markdown file
+### 5. "Update issue status to Done"
+```bash
+cd c:\ssafy\공통\Jira
+python update_issues.py --key S14P11D108-82 --status "완료"
+```
 
-### 6. User asks: "Show all Epic issues"
-- Run: `python search_issues.py --jql "project = S14P11D108 AND issuetype = Epic"`
-- Read the temp file at TEMP_FILE_PATH
-- Present the formatted results from the markdown file
+### 6. "Create Epic and link Stories"
+```bash
+cd c:\ssafy\공통\Jira
 
-### 7. User asks: "Search for WebSocket issues"
-- Run: `python search_issues.py --filter "WebSocket"`
-- Read the temp file at TEMP_FILE_PATH
-- Present the formatted results from the markdown file
+# 1. Create Epic
+python create_issues.py --project S14P11D108 --summary "LLM" --type Epic
+# Note the epic key (e.g., S14P11D108-80)
+
+# 2. Create Story
+python create_issues.py --project S14P11D108 --summary "Feat: Story" --type Story --points 8
+# Note the story key (e.g., S14P11D108-82)
+
+# 3. Link Story to Epic
+python link_epic.py --issue S14P11D108-82 --epic S14P11D108-80
+```
 
 ---
 
 ## Error Handling
 
-Common errors:
-- **Authentication failure**: Check JIRA_URL, JIRA_EMAIL, and JIRA_API_TOKEN in config.py
-- **IP not allowed**: Contact JIRA admin to whitelist the IP
-- **Invalid JQL**: Ensure JQL queries are properly formatted
-- **Story Points field error**: customfield_10016 may differ, check with JIRA admin
-- **UTF-8 encoding error**: You're using read_issues.py - switch to search_issues.py
+### Common Errors
 
-When errors occur, check the script output for error messages and verify the config.py settings.
+| Error | Solution |
+|-------|----------|
+| **Authentication failure** | Check `config.py`: JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN |
+| **IP not allowed** | Contact JIRA admin to whitelist IP |
+| **Invalid JQL** | Check JQL syntax (use double quotes for strings) |
+| **UTF-8 encoding error** | You're using `read_issues.py` - switch to `search_issues.py` |
+| **Story Points failed** | `customfield_10016` may differ - check with admin |
+| **Python not found** | Ask user to install Python 3.8+ |
+| **jira module not found** | Run `pip install jira` |
 
 ---
 
 ## Quick Reference
 
-**Default Project**: S14P11D108
+### Default Settings
+- **Project**: S14P11D108
+- **Story Points Field**: customfield_10016
 
-**Most Common Commands**:
-- List all issues: `python search_issues.py --project S14P11D108`
-- Search by keyword: `python search_issues.py --filter "KEYWORD"`
-- Filter by type: `python search_issues.py --jql "issuetype = Epic"`
-- My issues: `python search_issues.py --jql "assignee = currentUser()"`
-- Update status: `python update_issues.py --key KEY --status "STATUS"`
+### Most Common Commands
+```bash
+# Search
+python search_issues.py --project S14P11D108
+python search_issues.py --filter "KEYWORD"
+python search_issues.py --jql "issuetype = Epic"
+
+# Create
+python create_issues.py --project S14P11D108 --summary "Title" --type Story --points 8
+
+# Update
+python update_issues.py --key KEY --status "완료"
+python update_issues.py --key KEY --assign me
+python update_issues.py --key KEY --points 8
+
+# Link
+python link_epic.py --issue STORY_KEY --epic EPIC_KEY
+```
+
+### JQL Quick Examples
+```jql
+project = S14P11D108
+project = S14P11D108 AND issuetype = Epic
+project = S14P11D108 AND status = "해야 할 일"
+assignee = currentUser()
+key in (S14P11D108-80, S14P11D108-81)
+```
+
+---
+
+## Remember
+
+1. ✅ **ALWAYS** use `search_issues.py` + temp file (never read terminal directly)
+2. ✅ **ALWAYS** `cd c:\ssafy\공통\Jira` before running commands
+3. ✅ **CHECK** Python installed before first use
+4. ✅ **RUN** `pip install jira` before first use
+5. ✅ **PRESENT** results to user in friendly format (not raw JSON)
