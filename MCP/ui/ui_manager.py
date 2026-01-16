@@ -9,7 +9,7 @@ import threading
 from typing import Optional
 
 from core.interfaces import IUIManager, AppStatus
-from core.event_bus import subscribe, EventType, Event
+from core.event_bus import subscribe, publish_sync, EventType, Event
 from ui.mini_window import MiniWindow
 
 logger = logging.getLogger(__name__)
@@ -144,8 +144,4 @@ class UIManager(IUIManager):
     def _on_exit_requested(self):
         """UI에서 종료 요청"""
         logger.info("Application exit requested from UI")
-        # UI 종료
-        self.stop()
-        # 프로세스 종료 (강제 종료)
-        import os
-        os._exit(0)
+        publish_sync(EventType.APP_SHUTDOWN, source="ui")
