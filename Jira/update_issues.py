@@ -8,9 +8,14 @@ JIRA 이슈 수정 스크립트
     python update_issues.py --key MCP-01 --comment "작업 진행 중"
 """
 
+import sys
 import argparse
 from jira import JIRA
 from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN
+
+# UTF-8 인코딩 강제 설정 (Windows 터미널 호환)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 
 def connect_jira():

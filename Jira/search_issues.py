@@ -7,11 +7,16 @@ JIRA 이슈 검색 스크립트 (임시 파일 사용)
     python search_issues.py --project S14P11D108 --filter "MCP"
 """
 
+import sys
 import argparse
 import tempfile
 import os
 from jira import JIRA
 from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, PROJECT_KEY
+
+# UTF-8 인코딩 강제 설정 (Windows 터미널 호환)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 
 def connect_jira():
