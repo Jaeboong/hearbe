@@ -56,14 +56,20 @@ def assign_issue(jira, issue_key, assignee):
     """이슈 담당자 할당"""
     try:
         issue = jira.issue(issue_key)
-        
+
         # 담당자 검색
         if assignee.lower() == "me":
-            assignee = None  # 현재 사용자
-        
+            # 현재 사용자 정보 가져오기
+            current_user = jira.myself()
+            assignee = current_user['accountId']
+            print(f"✅ {issue_key} 담당자 할당: 나 ({current_user.get('displayName', 'Unknown')})")
+        else:
+            jira.assign_issue(issue, assignee)
+            print(f"✅ {issue_key} 담당자 할당: {assignee}")
+            return
+
         jira.assign_issue(issue, assignee)
-        print(f"✅ {issue_key} 담당자 할당: {assignee or '나'}")
-        
+
     except Exception as e:
         print(f"❌ 오류: {str(e)}")
 
