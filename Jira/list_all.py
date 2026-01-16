@@ -3,8 +3,13 @@
 JIRA 프로젝트 및 이슈 전체 조회
 """
 
+import sys
 from jira import JIRA
 from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN
+
+# UTF-8 인코딩 강제 설정 (Windows 터미널 호환)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 
 def list_all():

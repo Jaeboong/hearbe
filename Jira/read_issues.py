@@ -9,9 +9,14 @@ JIRA 이슈 읽기 스크립트
     python read_issues.py --assignee currentUser()  # 나에게 할당된 이슈
 """
 
+import sys
 import argparse
 from jira import JIRA
 from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_PROJECT_KEY
+
+# UTF-8 인코딩 강제 설정 (Windows 터미널 호환)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 
 def connect_jira():

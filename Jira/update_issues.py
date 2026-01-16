@@ -8,9 +8,14 @@ JIRA 이슈 수정 스크립트
     python update_issues.py --key MCP-01 --comment "작업 진행 중"
 """
 
+import sys
 import argparse
 from jira import JIRA
 from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN
+
+# UTF-8 인코딩 강제 설정 (Windows 터미널 호환)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 
 def connect_jira():
@@ -51,14 +56,20 @@ def assign_issue(jira, issue_key, assignee):
     """이슈 담당자 할당"""
     try:
         issue = jira.issue(issue_key)
-        
+
         # 담당자 검색
         if assignee.lower() == "me":
-            assignee = None  # 현재 사용자
-        
+            # 현재 사용자 정보 가져오기
+            current_user = jira.myself()
+            assignee = current_user['accountId']
+            print(f"✅ {issue_key} 담당자 할당: 나 ({current_user.get('displayName', 'Unknown')})")
+        else:
+            jira.assign_issue(issue, assignee)
+            print(f"✅ {issue_key} 담당자 할당: {assignee}")
+            return
+
         jira.assign_issue(issue, assignee)
-        print(f"✅ {issue_key} 담당자 할당: {assignee or '나'}")
-        
+
     except Exception as e:
         print(f"❌ 오류: {str(e)}")
 
@@ -91,24 +102,29 @@ def main():
     parser.add_argument('--assign', help='담당자 (me = 나)')
     parser.add_argument('--comment', help='추가할 코멘트')
     parser.add_argument('--priority', help='우선순위 (High/Medium/Low)')
-    
+    parser.add_argument('--points', type=int, help='Story Points')
+
     args = parser.parse_args()
-    
+
     print("🔗 JIRA 연결 중...")
     jira = connect_jira()
     print("✅ 연결 성공!\n")
-    
+
     if args.status:
         update_issue_status(jira, args.key, args.status)
-    
+
     if args.assign:
         assign_issue(jira, args.key, args.assign)
-    
+
     if args.comment:
         add_comment(jira, args.key, args.comment)
-    
+
     if args.priority:
         update_fields(jira, args.key, priority={'name': args.priority})
+
+    if args.points is not None:
+        update_fields(jira, args.key, customfield_10016=args.points)
+        print(f"✅ {args.key} Story Points: {args.points}")
 
 
 if __name__ == "__main__":

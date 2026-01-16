@@ -19,6 +19,8 @@ JIRA_API_TOKEN = "your-api-token-here"
 PROJECT_KEY = "S14P11D108"
 ```
 
+Python 설치 필수!!
+
 API 토큰 생성: https://id.atlassian.com/manage-profile/security/api-tokens
 
 ### LLM에게 요청하는 방법
