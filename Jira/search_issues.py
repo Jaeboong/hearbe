@@ -56,10 +56,14 @@ def search_and_save(jira, jql, keyword=None):
         
         for i, issue in enumerate(issues, 1):
             assignee = issue.fields.assignee.displayName if issue.fields.assignee else "미할당"
+            story_points = getattr(issue.fields, 'customfield_10016', None)
+
             temp_file.write(f"## {i}. [{issue.key}] {issue.fields.summary}\n\n")
             temp_file.write(f"- **상태**: {issue.fields.status.name}\n")
             temp_file.write(f"- **담당자**: {assignee}\n")
             temp_file.write(f"- **유형**: {issue.fields.issuetype.name}\n")
+            if story_points is not None:
+                temp_file.write(f"- **Story Points**: {story_points}\n")
             if issue.fields.description:
                 desc_preview = issue.fields.description[:200] + "..." if len(issue.fields.description) > 200 else issue.fields.description
                 temp_file.write(f"- **설명**: {desc_preview}\n")

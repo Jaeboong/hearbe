@@ -102,24 +102,29 @@ def main():
     parser.add_argument('--assign', help='담당자 (me = 나)')
     parser.add_argument('--comment', help='추가할 코멘트')
     parser.add_argument('--priority', help='우선순위 (High/Medium/Low)')
-    
+    parser.add_argument('--points', type=int, help='Story Points')
+
     args = parser.parse_args()
-    
+
     print("🔗 JIRA 연결 중...")
     jira = connect_jira()
     print("✅ 연결 성공!\n")
-    
+
     if args.status:
         update_issue_status(jira, args.key, args.status)
-    
+
     if args.assign:
         assign_issue(jira, args.key, args.assign)
-    
+
     if args.comment:
         add_comment(jira, args.key, args.comment)
-    
+
     if args.priority:
         update_fields(jira, args.key, priority={'name': args.priority})
+
+    if args.points is not None:
+        update_fields(jira, args.key, customfield_10016=args.points)
+        print(f"✅ {args.key} Story Points: {args.points}")
 
 
 if __name__ == "__main__":
