@@ -140,9 +140,12 @@ class MiniWindow:
     def destroy(self):
         """창 종료"""
         if self.root:
-            self.root.quit()
-            self.root.destroy()
-            logger.info("Mini window destroyed")
+            try:
+                self.root.quit()
+                logger.info("Mini window destroyed")
+            except Exception as e:
+                logger.warning(f"Error destroying window: {e}")
+            self.root = None
 
     def set_exit_callback(self, callback):
         """

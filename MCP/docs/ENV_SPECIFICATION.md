@@ -42,21 +42,6 @@ WS_URL=wss://api.example.com/ws
 
 ---
 
-#### `AUTH_URL`
-**설명**: 인증 서버 URL (OAuth 콜백용)
-
-**기본값**: `http://localhost:8000/auth`
-
-**예시**:
-```env
-AUTH_URL=http://localhost:8000/auth
-AUTH_URL=https://api.example.com/auth
-```
-
-**사용 모듈**: `network.auth`
-
----
-
 #### `WS_RECONNECT_DELAY`
 **설명**: WebSocket 재연결 대기 시간 (초)
 
@@ -376,6 +361,23 @@ LOG_BACKUP_COUNT=10
 
 ---
 
+### Debug (디버그)
+
+#### `DEBUG_CONSOLE_ENABLED`
+**설명**: 콘솔 입력 모드 활성화 (테스트용)
+
+**기본값**: `false`
+
+**예시**:
+```env
+DEBUG_CONSOLE_ENABLED=false  # 비활성화
+DEBUG_CONSOLE_ENABLED=true   # 활성화
+```
+
+**사용 모듈**: `debug.console_input`
+
+---
+
 ## 환경별 설정 예시
 
 ### 개발 환경 (.env.development)
@@ -383,7 +385,6 @@ LOG_BACKUP_COUNT=10
 ```env
 # Network
 WS_URL=ws://localhost:8000/ws
-AUTH_URL=http://localhost:8000/auth
 WS_RECONNECT_DELAY=5
 WS_MAX_RETRIES=10
 
@@ -391,7 +392,6 @@ WS_MAX_RETRIES=10
 AUDIO_SAMPLE_RATE=16000
 AUDIO_CHANNELS=1
 AUDIO_CHUNK_SIZE=1024
-AUDIO_FORMAT=paInt16
 HOTKEY=v
 
 # Browser
@@ -414,6 +414,9 @@ LOG_LEVEL=DEBUG
 LOG_FILE_PATH=./logs/app.log
 LOG_MAX_BYTES=10485760
 LOG_BACKUP_COUNT=5
+
+# Debug
+DEBUG_CONSOLE_ENABLED=true
 ```
 
 ### 프로덕션 환경 (.env.production)
@@ -421,7 +424,6 @@ LOG_BACKUP_COUNT=5
 ```env
 # Network
 WS_URL=wss://api.example.com/ws
-AUTH_URL=https://api.example.com/auth
 WS_RECONNECT_DELAY=10
 WS_MAX_RETRIES=-1
 
@@ -429,7 +431,6 @@ WS_MAX_RETRIES=-1
 AUDIO_SAMPLE_RATE=16000
 AUDIO_CHANNELS=1
 AUDIO_CHUNK_SIZE=1024
-AUDIO_FORMAT=paInt16
 HOTKEY=v
 
 # Browser
@@ -452,6 +453,9 @@ LOG_LEVEL=INFO
 LOG_FILE_PATH=C:\ProgramData\MCPApp\logs\app.log
 LOG_MAX_BYTES=52428800
 LOG_BACKUP_COUNT=10
+
+# Debug
+DEBUG_CONSOLE_ENABLED=false
 ```
 
 ## 환경 변수 사용 방법
@@ -465,7 +469,6 @@ config = get_config()
 
 # Network 설정
 ws_url = config.network.ws_url
-auth_url = config.network.auth_url
 
 # Audio 설정
 sample_rate = config.audio.sample_rate
