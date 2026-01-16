@@ -20,8 +20,13 @@
 AI/
 ├── services/
 │   ├── llm.py              # OpenAI API, 명령 생성
+│   ├── rag.py              # RAG 파이프라인 (Vector 검색, Few-Shot)
+│   ├── embedding.py        # 임베딩 생성 (OpenAI/Sentence-BERT)
 │   ├── flow_engine.py      # 플로우 상태 머신
 │   └── ocr.py              # HF OCR 모델, 키패드 인식
+├── db/
+│   ├── vector_store.py     # MariaDB Vector DB 연동
+│   └── seed_data.py        # 초기 예제 데이터 삽입
 ├── flows/
 │   ├── coupang/
 │   │   ├── search.json     # 쿠팡 검색 플로우
@@ -33,84 +38,140 @@ AI/
 │   └── elevenst/
 │       ├── search.json     # 11번가 검색 플로우
 │       └── checkout.json   # 11번가 결제 플로우
+├── data/
+│   ├── intent_examples.json    # Intent 예제 시드 데이터
+│   ├── command_templates.json  # MCP 명령 템플릿
+│   └── flow_patterns.json      # 플로우 패턴
 ├── models/
 │   └── flow.py             # 플로우 데이터 모델 (Pydantic)
 └── tests/
     ├── test_llm.py
+    ├── test_rag.py
     ├── test_flow_engine.py
     └── test_ocr.py
 ```
 
 ---
 
-## AI-05: LLM 명령 생성
+## AI-05: LLM 명령 생성 (RAG 기반)
 
 ### 기능 설명
 사용자의 자연어 발화를 MCP 브라우저 자동화 명령으로 변환합니다.
+**RAG(Retrieval-Augmented Generation)** 기반으로 MariaDB Vector DB에서 유사 예제를 검색하여 신뢰도를 높입니다.
+
+### 아키텍처
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     RAG 기반 명령 생성 파이프라인                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   [사용자 발화] → [임베딩 생성] → [Vector 검색] → [Few-Shot 구성]     │
+│                         ↓                                           │
+│                   MariaDB Vector DB                                 │
+│                   ┌─────────────────┐                               │
+│                   │ - Intent 예제   │                               │
+│                   │ - MCP 명령 템플릿│                               │
+│                   │ - Flow 패턴     │                               │
+│                   │ - 에러 복구 예제│                               │
+│                   └─────────────────┘                               │
+│                         ↓                                           │
+│   [유사 예제 Top-K] → [Few-Shot 프롬프트] → [GPT-5-mini] → [tool_calls]│
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ### 상세 동작
-1. WebSocket에서 STT 결과 텍스트 수신
-2. GPT-5-mini로 의도 분석 (NLU)
-   - 상품 검색, 장바구니 추가, 결제 진행 등 의도 파악
-   - 상품명, 브랜드, 가격 범위 등 개체명 추출 (NER)
-3. MCP tool_call 형식으로 명령 생성
-4. 일반 명령 vs 플로우 필요 여부 판단
-   - 일반 명령 → 즉시 MCP 실행
-   - 회원가입/결제 → Flow Engine으로 위임
+1. **임베딩 생성**: 사용자 발화를 OpenAI Embedding 또는 Sentence-BERT로 벡터화
+2. **Vector 검색**: MariaDB Vector DB에서 유사한 예제 Top-K 검색
+3. **Few-Shot 프롬프트 구성**: 검색된 예제를 프롬프트에 포함
+4. **LLM 추론**: GPT-5-mini로 명령 생성 (Few-Shot 컨텍스트 활용)
+5. **검증**: 생성된 명령이 DB 템플릿과 일치하는지 확인
+
+### MariaDB Vector DB 스키마
+
+```sql
+-- Intent 예제 테이블
+CREATE TABLE intent_examples (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_input TEXT NOT NULL,
+    intent_type VARCHAR(50) NOT NULL,  -- search, compare, cart, checkout
+    embedding BLOB NOT NULL,            -- 768차원 벡터
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- MCP 명령 템플릿 테이블
+CREATE TABLE mcp_command_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    intent_type VARCHAR(50) NOT NULL,
+    site VARCHAR(30) NOT NULL,          -- coupang, naver, 11st
+    input_pattern TEXT NOT NULL,        -- 입력 패턴 예제
+    tool_calls JSON NOT NULL,           -- MCP 명령 시퀀스
+    embedding BLOB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 플로우 패턴 테이블
+CREATE TABLE flow_patterns (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    flow_type VARCHAR(30) NOT NULL,     -- signup, checkout
+    site VARCHAR(30) NOT NULL,
+    trigger_keywords JSON NOT NULL,     -- 플로우 트리거 키워드
+    embedding BLOB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ### 구현 파일
-- `services/llm.py`
+- `services/llm.py` - LLM 추론 및 명령 생성
+- `services/rag.py` - RAG 파이프라인 (Vector 검색, 프롬프트 구성)
+- `services/embedding.py` - 임베딩 생성
+- `db/vector_store.py` - MariaDB Vector DB 연동
 
-### 예시: 자연어 → MCP 명령 변환
+### 예시: RAG 기반 명령 생성
 
 **입력**:
 ```
 "쿠팡에서 물티슈 검색해줘"
 ```
 
-**출력** (순차 실행):
+**1. Vector 검색 결과 (Top-3):**
 ```json
 [
-    {
-        "tool_name": "navigate_to_url",
-        "arguments": {"url": "https://www.coupang.com"}
-    },
-    {
-        "tool_name": "fill_input",
-        "arguments": {"selector": "#headerSearchKeyword", "value": "물티슈"}
-    },
-    {
-        "tool_name": "click_element",
-        "arguments": {"selector": ".search-btn"}
-    }
+    {"input": "쿠팡에서 우유 찾아줘", "intent": "search", "similarity": 0.95},
+    {"input": "쿠팡에서 라면 검색", "intent": "search", "similarity": 0.92},
+    {"input": "네이버에서 세제 검색해줘", "intent": "search", "similarity": 0.88}
 ]
 ```
 
-### LLM 프롬프트 구조
+**2. Few-Shot 프롬프트 구성 → LLM 추론**
 
-```python
-SYSTEM_PROMPT = """
-당신은 시각장애인을 위한 쇼핑 도우미입니다.
-사용자의 자연어 요청을 브라우저 자동화 명령으로 변환합니다.
-
-사용 가능한 도구:
-- navigate_to_url(url): URL로 이동
-- click_element(selector): 요소 클릭
-- fill_input(selector, value): 입력 필드 채우기
-- get_text(selector): 텍스트 추출
-- take_screenshot(): 스크린샷 캡처
-- scroll(direction, amount): 페이지 스크롤
-
-출력 형식: JSON 배열로 tool_call 목록 반환
-"""
+**3. 출력** (순차 실행):
+```json
+[
+    {"tool_name": "navigate_to_url", "arguments": {"url": "https://www.coupang.com"}},
+    {"tool_name": "fill_input", "arguments": {"selector": "#headerSearchKeyword", "value": "물티슈"}},
+    {"tool_name": "click_element", "arguments": {"selector": ".search-btn"}}
+]
 ```
+
+### RAG 장점
+1. **신뢰도 향상**: 검증된 예제 기반으로 환각(hallucination) 감소
+2. **일관성**: 동일 상황에서 일관된 명령 생성
+3. **확장 용이**: 새 쇼핑몰 추가 시 DB에 예제만 삽입
+4. **디버깅 용이**: 어떤 예제가 사용되었는지 추적 가능
 
 ### 환경 변수
 ```env
 OPENAI_API_KEY=sk-...
 LLM_MODEL=gpt-5-mini
 LLM_MAX_TOKENS=1024
-LLM_TEMPERATURE=0.7
+LLM_TEMPERATURE=0.3          # RAG 사용 시 낮은 temperature
+EMBEDDING_MODEL=text-embedding-3-small
+MARIADB_HOST=localhost
+MARIADB_PORT=3306
+MARIADB_DATABASE=ai_rag
+RAG_TOP_K=5
 ```
 
 ### 인터페이스
@@ -119,6 +180,11 @@ class ILLMService:
     async def generate_commands(self, user_input: str, context: dict) -> List[ToolCall]: ...
     async def analyze_intent(self, user_input: str) -> Intent: ...
     def should_use_flow(self, intent: Intent) -> bool: ...
+
+class IRAGService:
+    async def search_similar_examples(self, query: str, top_k: int = 5) -> List[Example]: ...
+    async def build_few_shot_prompt(self, examples: List[Example], user_input: str) -> str: ...
+    async def index_new_example(self, example: Example) -> None: ...
 ```
 
 ---
@@ -325,7 +391,9 @@ class IOCRService:
 
 ## 필요 기술 스택
 
-- **OpenAI API** - GPT-5-mini 호출
+- **OpenAI API** - GPT-5-mini 호출, Embedding 생성
+- **MariaDB Vector** - Vector DB (예제 저장/검색)
+- **Sentence-BERT** - 대안 임베딩 모델 (로컬)
 - **Pydantic** - 데이터 모델 정의/검증
 - **JSON Schema** - 플로우 정의 파일
 - **상태 머신 패턴** - 플로우 엔진 구현
@@ -337,6 +405,9 @@ class IOCRService:
 ## 학습 리소스
 
 - OpenAI API: https://platform.openai.com/docs/api-reference
+- OpenAI Embeddings: https://platform.openai.com/docs/guides/embeddings
+- MariaDB Vector: https://mariadb.com/kb/en/vector-overview/
+- RAG Pattern: https://www.pinecone.io/learn/retrieval-augmented-generation/
 - Flow State Machine: https://en.wikipedia.org/wiki/Finite-state_machine
 - TrOCR: https://huggingface.co/microsoft/trocr-base-printed
 - PaddleOCR: https://github.com/PaddlePaddle/PaddleOCR
