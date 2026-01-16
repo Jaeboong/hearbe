@@ -1,0 +1,300 @@
+"""
+설정 관리 모듈
+
+환경 변수 및 설정 파일 로드
+"""
+
+import os
+import logging
+import logging.handlers
+from pathlib import Path
+from typing import Optional
+from dataclasses import dataclass
+from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ASRConfig:
+    """ASR (음성 인식) 설정"""
+    model_name: str = "large-v3-turbo"
+    device: str = "cuda"
+    compute_type: str = "float16"
+    language: str = "ko"
+    beam_size: int = 5
+
+
+@dataclass
+class NLUConfig:
+    """NLU (자연어 이해) 설정"""
+    intent_model: str = "gpt-4o-mini"
+    ner_enabled: bool = True
+    context_window: int = 10
+
+
+@dataclass
+class LLMConfig:
+    """LLM Planner 설정"""
+    model_name: str = "gpt-4o-mini"
+    api_key: Optional[str] = None
+    max_tokens: int = 2048
+    temperature: float = 0.7
+    timeout: int = 30
+
+
+@dataclass
+class TTSConfig:
+    """TTS (음성 합성) 설정"""
+    provider: str = "elevenlabs"  # elevenlabs, minimax, cartesia, cosyvoice
+    api_key: Optional[str] = None
+    voice_id: str = "korean_female_1"
+    model_id: str = "eleven_flash_v2_5"
+    sample_rate: int = 24000
+    streaming: bool = True
+
+
+@dataclass
+class OCRConfig:
+    """OCR (이미지 인식) 설정"""
+    provider: str = "openai"  # openai, tesseract, paddleocr
+    api_key: Optional[str] = None
+    language: str = "kor+eng"
+
+
+@dataclass
+class FlowEngineConfig:
+    """Flow Engine 설정"""
+    flows_dir: str = "flows"
+    default_site: str = "coupang"
+    confirmation_required: bool = True
+
+
+@dataclass
+class ServerConfig:
+    """서버 설정"""
+    host: str = "0.0.0.0"
+    port: int = 8000
+    ws_path: str = "/ws"
+    cors_origins: str = "*"
+    debug: bool = False
+
+
+@dataclass
+class LogConfig:
+    """로깅 설정"""
+    level: str = "INFO"
+    log_dir: str = "logs"
+    log_file: str = "ai_server.log"
+    max_bytes: int = 10 * 1024 * 1024  # 10MB
+    backup_count: int = 5
+
+
+@dataclass
+class AppConfig:
+    """전체 애플리케이션 설정"""
+    asr: ASRConfig
+    nlu: NLUConfig
+    llm: LLMConfig
+    tts: TTSConfig
+    ocr: OCRConfig
+    flow_engine: FlowEngineConfig
+    server: ServerConfig
+    log: LogConfig
+
+
+class ConfigManager:
+    """
+    설정 관리자 (Singleton)
+
+    환경 변수와 기본값을 결합하여 애플리케이션 설정 관리
+    """
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self):
+        if self._initialized:
+            return
+
+        # .env 파일 로드
+        self._load_env()
+
+        # 설정 초기화
+        self.config = self._create_config()
+
+        self._initialized = True
+        logger.info("ConfigManager initialized")
+
+    def _load_env(self):
+        """환경 변수 로드"""
+        current_dir = Path(__file__).parent.parent
+        env_path = current_dir / ".env"
+
+        if env_path.exists():
+            load_dotenv(env_path)
+            logger.info(f"Loaded .env file from {env_path}")
+        else:
+            logger.warning(f".env file not found at {env_path}")
+
+    def _get_env(self, key: str, default: str = "") -> str:
+        """환경 변수 가져오기"""
+        return os.getenv(key, default)
+
+    def _get_env_int(self, key: str, default: int) -> int:
+        """환경 변수를 정수로 가져오기"""
+        try:
+            return int(self._get_env(key, str(default)))
+        except ValueError:
+            logger.warning(f"Invalid integer value for {key}, using default: {default}")
+            return default
+
+    def _get_env_float(self, key: str, default: float) -> float:
+        """환경 변수를 float으로 가져오기"""
+        try:
+            return float(self._get_env(key, str(default)))
+        except ValueError:
+            logger.warning(f"Invalid float value for {key}, using default: {default}")
+            return default
+
+    def _get_env_bool(self, key: str, default: bool) -> bool:
+        """환경 변수를 boolean으로 가져오기"""
+        value = self._get_env(key, str(default)).lower()
+        return value in ("true", "1", "yes", "on")
+
+    def _create_config(self) -> AppConfig:
+        """환경 변수를 기반으로 설정 생성"""
+        # ASR 설정
+        asr = ASRConfig(
+            model_name=self._get_env("ASR_MODEL_NAME", "large-v3-turbo"),
+            device=self._get_env("ASR_DEVICE", "cuda"),
+            compute_type=self._get_env("ASR_COMPUTE_TYPE", "float16"),
+            language=self._get_env("ASR_LANGUAGE", "ko"),
+            beam_size=self._get_env_int("ASR_BEAM_SIZE", 5)
+        )
+
+        # NLU 설정
+        nlu = NLUConfig(
+            intent_model=self._get_env("NLU_INTENT_MODEL", "gpt-4o-mini"),
+            ner_enabled=self._get_env_bool("NLU_NER_ENABLED", True),
+            context_window=self._get_env_int("NLU_CONTEXT_WINDOW", 10)
+        )
+
+        # LLM 설정
+        llm = LLMConfig(
+            model_name=self._get_env("LLM_MODEL_NAME", "gpt-4o-mini"),
+            api_key=self._get_env("OPENAI_API_KEY") or None,
+            max_tokens=self._get_env_int("LLM_MAX_TOKENS", 2048),
+            temperature=self._get_env_float("LLM_TEMPERATURE", 0.7),
+            timeout=self._get_env_int("LLM_TIMEOUT", 30)
+        )
+
+        # TTS 설정
+        tts = TTSConfig(
+            provider=self._get_env("TTS_PROVIDER", "elevenlabs"),
+            api_key=self._get_env("TTS_API_KEY") or self._get_env("ELEVENLABS_API_KEY") or None,
+            voice_id=self._get_env("TTS_VOICE_ID", "korean_female_1"),
+            model_id=self._get_env("TTS_MODEL_ID", "eleven_flash_v2_5"),
+            sample_rate=self._get_env_int("TTS_SAMPLE_RATE", 24000),
+            streaming=self._get_env_bool("TTS_STREAMING", True)
+        )
+
+        # OCR 설정
+        ocr = OCRConfig(
+            provider=self._get_env("OCR_PROVIDER", "openai"),
+            api_key=self._get_env("OCR_API_KEY") or self._get_env("OPENAI_API_KEY") or None,
+            language=self._get_env("OCR_LANGUAGE", "kor+eng")
+        )
+
+        # Flow Engine 설정
+        flow_engine = FlowEngineConfig(
+            flows_dir=self._get_env("FLOWS_DIR", "flows"),
+            default_site=self._get_env("DEFAULT_SITE", "coupang"),
+            confirmation_required=self._get_env_bool("FLOW_CONFIRMATION_REQUIRED", True)
+        )
+
+        # Server 설정
+        server = ServerConfig(
+            host=self._get_env("SERVER_HOST", "0.0.0.0"),
+            port=self._get_env_int("SERVER_PORT", 8000),
+            ws_path=self._get_env("WS_PATH", "/ws"),
+            cors_origins=self._get_env("CORS_ORIGINS", "*"),
+            debug=self._get_env_bool("DEBUG", False)
+        )
+
+        # Log 설정
+        log = LogConfig(
+            level=self._get_env("LOG_LEVEL", "INFO"),
+            log_dir=self._get_env("LOG_DIR", "logs"),
+            log_file=self._get_env("LOG_FILE", "ai_server.log"),
+            max_bytes=self._get_env_int("LOG_MAX_BYTES", 10 * 1024 * 1024),
+            backup_count=self._get_env_int("LOG_BACKUP_COUNT", 5)
+        )
+
+        return AppConfig(
+            asr=asr,
+            nlu=nlu,
+            llm=llm,
+            tts=tts,
+            ocr=ocr,
+            flow_engine=flow_engine,
+            server=server,
+            log=log
+        )
+
+    def get(self) -> AppConfig:
+        """현재 설정 반환"""
+        return self.config
+
+    def reload(self):
+        """설정 다시 로드"""
+        logger.info("Reloading configuration...")
+        self._load_env()
+        self.config = self._create_config()
+        logger.info("Configuration reloaded")
+
+
+# 싱글톤 인스턴스
+config_manager = ConfigManager()
+
+
+def get_config() -> AppConfig:
+    """전역 설정 가져오기"""
+    return config_manager.get()
+
+
+def setup_logging(config: AppConfig):
+    """로깅 설정"""
+    log_dir = Path(config.log.log_dir)
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    log_file = log_dir / config.log.log_file
+
+    level_map = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "CRITICAL": logging.CRITICAL
+    }
+    log_level = level_map.get(config.log.level.upper(), logging.INFO)
+
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.handlers.RotatingFileHandler(
+                log_file,
+                maxBytes=config.log.max_bytes,
+                backupCount=config.log.backup_count,
+                encoding="utf-8"
+            ),
+            logging.StreamHandler()
+        ]
+    )
+
+    logger.info(f"Logging configured: level={config.log.level}, file={log_file}")
