@@ -1,14 +1,26 @@
 """
 JIRA 설정 파일
 
-이 파일에 JIRA 연결 정보를 입력하세요.
+환경 변수(.env 파일)에서 JIRA 연결 정보를 읽어옵니다.
+.env 파일이 없으면 .env.example을 복사해서 만드세요.
 """
 
-# JIRA 연결 정보
-JIRA_URL = "https://ssafy.atlassian.net"
-JIRA_EMAIL = "cbkjh0225@gmail.com"
-JIRA_API_TOKEN = "ATATT3xFfGF0VH-lGpoFujFVE8AkInxnqLHmbRFiWnUDosRH30AHQBiTtys7-YSqP2rFLe2TDCNOcuFk4j0R_ntEsnvScEWEJsmko6dXuEoQ9d4OOhzVemaLx8TfB9re9lmBoW3KK_EEHJeRMo4zoFw9Jo9FyI_gYyJJywNTso24Q5zi-M1LiKQ=8C48F04D"
-PROJECT_KEY = "S14P11D108"
+import os
+from pathlib import Path
+
+# .env 파일 로드
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent / ".env"
+    load_dotenv(dotenv_path=env_path)
+except ImportError:
+    print("Warning: python-dotenv not installed. Run: pip install python-dotenv")
+
+# JIRA 연결 정보 (환경 변수에서 로드)
+JIRA_URL = os.environ.get("JIRA_URL", "https://ssafy.atlassian.net")
+JIRA_EMAIL = os.environ.get("JIRA_EMAIL", "")
+JIRA_API_TOKEN = os.environ.get("JIRA_API_TOKEN", "")
+PROJECT_KEY = os.environ.get("JIRA_PROJECT_KEY", "S14P11D108")
 
 # 기본 프로젝트 키
-DEFAULT_PROJECT_KEY = "MCP"
+DEFAULT_PROJECT_KEY = PROJECT_KEY
