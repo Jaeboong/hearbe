@@ -12,7 +12,8 @@ import argparse
 import tempfile
 import os
 from jira import JIRA
-from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, PROJECT_KEY
+from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, PROJECT_KEY, JIRA_TIMEOUT
+
 
 # UTF-8 인코딩 강제 설정 (Windows 터미널 호환)
 if sys.stdout.encoding != 'utf-8':
@@ -21,9 +22,11 @@ if sys.stdout.encoding != 'utf-8':
 
 def connect_jira():
     """JIRA 서버에 연결"""
+    print("Connecting to Jira...", flush=True)
     return JIRA(
         server=JIRA_URL,
-        basic_auth=(JIRA_EMAIL, JIRA_API_TOKEN)
+        basic_auth=(JIRA_EMAIL, JIRA_API_TOKEN),
+        timeout=JIRA_TIMEOUT
     )
 
 
@@ -84,6 +87,7 @@ def search_and_save(jira, jql, keyword=None):
 
 
 def main():
+    print("Initializing search_issues.py...", flush=True)
     parser = argparse.ArgumentParser(description='JIRA 이슈 검색 (임시 파일)')
     parser.add_argument('--project', default=PROJECT_KEY, help='프로젝트 키')
     parser.add_argument('--filter', help='필터 키워드 (예: MCP, AI)')

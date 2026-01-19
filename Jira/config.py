@@ -23,4 +23,7 @@ JIRA_API_TOKEN = os.environ.get("JIRA_API_TOKEN", "")
 PROJECT_KEY = os.environ.get("JIRA_PROJECT_KEY", "S14P11D108")
 
 # 기본 프로젝트 키
-DEFAULT_PROJECT_KEY = PROJECT_KEY
+DEFAULT_PROJECT_KEY = "MCP"
+
+# 타임아웃 (초)
+JIRA_TIMEOUT = 10
