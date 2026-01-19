@@ -9,7 +9,7 @@ JIRA 이슈 생성 스크립트
 import sys
 import argparse
 from jira import JIRA
-from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN
+from config import JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_TIMEOUT
 
 # UTF-8 인코딩 강제 설정 (Windows 터미널 호환)
 if sys.stdout.encoding != 'utf-8':
@@ -20,7 +20,8 @@ def connect_jira():
     """JIRA 서버에 연결"""
     return JIRA(
         server=JIRA_URL,
-        basic_auth=(JIRA_EMAIL, JIRA_API_TOKEN)
+        basic_auth=(JIRA_EMAIL, JIRA_API_TOKEN),
+        timeout=JIRA_TIMEOUT
     )
 
 

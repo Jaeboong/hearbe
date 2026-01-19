@@ -30,7 +30,13 @@ cd c:\ssafy\공통\Jira
 ```bash
 python --version
 ```
-If Python is not installed, ask the user to install Python 3.8+ from https://www.python.org/
+If Python is not installed, **run the following command** to install it automatically:
+```bash
+curl -o python_installer.exe https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+python_installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
+del python_installer.exe
+```
+**Note**: You may need to ask the user to restart their terminal after installation.
 
 **2. Install Required Package**
 ```bash
@@ -219,8 +225,9 @@ python link_epic.py --issue S14P11D108-82 --epic S14P11D108-80
 | **Invalid JQL** | Check JQL syntax (use double quotes for strings) |
 | **UTF-8 encoding error** | You're using `read_issues.py` - switch to `search_issues.py` |
 | **Story Points failed** | `customfield_10016` may differ - check with admin |
-| **Python not found** | Ask user to install Python 3.8+ |
+| **Python not found** | Run auto-install command (see Setup section) |
 | **jira module not found** | Run `pip install jira` |
+| **Command hangs / No output** | 1. **Windows Alias**: Python might be trying to open MS Store. Run auto-install command.<br>2. **Buffering**: Use `python -u script.py` to force output. |
 
 ---
 
