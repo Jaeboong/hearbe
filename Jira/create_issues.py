@@ -40,12 +40,12 @@ def create_issue(jira, project_key, summary, description, issuetype="Task", prio
         
         new_issue = jira.create_issue(fields=issue_dict)
         
-        # Story Points 설정
+        # Story Points 설정 (customfield_10031이 웹 UI에 표시되는 필드)
         if story_points:
             try:
-                new_issue.update(fields={'customfield_10016': story_points})
-            except:
-                print(f"[WARNING] Story Points 설정 실패")
+                new_issue.update(fields={'customfield_10031': story_points})
+            except Exception as e:
+                print(f"[WARNING] Story Points 설정 실패: {e}")
 
         print(f"[SUCCESS] 생성 완료: {new_issue.key} - {summary}")
         return new_issue
