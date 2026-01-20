@@ -38,6 +38,7 @@ class LLMConfig:
     """LLM Planner 설정"""
     model_name: str = "gpt-4o-mini"
     api_key: Optional[str] = None
+    base_url: Optional[str] = None  # OpenAI compatible API endpoint
     max_tokens: int = 2048
     temperature: float = 0.7
     timeout: int = 30
@@ -187,7 +188,8 @@ class ConfigManager:
         # LLM 설정
         llm = LLMConfig(
             model_name=self._get_env("LLM_MODEL_NAME", "gpt-4o-mini"),
-            api_key=self._get_env("OPENAI_API_KEY") or None,
+            api_key=self._get_env("OPENAI_API_KEY") or self._get_env("GMS_KEY") or None,
+            base_url=self._get_env("OPENAI_BASE_URL") or None,
             max_tokens=self._get_env_int("LLM_MAX_TOKENS", 2048),
             temperature=self._get_env_float("LLM_TEMPERATURE", 0.7),
             timeout=self._get_env_int("LLM_TIMEOUT", 30)
