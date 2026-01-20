@@ -203,5 +203,10 @@ def main():
     server.run()
 
 
+# Module-level app for uvicorn (e.g., uvicorn main:app)
+_server = AIServer()
+app = _server.create_app()
+
+
 if __name__ == "__main__":
     main()
