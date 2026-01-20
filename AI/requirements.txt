@@ -32,6 +32,15 @@ aiohttp>=3.9.0
 # ============================================================================
 Pillow>=10.2.0
 
+# PaddleOCR (한국어 OCR)
+# ⚠️ PaddlePaddle은 CUDA 버전에 따라 별도 설치 필요:
+#   CUDA 11.8: python -m pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+#   CUDA 12.6: python -m pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu126/
+#   CPU Only:  python -m pip install paddlepaddle==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
+paddleocr>=2.7.0
+
+# 사용 모델: korean_PP-OCRv5_mobile_rec (한국어 텍스트 인식)
+
 # ============================================================================
 # WebSocket & Async
 # ============================================================================
