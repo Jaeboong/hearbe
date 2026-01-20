@@ -45,42 +45,68 @@
 
 ---
 
-### 👤 담당자 김재환: LLM & Flow Engine & OCR
+### 👤 담당자 김재환: LLM & Flow Engine
 
 **핵심 역할**: AI 명령 생성 및 플로우 관리
 
 **담당 모듈**:
 - 🔴 `services/llm.py` - OpenAI GPT-5-mini
+- 🔴 `services/rag.py` - RAG 파이프라인 (Vector 검색, Few-Shot)
+- 🔴 `services/embedding.py` - 임베딩 생성
 - 🔴 `services/flow_engine.py` - 플로우 엔진 (사이트별 단계 처리)
-- 🔴 `services/ocr.py` - 결제 키패드 OCR
 - 🔴 `flows/` - 사이트별 플로우 JSON 정의
 
 **구현 파일**:
 ```
 □  services/llm.py              (OpenAI API, 명령 생성)
+□  services/rag.py              (RAG 파이프라인)
+□  services/embedding.py        (임베딩 생성)
 □  services/flow_engine.py      (플로우 상태 머신)
-□  services/ocr.py              (HF OCR 모델, 키패드 인식)
 □  flows/coupang/search.json    (쿠팡 검색 플로우)
 □  flows/coupang/checkout.json  (쿠팡 결제 플로우)
 □  flows/naver/search.json      (네이버 검색 플로우)
 □  flows/elevenst/search.json   (11번가 검색 플로우)
 □  models/flow.py               (플로우 데이터 모델)
 □  tests/test_llm.py
+□  tests/test_rag.py
 □  tests/test_flow_engine.py
-□  tests/test_ocr.py
 ```
 
 **필요 기술**:
 - OpenAI API (GPT-5-mini)
+- MariaDB Vector (RAG용 Vector DB)
 - JSON 플로우 설계
-- Hugging Face OCR (TrOCR, PaddleOCR 등)
 - 상태 머신 패턴
 
-**예상 작업량**: 40시간
+**예상 작업량**: 35시간
 
 ---
 
-### 👤 담당자 하주형: WebRTC & HTTP API & 통합
+### 👤 담당자 하주형: OCR
+
+**핵심 역할**: 결제 키패드/CAPTCHA/상품 이미지 인식
+
+**담당 모듈**:
+- 🔴 `services/ocr.py` - 결제 키패드 OCR
+- 🔴 `services/image_recognition.py` - 상품 이미지 인식
+
+**구현 파일**:
+```
+□  services/ocr.py              (HF OCR 모델, 키패드 인식)
+□  services/image_recognition.py (상품 이미지 텍스트/특징 추출)
+□  tests/test_ocr.py
+```
+
+**필요 기술**:
+- Hugging Face OCR (TrOCR, PaddleOCR)
+- 이미지 전처리
+- 바운딩 박스 검출
+
+**예상 작업량**: 20시간
+
+---
+
+### 👤 담당자 김민찬: WebRTC & HTTP API & 통합
 
 **핵심 역할**: 보호자 원격 제어 및 시스템 통합
 
@@ -188,7 +214,7 @@
 
 ### Week 2: 핵심 기능 구현 (Day 6-10)
 
-#### 담당자 A: WebSocket 통신 완성
+#### 담당자 김민찬: WebSocket 통신 완성
 
 | 일차 | 작업 | 파일 | 시간 | 상태 |
 |------|------|------|------|------|
@@ -205,7 +231,7 @@
 
 ---
 
-#### 담당자 B: Flow Engine & OCR
+#### 담당자 하주형: Flow Engine & OCR
 
 | 일차 | 작업 | 파일 | 시간 | 상태 |
 |------|------|------|------|------|
@@ -222,7 +248,7 @@
 
 ---
 
-#### 담당자 C: WebRTC & 통합
+#### 담당자 김민찬: WebRTC & 통합
 
 | 일차 | 작업 | 파일 | 시간 | 상태 |
 |------|------|------|------|------|

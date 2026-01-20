@@ -1,6 +1,6 @@
 # 김재환 담당 파트 명세서
 
-> AI 서버 - LLM & Flow Engine & OCR 담당
+> AI 서버 - LLM & Flow Engine 담당
 
 ---
 
@@ -10,7 +10,6 @@
 |------|--------|------|------|
 | AI-05 | LLM 명령 생성 | GPT 기반 자연어 → MCP 명령 변환 | 미구현 |
 | AI-06 | 플로우 엔진 | 사이트별 쇼핑 플로우 단계 처리 | 미구현 |
-| AI-07 | OCR 인식 | 결제 키패드/인증 이미지 인식 | 미구현 |
 
 ---
 
@@ -19,37 +18,31 @@
 ```
 AI/
 ├── services/
-│   ├── llm.py              # OpenAI API, 명령 생성
-│   ├── rag.py              # RAG 파이프라인 (Vector 검색, Few-Shot)
-│   ├── embedding.py        # 임베딩 생성 (OpenAI/Sentence-BERT)
-│   ├── flow_engine.py      # 플로우 상태 머신
-│   └── ocr.py              # HF OCR 모델, 키패드 인식
-├── db/
-│   ├── vector_store.py     # MariaDB Vector DB 연동
-│   └── seed_data.py        # 초기 예제 데이터 삽입
-├── flows/
+│   └── llm/                     # LLM 관련 모듈 (담당 핵심)
+│       ├── service.py           # LLMPlanner (의도 기반 명령 생성)
+│       ├── command_generator.py # 규칙 기반 명령 생성 ✅ 구현
+│       ├── site_manager.py      # 사이트 설정 관리 ✅ 구현
+│       └── context_rules.py     # 컨텍스트 인식 규칙 ✅ 구현
+├── sites/                       # 사이트별 JSON 설정 ✅ 구현
+│   ├── coupang.json             # 쿠팡 URL/셀렉터
+│   ├── naver.json               # 네이버쇼핑 URL/셀렉터
+│   └── 11st.json                # 11번가 URL/셀렉터
+├── flows/                       # 플로우 정의 (미구현)
 │   ├── coupang/
-│   │   ├── search.json     # 쿠팡 검색 플로우
-│   │   ├── checkout.json   # 쿠팡 결제 플로우
-│   │   └── signup.json     # 쿠팡 회원가입 플로우
+│   │   ├── search.json
+│   │   ├── checkout.json
+│   │   └── signup.json
 │   ├── naver/
-│   │   ├── search.json     # 네이버 검색 플로우
-│   │   └── checkout.json   # 네이버 결제 플로우
 │   └── elevenst/
-│       ├── search.json     # 11번가 검색 플로우
-│       └── checkout.json   # 11번가 결제 플로우
-├── data/
-│   ├── intent_examples.json    # Intent 예제 시드 데이터
-│   ├── command_templates.json  # MCP 명령 템플릿
-│   └── flow_patterns.json      # 플로우 패턴
 ├── models/
-│   └── flow.py             # 플로우 데이터 모델 (Pydantic)
+│   └── flow.py                  # 플로우 데이터 모델 (Pydantic)
+├── scripts/
+│   └── test_command_cli.py      # 명령 생성 테스트 CLI ✅ 구현
 └── tests/
     ├── test_llm.py
-    ├── test_rag.py
-    ├── test_flow_engine.py
-    └── test_ocr.py
+    └── test_flow_engine.py
 ```
+
 
 ---
 
