@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 LLM 명령 생성 및 MCP API 실행 CLI
 
@@ -35,16 +34,19 @@ MCP_API_URL = "http://localhost:8000"
 
 
 def convert_to_api_format(commands: List[GeneratedCommand]) -> Dict[str, Any]:
-    """명령을 MCP API 형식으로 변환"""
+    """명령을 MCP API 형식으로 변환 (FASTAPI_TO_APP.md 기준)"""
     return {
-        "actions": [
-            {
-                "action": cmd.tool_name,
-                "args": cmd.arguments,
-                "desc": cmd.description or ""
-            }
-            for cmd in commands
-        ]
+        "type": "tool_calls",
+        "data": {
+            "commands": [
+                {
+                    "action": cmd.tool_name,
+                    "args": cmd.arguments,
+                    "desc": cmd.description or ""
+                }
+                for cmd in commands
+            ]
+        }
     }
 
 
