@@ -227,7 +227,6 @@ python link_epic.py --issue S14P11D108-82 --epic S14P11D108-80
 | **Story Points failed** | `customfield_10016` may differ - check with admin |
 | **Python not found** | Run auto-install command (see Setup section) |
 | **jira module not found** | Run `pip install jira` |
-| **Command hangs / No output** | 1. **Windows Alias**: Python might be trying to open MS Store. Run auto-install command.<br>2. **Buffering**: Use `python -u script.py` to force output. |
 
 ---
 

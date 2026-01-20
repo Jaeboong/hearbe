@@ -5,7 +5,7 @@ LLM 명령 생성 및 MCP API 실행 CLI
 
 사용법:
     cd c:\\ssafy\\공통\\AI
-    python scripts/test_command_cli.py
+    python services/llm/tests/test_command_cli.py
     
 API 서버 (localhost:8000)가 실행 중이어야 합니다.
 """
@@ -16,8 +16,10 @@ import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-# 프로젝트 루트를 path에 추가
-project_root = Path(__file__).parent.parent
+# 프로젝트 루트를 path에 추가 (AI 디렉토리)
+# 현재 위치: AI/services/llm/tests/test_command_cli.py
+# AI 디렉토리로 가려면 3단계 위로 (tests -> llm -> services -> AI)
+project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 try:
