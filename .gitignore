@@ -81,16 +81,6 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
 # Scrapy stuff:
 .scrapy
 
@@ -515,3 +505,13 @@ sample_data/
 .cache/
 cache/
 *.cache
+
+# ============================================================================
+# AI 서버 추가 항목 (AI/.gitignore 통합)
+# ============================================================================
+*.bin
+*.onnx
+session.json
+sessions/
+
+nul

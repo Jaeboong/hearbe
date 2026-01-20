@@ -42,6 +42,9 @@ class EventType(Enum):
     # Session 모듈 이벤트
     SESSION_UPDATED = auto()
 
+    # Debug 모듈 이벤트
+    TEXT_INPUT_READY = auto()
+
     # 시스템 이벤트
     APP_STARTED = auto()
     APP_SHUTDOWN = auto()
@@ -83,6 +86,7 @@ class EventBus:
         self._subscribers: Dict[EventType, List[Callable]] = {}
         self._event_queue: asyncio.Queue = asyncio.Queue()
         self._running = False
+        self._process_task = None
         self._initialized = True
 
         logger.info("EventBus initialized")
@@ -181,7 +185,7 @@ class EventBus:
             return
 
         self._running = True
-        asyncio.create_task(self._process_events())
+        self._process_task = asyncio.create_task(self._process_events())
         logger.info("EventBus started")
 
     async def stop(self):
@@ -189,12 +193,14 @@ class EventBus:
         logger.info("Stopping EventBus...")
         self._running = False
 
-        # 남은 이벤트 처리
-        while not self._event_queue.empty():
+        # 프로세스 태스크 취소 및 대기
+        if self._process_task:
+            self._process_task.cancel()
             try:
-                await asyncio.wait_for(self._event_queue.get(), timeout=0.1)
-            except asyncio.TimeoutError:
-                break
+                await self._process_task
+            except asyncio.CancelledError:
+                pass
+            self._process_task = None
 
         logger.info("EventBus stopped")
 

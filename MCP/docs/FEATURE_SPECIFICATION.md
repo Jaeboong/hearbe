@@ -6,16 +6,36 @@
 
 ## 핵심 기능 목록
 
-| 번호 | 기능명 | 설명 |
-|------|--------|------|
-| F-01 | 음성 녹음 | V키 핫키로 마이크 녹음 시작/종료 |
-| F-02 | 음성 재생 | TTS 오디오 재생 |
-| F-03 | 브라우저 실행 | Chrome 자동 실행 (CDP 활성화) |
-| F-04 | 브라우저 제어 | MCP 도구로 웹 페이지 조작 |
-| F-05 | 서버 통신 | WebSocket으로 AI 서버와 실시간 통신 |
-| F-06 | 세션 관리 | 현재 작업 상태 추적 |
-| F-07 | 인증 | OAuth 2.0 로그인 |
-| F-08 | 상태 표시 | 최소 UI로 현재 상태 표시 |
+| 번호 | 기능명 | 설명 | 담당자 |
+|------|--------|------|--------|
+| MCP-01 | 음성 녹음 | V키 핫키로 마이크 녹음 시작/종료 | 김민찬 |
+| MCP-02 | 음성 재생 | TTS 오디오 재생 | 김민찬 |
+| MCP-03 | 브라우저 실행 | Chrome 자동 실행 (CDP 활성화) | 김재환 |
+| MCP-04 | 브라우저 제어 | MCP 도구로 웹 페이지 조작 | 김재환 |
+| MCP-05 | 서버 통신 | WebSocket으로 AI 서버와 실시간 통신 | 김민찬 |
+| MCP-06 | 세션 관리 | 현재 작업 상태 추적 | 김민찬 |
+| MCP-07 | 상태 표시 | 최소 UI로 현재 상태 표시 | 김민찬 |
+| MCP-08 | 텍스트 입력 (테스트용) | 콘솔에서 직접 텍스트 입력하여 AI 서버로 전송 | 김재환 |
+| MCP-09 | WS 게이트웨이 | 세션 생성/상태(status) 송수신/재연결 정책 | 김민찬 |
+
+---
+
+## 전체 동작 플로우
+
+### 일반 플로우
+```
+MCP앱(음성녹음) → AI서버(STT→LLM판단→TTS) → MCP앱(음성출력)
+       ↓                                        ↓
+  다시 음성녹음 ←──────────────────────────────┘
+       ↓
+AI서버(STT→명령판단) → MCP앱(MCP명령 실행) → 브라우저 제어
+```
+
+### 플로우/DB 조회 필요 시
+```
+AI서버 ──→ 백엔드(웹서버) ──→ DB
+        (플로우 조회)    (사용자 데이터)
+```
 
 ---
 
@@ -83,6 +103,8 @@ AUDIO_CHUNK_SIZE=1024
 4. CDP WebSocket URL 획득
 5. 브라우저 준비 완료 이벤트 발행
 
+> **TODO**: 추후 자사 웹사이트 구현 완료 시, 브라우저 실행 후 자사 웹사이트로 자동 리다이렉트 기능 추가
+
 ### 담당 모듈
 - `browser/launcher.py` - Chrome 실행
 - `browser/cdp_client.py` - CDP 연결
@@ -125,6 +147,10 @@ MCP 서버를 통해 Playwright로 브라우저를 자동 제어.
 2. 서버로부터 도구 호출 요청 수신
 3. Playwright로 브라우저 조작 실행
 4. 실행 결과 반환
+
+MCP (Model Context Protocol) 는 AI 모델이 외부 도구(브라우저, 파일 시스템 등)를 호출할 수 있게 해주는 프로토콜입니다.
+
+이 프로젝트에서 MCP 서버는 AI 서버와 브라우저 사이의 중간 다리 역할을 합니다:
 
 ### 담당 모듈
 - `mcp/server_manager.py` - MCP 서버 관리
@@ -427,41 +453,7 @@ SESSION_AUTO_SAVE=true
 
 ---
 
-## F-07: 인증
-
-### 기능 설명
-OAuth 2.0 기반 AI 서버 인증.
-
-### 상세 동작
-1. 로컬 콜백 서버 실행 (http://127.0.0.1:PORT/callback)
-2. 브라우저로 서버 로그인 페이지 오픈
-3. 로그인 완료 → 서버가 로컬 콜백으로 auth_code 전달
-4. auth_code로 access/refresh 토큰 발급
-5. WebSocket 연결 시 access 토큰 사용
-
-### 담당 모듈
-- `network/auth.py` - 인증 처리
-
-### 인증 플로우
-```
-1. start_oauth_flow() 호출
-2. 로컬 콜백 서버 실행
-3. 브라우저 오픈: AUTH_URL/login?redirect_uri=http://127.0.0.1:PORT/callback
-4. 사용자 로그인
-5. 리다이렉트: http://127.0.0.1:PORT/callback?code=AUTH_CODE
-6. POST AUTH_URL/token {"code": "AUTH_CODE"}
-7. access_token, refresh_token 수신
-8. 로컬 서버 종료
-```
-
-### 환경 변수
-```env
-AUTH_URL=http://localhost:8000/auth
-```
-
----
-
-## F-08: 상태 표시
+## F-07: 상태 표시
 
 ### 기능 설명
 최소한의 UI 창으로 현재 앱 상태 표시.
@@ -498,9 +490,50 @@ AUTH_URL=http://localhost:8000/auth
 
 ---
 
+## F-08: 텍스트 입력 (테스트용)
+
+### 기능 설명
+개발/디버깅 목적으로 콘솔에서 직접 텍스트를 입력하여 AI 서버로 전송. 음성 녹음 → STT 과정을 건너뛰고 바로 텍스트 명령을 테스트할 수 있음.
+
+### 상세 동작
+1. 콘솔/터미널에서 텍스트 입력 대기
+2. 사용자가 텍스트 입력 후 Enter
+3. 입력된 텍스트를 AI 서버로 전송 (STT 결과처럼 처리)
+4. 서버 응답(TTS/MCP 명령) 수신 및 처리
+
+### 담당 모듈
+- `debug/console_input.py` - 콘솔 입력 처리
+
+### 발행 이벤트
+- `TEXT_INPUT_READY` - 텍스트 입력 완료 (data: str)
+
+### 메시지 타입 (Client → Server)
+```json
+{
+  "type": "text_input",
+  "data": {
+    "text": "쿠팡에서 우유 검색해줘"
+  },
+  "session_id": "uuid-v4"
+}
+```
+
+### 사용 방법
+```bash
+# 앱 실행 시 --console 플래그로 활성화
+python main.py --console
+```
+
+### 환경 변수
+```env
+DEBUG_CONSOLE_ENABLED=false
+```
+
+---
+
 ## 이벤트 목록
 
-전체 이벤트 15개
+전체 이벤트 16개
 
 | 이벤트 | 발행자 | 구독자 | 데이터 |
 |--------|--------|--------|--------|
@@ -519,6 +552,7 @@ AUTH_URL=http://localhost:8000/auth
 | `SESSION_UPDATED` | session | ui | dict |
 | `ERROR_OCCURRED` | 모든 모듈 | ui, session | str/dict |
 | `APP_SHUTDOWN` | main | 모든 모듈 | None |
+| `TEXT_INPUT_READY` | debug.console_input | network | str |
 
 ---
 
@@ -574,11 +608,6 @@ class IWebSocketClient:
     async def disconnect(self) -> None: ...
     async def send_message(self, message_type: str, data: dict) -> None: ...
     def is_connected(self) -> bool: ...
-
-class IAuthManager:
-    async def start_oauth_flow(self) -> str: ...
-    async def refresh_token(self) -> str: ...
-    def get_access_token(self) -> str: ...
 ```
 
 ### Session 모듈
@@ -633,7 +662,6 @@ await publish(
 ```env
 # Network
 WS_URL=ws://localhost:8000/ws
-AUTH_URL=http://localhost:8000/auth
 WS_RECONNECT_DELAY=5
 WS_MAX_RETRIES=10
 
@@ -661,6 +689,9 @@ SESSION_AUTO_SAVE=true
 # Logging
 LOG_LEVEL=INFO
 LOG_FILE_PATH=./logs/app.log
+
+# Debug
+DEBUG_CONSOLE_ENABLED=false
 ```
 
 ---
