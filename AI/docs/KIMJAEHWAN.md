@@ -275,77 +275,6 @@ class IFlowEngine:
 
 ---
 
-## AI-07: OCR 인식
-
-### 기능 설명
-결제 키패드, CAPTCHA, 보안문자 등 인증 이미지를 인식합니다.
-
-### 상세 동작
-1. MCP 앱에서 스크린샷 (base64) 수신
-2. 이미지 전처리 (크기 조정, 노이즈 제거)
-3. TrOCR 또는 PaddleOCR로 텍스트 추출
-4. 키패드인 경우:
-   - 키패드 영역 검출 (바운딩 박스)
-   - 숫자 위치 매핑
-   - 좌표 → 숫자 변환 결과 반환
-5. 인식 결과를 LLM에 전달하여 다음 액션 결정
-
-### 구현 파일
-- `services/ocr.py`
-
-### 키패드 인식 예시
-
-**입력**: 결제 키패드 스크린샷
-
-**출력**:
-```json
-{
-    "type": "keypad",
-    "layout": [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        ["", "0", ""]
-    ],
-    "positions": {
-        "0": {"x": 150, "y": 300},
-        "1": {"x": 50, "y": 100},
-        "2": {"x": 150, "y": 100},
-        ...
-    }
-}
-```
-
-### CAPTCHA 인식 예시
-
-**입력**: 보안문자 이미지
-
-**출력**:
-```json
-{
-    "type": "captcha",
-    "text": "X7K9M2",
-    "confidence": 0.92
-}
-```
-
-### 환경 변수
-```env
-OCR_MODEL=trocr-base-printed
-OCR_DEVICE=cuda
-OCR_CONFIDENCE_THRESHOLD=0.8
-```
-
-### 인터페이스
-```python
-class IOCRService:
-    async def recognize_image(self, image_base64: str) -> OCRResult: ...
-    async def detect_keypad(self, image_base64: str) -> KeypadLayout: ...
-    async def recognize_captcha(self, image_base64: str) -> str: ...
-```
-
----
-
 ## 개발 일정 (TEAM_ASSIGNMENT 기준)
 
 ### Week 1 (Day 2-5)
@@ -365,11 +294,11 @@ class IOCRService:
 |------|------|------|------|
 | 6일 | 쿠팡 결제 플로우 JSON | flows/coupang/checkout.json | 4h |
 | 6일 | 플로우 단계별 실행 | services/flow_engine.py | 4h |
-| 7일 | OCR 모델 로딩 | services/ocr.py | 4h |
-| 7일 | 키패드 인식 로직 | services/ocr.py | 4h |
-| 8일 | 네이버 검색 플로우 | flows/naver/search.json | 4h |
-| 8일 | 11번가 검색 플로우 | flows/elevenst/search.json | 4h |
-| 9일 | OCR 단위 테스트 | tests/test_ocr.py | 4h |
+| 7일 | 네이버 검색 플로우 | flows/naver/search.json | 4h |
+| 7일 | 11번가 검색 플로우 | flows/elevenst/search.json | 4h |
+| 8일 | 대화형 응답 생성 모듈 | services/llm/response.py | 4h |
+| 8일 | 플로우 위임 판단 로직 | services/llm/flow_delegate.py | 4h |
+| 9일 | 의도 분석 모듈 | services/llm/intent.py | 4h |
 | 10일 | 플로우 통합 테스트 | tests/test_flow_engine.py | 4h |
 
 ### Week 4 (Day 16-18)
@@ -390,8 +319,6 @@ class IOCRService:
 - **Pydantic** - 데이터 모델 정의/검증
 - **JSON Schema** - 플로우 정의 파일
 - **상태 머신 패턴** - 플로우 엔진 구현
-- **Hugging Face Transformers** - TrOCR 모델
-- **PaddleOCR** - 대안 OCR 엔진
 
 ---
 
@@ -402,8 +329,6 @@ class IOCRService:
 - MariaDB Vector: https://mariadb.com/kb/en/vector-overview/
 - RAG Pattern: https://www.pinecone.io/learn/retrieval-augmented-generation/
 - Flow State Machine: https://en.wikipedia.org/wiki/Finite-state_machine
-- TrOCR: https://huggingface.co/microsoft/trocr-base-printed
-- PaddleOCR: https://github.com/PaddlePaddle/PaddleOCR
 - JSON Schema: https://json-schema.org/
 
 ---
