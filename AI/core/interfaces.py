@@ -6,7 +6,7 @@
 
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any, List, AsyncGenerator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -31,12 +31,14 @@ class IntentType(Enum):
 
 
 @dataclass
-class STTResult:
-    """STT 결과"""
+class ASRResult:
+    """ASR transcription result"""
     text: str
     confidence: float = 1.0
     language: str = "ko"
     duration: float = 0.0
+    is_final: bool = True
+    segment_id: Optional[str] = None
 
 
 @dataclass
@@ -168,28 +170,28 @@ class IASRService(ABC):
     """음성 인식 (ASR) 서비스 인터페이스"""
 
     @abstractmethod
-    async def transcribe(self, audio_data: bytes) -> STTResult:
+    async def transcribe(self, audio_data: bytes) -> ASRResult:
         """
-        음성을 텍스트로 변환
+        Transcribe audio to text.
 
         Args:
-            audio_data: 오디오 데이터 (WAV/PCM)
+            audio_data: Audio data (WAV/PCM)
 
         Returns:
-            STTResult: 변환된 텍스트 결과
+            ASRResult: Transcription result
         """
         pass
 
     @abstractmethod
-    async def transcribe_stream(self, audio_chunks: AsyncGenerator[bytes, None]) -> AsyncGenerator[STTResult, None]:
+    async def transcribe_stream(self, audio_chunks: AsyncGenerator[bytes, None]) -> AsyncGenerator[ASRResult, None]:
         """
-        스트리밍 음성을 실시간으로 텍스트 변환
+        Stream audio and yield real-time transcription results.
 
         Args:
-            audio_chunks: 오디오 청크 스트림
+            audio_chunks: Async generator of audio chunks
 
         Yields:
-            STTResult: 중간/최종 변환 결과
+            ASRResult: Intermediate/final transcription results
         """
         pass
 
