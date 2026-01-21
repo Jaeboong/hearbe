@@ -1,0 +1,19 @@
+package project2.pro.configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/user", "/guardian", "/jss/**").permitAll() // jss 폴더 허용
+                        .anyRequest().authenticated()
+                );
+        return http.build();
+    }
+}
