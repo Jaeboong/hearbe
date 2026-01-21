@@ -6,7 +6,7 @@
 
 WebSocket을 통해 **양방향 실시간 통신**을 수행합니다.
 - MCP 앱에서 오디오 스트림 전송
-- AI 서버에서 STT 결과, LLM 명령, TTS 음성 전송
+- AI 서버에서 ASR 결과, LLM 명령, TTS 음성 전송
 
 ## 연결 URL
 
@@ -72,7 +72,7 @@ Authorization: Bearer <임시_토큰>
 
 #### 1.2 `command` - 사용자 명령 전송
 
-**설명**: 텍스트로 직접 명령 전송 (STT 우회)
+**설명**: 텍스트로 직접 명령 전송 (ASR 우회)
 
 **데이터 구조**:
 ```json
@@ -157,18 +157,21 @@ Authorization: Bearer <임시_토큰>
 
 ### 2. 서버 → 클라이언트
 
-#### 2.1 `stt_result` - STT 변환 결과
+#### 2.1 `asr_result` - ASR 변환 결과
 
-**설명**: 음성→텍스트 변환 결과
+**설명**: 음성→텍스트 변환 결과 (실시간 스트리밍)
 
 **데이터 구조**:
 ```json
 {
-  "type": "stt_result",
+  "type": "asr_result",
   "data": {
     "text": "쿠팡에서 우유 검색해줘",
     "confidence": 0.95,
-    "language": "ko"
+    "language": "ko",
+    "duration": 2.5,
+    "is_final": true,
+    "segment_id": "seg_1"
   },
   "timestamp": "2026-01-14T12:34:58Z",
   "session_id": "550e8400-e29b-41d4-a716-446655440000"
@@ -179,6 +182,9 @@ Authorization: Bearer <임시_토큰>
 - `text`: 인식된 텍스트
 - `confidence`: 신뢰도 (0.0 ~ 1.0)
 - `language`: 감지된 언어 코드
+- `duration`: 오디오 길이 (초)
+- `is_final`: 최종 결과 여부 (false=중간 결과)
+- `segment_id`: 세그먼트 식별자
 
 ---
 
@@ -326,7 +332,7 @@ Authorization: Bearer <임시_토큰>
   "type": "status",
   "data": {
     "state": "processing",
-    "message": "STT 처리 중...",
+    "message": "ASR 처리 중...",
     "progress": 50
   },
   "timestamp": "2026-01-14T12:34:57Z",
@@ -337,7 +343,7 @@ Authorization: Bearer <임시_토큰>
 **상태 값**:
 - `idle`: 대기 중
 - `recording`: 녹음 중
-- `processing`: 처리 중 (STT, LLM)
+- `processing`: 처리 중 (ASR, LLM)
 - `executing`: 도구 실행 중
 - `completed`: 완료
 - `error`: 오류 발생
@@ -367,7 +373,7 @@ Authorization: Bearer <임시_토큰>
 ```
 
 **에러 코드**:
-- `STT_FAILED`: STT 실패
+- `ASR_FAILED`: ASR 실패
 - `LLM_ERROR`: LLM 호출 오류
 - `TTS_FAILED`: TTS 실패
 - `TOOL_TIMEOUT`: 도구 실행 시간 초과
@@ -403,12 +409,14 @@ Authorization: Bearer <임시_토큰>
 
 ```
 1. [Client → Server] audio_chunk (음성 스트림 전송)
-   → 서버가 Whisper로 STT 처리
+   → 서버가 Whisper로 ASR 처리
 
-2. [Server → Client] stt_result
+2. [Server → Client] asr_result
    {
      "text": "쿠팡에서 우유 검색해줘",
-     "confidence": 0.95
+     "confidence": 0.95,
+     "is_final": true,
+     "segment_id": "seg_1"
    }
 
 3. [Server → Client] llm_command
