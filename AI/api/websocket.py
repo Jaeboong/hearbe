@@ -41,6 +41,10 @@ BUFFER_OVERLAP_BYTES = 6400         # 200ms overlap for continuity
 MAX_BUFFER_SIZE = 320000            # 10 seconds max (memory limit)
 MAX_QUEUE_SIZE = 50                 # Max pending chunks per session
 
+# PTT (Push-to-Talk) mode: client controls recording
+# Server simply transcribes whatever audio chunks it receives
+# No VAD needed - client sends is_final=true when recording stops
+
 
 class MessageType(str, Enum):
     """WebSocket message types"""
@@ -259,10 +263,12 @@ class WebSocketHandler:
 
     async def _asr_worker(self, session_id: str):
         """
-        ASR worker task for a session.
+        ASR worker task for PTT (Push-to-Talk) mode.
 
-        Pulls audio chunks from queue, buffers them, and triggers
-        transcription when threshold is reached or stream ends.
+        Client controls recording start/stop:
+        - Receives audio chunks and buffers them
+        - Transcribes when is_final=true (user released record button)
+        - Also transcribes partial results for long recordings (>3s chunks)
         """
         queue = self._audio_queues.get(session_id)
         if not queue:
@@ -280,22 +286,21 @@ class WebSocketHandler:
                 except asyncio.TimeoutError:
                     continue
 
-                # Append to buffer
+                # Append chunk to buffer
                 buffer = self._audio_buffers.get(session_id, b"")
                 buffer += chunk.data
                 self._audio_buffers[session_id] = buffer
 
                 # Check buffer size limit
                 if len(buffer) > MAX_BUFFER_SIZE:
-                    logger.warning(f"Buffer overflow, dropping old data: {session_id}")
-                    buffer = buffer[-BUFFER_THRESHOLD_BYTES:]
+                    logger.warning(f"Buffer overflow, truncating: {session_id}")
+                    buffer = buffer[-MAX_BUFFER_SIZE:]
                     self._audio_buffers[session_id] = buffer
 
-                # Trigger transcription on threshold or final chunk
-                should_transcribe = (
-                    len(buffer) >= BUFFER_THRESHOLD_BYTES or
-                    chunk.is_final
-                )
+                # Transcribe if:
+                # 1. is_final=true (user released record button)
+                # 2. Buffer has data and chunk signals end of a segment
+                should_transcribe = chunk.is_final and len(buffer) > 0
 
                 if should_transcribe and self.asr and self.asr.is_ready():
                     await self._process_audio_buffer(
@@ -303,13 +308,8 @@ class WebSocketHandler:
                         buffer,
                         is_final=chunk.is_final
                     )
-
-                    if chunk.is_final:
-                        # Clear buffer completely on final
-                        self._audio_buffers[session_id] = b""
-                    else:
-                        # Keep overlap for continuity
-                        self._audio_buffers[session_id] = buffer[-BUFFER_OVERLAP_BYTES:]
+                    # Clear buffer after transcription
+                    self._audio_buffers[session_id] = b""
 
         except asyncio.CancelledError:
             logger.debug(f"ASR worker cancelled: {session_id}")
