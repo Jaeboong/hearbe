@@ -1,0 +1,173 @@
+"""
+MCP 데스크탑 앱 메인 진입점
+
+시각장애인을 위한 음성 기반 웹 쇼핑 지원 애플리케이션
+"""
+
+import argparse
+import asyncio
+import logging
+import signal
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from core.config import get_config, setup_logging
+from core.event_bus import event_bus, EventType, publish
+
+logger = logging.getLogger(__name__)
+
+
+def parse_args():
+    """커맨드라인 인자 파싱"""
+    parser = argparse.ArgumentParser(
+        description="MCP Desktop App - 시각장애인을 위한 음성 기반 웹 쇼핑 지원"
+    )
+    parser.add_argument(
+        "--console", action="store_true",
+        help="콘솔 입력 모드 활성화 (테스트용)"
+    )
+    return parser.parse_args()
+
+
+class Application:
+    """메인 애플리케이션 클래스"""
+
+    def __init__(self, console_mode: bool = False):
+        self.config = get_config()
+        setup_logging(self.config)
+
+        self.console_mode = console_mode or self.config.debug.console_enabled
+        self.running = False
+
+        # 모듈 인스턴스 (각 담당자가 구현 후 초기화)
+        self.modules = {}
+
+        logger.info("Application initialized")
+
+    async def setup_modules(self):
+        """모듈 초기화"""
+        logger.info("Setting up modules...")
+
+        # UI 모듈
+        from ui.ui_manager import UIManager
+        self.modules["ui"] = UIManager()
+        self.modules["ui"].setup_event_handlers()
+        self.modules["ui"].start()
+
+        # Browser 모듈
+        from browser.launcher import ChromeLauncher
+        self.modules["browser"] = ChromeLauncher()
+
+        # MCP 모듈
+        from mcp.handler import MCPHandler
+        self.modules["mcp"] = MCPHandler()
+        self.modules["mcp"].setup_event_handlers()
+
+        # 콘솔 입력 모듈 (테스트용)
+        if self.console_mode:
+            from debug.console_input import ConsoleInputManager
+            self.modules["console_input"] = ConsoleInputManager()
+
+        # 시스템 이벤트 핸들러
+        event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
+        event_bus.subscribe(EventType.ERROR_OCCURRED, self._on_error)
+
+        logger.info("Modules setup complete")
+
+    async def start(self):
+        """애플리케이션 시작"""
+        logger.info("Starting application...")
+
+        await event_bus.start()
+        await self.setup_modules()
+
+        self.running = True
+        await publish(EventType.APP_STARTED, source="main")
+
+        # Browser 시작
+        if "browser" in self.modules:
+            await self.modules["browser"].start()
+
+        # 콘솔 입력 시작
+        if "console_input" in self.modules:
+            await self.modules["console_input"].start()
+
+        logger.info("=== MCP Desktop App is now running ===")
+        if self.console_mode:
+            logger.info("Console input mode: ON (type 'exit' to quit)")
+        logger.info("Press Ctrl+C to exit")
+
+    async def stop(self):
+        """애플리케이션 종료"""
+        logger.info("Stopping application...")
+        self.running = False
+
+        await publish(EventType.APP_SHUTDOWN, source="main")
+
+        # 모듈 종료
+        if "console_input" in self.modules:
+            await self.modules["console_input"].stop()
+        if "mcp" in self.modules:
+            await self.modules["mcp"].stop()
+        if "browser" in self.modules:
+            await self.modules["browser"].stop()
+        if "ui" in self.modules:
+            self.modules["ui"].stop()
+
+        await event_bus.stop()
+        logger.info("Application stopped")
+
+    async def run(self):
+        """메인 실행 루프"""
+        try:
+            await self.start()
+            while self.running:
+                await asyncio.sleep(0.1)
+        except KeyboardInterrupt:
+            logger.info("Keyboard interrupt received")
+        finally:
+            await self.stop()
+
+    async def _on_shutdown(self, _event):
+        """종료 이벤트 처리"""
+        self.running = False
+
+    async def _on_error(self, event):
+        """에러 이벤트 처리"""
+        logger.error(f"Error: {event.data}")
+
+
+def main():
+    """메인 함수"""
+    args = parse_args()
+
+    print("=" * 60)
+    print("MCP Desktop App")
+    print("=" * 60)
+
+    app = Application(console_mode=args.console)
+
+    if sys.platform == "win32":
+        loop = asyncio.ProactorEventLoop()
+        asyncio.set_event_loop(loop)
+    else:
+        loop = asyncio.get_event_loop()
+
+    def signal_handler(signum, frame):
+        app.running = False
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    try:
+        loop.run_until_complete(app.run())
+    finally:
+        loop.close()
+
+    print("Goodbye!")
+
+
+if __name__ == "__main__":
+    main()

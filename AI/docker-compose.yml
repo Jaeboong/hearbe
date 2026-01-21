@@ -1,0 +1,35 @@
+# AI/docker-compose.yml
+version: "3.8"
+
+services:
+  ai-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: herewego-ai
+    ports:
+      - "8000:8000"
+    environment:
+      - GMS_KEY=${GMS_KEY}
+      - OPENAI_API_KEY=${GMS_KEY}
+      - OPENAI_BASE_URL=https://gms.ssafy.io/gmsapi/api.openai.com/v1
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./flows:/app/flows
+      - huggingface-cache:/root/.cache/huggingface
+      - paddleocr-cache:/root/.paddleocr
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:
+  paddleocr-cache:
