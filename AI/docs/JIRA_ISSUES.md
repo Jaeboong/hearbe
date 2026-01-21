@@ -89,64 +89,134 @@
 
 ---
 
-### AI-04: 의도 분석
+### AI-04: 의도 분석 (세분화됨)
 
-**Title (서브태스크):** `Feat: 의도 분석`
+> **세분화 완료**: 8점 → 2개 Story (각 4점)
 
-**설명 (Description):**
+#### AI-04-1: NLU 인텐트 분류기 구현 (S14P11D108-134)
 
-사용자는 자연어 명령의 의도를 파악하기 위해 의도 분석 기능을 사용하고 싶다.
+**설명**: GPT-5-mini 기반 인텐트 분류기 구현
 
 ## ✅ 완료 조건
-- STT 결과 텍스트에서 사용자 의도 추출
-- Intent 타입 분류 (검색/비교/장바구니/결제 등)
-- NLU(Natural Language Understanding) 모듈 구현
-- 의도 분석 결과를 후속 모듈로 전달
+- Intent Enum 클래스 정의 (search, compare, cart, checkout, signup, general)
+- GPT API 호출 함수 구현
+- Few-Shot 프롬프트 작성
+- analyze_intent(user_input: str) -> Intent 구현
+- 단위 테스트 작성 (5개 인텐트 분류 테스트)
 
-## 💬 기타
-- GPT-5-mini 활용
-- 다중 의도 처리 가능
-- 컨텍스트 기반 의도 파악
+**Story Point:** 4
+**담당자:** 김재환
 
-**Story Point:** 8
+#### AI-04-2: 개체명 인식 및 컨텍스트 해석 (S14P11D108-135)
 
-**중요도 (Priority):** High
+**설명**: 상품명, 브랜드, 가격 추출 및 대명사 해석
 
+## ✅ 완료 조건
+- Entity 타입 정의 (product_name, brand, price, quantity, reference)
+- GPT API로 Entity 추출 함수 구현
+- 세션 컨텍스트 기반 대명사 해석 ("아까 그거" → 실제 상품명)
+- extract_entities(user_input, context) -> dict 구현
+- 단위 테스트 (대명사 해석 포함)
+
+**Story Point:** 4
 **담당자:** 김재환
 
 ---
 
-### AI-05: MCP 명령 생성 (RAG 기반)
+### AI-05: MCP 명령 생성 (LLM+Prompting 접근)
 
-**Title (서브태스크):** `Feat: MCP 명령 생성 (RAG)`
+> **전략 변경**: RAG 제외, LLM+Prompting 우선 구현
+> **세분화 완료**: 13점 → 3개 Story (4+3+3점)
 
-**설명 (Description):**
+#### AI-05-1: 사이트별 셀렉터 DB 구축 (S14P11D108-136)
 
-사용자는 신뢰할 수 있는 명령 생성을 위해 RAG 기반 MCP 명령 생성 기능을 사용하고 싶다.
+**설명**: 쿠팡/네이버/11번가 DOM 셀렉터 JSON DB 구축
 
 ## ✅ 완료 조건
-- MariaDB Vector DB에 MCP 명령 템플릿 저장
-- 사용자 발화에 대한 유사 예제 Top-K 검색
-- Few-Shot 프롬프트 구성 및 LLM 추론
-- 생성된 명령 유효성 검증
-- RAG 파이프라인 모듈(`services/rag.py`) 구현
+- 쿠팡 사이트 주요 셀렉터 조사
+- 네이버쇼핑, 11번가 셀렉터 조사  
+- sites/*.json 파일 작성 (URL, selectors, actions)
+- SiteManager 클래스 구현
+- 단위 테스트
 
-## 💬 기타
-- OpenAI Embedding 또는 Sentence-BERT 활용
-- 환각 감소를 위한 검증된 예제 기반 생성
-- 쇼핑몰별 선택자 매핑 DB화
-
-**Story Point:** 13
-
-**중요도 (Priority):** High
-
+**Story Point:** 4
 **담당자:** 김재환
+
+#### AI-05-2: Few-Shot 프롬프트 템플릿 작성 (S14P11D108-137)
+
+**설명**: 명령 생성용 Few-Shot 예제 작성
+
+## ✅ 완료 조건
+- 쿠팡/네이버 검색 Few-Shot 예제 작성 (각 5개)
+- 장바구니/결제 Few-Shot 예제 5개
+- 프롬프트 템플릿 파일 작성
+- build_command_prompt 함수 구현
+- 프롬프트 검증
+
+**Story Point:** 3
+**담당자:** 김재환
+
+#### AI-05-3: LLM 명령 생성 엔진 구현 (S14P11D108-138)
+
+**설명**: GPT-5-mini 기반 tool_calls 생성
+
+## ✅ 완료 조건
+- GPT API 호출 함수 구현
+- generate_commands(user_input, site, context) -> List[ToolCall]
+- tool_calls 형식 변환
+- 명령 검증 로직
+- 통합 테스트 (10개 케이스)
+
+**Story Point:** 3
+**담당자:** 김재환
+
+#### [백로그] RAG 고도화 (3개 작업, 11점)
+- 임베딩 서비스 구현 (3점)
+- Vector DB 구축 (4점)
+- RAG Pipeline 통합 (4점)
 
 ---
 
-### AI-06: 플로우 엔진
+### AI-06: 플로우 엔진 (세분화됨)
 
-**Title (서브태스크):** `Feat: 플로우 엔진`
+> **세분화 완료**: 13점 → 7개 Story (3+5+3+3+3+4+3점)
+
+#### AI-06-1: 플로우 데이터 모델 정의 (S14P11D108-139)
+
+**Story Point:** 3
+**담당자:** 김재환
+
+#### AI-06-2: 플로우 엔진 상태 머신 구현 (S14P11D108-140)
+
+**Story Point:** 5
+**담당자:** 김재환
+
+#### AI-06-3: 플로우 액션 실행기 구현 (S14P11D108-141)
+
+**Story Point:** 3
+**담당자:** 김재환
+
+#### AI-06-4: 플로우 검증 로직 구현 (S14P11D108-142)
+
+**Story Point:** 3
+**담당자:** 김재환
+
+#### AI-06-5: 쿠팡 플로우 JSON 작성 (S14P11D108-143)
+
+**Story Point:** 3
+**담당자:** 김재환
+
+#### AI-06-6: 네이버 및 11번가 플로우 JSON 작성 (S14P11D108-144)
+
+**Story Point:** 4
+**담당자:** 김재환
+
+#### AI-06-7: 플로우 에러 처리 및 재시도 로직 (S14P11D108-145)
+
+**Story Point:** 3
+**담당자:** 김재환
+
+---
 
 **설명 (Description):**
 
