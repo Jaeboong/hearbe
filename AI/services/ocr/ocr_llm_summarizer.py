@@ -2,8 +2,10 @@ import argparse
 import json
 import os
 import sys
-import urllib.request
+import time
 from pathlib import Path
+
+import requests
 from typing import Dict, List, Tuple
 
 # Import product type module
@@ -18,17 +20,16 @@ from product_type_detector import (
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    # Load .env from workspace root (새 폴더 (2))
-    # Path: scripts/ocr_llm_summarizer.py -> ocr_test -> 새 폴더 (2) -> .env
-    env_path = Path(__file__).parent.parent.parent / ".env"
+    # Load .env from the same directory as this script
+    env_path = Path(__file__).parent / ".env"
     load_dotenv(dotenv_path=env_path)
 except ImportError:
     print("Warning: python-dotenv not installed. Install with: pip install python-dotenv")
     print("Falling back to system environment variables only.")
 
 
-DEFAULT_INPUT = os.path.join("output", "샴푸_res.json")
-DEFAULT_OUTPUT = os.path.join("output", "샴푸_summary.json")
+DEFAULT_INPUT = os.path.join("output", "오겹살_res_texts.json")
+DEFAULT_OUTPUT = os.path.join("output", "오겹살_texts_summary.json")
 
 # Import text preprocessor
 try:
@@ -108,50 +109,72 @@ def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]
     return {"system": system, "instructions": instructions, "user": user}
 
 
-def _call_openai(prompt: Dict[str, str]) -> Dict:
-    api_key = os.environ.get("OPENAI_API_KEY")
+def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
+    """Call SSAFY GMS API (OpenAI-compatible Chat Completions) with retry logic."""
+    api_key = os.environ.get("GMS_KEY")
     if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is not set.")
+        raise RuntimeError("GMS_KEY is not set. Set the GMS_KEY environment variable.")
 
     model = os.environ.get("OPENAI_MODEL", "gpt-5-mini")
-    base_url = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
-    url = f"{base_url.rstrip('/')}/responses"
+    url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"
+
+    # Build messages using Chat Completions format
+    messages = [
+        {
+            "role": "developer",
+            "content": prompt["system"] + "\n\n" + prompt["instructions"]
+        },
+        {
+            "role": "user",
+            "content": prompt["user"]
+        }
+    ]
 
     payload = {
         "model": model,
-        "instructions": prompt["system"] + "\n\n" + prompt["instructions"],
-        "input": prompt["user"],
-        "reasoning": {"effort": "minimal"},
-        "text": {"verbosity": "low"},
+        "messages": messages,
     }
 
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        method="POST",
-    )
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
 
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        body = resp.read().decode("utf-8")
-    raw = json.loads(body)
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                url,
+                json=payload,
+                headers=headers,
+                timeout=(10, 120),  # (connection timeout, read timeout)
+            )
+            response.raise_for_status()
+            raw = response.json()
 
-    # Extract response text from the Responses API format.
-    output_text = ""
-    for item in raw.get("output", []):
-        if item.get("type") == "message":
-            for content in item.get("content", []):
-                if content.get("type") == "output_text":
-                    output_text = content.get("text", "")
-                    break
-    if not output_text:
-        raise RuntimeError("LLM returned no output_text.")
+            # Extract response text from Chat Completions API format
+            choices = raw.get("choices", [])
+            if not choices:
+                raise RuntimeError("LLM returned no choices.")
+            
+            output_text = choices[0].get("message", {}).get("content", "")
+            if not output_text:
+                raise RuntimeError("LLM returned no content.")
 
-    try:
-        return json.loads(output_text)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(f"LLM output is not valid JSON: {exc}") from exc
+            try:
+                return json.loads(output_text)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(f"LLM output is not valid JSON: {exc}") from exc
+
+        except requests.exceptions.RequestException as e:
+            last_error = e
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
+                print(f"Request failed (attempt {attempt + 1}/{max_retries}): {e}")
+                print(f"Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+            else:
+                raise RuntimeError(f"LLM request failed after {max_retries} retries: {last_error}") from last_error
 
 
 def _write_json(path: str, data: Dict) -> None:

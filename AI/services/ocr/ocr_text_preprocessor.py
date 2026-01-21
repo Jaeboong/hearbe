@@ -145,8 +145,12 @@ def load_and_preprocess_ocr_json(
     
     if not texts:
         raise ValueError("No 'rec_texts' found in JSON data")
+    
+    # If no scores provided, assume all texts have high confidence (1.0)
     if not scores:
-        raise ValueError("No 'rec_scores' found in JSON data")
+        if verbose:
+            print("Note: No 'rec_scores' found. Assuming all texts have score 1.0")
+        scores = [1.0] * len(texts)
     
     return preprocess_ocr_texts(texts, scores, min_score, min_length, verbose)
 
