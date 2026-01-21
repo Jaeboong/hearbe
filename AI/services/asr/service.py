@@ -1,11 +1,16 @@
 """
-ASR 서비스 구현
+ASR Service Implementation
 
-Faster-Whisper(turbo) 모델을 사용한 음성 인식
+Faster-Whisper (turbo) model for speech recognition.
 """
 
+import io
 import logging
 from typing import AsyncGenerator, Optional
+
+import numpy as np
+import soundfile as sf
+
 from core.interfaces import IASRService, STTResult
 from core.config import get_config
 
@@ -14,12 +19,12 @@ logger = logging.getLogger(__name__)
 
 class ASRService(IASRService):
     """
-    Faster-Whisper 기반 ASR 서비스
+    Faster-Whisper based ASR service.
 
     Features:
-    - GPU 가속 기반 빠른 인식
-    - 한국어 최적화
-    - 실시간 스트리밍 지원
+    - GPU accelerated transcription
+    - Korean language optimized
+    - Batch transcription (streaming support planned)
     """
 
     def __init__(self):
@@ -28,48 +33,88 @@ class ASRService(IASRService):
         self._ready = False
 
     async def initialize(self):
-        """모델 초기화"""
+        """Load Whisper model."""
         try:
-            # TODO: Faster-Whisper 모델 로드
-            # from faster_whisper import WhisperModel
-            # self._model = WhisperModel(
-            #     self._config.model_name,
-            #     device=self._config.device,
-            #     compute_type=self._config.compute_type
-            # )
+            from faster_whisper import WhisperModel
+
+            logger.info(
+                f"Loading ASR model: {self._config.model_name} "
+                f"(device={self._config.device}, compute_type={self._config.compute_type})"
+            )
+            self._model = WhisperModel(
+                self._config.model_name,
+                device=self._config.device,
+                compute_type=self._config.compute_type
+            )
             self._ready = True
             logger.info(f"ASR model loaded: {self._config.model_name}")
         except Exception as e:
             logger.error(f"Failed to load ASR model: {e}")
             raise
 
+    def _preprocess_audio(self, audio_data: bytes) -> np.ndarray:
+        """
+        Convert raw audio bytes to numpy array for Whisper.
+
+        Expects WAV format or raw PCM (16kHz, mono, 16-bit).
+        Returns float32 numpy array normalized to [-1, 1].
+        """
+        try:
+            # Try reading as WAV file
+            audio_io = io.BytesIO(audio_data)
+            audio_array, sample_rate = sf.read(audio_io, dtype="float32")
+
+            # Convert stereo to mono if needed
+            if len(audio_array.shape) > 1:
+                audio_array = np.mean(audio_array, axis=1)
+
+            # Resample to 16kHz if needed (Whisper requirement)
+            if sample_rate != 16000:
+                import scipy.signal as signal
+                num_samples = int(len(audio_array) * 16000 / sample_rate)
+                audio_array = signal.resample(audio_array, num_samples)
+
+            return audio_array.astype(np.float32)
+
+        except Exception:
+            # Fallback: assume raw PCM (16-bit, 16kHz, mono)
+            logger.debug("WAV parsing failed, treating as raw PCM")
+            audio_array = np.frombuffer(audio_data, dtype=np.int16)
+            return audio_array.astype(np.float32) / 32768.0
+
     async def transcribe(self, audio_data: bytes) -> STTResult:
         """
-        음성을 텍스트로 변환
+        Transcribe audio to text.
 
         Args:
-            audio_data: 오디오 데이터 (WAV/PCM, 16kHz, 모노)
+            audio_data: Audio bytes (WAV or raw PCM, 16kHz, mono)
 
         Returns:
-            STTResult: 변환된 텍스트 결과
+            STTResult: Transcription result
         """
         if not self._ready:
             raise RuntimeError("ASR model not initialized")
 
         try:
-            # TODO: 실제 구현
-            # segments, info = self._model.transcribe(
-            #     audio_data,
-            #     language=self._config.language,
-            #     beam_size=self._config.beam_size
-            # )
-            # text = " ".join([segment.text for segment in segments])
+            audio_array = self._preprocess_audio(audio_data)
+            duration = len(audio_array) / 16000.0
 
-            text = ""  # placeholder
-            confidence = 1.0
-            duration = 0.0
+            segments, info = self._model.transcribe(
+                audio_array,
+                language=self._config.language,
+                beam_size=self._config.beam_size,
+                word_timestamps=False
+            )
 
-            logger.debug(f"Transcribed: {text[:50]}...")
+            # Collect all segment texts
+            text_parts = []
+            for segment in segments:
+                text_parts.append(segment.text.strip())
+
+            text = " ".join(text_parts)
+            confidence = info.language_probability if hasattr(info, "language_probability") else 1.0
+
+            logger.debug(f"Transcribed ({duration:.2f}s): {text[:80]}...")
             return STTResult(
                 text=text,
                 confidence=confidence,
@@ -85,32 +130,33 @@ class ASRService(IASRService):
         audio_chunks: AsyncGenerator[bytes, None]
     ) -> AsyncGenerator[STTResult, None]:
         """
-        스트리밍 음성을 실시간으로 텍스트 변환
+        Stream audio chunks and yield transcription results.
+
+        Accumulates chunks and transcribes when buffer reaches threshold.
+        Future: integrate VAD for utterance boundary detection.
 
         Args:
-            audio_chunks: 오디오 청크 스트림
+            audio_chunks: Async generator of audio bytes
 
         Yields:
-            STTResult: 중간/최종 변환 결과
+            STTResult: Intermediate/final transcription results
         """
         if not self._ready:
             raise RuntimeError("ASR model not initialized")
 
-        # TODO: 실시간 스트리밍 구현
-        # 청크를 누적하면서 VAD로 발화 구간 감지
-        # 발화 종료 시점에 transcribe 호출
+        # Threshold: 1 second of audio (16kHz, 16-bit = 32000 bytes)
+        CHUNK_THRESHOLD = 32000
 
         buffer = b""
         async for chunk in audio_chunks:
             buffer += chunk
 
-            # 일정 크기마다 중간 결과 생성 (예: 0.5초 분량)
-            if len(buffer) >= 16000:  # 1초 분량 (16kHz, 16bit)
+            if len(buffer) >= CHUNK_THRESHOLD:
                 result = await self.transcribe(buffer)
                 yield result
                 buffer = b""
 
-        # 남은 버퍼 처리
+        # Process remaining buffer
         if buffer:
             result = await self.transcribe(buffer)
             yield result
