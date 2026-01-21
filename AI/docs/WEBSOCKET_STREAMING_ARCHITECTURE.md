@@ -1,8 +1,8 @@
 # WebSocket ASR 스트리밍 아키텍처
 
-> Queue 기반 실시간 음성 인식 처리 아키텍처
+> PTT(Push-to-Talk) 기반 실시간 음성 인식 처리 아키텍처
 
-**버전**: 1.0
+**버전**: 2.0
 **작성일**: 2026-01-21
 **관련 문서**: [WEBSOCKET_PROTOCOL.md](./WEBSOCKET_PROTOCOL.md)
 
@@ -12,35 +12,47 @@
 
 ### 1.1 목적
 
-WebSocket을 통한 실시간 음성 스트리밍에서 **수신 루프와 ASR 추론을 분리**하여:
-- 네트워크 수신 블로킹 방지
-- GPU 리소스 효율적 사용
-- 안정적인 백프레셔 처리
+WebSocket을 통한 **Push-to-Talk(PTT) 방식** 음성 인식 시스템:
+- 클라이언트가 녹음 시작/종료를 제어
+- 서버는 수신된 오디오를 버퍼링 후 `is_final=true` 시점에 transcribe
+- VAD(Voice Activity Detection) 없이 단순하고 안정적인 구조
 
-### 1.2 아키텍처 다이어그램
+### 1.2 PTT vs VAD 비교
+
+| 항목 | PTT (현재) | VAD |
+|------|-----------|-----|
+| 녹음 제어 | 클라이언트 (사용자 버튼) | 서버 (음성 감지) |
+| 구현 복잡도 | 낮음 | 높음 |
+| Whisper 환각 | 없음 (무음 전송 안함) | 있음 (무음 시 발생) |
+| 사용자 경험 | 명시적 (버튼 누름) | 암묵적 (자동 감지) |
+
+### 1.3 아키텍처 다이어그램
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Client (MCP App / Browser Extension)                                    │
+│  Client (MCP App / Test Script)                                          │
 │                                                                          │
-│  [Microphone] → [20ms chunks] → WebSocket                               │
+│  [Microphone] → [Hold SPACE] → [3s chunks] → WebSocket                  │
+│                     │                              │                     │
+│                     │  is_final=false (3s auto)   │                     │
+│                     │  is_final=true (release)    ▼                     │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  AI Server - WebSocket Handler                                           │
+│  AI Server - WebSocket Handler (PTT Mode)                                │
 │                                                                          │
 │  ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐ │
 │  │  Receive Loop    │     │   Audio Queue    │     │   ASR Worker     │ │
-│  │                  │     │                  │     │                  │ │
-│  │  - Parse JSON    │────▶│  asyncio.Queue   │────▶│  - Buffer mgmt   │ │
-│  │  - Decode Base64 │     │  (per session)   │     │  - GPU inference │ │
-│  │  - Non-blocking  │     │  max_size=50     │     │  - Result send   │ │
+│  │                  │     │                  │     │   (PTT Mode)     │ │
+│  │  - Parse JSON    │────▶│  asyncio.Queue   │────▶│  - Buffer audio  │ │
+│  │  - Decode Base64 │     │  (per session)   │     │  - Wait is_final │ │
+│  │  - Non-blocking  │     │  max_size=50     │     │  - Transcribe    │ │
 │  └──────────────────┘     └──────────────────┘     └──────────────────┘ │
-│           │                                                 │            │
-│           │              ┌──────────────────┐               │            │
-│           │              │    ASR Lock      │               │            │
-│           └─────────────▶│  (GPU serialize) │◀──────────────┘            │
+│                                                            │            │
+│                          ┌──────────────────┐              │            │
+│                          │    ASR Lock      │              │            │
+│                          │  (GPU serialize) │◀─────────────┘            │
 │                          └──────────────────┘                            │
 │                                    │                                     │
 │                                    ▼                                     │
@@ -162,14 +174,22 @@ async def _handle_audio_chunk(self, session_id: str, data: dict):
         queue.put_nowait(chunk)
 ```
 
-### 3.3 ASR Worker (Per-session)
+### 3.3 ASR Worker (PTT Mode)
 
-각 세션마다 독립적인 Worker Task가 Queue를 소비합니다.
+PTT 모드에서는 `is_final=true`를 받을 때만 transcribe를 수행합니다.
 
 ```python
 async def _asr_worker(self, session_id: str):
-    """Background worker that processes audio from queue."""
+    """
+    ASR worker task for PTT (Push-to-Talk) mode.
+
+    Client controls recording start/stop:
+    - Receives audio chunks and buffers them
+    - Transcribes when is_final=true (user released record button)
+    """
     queue = self._audio_queues.get(session_id)
+    if not queue:
+        return
 
     while True:
         try:
@@ -178,15 +198,19 @@ async def _asr_worker(self, session_id: str):
                 timeout=30.0
             )
 
-            # Accumulate buffer
+            # Append chunk to buffer
             buffer = self._audio_buffers.get(session_id, b"")
             buffer += chunk.data
+            self._audio_buffers[session_id] = buffer
 
-            # Check transcription trigger
-            should_transcribe = (
-                len(buffer) >= BUFFER_THRESHOLD_BYTES or
-                chunk.is_final
-            )
+            # Check buffer size limit
+            if len(buffer) > MAX_BUFFER_SIZE:
+                logger.warning(f"Buffer overflow, truncating: {session_id}")
+                buffer = buffer[-MAX_BUFFER_SIZE:]
+                self._audio_buffers[session_id] = buffer
+
+            # Transcribe only when is_final=true (user released button)
+            should_transcribe = chunk.is_final and len(buffer) > 0
 
             if should_transcribe and self.asr.is_ready():
                 await self._process_audio_buffer(
@@ -194,19 +218,38 @@ async def _asr_worker(self, session_id: str):
                     buffer,
                     is_final=chunk.is_final
                 )
-
-                # Keep overlap for continuity (or clear if final)
-                if chunk.is_final:
-                    self._audio_buffers[session_id] = b""
-                else:
-                    self._audio_buffers[session_id] = buffer[-BUFFER_OVERLAP_BYTES:]
-            else:
-                self._audio_buffers[session_id] = buffer
+                # Clear buffer after transcription
+                self._audio_buffers[session_id] = b""
 
         except asyncio.TimeoutError:
             continue  # Keep waiting
         except asyncio.CancelledError:
             break  # Clean shutdown
+```
+
+### 3.4 PTT 처리 흐름
+
+```
+Client                          Server
+  │                               │
+  │  [User holds SPACE]           │
+  │  ──────────────────────────►  │
+  │  audio_chunk (is_final=false) │  Buffer += chunk.data
+  │  ──────────────────────────►  │  Buffer += chunk.data
+  │  audio_chunk (is_final=false) │  Buffer += chunk.data
+  │  ...                          │  ...
+  │                               │
+  │  [3 seconds elapsed]          │
+  │  audio_chunk (is_final=false) │  (Partial: buffer sent, but no transcribe)
+  │  ──────────────────────────►  │
+  │                               │
+  │  [User releases SPACE]        │
+  │  audio_chunk (is_final=true)  │  Transcribe(buffer)
+  │  ──────────────────────────►  │  Clear buffer
+  │                               │
+  │  ◄──────────────────────────  │
+  │  asr_result                   │
+  │                               │
 ```
 
 ---
@@ -248,44 +291,60 @@ async def _process_audio_buffer(self, session_id: str, buffer: bytes, is_final: 
 
 ---
 
-## 5. 버퍼링 전략
+## 5. PTT 버퍼링 전략
 
-### 5.1 Fixed Buffer + Overlap
+### 5.1 클라이언트 측 버퍼링
+
+PTT 모드에서는 클라이언트가 녹음 시간을 제어합니다.
 
 ```
 Time →
-┌────────────────────────────────────────────────────────────┐
-│  Audio Stream                                               │
-├────────┬────────┬────────┬────────┬────────┬────────┬─────┤
-│ chunk1 │ chunk2 │ chunk3 │ chunk4 │ chunk5 │ chunk6 │ ... │
-└────────┴────────┴────────┴────────┴────────┴────────┴─────┘
-
-Buffer accumulation:
-├─────────────── 1 second (32000 bytes) ───────────────┤
-                                                        ↓ Transcribe
-                               ├── 200ms overlap ──┤
-                               └─────────────────────── Next buffer starts
+┌────────────────────────────────────────────────────────────────────────┐
+│  User holds SPACE                                                       │
+├────────┬────────┬────────┬────────┬────────┬────────┬────────┬────────┤
+│ chunk1 │ chunk2 │ chunk3 │ ...    │ chunkN │ chunkN+1 │ ...   │ final │
+└────────┴────────┴────────┴────────┴────────┴────────┴────────┴────────┘
+         │                          │                           │
+         │◄─── 3 seconds ──────────►│                           │
+         │      (is_final=false)    │                           │
+         │                          │◄─── remaining ───────────►│
+         │                          │      (is_final=true)      │
 ```
 
-### 5.2 버퍼 크기 선택 근거
+### 5.2 PTT 청크 크기
 
-| 버퍼 크기 | 장점 | 단점 |
-|-----------|------|------|
-| 500ms | 낮은 latency | 문맥 부족, 정확도 저하 |
-| **1초 (선택)** | 균형잡힌 latency/정확도 | - |
-| 2초 | 높은 정확도 | 체감 지연 증가 |
-| 5초 | 최고 정확도 | 실시간 부적합 |
+| 설정 | 값 | 설명 |
+|------|-----|------|
+| `CHUNK_DURATION_SEC` | 3.0초 | 자동 분할 간격 |
+| `MIN_RECORDING_SEC` | 0.5초 | 최소 녹음 시간 (미만 시 스킵) |
+| `MAX_BUFFER_SIZE` | 320000 bytes | 10초 최대 (메모리 제한) |
 
-### 5.3 Overlap 필요성
+### 5.3 짧은 녹음 처리
 
-발화가 버퍼 경계에서 끊길 때 문맥 손실 방지:
+Whisper는 무음 또는 극히 짧은 오디오에서 환각(hallucination)을 일으킵니다.
 
 ```
-Without overlap:
-"쿠팡에서 우유" | "검색해줘"  → 두 개의 불완전한 문장
+Recording < 0.5s:
+- Skip audio data (don't send to Whisper)
+- Send is_final=true signal (empty audio)
+- Server processes any previously buffered audio
 
-With 200ms overlap:
-"쿠팡에서 우유 검" | "유 검색해줘"  → 겹침으로 문맥 연결
+Example output:
+[SKIP] Audio too short (0.13s < 0.5s), sending final signal only
+```
+
+### 5.4 서버 측 버퍼링
+
+서버는 `is_final=true`를 받을 때까지 오디오를 누적합니다.
+
+```python
+# PTT mode: no overlap, no automatic transcription
+# Just buffer until is_final=true
+should_transcribe = chunk.is_final and len(buffer) > 0
+
+if should_transcribe:
+    await self._process_audio_buffer(session_id, buffer)
+    self._audio_buffers[session_id] = b""  # Clear completely
 ```
 
 ---
@@ -435,18 +494,58 @@ logger.debug(f"ASR transcribed: session={session_id}, "
 
 ---
 
-## 10. 향후 개선 계획
+## 10. 테스트 클라이언트
+
+### 10.1 PTT 테스트 (`test_ws_ptt.py`)
+
+Hold-to-talk 방식의 테스트 클라이언트입니다.
+
+**실행 방법**:
+```bash
+pip install pyaudio websockets keyboard
+python tests/test_ws_ptt.py --host localhost --port 8000
+```
+
+**사용법**:
+- **SPACE 누르고 있기**: 녹음 시작
+- **SPACE 놓기**: 녹음 종료 및 전송
+- **ESC**: 종료
+
+**자동 분할**:
+- 3초 이상 녹음 시 자동으로 partial chunk 전송 (`is_final=false`)
+- SPACE를 놓으면 남은 버퍼 전송 (`is_final=true`)
+
+**예시 출력**:
+```
+[REC] Recording started...
+[SEND] PARTIAL chunk #1 (2.94s, 94208 bytes)
+[STOP] Recording stopped (1.50s)
+[SEND] FINAL chunk #2 (1.50s, 48000 bytes)
+[FINAL] 쿠팡에서 우유 검색해줘 (conf=0.95)
+```
+
+### 10.2 연속 스트리밍 테스트 (`test_ws_mic.py`)
+
+RMS 모니터링이 포함된 연속 스트리밍 테스트입니다.
+
+```bash
+python tests/test_ws_mic.py --host localhost --port 8000 --device 1
+```
+
+---
+
+## 11. 향후 개선 계획
 
 | 기능 | 우선순위 | 설명 |
 |------|----------|------|
-| VAD Integration | High | 발화 경계 자동 감지 |
-| Adaptive Buffering | Medium | 네트워크 상태에 따른 버퍼 조절 |
+| Mobile PTT Button | High | 모바일 앱용 PTT 버튼 UI |
+| Streaming Partial Results | Medium | 긴 녹음 중 중간 결과 표시 |
 | Multi-GPU | Low | 여러 GPU 간 로드밸런싱 |
 | WebRTC | Low | UDP 기반 저지연 전송 |
 
 ---
 
-## 11. 참고 자료
+## 12. 참고 자료
 
 - [Faster-Whisper GitHub](https://github.com/SYSTRAN/faster-whisper)
 - [asyncio.Queue Documentation](https://docs.python.org/3/library/asyncio-queue.html)
@@ -454,5 +553,8 @@ logger.debug(f"ASR transcribed: session={session_id}, "
 
 ---
 
-**문서 버전**: 1.0
+**문서 버전**: 2.0
 **최종 수정일**: 2026-01-21
+**변경 이력**:
+- v2.0 (2026-01-21): VAD에서 PTT 모드로 전환, 테스트 클라이언트 문서 추가
+- v1.0 (2026-01-21): 초기 버전 (VAD 기반)
