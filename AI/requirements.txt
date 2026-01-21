@@ -7,6 +7,7 @@ fastapi>=0.109.0
 uvicorn[standard]>=0.27.0
 pydantic>=2.5.0
 python-dotenv>=1.0.0
+python-multipart>=0.0.6
 
 # ============================================================================
 # ASR - faster-whisper (Dockerfile에서 별도 설치)
