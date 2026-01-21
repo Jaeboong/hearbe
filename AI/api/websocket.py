@@ -1,40 +1,58 @@
 """
-WebSocket 핸들러
+WebSocket Handler
 
-실시간 양방향 통신 처리
-- 음성 스트리밍 (audio_chunk)
-- STT 결과 (stt_result)
-- MCP 명령 (tool_calls)
-- TTS 스트리밍 (tts_chunk)
-- 플로우 진행 (flow_step)
+Real-time bidirectional communication:
+- Audio streaming (audio_chunk)
+- ASR results (asr_result)
+- MCP commands (tool_calls)
+- TTS streaming (tts_chunk)
+- Flow progression (flow_step)
 """
 
 import logging
 import json
 import asyncio
-from typing import Dict, Set, Any, Optional
+from typing import Dict, Any, Optional
 from datetime import datetime
 from fastapi import WebSocket, WebSocketDisconnect
 from dataclasses import dataclass, asdict
 from enum import Enum
 
 from core.event_bus import EventType, publish
-from core.interfaces import SessionState
+from core.interfaces import SessionState, ASRResult
 
 logger = logging.getLogger(__name__)
 
 
+# ============================================================================
+# Audio Contract Constants
+# ============================================================================
+
+AUDIO_SAMPLE_RATE = 16000          # 16kHz (Whisper requirement)
+AUDIO_CHANNELS = 1                  # Mono
+AUDIO_BIT_DEPTH = 16                # 16-bit
+AUDIO_BYTES_PER_SAMPLE = 2          # 16-bit = 2 bytes
+AUDIO_FRAME_MS = 20                 # 20ms frame (VAD compatible)
+AUDIO_FRAME_BYTES = AUDIO_SAMPLE_RATE * AUDIO_BYTES_PER_SAMPLE * AUDIO_FRAME_MS // 1000  # 640 bytes
+
+# Buffer thresholds
+BUFFER_THRESHOLD_BYTES = 32000      # ~1 second of audio
+BUFFER_OVERLAP_BYTES = 6400         # 200ms overlap for continuity
+MAX_BUFFER_SIZE = 320000            # 10 seconds max (memory limit)
+MAX_QUEUE_SIZE = 50                 # Max pending chunks per session
+
+
 class MessageType(str, Enum):
-    """WebSocket 메시지 타입"""
-    # Client → Server
+    """WebSocket message types"""
+    # Client -> Server
     AUDIO_CHUNK = "audio_chunk"
     USER_INPUT = "user_input"
     USER_CONFIRM = "user_confirm"
     CANCEL = "cancel"
     MCP_RESULT = "mcp_result"
 
-    # Server → Client
-    STT_RESULT = "stt_result"
+    # Server -> Client
+    ASR_RESULT = "asr_result"
     TOOL_CALLS = "tool_calls"
     FLOW_STEP = "flow_step"
     TTS_CHUNK = "tts_chunk"
@@ -44,7 +62,7 @@ class MessageType(str, Enum):
 
 @dataclass
 class WSMessage:
-    """WebSocket 메시지"""
+    """WebSocket message"""
     type: MessageType
     data: Any
     session_id: Optional[str] = None
@@ -58,24 +76,31 @@ class WSMessage:
         return json.dumps(asdict(self), default=str)
 
 
+@dataclass
+class AudioChunk:
+    """Audio chunk with metadata"""
+    data: bytes
+    seq: int
+    is_final: bool = False
+    timestamp_ms: int = 0
+
+
 class ConnectionManager:
-    """WebSocket 연결 관리자"""
+    """WebSocket connection manager"""
 
     def __init__(self):
-        # session_id -> WebSocket
         self._connections: Dict[str, WebSocket] = {}
-        # WebSocket -> session_id (역방향 조회용)
         self._ws_to_session: Dict[WebSocket, str] = {}
 
     async def connect(self, websocket: WebSocket, session_id: str) -> None:
-        """새 연결 등록"""
+        """Register new connection"""
         await websocket.accept()
         self._connections[session_id] = websocket
         self._ws_to_session[websocket] = session_id
         logger.info(f"WebSocket connected: session={session_id}")
 
     def disconnect(self, websocket: WebSocket) -> Optional[str]:
-        """연결 해제"""
+        """Unregister connection"""
         session_id = self._ws_to_session.pop(websocket, None)
         if session_id:
             self._connections.pop(session_id, None)
@@ -83,7 +108,7 @@ class ConnectionManager:
         return session_id
 
     async def send_message(self, session_id: str, message: WSMessage) -> None:
-        """특정 세션에 메시지 전송"""
+        """Send message to specific session"""
         ws = self._connections.get(session_id)
         if ws:
             try:
@@ -92,7 +117,7 @@ class ConnectionManager:
                 logger.error(f"Failed to send message to {session_id}: {e}")
 
     async def send_bytes(self, session_id: str, data: bytes) -> None:
-        """특정 세션에 바이너리 데이터 전송"""
+        """Send binary data to specific session"""
         ws = self._connections.get(session_id)
         if ws:
             try:
@@ -101,7 +126,7 @@ class ConnectionManager:
                 logger.error(f"Failed to send bytes to {session_id}: {e}")
 
     async def broadcast(self, message: WSMessage) -> None:
-        """모든 연결에 메시지 전송"""
+        """Broadcast message to all connections"""
         for session_id, ws in self._connections.items():
             try:
                 await ws.send_text(message.to_json())
@@ -109,27 +134,33 @@ class ConnectionManager:
                 logger.error(f"Broadcast failed for {session_id}: {e}")
 
     def get_session_id(self, websocket: WebSocket) -> Optional[str]:
-        """WebSocket에서 세션 ID 조회"""
+        """Get session ID from WebSocket"""
         return self._ws_to_session.get(websocket)
 
     def get_connection_count(self) -> int:
-        """현재 연결 수"""
+        """Get current connection count"""
         return len(self._connections)
 
     def is_connected(self, session_id: str) -> bool:
-        """세션 연결 여부"""
+        """Check if session is connected"""
         return session_id in self._connections
 
 
-# 전역 연결 관리자
+# Global connection manager
 connection_manager = ConnectionManager()
+
+# Global ASR lock for GPU serialization
+_asr_lock = asyncio.Lock()
 
 
 class WebSocketHandler:
     """
-    WebSocket 메시지 핸들러
+    WebSocket message handler with Queue-based ASR processing.
 
-    클라이언트-서버 간 실시간 통신 처리
+    Architecture:
+    - Receive loop: puts audio chunks into per-session queue (fast)
+    - Worker task: pulls from queue, buffers, and triggers ASR (slow)
+    - Separation prevents receive blocking during ASR inference
     """
 
     def __init__(
@@ -147,21 +178,38 @@ class WebSocketHandler:
         self.tts = tts_service
         self.flow = flow_engine
         self.session = session_manager
+
+        # Per-session state
+        self._audio_queues: Dict[str, asyncio.Queue] = {}
         self._audio_buffers: Dict[str, bytes] = {}
+        self._worker_tasks: Dict[str, asyncio.Task] = {}
+        self._chunk_counters: Dict[str, int] = {}
+        self._segment_counters: Dict[str, int] = {}
 
     async def handle_connection(self, websocket: WebSocket, session_id: str):
-        """WebSocket 연결 처리"""
+        """Handle WebSocket connection lifecycle"""
         await connection_manager.connect(websocket, session_id)
 
-        # 세션 생성 또는 조회
-        session = self.session.get_session(session_id)
-        if not session:
+        # Create or retrieve session
+        session = self.session.get_session(session_id) if self.session else None
+        if not session and self.session:
             session = self.session.create_session()
 
-        # 연결 확인 메시지
-        await self._send_status(session_id, "connected", "서버에 연결되었습니다.")
+        # Initialize per-session state
+        self._audio_queues[session_id] = asyncio.Queue(maxsize=MAX_QUEUE_SIZE)
+        self._audio_buffers[session_id] = b""
+        self._chunk_counters[session_id] = 0
+        self._segment_counters[session_id] = 0
 
-        # 이벤트 발행
+        # Start ASR worker task
+        self._worker_tasks[session_id] = asyncio.create_task(
+            self._asr_worker(session_id)
+        )
+
+        # Send connection confirmation
+        await self._send_status(session_id, "connected", "Connected to server")
+
+        # Publish connection event
         await publish(
             EventType.CLIENT_CONNECTED,
             data={"session_id": session_id},
@@ -170,7 +218,6 @@ class WebSocketHandler:
 
         try:
             while True:
-                # 메시지 수신
                 data = await websocket.receive()
 
                 if "text" in data:
@@ -183,6 +230,7 @@ class WebSocketHandler:
         except Exception as e:
             logger.error(f"WebSocket error: {e}")
         finally:
+            await self._cleanup_session(session_id)
             connection_manager.disconnect(websocket)
             await publish(
                 EventType.CLIENT_DISCONNECTED,
@@ -190,8 +238,140 @@ class WebSocketHandler:
                 source="websocket"
             )
 
+    async def _cleanup_session(self, session_id: str):
+        """Clean up session resources on disconnect"""
+        # Cancel worker task
+        if session_id in self._worker_tasks:
+            task = self._worker_tasks.pop(session_id)
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+        # Clear buffers and queues
+        self._audio_queues.pop(session_id, None)
+        self._audio_buffers.pop(session_id, None)
+        self._chunk_counters.pop(session_id, None)
+        self._segment_counters.pop(session_id, None)
+
+        logger.debug(f"Session resources cleaned up: {session_id}")
+
+    async def _asr_worker(self, session_id: str):
+        """
+        ASR worker task for a session.
+
+        Pulls audio chunks from queue, buffers them, and triggers
+        transcription when threshold is reached or stream ends.
+        """
+        queue = self._audio_queues.get(session_id)
+        if not queue:
+            return
+
+        logger.debug(f"ASR worker started: {session_id}")
+
+        try:
+            while True:
+                try:
+                    chunk: AudioChunk = await asyncio.wait_for(
+                        queue.get(),
+                        timeout=30.0
+                    )
+                except asyncio.TimeoutError:
+                    continue
+
+                # Append to buffer
+                buffer = self._audio_buffers.get(session_id, b"")
+                buffer += chunk.data
+                self._audio_buffers[session_id] = buffer
+
+                # Check buffer size limit
+                if len(buffer) > MAX_BUFFER_SIZE:
+                    logger.warning(f"Buffer overflow, dropping old data: {session_id}")
+                    buffer = buffer[-BUFFER_THRESHOLD_BYTES:]
+                    self._audio_buffers[session_id] = buffer
+
+                # Trigger transcription on threshold or final chunk
+                should_transcribe = (
+                    len(buffer) >= BUFFER_THRESHOLD_BYTES or
+                    chunk.is_final
+                )
+
+                if should_transcribe and self.asr and self.asr.is_ready():
+                    await self._process_audio_buffer(
+                        session_id,
+                        buffer,
+                        is_final=chunk.is_final
+                    )
+
+                    if chunk.is_final:
+                        # Clear buffer completely on final
+                        self._audio_buffers[session_id] = b""
+                    else:
+                        # Keep overlap for continuity
+                        self._audio_buffers[session_id] = buffer[-BUFFER_OVERLAP_BYTES:]
+
+        except asyncio.CancelledError:
+            logger.debug(f"ASR worker cancelled: {session_id}")
+        except Exception as e:
+            logger.error(f"ASR worker error: {session_id}: {e}")
+
+    async def _process_audio_buffer(
+        self,
+        session_id: str,
+        audio_data: bytes,
+        is_final: bool
+    ):
+        """Process buffered audio through ASR pipeline"""
+        try:
+            # Increment segment counter
+            self._segment_counters[session_id] = self._segment_counters.get(session_id, 0) + 1
+            segment_id = f"seg_{self._segment_counters[session_id]}"
+
+            # Publish processing started event
+            await publish(
+                EventType.ASR_PROCESSING_STARTED,
+                data={"segment_id": segment_id},
+                session_id=session_id
+            )
+
+            # Acquire lock for GPU serialization
+            async with _asr_lock:
+                asr_result = await self.asr.transcribe(
+                    audio_data,
+                    is_final=is_final,
+                    segment_id=segment_id
+                )
+
+            # Send ASR result to client
+            await self._send_asr_result(session_id, asr_result)
+
+            # Publish result ready event
+            await publish(
+                EventType.ASR_RESULT_READY,
+                data={
+                    "text": asr_result.text,
+                    "is_final": asr_result.is_final,
+                    "segment_id": asr_result.segment_id
+                },
+                session_id=session_id
+            )
+
+            # Process through NLU/LLM pipeline only on final result
+            if is_final and asr_result.text.strip():
+                await self._process_text_input(session_id, asr_result.text)
+
+        except Exception as e:
+            logger.error(f"Audio processing failed: {e}")
+            await publish(
+                EventType.ASR_ERROR,
+                data={"error": str(e)},
+                session_id=session_id
+            )
+            await self._send_error(session_id, "Audio processing error")
+
     async def _handle_text_message(self, session_id: str, text: str):
-        """텍스트 메시지 처리"""
+        """Handle text message from client"""
         try:
             msg = json.loads(text)
             msg_type = msg.get("type")
@@ -200,25 +380,22 @@ class WebSocketHandler:
             logger.debug(f"Received message: type={msg_type}, session={session_id}")
 
             if msg_type == MessageType.AUDIO_CHUNK:
-                # Base64 인코딩된 오디오 청크
                 import base64
                 audio_data = base64.b64decode(data.get("audio", ""))
-                await self._handle_audio_chunk(session_id, audio_data, data.get("is_final", False))
+                seq = data.get("seq", 0)
+                is_final = data.get("is_final", False)
+                await self._enqueue_audio_chunk(session_id, audio_data, seq, is_final)
 
             elif msg_type == MessageType.USER_INPUT:
-                # 사용자 텍스트 입력 (음성 대신)
                 await self._handle_user_input(session_id, data.get("text", ""))
 
             elif msg_type == MessageType.USER_CONFIRM:
-                # 사용자 확인 응답
                 await self._handle_user_confirm(session_id, data)
 
             elif msg_type == MessageType.CANCEL:
-                # 취소 요청
                 await self._handle_cancel(session_id)
 
             elif msg_type == MessageType.MCP_RESULT:
-                # MCP 실행 결과 (클라이언트에서 전송)
                 await self._handle_mcp_result(session_id, data)
 
             else:
@@ -229,73 +406,79 @@ class WebSocketHandler:
             await self._send_error(session_id, "Invalid message format")
 
     async def _handle_binary_message(self, session_id: str, data: bytes):
-        """바이너리 메시지 처리 (오디오 스트림)"""
-        await self._handle_audio_chunk(session_id, data, False)
+        """Handle binary message (raw audio stream)"""
+        counter = self._chunk_counters.get(session_id, 0) + 1
+        self._chunk_counters[session_id] = counter
+        await self._enqueue_audio_chunk(session_id, data, counter, False)
 
-    async def _handle_audio_chunk(self, session_id: str, audio_data: bytes, is_final: bool):
-        """오디오 청크 처리"""
-        # 버퍼에 누적
-        if session_id not in self._audio_buffers:
-            self._audio_buffers[session_id] = b""
+    async def _enqueue_audio_chunk(
+        self,
+        session_id: str,
+        audio_data: bytes,
+        seq: int,
+        is_final: bool
+    ):
+        """Enqueue audio chunk for ASR processing"""
+        queue = self._audio_queues.get(session_id)
+        if not queue:
+            logger.warning(f"No queue for session: {session_id}")
+            return
 
-        self._audio_buffers[session_id] += audio_data
+        chunk = AudioChunk(
+            data=audio_data,
+            seq=seq,
+            is_final=is_final,
+            timestamp_ms=int(datetime.now().timestamp() * 1000)
+        )
 
-        # 최종 청크면 STT 처리
-        if is_final and self.asr:
-            buffer = self._audio_buffers.pop(session_id, b"")
-            if buffer:
-                await self._process_audio(session_id, buffer)
-
-    async def _process_audio(self, session_id: str, audio_data: bytes):
-        """오디오 처리 (STT → NLU → LLM → TTS)"""
         try:
-            # 1. STT
-            await publish(EventType.STT_PROCESSING_STARTED, session_id=session_id)
-            stt_result = await self.asr.transcribe(audio_data)
-
-            await self._send_stt_result(session_id, stt_result.text)
-            await publish(
-                EventType.STT_RESULT_READY,
-                data={"text": stt_result.text},
-                session_id=session_id
-            )
-
-            # 2. 이후 파이프라인 처리
-            await self._process_text_input(session_id, stt_result.text)
-
-        except Exception as e:
-            logger.error(f"Audio processing failed: {e}")
-            await self._send_error(session_id, "음성 처리 중 오류가 발생했습니다.")
+            queue.put_nowait(chunk)
+        except asyncio.QueueFull:
+            # Backpressure: drop oldest chunk
+            logger.warning(f"Queue full, dropping chunk: {session_id}")
+            try:
+                queue.get_nowait()
+                queue.put_nowait(chunk)
+            except asyncio.QueueEmpty:
+                pass
 
     async def _handle_user_input(self, session_id: str, text: str):
-        """사용자 텍스트 입력 처리"""
-        await self._send_stt_result(session_id, text)
+        """Handle direct text input (bypass ASR)"""
+        # Send as ASR result for UI consistency
+        result = ASRResult(
+            text=text,
+            confidence=1.0,
+            language="ko",
+            duration=0.0,
+            is_final=True,
+            segment_id="text_input"
+        )
+        await self._send_asr_result(session_id, result)
         await self._process_text_input(session_id, text)
 
     async def _process_text_input(self, session_id: str, text: str):
-        """텍스트 입력 처리 (NLU → LLM → TTS)"""
+        """Process text through NLU -> LLM -> TTS pipeline"""
         try:
-            session = self.session.get_session(session_id)
+            session = self.session.get_session(session_id) if self.session else None
             if not session:
                 return
 
-            # 대화 기록 추가
-            self.session.add_to_history(session_id, "user", text)
+            # Add to conversation history
+            if self.session:
+                self.session.add_to_history(session_id, "user", text)
 
-            # Flow 진행 중인지 확인
+            # Check if flow is active
             if self.flow and self.flow.is_flow_active(session_id):
                 await self._handle_flow_input(session_id, text)
                 return
 
-            # 2. NLU - 의도 분석
+            # NLU: intent analysis
             if self.nlu:
                 context = session.context
                 intent = await self.nlu.analyze_intent(text, context)
-
-                # 참조 해석
                 resolved_text = await self.nlu.resolve_reference(text, context)
 
-                # 3. LLM - 명령 생성
+                # LLM: command generation
                 if self.llm:
                     response = await self.llm.generate_commands(
                         resolved_text,
@@ -303,35 +486,34 @@ class WebSocketHandler:
                         session
                     )
 
-                    # Flow Engine 위임 필요?
+                    # Check if flow delegation required
                     if response.requires_flow and self.flow:
                         flow_type = response.flow_type
                         site = session.current_site or "coupang"
                         step = await self.flow.start_flow(flow_type, site, session)
                         await self._send_flow_step(session_id, step)
                     else:
-                        # MCP 명령 전송
                         if response.commands:
                             await self._send_tool_calls(session_id, response.commands)
 
-                    # TTS 응답
+                    # TTS response
                     if response.text and self.tts:
                         await self._send_tts_response(session_id, response.text)
 
-                    # 대화 기록 추가
-                    self.session.add_to_history(session_id, "assistant", response.text)
+                    # Add to conversation history
+                    if self.session:
+                        self.session.add_to_history(session_id, "assistant", response.text)
 
         except Exception as e:
             logger.error(f"Text processing failed: {e}")
-            await self._send_error(session_id, "처리 중 오류가 발생했습니다.")
+            await self._send_error(session_id, "Processing error")
 
     async def _handle_flow_input(self, session_id: str, text: str):
-        """플로우 진행 중 입력 처리"""
-        session = self.session.get_session(session_id)
+        """Handle input during active flow"""
+        session = self.session.get_session(session_id) if self.session else None
         if not session:
             return
 
-        # TODO: 입력 파싱 및 다음 단계 진행
         user_input = {"text": text}
         next_step = await self.flow.next_step(session, user_input)
         await self._send_flow_step(session_id, next_step)
@@ -340,27 +522,36 @@ class WebSocketHandler:
             await self._send_tts_response(session_id, next_step.prompt)
 
     async def _handle_user_confirm(self, session_id: str, data: Dict[str, Any]):
-        """사용자 확인 응답 처리"""
+        """Handle user confirmation response"""
         confirmed = data.get("confirmed", False)
         if confirmed:
-            await self._process_text_input(session_id, "네")
+            await self._process_text_input(session_id, "yes")
         else:
-            await self._process_text_input(session_id, "아니")
+            await self._process_text_input(session_id, "no")
 
     async def _handle_cancel(self, session_id: str):
-        """취소 요청 처리"""
-        session = self.session.get_session(session_id)
+        """Handle cancel request"""
+        # Clear audio buffer and queue
+        self._audio_buffers[session_id] = b""
+        queue = self._audio_queues.get(session_id)
+        if queue:
+            while not queue.empty():
+                try:
+                    queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    break
+
+        session = self.session.get_session(session_id) if self.session else None
         if session and self.flow:
             await self.flow.cancel_flow(session)
 
-        await self._send_status(session_id, "cancelled", "취소되었습니다.")
+        await self._send_status(session_id, "cancelled", "Cancelled")
 
         if self.tts:
-            await self._send_tts_response(session_id, "취소되었습니다.")
+            await self._send_tts_response(session_id, "Cancelled")
 
     async def _handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
-        """MCP 실행 결과 처리"""
-        # 클라이언트에서 MCP 명령 실행 후 결과 전송
+        """Handle MCP execution result from client"""
         success = data.get("success", False)
         result = data.get("result", {})
         error = data.get("error")
@@ -371,25 +562,23 @@ class WebSocketHandler:
             session_id=session_id
         )
 
-        # 결과에 따라 응답 생성
         if self.llm:
-            session = self.session.get_session(session_id)
+            session = self.session.get_session(session_id) if self.session else None
             if session:
-                # 컨텍스트에 결과 저장
-                self.session.set_context(session_id, "mcp_result", result)
+                if self.session:
+                    self.session.set_context(session_id, "mcp_result", result)
 
-                # 응답 텍스트 생성
                 response_text = await self.llm.generate_response(session.context)
 
                 if self.tts:
                     await self._send_tts_response(session_id, response_text)
 
     # ========================================================================
-    # 메시지 전송 헬퍼
+    # Message sending helpers
     # ========================================================================
 
     async def _send_status(self, session_id: str, status: str, message: str):
-        """상태 메시지 전송"""
+        """Send status message"""
         msg = WSMessage(
             type=MessageType.STATUS,
             data={"status": status, "message": message},
@@ -398,7 +587,7 @@ class WebSocketHandler:
         await connection_manager.send_message(session_id, msg)
 
     async def _send_error(self, session_id: str, error: str):
-        """에러 메시지 전송"""
+        """Send error message"""
         msg = WSMessage(
             type=MessageType.ERROR,
             data={"error": error},
@@ -406,17 +595,24 @@ class WebSocketHandler:
         )
         await connection_manager.send_message(session_id, msg)
 
-    async def _send_stt_result(self, session_id: str, text: str):
-        """STT 결과 전송"""
+    async def _send_asr_result(self, session_id: str, result: ASRResult):
+        """Send ASR result to client"""
         msg = WSMessage(
-            type=MessageType.STT_RESULT,
-            data={"text": text},
+            type=MessageType.ASR_RESULT,
+            data={
+                "text": result.text,
+                "confidence": result.confidence,
+                "language": result.language,
+                "duration": result.duration,
+                "is_final": result.is_final,
+                "segment_id": result.segment_id
+            },
             session_id=session_id
         )
         await connection_manager.send_message(session_id, msg)
 
     async def _send_tool_calls(self, session_id: str, commands: list):
-        """MCP 명령 전송"""
+        """Send MCP tool calls"""
         msg = WSMessage(
             type=MessageType.TOOL_CALLS,
             data={
@@ -434,7 +630,7 @@ class WebSocketHandler:
         await connection_manager.send_message(session_id, msg)
 
     async def _send_flow_step(self, session_id: str, step):
-        """플로우 단계 전송"""
+        """Send flow step"""
         msg = WSMessage(
             type=MessageType.FLOW_STEP,
             data={
@@ -448,7 +644,7 @@ class WebSocketHandler:
         await connection_manager.send_message(session_id, msg)
 
     async def _send_tts_response(self, session_id: str, text: str):
-        """TTS 응답 전송 (스트리밍)"""
+        """Send TTS response (streaming)"""
         if not self.tts:
             return
 

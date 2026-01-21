@@ -11,7 +11,7 @@ from typing import AsyncGenerator, Optional
 import numpy as np
 import soundfile as sf
 
-from core.interfaces import IASRService, STTResult
+from core.interfaces import IASRService, ASRResult
 from core.config import get_config
 
 logger = logging.getLogger(__name__)
@@ -82,15 +82,17 @@ class ASRService(IASRService):
             audio_array = np.frombuffer(audio_data, dtype=np.int16)
             return audio_array.astype(np.float32) / 32768.0
 
-    async def transcribe(self, audio_data: bytes) -> STTResult:
+    async def transcribe(self, audio_data: bytes, is_final: bool = True, segment_id: str = None) -> ASRResult:
         """
         Transcribe audio to text.
 
         Args:
             audio_data: Audio bytes (WAV or raw PCM, 16kHz, mono)
+            is_final: Whether this is the final transcription for the segment
+            segment_id: Optional segment identifier for tracking
 
         Returns:
-            STTResult: Transcription result
+            ASRResult: Transcription result
         """
         if not self._ready:
             raise RuntimeError("ASR model not initialized")
@@ -115,11 +117,13 @@ class ASRService(IASRService):
             confidence = info.language_probability if hasattr(info, "language_probability") else 1.0
 
             logger.debug(f"Transcribed ({duration:.2f}s): {text[:80]}...")
-            return STTResult(
+            return ASRResult(
                 text=text,
                 confidence=confidence,
                 language=self._config.language,
-                duration=duration
+                duration=duration,
+                is_final=is_final,
+                segment_id=segment_id
             )
         except Exception as e:
             logger.error(f"Transcription failed: {e}")
@@ -128,7 +132,7 @@ class ASRService(IASRService):
     async def transcribe_stream(
         self,
         audio_chunks: AsyncGenerator[bytes, None]
-    ) -> AsyncGenerator[STTResult, None]:
+    ) -> AsyncGenerator[ASRResult, None]:
         """
         Stream audio chunks and yield transcription results.
 
@@ -139,7 +143,7 @@ class ASRService(IASRService):
             audio_chunks: Async generator of audio bytes
 
         Yields:
-            STTResult: Intermediate/final transcription results
+            ASRResult: Intermediate/final transcription results
         """
         if not self._ready:
             raise RuntimeError("ASR model not initialized")
@@ -148,17 +152,28 @@ class ASRService(IASRService):
         CHUNK_THRESHOLD = 32000
 
         buffer = b""
+        segment_counter = 0
         async for chunk in audio_chunks:
             buffer += chunk
 
             if len(buffer) >= CHUNK_THRESHOLD:
-                result = await self.transcribe(buffer)
+                segment_counter += 1
+                result = await self.transcribe(
+                    buffer,
+                    is_final=False,
+                    segment_id=f"seg_{segment_counter}"
+                )
                 yield result
                 buffer = b""
 
-        # Process remaining buffer
+        # Process remaining buffer as final
         if buffer:
-            result = await self.transcribe(buffer)
+            segment_counter += 1
+            result = await self.transcribe(
+                buffer,
+                is_final=True,
+                segment_id=f"seg_{segment_counter}"
+            )
             yield result
 
     def is_ready(self) -> bool:
