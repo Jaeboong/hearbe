@@ -7,7 +7,7 @@ ocr = PaddleOCR(
     use_textline_orientation=True, # Use use_textline_orientation to enable/disable textline orientation classification model
     device="gpu:0", # Use device to specify GPU for model inference
 )
-result = ocr.predict("images/샴푸.jpg")  
+result = ocr.predict("images/오겹살.jpg")  
 for res in result:  
     res.print()  
     res.save_to_img("output")  
