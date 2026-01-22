@@ -75,21 +75,22 @@ class LLMPlanner(ILLMPlanner):
         # 1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
         decision = self._routing_policy.decide(user_text, intent, rule_result)
-        # 2. 규칙 매칭 실패 시 LLM fallback
-        if result.matched_rule == "none" and self._use_llm_fallback and self._llm_generator:
-            logger.info(f"규칙 매칭 실패, LLM fallback: '{user_text}'")
-            
-            llm_result = await self._llm_generator.generate(
-                user_text=user_text,
-                current_url=current_url,
-                conversation_history=conversation_history
-            )
-            
-            if llm_result.success and llm_result.commands:
-                return self._llm_result_to_response(llm_result)
-            else:
-                # LLM도 실패하면 원래 규칙 기반 결과 반환
-                logger.warning(f"LLM fallback 실패: {llm_result.error}")
+        # 2. LLM fallback by policy
+        if decision.use_llm:
+            if self._use_llm_fallback and self._llm_generator:
+                logger.info(
+                    f"LLM routing: rule={rule_result.matched_rule}, reason={decision.reason}, text='{user_text}'"
+                )
+                llm_result = await self._llm_generator.generate(
+                    user_text=user_text,
+                    current_url=current_url,
+                    conversation_history=conversation_history
+                )
+
+                if llm_result.success and llm_result.commands:
+                    return self._llm_result_to_response(llm_result)
+
+                logger.warning(f"LLM fallback ??: {llm_result.error}")
 
         return self._to_response(result)
 
