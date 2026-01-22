@@ -4,7 +4,7 @@
 
 from typing import Optional
 from . import BaseRule, RuleResult
-from ..context_rules import (
+from ..context.context_rules import (
     CART_ADD_TRIGGERS,
     CART_GO_TRIGGERS,
     build_add_to_cart_commands,

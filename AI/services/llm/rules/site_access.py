@@ -4,7 +4,7 @@
 
 from typing import Optional
 from . import BaseRule, RuleResult
-from ..context_rules import (
+from ..context.context_rules import (
     SITE_KEYWORDS,
     SITE_ACCESS_TRIGGERS,
     build_site_access_commands

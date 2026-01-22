@@ -105,8 +105,8 @@ class SiteManager:
     
     def __init__(self, sites_dir: Optional[str] = None):
         if sites_dir is None:
-            # services/llm/ -> services/ -> AI/ -> config/sites/
-            sites_dir = Path(__file__).parent.parent.parent / "config" / "sites"
+            # services/llm/sites/ -> services/ -> AI/ -> config/sites/
+            sites_dir = Path(__file__).parent.parent.parent.parent / "config" / "sites"
         self.sites_dir = Path(sites_dir)
         self.sites: Dict[str, SiteConfig] = {}
         self._load_all_sites()

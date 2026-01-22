@@ -13,9 +13,9 @@ from core.interfaces import (
     LLMResponse, MCPCommand
 )
 
-from .command_generator import CommandGenerator, CommandResult
-from .llm_generator import LLMGenerator, LLMResult
-from .context_rules import GeneratedCommand
+from ..generators.command_generator import CommandGenerator, CommandResult
+from ..generators.llm_generator import LLMGenerator, LLMResult
+from .routing import LLMRoutingPolicy
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,7 @@ class LLMPlanner(ILLMPlanner):
         self._rule_generator: Optional[CommandGenerator] = None
         self._llm_generator: Optional[LLMGenerator] = None
         self._use_llm_fallback = use_llm_fallback
+        self._routing_policy = LLMRoutingPolicy()
 
     async def initialize(self):
         """초기화"""
@@ -72,26 +73,30 @@ class LLMPlanner(ILLMPlanner):
         current_url = session.current_url if session else ""
         conversation_history = session.conversation_history if session else None
 
-        # 1. 규칙 기반 시도
-        result = self._rule_generator.generate(user_text, current_url)
+        # 1. Rule-based pass
+        rule_result = await self._rule_generator.generate_rules(user_text, current_url)
+        decision = self._routing_policy.decide(user_text, intent, rule_result)
 
-        # 2. 규칙 매칭 실패 시 LLM fallback
-        if result.matched_rule == "none" and self._use_llm_fallback and self._llm_generator:
-            logger.info(f"규칙 매칭 실패, LLM fallback: '{user_text}'")
-            
-            llm_result = await self._llm_generator.generate(
-                user_text=user_text,
-                current_url=current_url,
-                conversation_history=conversation_history
-            )
-            
-            if llm_result.success and llm_result.commands:
-                return self._llm_result_to_response(llm_result)
+        # 2. LLM fallback by policy
+        if decision.use_llm:
+            if self._use_llm_fallback and self._llm_generator:
+                logger.info(
+                    f"LLM routing: rule={rule_result.matched_rule}, reason={decision.reason}, text='{user_text}'"
+                )
+                llm_result = await self._llm_generator.generate(
+                    user_text=user_text,
+                    current_url=current_url,
+                    conversation_history=conversation_history
+                )
+
+                if llm_result.success and llm_result.commands:
+                    return self._llm_result_to_response(llm_result)
+
+                logger.warning(f"LLM fallback ??: {llm_result.error}")
             else:
-                # LLM도 실패하면 원래 규칙 기반 결과 반환
-                logger.warning(f"LLM fallback 실패: {llm_result.error}")
+                logger.info("LLM fallback disabled or not initialized; using rule result")
 
-        return self._to_response(result)
+        return self._to_response(rule_result)
 
     def _to_response(self, result: CommandResult) -> LLMResponse:
         """CommandResult → LLMResponse 변환"""

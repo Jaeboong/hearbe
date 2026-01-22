@@ -6,7 +6,7 @@
 
 from typing import Optional, List
 from dataclasses import dataclass
-from ..context_rules import GeneratedCommand
+from ..context.context_rules import GeneratedCommand
 
 
 @dataclass

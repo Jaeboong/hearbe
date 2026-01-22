@@ -4,7 +4,7 @@
 
 from typing import Optional
 from . import BaseRule, RuleResult
-from ..context_rules import (
+from ..context.context_rules import (
     extract_search_query,
     detect_target_site,
     build_search_with_navigation_commands
