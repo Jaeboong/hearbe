@@ -1,11 +1,11 @@
 """
 HTTP API 라우터
 
-인증, 헬스체크, 관리 API
+인증, 헬스체크, 관리 API, ASR
 """
 
 import logging
-from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
@@ -51,6 +51,14 @@ class TTSRequest(BaseModel):
     """TTS 요청 (HTTP용)"""
     text: str
     voice_id: Optional[str] = None
+
+
+class ASRResponse(BaseModel):
+    """ASR 응답"""
+    text: str
+    confidence: float
+    language: str
+    duration: float
 
 
 # ============================================================================
@@ -148,6 +156,46 @@ async def tts_health():
     """TTS 서비스 상태"""
     config = get_config().tts
     return {"status": "ready", "provider": config.provider}
+
+
+# ============================================================================
+# ASR API
+# ============================================================================
+
+@router.post("/asr/transcribe", response_model=ASRResponse)
+async def transcribe_audio(request: Request, file: UploadFile = File(...)):
+    """
+    Transcribe audio file to text.
+
+    Accepts WAV/PCM audio (16kHz mono recommended).
+    Returns transcription result with confidence score.
+    """
+    # Get ASR service from app state (set by main.py)
+    asr_service = getattr(request.app.state, "asr_service", None)
+
+    if asr_service is None or not asr_service.is_ready():
+        raise HTTPException(status_code=503, detail="ASR service not available")
+
+    try:
+        audio_data = await file.read()
+        if len(audio_data) == 0:
+            raise HTTPException(status_code=400, detail="Empty audio file")
+
+        logger.info(f"ASR request: file={file.filename}, size={len(audio_data)} bytes")
+
+        result = await asr_service.transcribe(audio_data)
+
+        return ASRResponse(
+            text=result.text,
+            confidence=result.confidence,
+            language=result.language,
+            duration=result.duration
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"ASR transcription failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
 
 
 # ============================================================================
