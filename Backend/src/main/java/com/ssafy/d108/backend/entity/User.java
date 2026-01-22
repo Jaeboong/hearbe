@@ -1,29 +1,25 @@
 package com.ssafy.d108.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Integer userId;
+    @Column(name = "user_id", length = 30, nullable = false)
+    private String userId;
 
-    @Column(name = "login_id", length = 50, nullable = false, unique = true)
-    private String loginId;
-
-    @Column(name = "username", length = 50)
+    @Column(name = "username", length = 15)
     private String username;
 
     @Column(name = "password", length = 255)
@@ -32,22 +28,21 @@ public class User {
     @Column(name = "phone_number", length = 20, nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "simple_password", length = 255)
+    @Column(name = "simple_password", length = 6)
     private String simplePassword;
 
-    @Column(name = "user_type", length = 20, nullable = false)
-    private String userType = "GENERAL";
-
-    @Column(name = "gender", length = 10)
-    private String gender;
-
-    @Column(name = "email", length = 100)
-    private String email;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", nullable = false, columnDefinition = "enum('BLIND', 'LOW_VISION', 'GUARDIAN', 'GENERAL') default 'BLIND'")
+    private UserType userType = UserType.BLIND;
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    public enum UserType {
+        BLIND, LOW_VISION, GUARDIAN, GENERAL
+    }
 }

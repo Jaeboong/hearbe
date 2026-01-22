@@ -1,18 +1,21 @@
 package com.ssafy.d108.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
-@Getter
-@NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "wishlist_items")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class WishlistItem {
 
     @Id
@@ -20,28 +23,19 @@ public class WishlistItem {
     @Column(name = "wishlist_item_id")
     private Integer wishlistItemId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "platform_id", nullable = false)
     private Platform platform;
 
-    @Column(name = "product_metadata", columnDefinition = "JSON")
-    private String productMetadata;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "product_metadata", columnDefinition = "json")
+    private Map<String, Object> productMetadata;
 
-    @Column(name = "selected_options", columnDefinition = "JSON")
-    private String selectedOptions;
-
-    @CreatedDate
-    @Column(name = "liked_at", nullable = false, updatable = false)
-    private LocalDateTime likedAt;
-
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

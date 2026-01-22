@@ -1,18 +1,18 @@
 package com.ssafy.d108.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "sharing_session_logs")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SharingSessionLog {
 
     @Id
@@ -20,26 +20,22 @@ public class SharingSessionLog {
     @Column(name = "sharing_session_id")
     private Integer sharingSessionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "host_user_id", nullable = false)
     private User hostUser;
 
-    @Column(name = "started_at")
+    @CreationTimestamp
+    @Column(name = "started_at", nullable = false, updatable = false)
     private LocalDateTime startedAt;
 
     @Column(name = "ended_at")
     private LocalDateTime endedAt;
 
-    @Column(name = "duration_seconds")
-    private Integer durationSeconds = 0;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "session_status", nullable = false, columnDefinition = "enum('active', 'completed', 'cancelled') default 'active'")
+    private SessionStatus sessionStatus = SessionStatus.ACTIVE;
 
-    @Column(name = "meeting_code", length = 10, unique = true)
-    private String meetingCode;
-
-    @Column(name = "session_status", length = 20, nullable = false)
-    private String sessionStatus = "active";
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    public enum SessionStatus {
+        ACTIVE, COMPLETED, CANCELLED
+    }
 }

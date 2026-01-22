@@ -1,13 +1,15 @@
 package com.ssafy.d108.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Getter
-@NoArgsConstructor
 @Table(name = "platforms")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Platform {
 
     @Id
@@ -15,12 +17,9 @@ public class Platform {
     @Column(name = "platform_id")
     private Integer platformId;
 
-    @Column(name = "shop_name", length = 100, nullable = false, unique = true)
-    private String shopName;
+    @Column(name = "platform_name", length = 100)
+    private String platformName;
 
-    @Column(name = "base_url", length = 255)
+    @Column(name = "base_url", length = 500, nullable = false)
     private String baseUrl;
-
-    @Column(name = "api_endpoint_url", length = 255)
-    private String apiEndpointUrl;
 }

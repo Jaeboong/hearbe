@@ -1,20 +1,20 @@
 package com.ssafy.d108.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "welfare_cards")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class WelfareCard {
 
     @Id
@@ -22,33 +22,24 @@ public class WelfareCard {
     @Column(name = "welfare_card_id")
     private Integer welfareCardId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(name = "cvc")
+    @Column(name = "cvc", length = 5, columnDefinition = "varchar(5) COMMENT 'CVC 번호 (AES-256 암호화 필수)'")
     private String cvc;
 
-    @Column(name = "owner_name", length = 50)
-    private String ownerName;
-
-    @Column(name = "birth_date", length = 6)
-    private String birthDate;
-
-    @Column(name = "gender", length = 10)
-    private String gender;
-
-    @Column(name = "issue_date")
+    @Column(name = "issue_date", nullable = false)
     private LocalDate issueDate;
 
-    @Column(name = "expiration_date")
+    @Column(name = "expiration_date", nullable = false)
     private LocalDate expirationDate;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }
