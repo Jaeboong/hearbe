@@ -72,9 +72,9 @@ class LLMPlanner(ILLMPlanner):
         current_url = session.current_url if session else ""
         conversation_history = session.conversation_history if session else None
 
-        # 1. 규칙 기반 시도
-        result = await self._rule_generator.generate(user_text, current_url)
-
+        # 1. Rule-based pass
+        rule_result = await self._rule_generator.generate_rules(user_text, current_url)
+        decision = self._routing_policy.decide(user_text, intent, rule_result)
         # 2. 규칙 매칭 실패 시 LLM fallback
         if result.matched_rule == "none" and self._use_llm_fallback and self._llm_generator:
             logger.info(f"규칙 매칭 실패, LLM fallback: '{user_text}'")
