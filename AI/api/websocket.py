@@ -616,7 +616,7 @@ class WebSocketHandler:
         await connection_manager.send_message(session_id, msg)
 
     async def _send_tool_calls(self, session_id: str, commands: list):
-        """Send MCP tool calls"""
+        """Send MCP tool calls - broadcasts to all clients for pipeline testing"""
         msg = WSMessage(
             type=MessageType.TOOL_CALLS,
             data={
@@ -631,7 +631,10 @@ class WebSocketHandler:
             },
             session_id=session_id
         )
-        await connection_manager.send_message(session_id, msg)
+        # TODO: [TEMP] Broadcasting to all clients for testing
+        # In production, send only to the originating session
+        logger.info(f"[BROADCAST] Sending {len(commands)} tool calls to all clients")
+        await connection_manager.broadcast(msg)
 
     async def _send_flow_step(self, session_id: str, step):
         """Send flow step"""
