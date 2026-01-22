@@ -95,7 +95,29 @@ class ChromeLauncher:
 
         # 사용자 프로필 디렉토리 생성
         user_data_dir = Path(self._config.user_data_dir)
-        user_data_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"User data dir (relative): {self._config.user_data_dir}")
+        logger.info(f"User data dir (absolute): {user_data_dir.absolute()}")
+
+        try:
+            user_data_dir.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Successfully created user data directory: {user_data_dir.absolute()}")
+        except PermissionError as e:
+            logger.error(f"Permission denied creating directory: {user_data_dir.absolute()}")
+            logger.error(f"Error: {e}")
+            await publish(
+                EventType.BROWSER_ERROR,
+                data={"error": f"Permission denied: {e}"},
+                source="browser.launcher"
+            )
+            return False
+        except Exception as e:
+            logger.error(f"Failed to create user data directory: {e}")
+            await publish(
+                EventType.BROWSER_ERROR,
+                data={"error": str(e)},
+                source="browser.launcher"
+            )
+            return False
 
         # Chrome 실행
         args = self._build_chrome_args(chrome_path)
