@@ -7,7 +7,7 @@ LLM 프롬프트용 컨텍스트 빌더
 from dataclasses import dataclass
 from typing import Dict, List, Any, Optional
 
-from .site_manager import SiteConfig, get_site_manager
+from ..sites.site_manager import SiteConfig, get_site_manager
 
 
 # =============================================================================

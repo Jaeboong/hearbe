@@ -9,16 +9,16 @@ import logging
 from typing import Optional
 from dataclasses import dataclass, field
 
-from .site_manager import get_site_manager, get_current_site
-from .context_rules import GeneratedCommand
-from .rules import BaseRule
-from .rules.site_access import SiteAccessRule
-from .rules.select import SearchSelectRule
-from .rules.search import SearchRule
-from .rules.cart import CartRule
-from .rules.checkout import CheckoutRule
-from .rules.login import LoginRule
-from .rules.generic import GenericClickRule
+from ..sites.site_manager import get_site_manager, get_current_site
+from ..context.context_rules import GeneratedCommand
+from ..rules import BaseRule
+from ..rules.site_access import SiteAccessRule
+from ..rules.select import SearchSelectRule
+from ..rules.search import SearchRule
+from ..rules.cart import CartRule
+from ..rules.checkout import CheckoutRule
+from ..rules.login import LoginRule
+from ..rules.generic import GenericClickRule
 
 logger = logging.getLogger(__name__)
 
@@ -56,16 +56,16 @@ class CommandGenerator:
             GenericClickRule(self.site_manager),
         ]
     
-    async def generate(self, user_text: str, current_url: str = "") -> CommandResult:
+    async def generate_rules(self, user_text: str, current_url: str = "") -> CommandResult:
         """
-        자연어를 MCP 명령으로 변환 (LLM fallback 포함)
+        지역 기반만 사용하여 명령 생성
         
         Args:
             user_text: 사용자 입력 텍스트
             current_url: 현재 브라우저 URL
             
         Returns:
-            CommandResult: 생성된 명령 및 응답
+            CommandResult: 그룹 기반 결과 (매칭 실패시 matched_rule="none")
         """
         text = user_text.strip()
         if not text:
@@ -77,7 +77,7 @@ class CommandGenerator:
         
         current_site = get_current_site(current_url)
         
-        # 규칙 순서대로 체크
+        # 그룹 순서로 체크
         for rule in self.rules:
             result = rule.check(text, current_url, current_site)
             if result and result.matched:
@@ -87,9 +87,30 @@ class CommandGenerator:
                     matched_rule=result.rule_name
                 )
         
-        # 규칙 매칭 실패 → LLM에게 위임
-        return await self._try_llm_fallback(text, current_url, current_site)
-    
+        return CommandResult(
+            commands=[],
+            response_text=f"'{text}' 명령을 어떤 방법으로 처리할지 모르겠습니다.",
+            matched_rule="none"
+        )
+
+    async def generate(self, user_text: str, current_url: str = "") -> CommandResult:
+        """
+        자연어를 MCP 명령으로 변환 (LLM fallback 포함)
+        
+        Args:
+            user_text: 사용자 입력 텍스트
+            current_url: 현재 브라우저 URL
+            
+        Returns:
+            CommandResult: 생성된 명령 및 응답
+        """
+        result = await self.generate_rules(user_text, current_url)
+        if result.matched_rule != "none":
+            return result
+
+        current_site = get_current_site(current_url)
+        return await self._try_llm_fallback(user_text.strip(), current_url, current_site)
+
     async def _call_llm_with_context(
         self, 
         user_text: str, 
@@ -123,7 +144,7 @@ class CommandGenerator:
             self.llm_generator = LLMGenerator()
         
         # 페이지 컨텍스트 구성
-        from .site_manager import get_page_type
+        from ..sites.site_manager import get_page_type
         page_type = get_page_type(current_url) if current_url else None
         
         # 사용 가능한 셀렉터 정보 수집

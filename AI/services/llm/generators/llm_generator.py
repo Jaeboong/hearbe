@@ -15,15 +15,15 @@ try:
     from dotenv import load_dotenv
     from pathlib import Path
     
-    # services/llm/llm_generator.py -> AI/.env
-    env_path = Path(__file__).parent.parent.parent / ".env"
+    # services/llm/generators/llm_generator.py -> AI/.env
+    env_path = Path(__file__).parent.parent.parent.parent / ".env"
     load_dotenv(dotenv_path=env_path)
 except ImportError:
     pass
 
-from .context_builder import ContextBuilder, get_page_context, PageContext
-from .context_rules import GeneratedCommand
-from .site_manager import get_site_manager
+from ..context.context_builder import ContextBuilder, get_page_context, PageContext
+from ..context.context_rules import GeneratedCommand
+from ..sites.site_manager import get_site_manager
 
 logger = logging.getLogger(__name__)
 

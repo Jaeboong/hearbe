@@ -4,7 +4,7 @@
 
 from typing import Optional
 from . import BaseRule, RuleResult
-from ..context_rules import (
+from ..context.context_rules import (
     CLICK_TRIGGERS,
     extract_click_target,
     build_generic_click_commands

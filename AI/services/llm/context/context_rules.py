@@ -8,7 +8,7 @@ CommandGenerator에서 호출하여 사용합니다.
 from typing import Any, Dict, List, Optional
 from dataclasses import dataclass
 
-from .site_manager import SiteConfig
+from ..sites.site_manager import SiteConfig
 
 
 @dataclass
@@ -113,7 +113,7 @@ def build_site_access_commands(site: SiteConfig) -> List[GeneratedCommand]:
 
 def build_search_commands(site: SiteConfig, query: str, current_url: str = "") -> List[GeneratedCommand]:
     """검색 명령 시퀀스 생성 (URL 기반 셀렉터 동적 로딩)"""
-    from .site_manager import get_selector
+    from ..sites.site_manager import get_selector
     
     # URL 기반으로 현재 페이지의 검색 셀렉터 로드
     input_selector = get_selector(current_url, "search_input") if current_url else None
@@ -159,7 +159,7 @@ def build_search_with_navigation_commands(
 
 def build_add_to_cart_commands(site: Optional[SiteConfig], current_url: str = "") -> List[GeneratedCommand]:
     """장바구니 담기 명령 시퀀스 생성 (URL 기반 셀렉터 동적 로딩)"""
-    from .site_manager import get_selector
+    from ..sites.site_manager import get_selector
     
     # URL 기반으로 셀렉터 로드 (product 페이지의 add_to_cart)
     selector = get_selector(current_url, "add_to_cart") if current_url else None

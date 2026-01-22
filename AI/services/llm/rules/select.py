@@ -6,12 +6,12 @@
 
 from typing import Optional
 from . import BaseRule, RuleResult
-from ..context_rules import (
+from ..context.context_rules import (
     build_click_text_command,
     build_click_command,
     build_wait_command,
 )
-from ..site_manager import get_page_type
+from ..sites.site_manager import get_page_type
 
 
 SELECTION_TRIGGERS = ["선택", "골라", "고르", "열어", "눌러", "클릭", "열어줘", "열어봐"]
