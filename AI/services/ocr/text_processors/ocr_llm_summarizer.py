@@ -39,9 +39,9 @@ except ImportError:
 # 기본 설정 상수
 # ==========================================
 # 입력 파일 기본 경로 (테스트용)
-DEFAULT_INPUT = os.path.join("output", "샴푸_res_texts.json")
+DEFAULT_INPUT = os.path.join("output", "초코파이_detail_res_texts.json")
 # 출력 파일 기본 경로
-DEFAULT_OUTPUT = os.path.join("output", "샴푸_texts_summary.json")
+DEFAULT_OUTPUT = os.path.join("output", "초코파이_texts_summary.json")
 
 # 텍스트 전처리 모듈 임포트 시도
 try:
