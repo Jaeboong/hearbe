@@ -14,6 +14,7 @@ import aiohttp
 
 from core.config import get_config
 from core.event_bus import EventType, publish
+from browser.chrome_utils import find_chrome_path
 
 logger = logging.getLogger(__name__)
 
@@ -24,13 +25,6 @@ class ChromeLauncher:
 
     CDP 모드로 Chrome을 실행하고 WebSocket URL을 획득
     """
-
-    # Windows Chrome 기본 설치 경로
-    CHROME_PATHS = [
-        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-        Path.home() / "AppData" / "Local" / "Google" / "Chrome" / "Application" / "chrome.exe",
-    ]
 
     def __init__(self):
         self._config = get_config().browser
@@ -54,21 +48,12 @@ class ChromeLauncher:
 
     def _find_chrome_path(self) -> Optional[str]:
         """Chrome 실행 파일 경로 탐색"""
-        # 환경 변수로 지정된 경로 우선
-        if self._config.chrome_path:
-            path = Path(self._config.chrome_path)
-            if path.exists():
-                return str(path)
+        chrome_path = find_chrome_path(self._config.chrome_path)
+        if chrome_path:
+            logger.info(f"Found Chrome at: {chrome_path}")
+        else:
             logger.warning(f"Configured Chrome path not found: {self._config.chrome_path}")
-
-        # 기본 경로 탐색
-        for path in self.CHROME_PATHS:
-            path = Path(path)
-            if path.exists():
-                logger.info(f"Found Chrome at: {path}")
-                return str(path)
-
-        return None
+        return chrome_path
 
     def _build_chrome_args(self, chrome_path: str) -> list:
         """Chrome 실행 인자 생성"""
