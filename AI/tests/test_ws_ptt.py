@@ -220,6 +220,30 @@ class PTTStreamer:
                     prefix = "[FINAL]" if is_final else "[PARTIAL]"
                     print(f"\n{prefix} {text} (conf={confidence:.2f})")
 
+                elif msg_type == "tool_calls":
+                    # LLM이 생성한 MCP 명령 출력
+                    commands = data.get("commands", [])
+                    print(f"\n[LLM] 명령 {len(commands)}개 생성:")
+                    for i, cmd in enumerate(commands, 1):
+                        tool = cmd.get("tool_name", "")
+                        args = cmd.get("arguments", {})
+                        desc = cmd.get("description", "")
+                        print(f"  [{i}] {tool}: {args}")
+                        if desc:
+                            print(f"      → {desc}")
+
+                elif msg_type == "flow_step":
+                    # Flow 단계 안내
+                    prompt = data.get("prompt", "")
+                    step_id = data.get("step_id", "")
+                    print(f"\n[FLOW] {step_id}: {prompt}")
+
+                elif msg_type == "tts_chunk":
+                    # TTS 응답 (오디오 데이터는 생략, 상태만 출력)
+                    is_final = data.get("is_final", False)
+                    if is_final:
+                        print("\n[TTS] 응답 완료")
+
                 elif msg_type == "error":
                     print(f"\n[ERROR] {data.get('error', '')}")
 

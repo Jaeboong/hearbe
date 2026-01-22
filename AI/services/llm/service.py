@@ -6,7 +6,7 @@ LLM Planner 서비스
 
 import logging
 import os
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 from core.interfaces import (
     ILLMPlanner, IntentResult, SessionState,
@@ -73,7 +73,7 @@ class LLMPlanner(ILLMPlanner):
         conversation_history = session.conversation_history if session else None
 
         # 1. 규칙 기반 시도
-        result = self._rule_generator.generate(user_text, current_url)
+        result = await self._rule_generator.generate(user_text, current_url)
 
         # 2. 규칙 매칭 실패 시 LLM fallback
         if result.matched_rule == "none" and self._use_llm_fallback and self._llm_generator:
@@ -128,6 +128,46 @@ class LLMPlanner(ILLMPlanner):
             requires_flow=False,
             flow_type=None
         )
+
+    async def generate_response(self, context: Dict[str, Any]) -> str:
+        """
+        사용자에게 전달할 응답 텍스트 생성
+
+        Args:
+            context: 현재 컨텍스트 (검색 결과, 상품 정보 등)
+
+        Returns:
+            str: 응답 텍스트
+        """
+        # MCP 결과 기반 응답 생성
+        mcp_result = context.get("mcp_result", {})
+        if mcp_result.get("success"):
+            return "작업이 완료되었습니다."
+        elif mcp_result.get("error"):
+            return f"작업 중 오류가 발생했습니다: {mcp_result.get('error')}"
+        return "알겠습니다."
+
+    async def should_delegate_to_flow(self, intent: Optional[IntentResult]) -> Optional[str]:
+        """
+        Flow Engine 위임 여부 판단
+
+        Args:
+            intent: 의도 분석 결과
+
+        Returns:
+            str: 위임할 플로우 타입 (signup, checkout) 또는 None
+        """
+        if not intent:
+            return None
+        
+        from core.interfaces import IntentType
+        
+        flow_mapping = {
+            IntentType.CHECKOUT: "checkout",
+            IntentType.SIGNUP: "signup",
+        }
+        
+        return flow_mapping.get(intent.intent)
 
     async def shutdown(self):
         """리소스 정리"""
