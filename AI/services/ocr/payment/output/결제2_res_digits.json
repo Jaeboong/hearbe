@@ -1,0 +1,17 @@
+{
+  "source_file": "c:\\Users\\SSAFY\\Desktop\\메인 프로젝트\\AI\\services\\ocr\\payment\\output\\결제2_res.json",
+  "step": "1_digit_extraction",
+  "extracted_digits": [
+    "2",
+    "6",
+    "8",
+    "0",
+    "9",
+    "7",
+    "3",
+    "5",
+    "4",
+    "1"
+  ],
+  "total_count": 10
+}

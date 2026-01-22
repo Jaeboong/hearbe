@@ -1,0 +1,18 @@
+{
+  "page_type": "search",
+  "url_pattern": "/np/search\\?",
+  "description": "쿠팡 검색 결과 페이지",
+  "selectors": {
+    "search_input": "input[name=\"q\"]",
+    "search_button": "button.headerSearchBtn",
+    "product_list": ".search-product",
+    "product_item": ".search-product-link",
+    "product_title": ".name",
+    "product_price": ".price-value",
+    "next_page_btn": "button.nextBtn",
+    "prev_page_btn": "button.prevBtn",
+    "next_page_link": "a[title=\"다음\"]",
+    "feedback_like": "button.customer-feedback_likeBtn__57m6h",
+    "feedback_dislike": "button.customer-feedback_dislikeBtn__FH5mZ"
+  }
+}

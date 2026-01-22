@@ -11,6 +11,12 @@ from typing import Any, Dict, Optional
 
 from playwright.async_api import async_playwright, Browser, Page, Playwright
 
+from browser.action_utils import (
+    click_text as click_text_util,
+    get_visible_buttons as get_visible_buttons_util,
+)
+from mcp.tool_utils import normalize_tool_call, resolve_frame_context
+
 logger = logging.getLogger(__name__)
 
 
@@ -110,37 +116,57 @@ class BrowserTools:
             logger.error(f"Navigation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def click_element(self, selector: str, wait_timeout: int = 5000) -> Dict[str, Any]:
+    async def click_element(
+        self,
+        selector: str,
+        wait_timeout: int = 5000,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
         """
         요소 클릭
 
         Args:
             selector: CSS 선택자
             wait_timeout: 대기 시간 (ms)
+            frame_selector: iframe CSS 선택자 (선택)
+            frame_name: iframe name 속성 (선택)
+            frame_url: iframe URL 일부 또는 정규식 (선택)
+            frame_index: iframe index (선택)
 
         Returns:
             {"success": bool, "element_found": bool}
         """
-        if not self._page:
-            return {"success": False, "error": "Not connected to browser"}
+        return await self._click_with_frame(
+            selector,
+            wait_timeout=wait_timeout,
+            frame_selector=frame_selector,
+            frame_name=frame_name,
+            frame_url=frame_url,
+            frame_index=frame_index,
+        )
 
-        try:
-            await self._page.wait_for_selector(selector, timeout=wait_timeout)
-            await self._page.click(selector)
-            logger.info(f"Clicked element: {selector}")
-            return {"success": True, "element_found": True}
-
-        except Exception as e:
-            logger.error(f"Click failed: {e}")
-            return {"success": False, "element_found": False, "error": str(e)}
-
-    async def fill_input(self, selector: str, value: str) -> Dict[str, Any]:
+    async def fill_input(
+        self,
+        selector: str,
+        value: str,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
         """
         입력 필드 채우기
 
         Args:
             selector: CSS 선택자
             value: 입력할 값
+            frame_selector: iframe CSS 선택자 (선택)
+            frame_name: iframe name 속성 (선택)
+            frame_url: iframe URL 일부 또는 정규식 (선택)
+            frame_index: iframe index (선택)
 
         Returns:
             {"success": bool}
@@ -149,7 +175,22 @@ class BrowserTools:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
-            await self._page.fill(selector, value)
+            context_type, context, error = resolve_frame_context(
+                self._page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error}
+
+            if context_type == "frame_locator":
+                locator = context.locator(selector)
+                await locator.fill(value)
+            else:
+                await context.fill(selector, value)
+
             logger.info(f"Filled input {selector} with: {value}")
             return {"success": True}
 
@@ -157,12 +198,73 @@ class BrowserTools:
             logger.error(f"Fill failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def get_text(self, selector: str) -> Dict[str, Any]:
+    async def press_key(
+        self,
+        selector: str,
+        key: str = "Enter",
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        키보드 키 입력
+
+        Args:
+            selector: CSS 선택자
+            key: 키 이름 (Enter, Tab 등)
+            frame_selector: iframe CSS 선택자 (선택)
+            frame_name: iframe name 속성 (선택)
+            frame_url: iframe URL 일부 또는 정규식 (선택)
+            frame_index: iframe index (선택)
+
+        Returns:
+            {"success": bool}
+        """
+        if not self._page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            context_type, context, error = resolve_frame_context(
+                self._page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error}
+
+            if context_type == "frame_locator":
+                locator = context.locator(selector)
+                await locator.press(key)
+            else:
+                await context.press(selector, key)
+
+            logger.info(f"Pressed key {key} on {selector}")
+            return {"success": True}
+
+        except Exception as e:
+            logger.error(f"Press failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def get_text(
+        self,
+        selector: str,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
         """
         요소의 텍스트 추출
 
         Args:
             selector: CSS 선택자
+            frame_selector: iframe CSS 선택자 (선택)
+            frame_name: iframe name 속성 (선택)
+            frame_url: iframe URL 일부 또는 정규식 (선택)
+            frame_index: iframe index (선택)
 
         Returns:
             {"success": bool, "text": str}
@@ -171,17 +273,87 @@ class BrowserTools:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
-            element = await self._page.query_selector(selector)
-            if element:
-                text = await element.text_content()
-                logger.info(f"Got text from {selector}: {text[:50] if text else ''}...")
-                return {"success": True, "text": text or ""}
+            context_type, context, error = resolve_frame_context(
+                self._page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error}
+
+            if context_type == "frame_locator":
+                locator = context.locator(selector)
+                if await locator.count() == 0:
+                    return {"success": False, "error": "Element not found"}
+                text = await locator.first.text_content()
             else:
-                return {"success": False, "error": "Element not found"}
+                element = await context.query_selector(selector)
+                if not element:
+                    return {"success": False, "error": "Element not found"}
+                text = await element.text_content()
+
+            logger.info(f"Got text from {selector}: {text[:50] if text else ''}...")
+            return {"success": True, "text": text or ""}
 
         except Exception as e:
             logger.error(f"Get text failed: {e}")
             return {"success": False, "error": str(e)}
+
+    async def click_text(self, text: str) -> Dict[str, Any]:
+        """
+        텍스트로 요소 클릭 (프레임 포함)
+
+        Args:
+            text: 찾을 텍스트
+
+        Returns:
+            {"success": bool, "result": str}
+        """
+        if not self._page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            return await click_text_util(self._page, text)
+        except Exception as e:
+            logger.error(f"Click text failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def get_visible_buttons(self, max_items: int = 200) -> Dict[str, Any]:
+        """
+        페이지에서 보이는 버튼 요소 조회
+
+        Args:
+            max_items: 최대 항목 수
+
+        Returns:
+            {"success": bool, "buttons": list, "count": int}
+        """
+        if not self._page:
+            return {"success": False, "error": "Not connected to browser", "buttons": []}
+
+        try:
+            buttons = await get_visible_buttons_util(self._page, max_items=max_items)
+            return {"success": True, "buttons": buttons, "count": len(buttons)}
+        except Exception as e:
+            logger.error(f"Get visible buttons failed: {e}")
+            return {"success": False, "error": str(e), "buttons": []}
+
+    async def wait(self, ms: int = 1000) -> Dict[str, Any]:
+        """
+        대기
+
+        Args:
+            ms: 대기 시간 (ms)
+
+        Returns:
+            {"success": bool}
+        """
+        if ms < 0:
+            return {"success": False, "error": "Invalid wait time"}
+        await asyncio.sleep(ms / 1000)
+        return {"success": True}
 
     async def take_screenshot(self, full_page: bool = False) -> Dict[str, Any]:
         """
@@ -241,6 +413,8 @@ class BrowserTools:
         Returns:
             도구 실행 결과
         """
+        tool_name, args = normalize_tool_call(tool_name, arguments)
+
         tools = {
             "navigate_to_url": self.navigate_to_url,
             "click_element": self.click_element,
@@ -248,6 +422,10 @@ class BrowserTools:
             "get_text": self.get_text,
             "take_screenshot": self.take_screenshot,
             "scroll": self.scroll,
+            "press_key": self.press_key,
+            "wait": self.wait,
+            "click_text": self.click_text,
+            "get_visible_buttons": self.get_visible_buttons,
         }
 
         if tool_name not in tools:
@@ -256,6 +434,44 @@ class BrowserTools:
         tool_func = tools[tool_name]
 
         try:
-            return await tool_func(**arguments)
+            return await tool_func(**args)
         except TypeError as e:
             return {"success": False, "error": f"Invalid arguments: {e}"}
+
+    async def _click_with_frame(
+        self,
+        selector: str,
+        wait_timeout: int = 5000,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        if not self._page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            context_type, context, error = resolve_frame_context(
+                self._page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "element_found": False, "error": error}
+
+            if context_type == "frame_locator":
+                locator = context.locator(selector)
+                await locator.wait_for(timeout=wait_timeout)
+                await locator.click(timeout=wait_timeout)
+            else:
+                await context.wait_for_selector(selector, timeout=wait_timeout)
+                await context.click(selector)
+
+            logger.info(f"Clicked element: {selector}")
+            return {"success": True, "element_found": True}
+
+        except Exception as e:
+            logger.error(f"Click failed: {e}")
+            return {"success": False, "element_found": False, "error": str(e)}

@@ -1,0 +1,15 @@
+{
+  "page_type": "login",
+  "url_pattern": "login\\.coupang\\.com/login",
+  "description": "쿠팡 로그인 페이지",
+  "selectors": {
+    "tab_email_login": "a.password[data-tab=\"password-login\"]",
+    "tab_phone_login": "a.pc-otp-login-v4[data-tab=\"pc-otp-login-v4\"]",
+    "tab_qr_login": "a.qrcode[data-tab=\"qr-login\"]",
+    "email_input": "#login-email-input",
+    "password_input": "#login-password-input",
+    "login_button": "button.login__button",
+    "phone_submit_button": "button._phoneSubmitButton",
+    "member_util": "button.member__util-trigger"
+  }
+}
