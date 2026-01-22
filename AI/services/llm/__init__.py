@@ -6,7 +6,7 @@ LLM 명령 생성 서비스
 """
 
 from .service import LLMPlanner
-from .command_generator import CommandGenerator, CommandResult, generate_commands
+from .command_generator import CommandGenerator, CommandResult
 from .context_rules import GeneratedCommand
 from .site_manager import get_site_manager, get_current_site, SiteConfig
 from .llm_generator import LLMGenerator, LLMResult, get_llm_generator
@@ -19,14 +19,13 @@ __all__ = [
     "CommandGenerator",
     "CommandResult",
     "GeneratedCommand",
-    "generate_commands",
     # LLM 생성기
     "LLMGenerator",
     "LLMResult",
     "get_llm_generator",
     # 컨텍스트
     "ContextBuilder",
-    "PageContext",
+    "PageContext",  
     "get_page_context",
     # 사이트 관리
     "get_site_manager",

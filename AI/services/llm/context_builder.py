@@ -35,17 +35,28 @@ AVAILABLE_COMMANDS = {
     },
     "click": {
         "description": "CSS 셀렉터로 요소 클릭",
-        "args": {"selector": "CSS 셀렉터"},
+        "args": {
+            "selector": "CSS 셀렉터",
+            "frame_selector": "iframe CSS 셀렉터 (선택)"
+        },
         "example": '{"action": "click", "args": {"selector": "#login-btn"}, "desc": "로그인 버튼 클릭"}'
     },
     "fill": {
         "description": "입력 필드에 텍스트 입력",
-        "args": {"selector": "CSS 셀렉터", "text": "입력할 텍스트"},
+        "args": {
+            "selector": "CSS 셀렉터",
+            "text": "입력할 텍스트",
+            "frame_selector": "iframe CSS 셀렉터 (선택)"
+        },
         "example": '{"action": "fill", "args": {"selector": "input[name=q]", "text": "생수"}, "desc": "검색어 입력"}'
     },
     "press": {
         "description": "키보드 키 입력",
-        "args": {"selector": "CSS 셀렉터", "key": "키 이름 (Enter, Tab 등)"},
+        "args": {
+            "selector": "CSS 셀렉터",
+            "key": "키 이름 (Enter, Tab 등)",
+            "frame_selector": "iframe CSS 셀렉터 (선택)"
+        },
         "example": '{"action": "press", "args": {"selector": "input", "key": "Enter"}, "desc": "엔터 키 입력"}'
     },
     "wait": {
@@ -103,7 +114,14 @@ def get_page_context(url: str, site: Optional[SiteConfig] = None) -> PageContext
     page_type = detect_page_type(url)
     
     site_name = site.name if site else "알 수 없음"
-    selectors = site.selectors.get(page_type, {}) if site else {}
+    
+    # 새 구조: get_page_selectors 사용
+    selectors = {}
+    if site:
+        page_selectors = site.get_page_selectors(page_type)
+        if page_selectors:
+            selectors = page_selectors.selectors
+    
     available_actions = PAGE_ACTIONS.get(page_type, PAGE_ACTIONS["unknown"])
     
     return PageContext(
