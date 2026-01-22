@@ -144,6 +144,7 @@ class SessionState:
     session_id: str
     user_id: Optional[str] = None
     current_site: Optional[str] = None
+    current_url: Optional[str] = None  # 현재 브라우저 URL
     current_flow: Optional[str] = None
     flow_step: int = 0
     search_history: List[str] = None
