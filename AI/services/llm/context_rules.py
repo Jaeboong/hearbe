@@ -26,10 +26,6 @@ class GeneratedCommand:
         }
 
 
-# =============================================================================
-# 사이트 키워드 매핑
-# =============================================================================
-
 SITE_KEYWORDS = {
     "쿠팡": "coupang",
     "네이버": "naver",
@@ -115,24 +111,37 @@ def build_site_access_commands(site: SiteConfig) -> List[GeneratedCommand]:
     ]
 
 
-def build_search_commands(site: SiteConfig, query: str) -> List[GeneratedCommand]:
-    """검색 명령 시퀀스 생성"""
-    search_selectors = site.selectors.get("search", {})
-    input_selector = search_selectors.get("input", "input[name='q']")
-    submit_key = search_selectors.get("submit_key", "Enter")
-
-    return [
-        build_click_command(input_selector, "검색창 클릭"),
+def build_search_commands(site: SiteConfig, query: str, current_url: str = "") -> List[GeneratedCommand]:
+    """검색 명령 시퀀스 생성 (URL 기반 셀렉터 동적 로딩)"""
+    from .site_manager import get_selector
+    
+    # URL 기반으로 현재 페이지의 검색 셀렉터 로드
+    input_selector = get_selector(current_url, "search_input") if current_url else None
+    button_selector = get_selector(current_url, "search_button") if current_url else None
+    
+    # 폴백: 기본 셀렉터
+    if not input_selector:
+        input_selector = "#headerSearchKeyword"  # 쿠팡 기본
+    
+    commands = [
         build_fill_command(input_selector, query, f"'{query}' 입력"),
-        build_press_command(input_selector, submit_key, "검색 실행"),
-        build_wait_command(1500, "검색 결과 로딩 대기")
     ]
+    
+    # 검색 버튼이 있으면 클릭, 없으면 Enter
+    if button_selector:
+        commands.append(build_click_command(button_selector, "검색 버튼 클릭"))
+    else:
+        commands.append(build_press_command(input_selector, "Enter", "검색 실행"))
+    
+    commands.append(build_wait_command(1500, "검색 결과 로딩 대기"))
+    return commands
 
 
 def build_search_with_navigation_commands(
     site: SiteConfig,
     query: str,
-    needs_navigation: bool
+    needs_navigation: bool,
+    current_url: str = ""
 ) -> List[GeneratedCommand]:
     """사이트 이동 포함 검색 명령 시퀀스 생성"""
     commands = []
@@ -141,22 +150,31 @@ def build_search_with_navigation_commands(
         home_url = site.get_url("home")
         commands.append(build_goto_command(home_url, f"{site.name} 이동"))
         commands.append(build_wait_command(1000, "페이지 로딩 대기"))
+        # 이동 후 URL 업데이트
+        current_url = home_url
 
-    commands.extend(build_search_commands(site, query))
+    commands.extend(build_search_commands(site, query, current_url))
     return commands
 
 
-def build_add_to_cart_commands(site: Optional[SiteConfig]) -> List[GeneratedCommand]:
-    """장바구니 담기 명령 시퀀스 생성"""
-    if site:
+def build_add_to_cart_commands(site: Optional[SiteConfig], current_url: str = "") -> List[GeneratedCommand]:
+    """장바구니 담기 명령 시퀀스 생성 (URL 기반 셀렉터 동적 로딩)"""
+    from .site_manager import get_selector
+    
+    # URL 기반으로 셀렉터 로드 (product 페이지의 add_to_cart)
+    selector = get_selector(current_url, "add_to_cart") if current_url else None
+    
+    # 폴백: SiteConfig에서 시도
+    if not selector and site:
         selector = site.get_selector("product", "add_to_cart")
-        if selector:
-            return [
-                build_click_command(selector, "장바구니 담기 버튼 클릭"),
-                build_wait_command(1000, "처리 대기")
-            ]
+    
+    if selector:
+        return [
+            build_click_command(selector, "장바구니 담기 버튼 클릭"),
+            build_wait_command(1000, "처리 대기")
+        ]
 
-    # 폴백
+    # 최종 폴백: 텍스트 기반
     return [build_click_text_command("장바구니", "장바구니 버튼 찾아서 클릭")]
 
 

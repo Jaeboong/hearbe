@@ -10,6 +10,17 @@ import os
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
+# .env 파일 로드 (프로젝트 루트인 AI 디렉토리 기준)
+try:
+    from dotenv import load_dotenv
+    from pathlib import Path
+    
+    # services/llm/llm_generator.py -> AI/.env
+    env_path = Path(__file__).parent.parent.parent / ".env"
+    load_dotenv(dotenv_path=env_path)
+except ImportError:
+    pass
+
 from .context_builder import ContextBuilder, get_page_context, PageContext
 from .context_rules import GeneratedCommand
 from .site_manager import get_site_manager
@@ -33,9 +44,11 @@ class LLMGenerator:
     OpenAI API를 사용하여 자연어를 MCP 명령으로 변환합니다.
     """
     
-    def __init__(self, api_key: str = None, model: str = "gpt-4o-mini"):
-        self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
+    def __init__(self, api_key: str = None, model: str = "gpt-5-mini"):
+        # GMS_API_KEY 우선, 없으면 OPENAI_API_KEY 사용
+        self.api_key = api_key or os.environ.get("GMS_API_KEY") or os.environ.get("OPENAI_API_KEY")
         self.model = model
+        self.base_url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1"
         self.context_builder = ContextBuilder()
         self._client = None
         
@@ -44,11 +57,14 @@ class LLMGenerator:
     
     @property
     def client(self):
-        """OpenAI 클라이언트 lazy 로딩"""
+        """OpenAI 클라이언트 lazy 로딩 (GMS 프록시 사용)"""
         if self._client is None:
             try:
                 from openai import OpenAI
-                self._client = OpenAI(api_key=self.api_key)
+                self._client = OpenAI(
+                    api_key=self.api_key,
+                    base_url=self.base_url
+                )
             except ImportError:
                 logger.error("openai 패키지가 설치되지 않았습니다: pip install openai")
                 raise
@@ -58,6 +74,8 @@ class LLMGenerator:
         self,
         user_text: str,
         current_url: str = "",
+        page_type: Optional[str] = None,
+        available_selectors: Optional[Dict[str, str]] = None,
         conversation_history: List[Dict[str, str]] = None
     ) -> LLMResult:
         """
@@ -66,6 +84,8 @@ class LLMGenerator:
         Args:
             user_text: 사용자 입력
             current_url: 현재 URL
+            page_type: 페이지 타입 (main, product, checkout 등)
+            available_selectors: 현재 페이지에서 사용 가능한 셀렉터 목록
             conversation_history: 대화 기록 (없으면 로컬 기록 사용)
         
         Returns:
@@ -77,6 +97,12 @@ class LLMGenerator:
         # 페이지 컨텍스트 생성
         site = get_site_manager().get_site_by_url(current_url)
         page_context = get_page_context(current_url, site)
+        
+        # available_selectors가 전달되면 컨텍스트에 추가
+        if page_type:
+            page_context.page_type = page_type
+        if available_selectors:
+            page_context.selectors = available_selectors
         
         # 프롬프트 메시지 구성
         messages = self.context_builder.build_messages(
@@ -92,8 +118,7 @@ class LLMGenerator:
                 model=self.model,
                 messages=messages,
                 response_format={"type": "json_object"},
-                temperature=0.3,
-                max_tokens=1000
+                max_completion_tokens=1000
             )
             
             # 응답 파싱
