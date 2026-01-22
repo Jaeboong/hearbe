@@ -33,17 +33,20 @@ class SessionManager(ISessionManager):
         """세션 관리자 초기화"""
         logger.info("Session Manager initialized")
 
-    def create_session(self, user_id: Optional[str] = None) -> SessionState:
+    def create_session(self, user_id: Optional[str] = None, session_id: Optional[str] = None) -> SessionState:
         """
         새 세션 생성
 
         Args:
             user_id: 사용자 ID (선택)
+            session_id: 세션 ID (선택, 없으면 자동 생성)
 
         Returns:
             SessionState: 생성된 세션
         """
-        session_id = str(uuid.uuid4())
+        if session_id is None:
+            session_id = str(uuid.uuid4())
+        
         session = SessionState(
             session_id=session_id,
             user_id=user_id,

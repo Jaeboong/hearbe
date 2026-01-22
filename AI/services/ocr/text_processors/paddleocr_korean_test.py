@@ -33,7 +33,7 @@ ocr = PaddleOCR(
 # 지정된 이미지 파일 경로를 입력받아 OCR을 수행합니다.
 # result 변수에는 인식된 텍스트 박스 위치, 텍스트 내용, 신뢰도가 포함됩니다.
 # =============================================================================
-img_path = "../tests/fixtures/샴푸.jpg" # 테스트할 이미지 경로 (text_processors 폴더 기준)
+img_path = "../tests/fixtures/초코파이_detail.jpg" # 테스트할 이미지 경로 (text_processors 폴더 기준)
 print(f"이미지 인식 시작: {img_path}")
 result = ocr.predict(img_path)
 
@@ -49,10 +49,10 @@ for res in result:
     # 원본 이미지 위에 인식된 텍스트 박스와 텍스트를 그려서 저장합니다.
     # 파일명은 'vis_{원본파일명}.jpg' 형태로 저장됩니다.
     res.save_to_img("output")
-    print("결과 이미지 저장 완료: output/vis_샴푸.jpg")             
+    print("결과 이미지 저장 완료: output/vis_초코파이_detail.jpg")              
     
     # 3. 결과 JSON 저장 (output 폴더)
     # 상세 인식 정보를 JSON 파일로 저장합니다.
     # 이 파일은 추후 LLM 요약 단계(ocr_llm_summarizer.py)의 입력으로 사용됩니다.
     res.save_to_json("output")
-    print("결과 JSON 저장 완료: output/샴푸_res.json")  
+    print("결과 JSON 저장 완료: output/초코파이_detail_res.json")  

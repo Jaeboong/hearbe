@@ -82,6 +82,26 @@ class ChromeLauncher:
             logger.warning("Chrome is already running")
             return False
 
+        # 먼저 기존 CDP 연결이 있는지 확인
+        existing_cdp_url = await self._check_existing_cdp()
+        if existing_cdp_url:
+            logger.info(f"Found existing Chrome CDP at port {self._config.debugging_port}")
+            self._cdp_url = existing_cdp_url
+            
+            # 브라우저 준비 완료 이벤트
+            await publish(
+                EventType.BROWSER_READY,
+                data={
+                    "cdp_url": self._cdp_url,
+                    "process_id": None  # 외부에서 시작된 프로세스
+                },
+                source="browser.launcher"
+            )
+            
+            logger.info(f"Connected to existing Chrome - CDP URL: {self._cdp_url}")
+            return True
+
+        # 기존 CDP가 없으면 새 Chrome 실행
         # Chrome 경로 탐색
         chrome_path = self._find_chrome_path()
         if not chrome_path:
@@ -162,6 +182,26 @@ class ChromeLauncher:
 
         logger.info(f"Chrome ready - CDP URL: {self._cdp_url}")
         return True
+
+    async def _check_existing_cdp(self) -> Optional[str]:
+        """
+        기존 CDP 연결 확인
+        
+        Returns:
+            기존 CDP WebSocket URL 또는 None
+        """
+        cdp_http_url = f"http://127.0.0.1:{self._config.debugging_port}/json/version"
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(cdp_http_url, timeout=aiohttp.ClientTimeout(total=2)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        return data.get("webSocketDebuggerUrl")
+        except Exception:
+            pass
+        
+        return None
 
     async def _wait_for_cdp(self, timeout: int = 10) -> Optional[str]:
         """
