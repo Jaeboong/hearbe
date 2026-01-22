@@ -39,9 +39,9 @@ except ImportError:
 # 기본 설정 상수
 # ==========================================
 # 입력 파일 기본 경로 (테스트용)
-DEFAULT_INPUT = os.path.join("output", "오겹살_res_texts.json")
+DEFAULT_INPUT = os.path.join("output", "샴푸_res_texts.json")
 # 출력 파일 기본 경로
-DEFAULT_OUTPUT = os.path.join("output", "오겹살_texts_summary.json")
+DEFAULT_OUTPUT = os.path.join("output", "샴푸_texts_summary.json")
 
 # 텍스트 전처리 모듈 임포트 시도
 try:
@@ -175,7 +175,7 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
     # API 요청 메시지 구성
     messages = [
         {
-            "role": "system", # developer 역할 대신 system 사용 (호환성)
+            "role": "developer", # GMS API는 developer 역할 사용
             "content": prompt["system"] + "\n\n" + prompt["instructions"]
         },
         {
@@ -187,8 +187,6 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
     payload = {
         "model": model,
         "messages": messages,
-        "temperature": 0.2, # 사실적인 정보를 위해 낮은 무작위성 설정
-        "response_format": {"type": "json_object"} # JSON 모드 강제
     }
 
     headers = {
@@ -207,6 +205,9 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
                 headers=headers,
                 timeout=(10, 120),  # (연결 타임아웃 10초, 읽기 타임아웃 120초)
             )
+            if response.status_code >= 400:
+                print(f"\n[DEBUG] HTTP {response.status_code} 에러")
+                print(f"[DEBUG] 응답 본문: {response.text}")
             response.raise_for_status() # 4xx, 5xx 에러 발생 시 예외 송출
             raw = response.json()
 
@@ -218,6 +219,12 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
             output_text = choices[0].get("message", {}).get("content", "")
             if not output_text:
                 raise RuntimeError("LLM 응답 내용이 비어있습니다.")
+
+            # Markdown 코드 블록으로 감싸진 JSON 처리 (예: ```json ... ```)
+            if output_text.strip().startswith("```"):
+                lines = output_text.strip().split("\n")
+                # 첫 줄(```json)과 마지막 줄(```) 제거
+                output_text = "\n".join(lines[1:-1])
 
             # JSON 파싱 시도
             try:
@@ -243,7 +250,9 @@ def _write_json(path: str, data: Dict) -> None:
     딕셔너리 데이터를 JSON 파일로 저장합니다.
     디렉토리가 없으면 자동으로 생성합니다.
     """
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    dir_path = os.path.dirname(path)
+    if dir_path:  # 빈 문자열이 아닐 때만 디렉토리 생성
+        os.makedirs(dir_path, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         # ensure_ascii=False: 한글이 깨지지 않고 그대로 저장되도록 함
         # indent=2: 들여쓰기를 2칸으로 하여 보기 좋게 포맷팅
@@ -354,7 +363,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="OCR 결과를 분석하여 JSON으로 요약합니다.")
     parser.add_argument("--input", default=DEFAULT_INPUT, help="입력 OCR JSON 파일 경로")
     parser.add_argument("--output", default=DEFAULT_OUTPUT, help="출력 요약 JSON 파일 경로")
-    parser.add_argument("--query", default="", help="요약된 JSON에 대해 질문할 때 사용 (예: "가격이 얼마야?")")
+    parser.add_argument("--query", default="", help='요약된 JSON에 대해 질문할 때 사용 (예: "가격이 얼마야?")')
     args = parser.parse_args()
 
     # 모드 1: 질문 답변 모드 (이미 요약된 JSON이 있을 때)
@@ -373,7 +382,7 @@ def main() -> int:
     # 1. OCR 텍스트 로드 및 전처리
     texts, _ = _load_ocr_texts(args.input)
     if not texts:
-        print("오류: 유요한 OCR 텍스트가 없습니다.")
+        print("오류: 유효한 OCR 텍스트가 없습니다.")
         return 1
 
     # 2. 제품 타입 감지

@@ -1,5 +1,5 @@
 {
-  "source_file": "output\\결제2_res_digits.json",
+  "source_file": "c:\\Users\\SSAFY\\Desktop\\메인 프로젝트\\AI\\services\\ocr\\payment\\output\\결제2_res_digits.json",
   "step": "2_dom_mapping",
   "digits": [
     "2",
@@ -14,28 +14,27 @@
     "1"
   ],
   "dom_keys": [
-    "key-100",
-    "key-101",
-    "key-102",
-    "key-103",
-    "key-104",
-    "key-105",
-    "key-106",
-    "key-107",
-    "key-108",
-    "key-109"
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
   ],
   "digit_to_key_mapping": {
-    "2": "key-100",
-    "6": "key-101",
-    "8": "key-102",
-    "0": "key-103",
-    "9": "key-104",
-    "7": "key-105",
-    "3": "key-106",
-    "5": "key-107",
-    "4": "key-108",
-    "1": "key-109"
-  },
-  "tts_text": "0은 key key-103. 1은 key key-109. 2은 key key-100. 3은 key key-106. 4은 key key-108. 5은 key key-107. 6은 key key-101. 7은 key key-105. 8은 key key-102. 9은 key key-104"
+    "2": "0",
+    "6": "1",
+    "8": "2",
+    "0": "3",
+    "9": "4",
+    "7": "5",
+    "3": "6",
+    "5": "7",
+    "4": "8",
+    "1": "9"
+  }
 }
