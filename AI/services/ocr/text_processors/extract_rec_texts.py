@@ -14,8 +14,8 @@ from pathlib import Path
 # ============================================
 # 기본 입출력 경로 설정 (직접 수정 가능)
 # ============================================
-DEFAULT_INPUT = os.path.join("output", "오겹살_res.json")
-DEFAULT_OUTPUT = os.path.join("output", "오겹살_res_texts.json")
+DEFAULT_INPUT = os.path.join("output", "샴푸_res.json")
+DEFAULT_OUTPUT = os.path.join("output", "샴푸_res_texts.json")
 
 
 def extract_rec_texts(input_path: str, output_path: str = None) -> list:
