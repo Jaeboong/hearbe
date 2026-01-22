@@ -4,11 +4,11 @@
 
 from typing import Optional
 from . import BaseRule, RuleResult
-from ..context_rules import (
+from ..context.context_rules import (
     CHECKOUT_TRIGGERS,
     GeneratedCommand
 )
-from ..site_manager import get_selector, get_page_type
+from ..sites.site_manager import get_selector, get_page_type
 
 
 class CheckoutRule(BaseRule):

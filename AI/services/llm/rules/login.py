@@ -4,7 +4,7 @@
 
 from typing import Optional
 from . import BaseRule, RuleResult
-from ..context_rules import (
+from ..context.context_rules import (
     LOGIN_SUBMIT_TRIGGERS,
     build_login_page_commands,
     build_login_submit_commands

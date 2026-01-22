@@ -10,8 +10,10 @@ import sys
 from pathlib import Path
 
 # 프로젝트 루트 추가
-project_root = Path(__file__).parent.parent.parent.parent
+services_root = Path(__file__).resolve().parents[2]
+project_root = services_root.parent
 sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(services_root))
 
 try:
     import requests
@@ -21,8 +23,8 @@ except ImportError:
     print("[ERROR] requests 모듈 필요: pip install requests")
     sys.exit(1)
 
-from services.llm.command_generator import CommandGenerator
-from services.llm.tests.session_manager import get_session_manager
+from llm.generators.command_generator import CommandGenerator
+from llm.tests.session_manager import get_session_manager
 
 # MCP API 서버
 MCP_API_URL = "http://localhost:8000"
