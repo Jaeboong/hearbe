@@ -18,7 +18,7 @@ AI/
 │   ├── __init__.py
 │   ├── asr/                      # 음성 인식 (ASR)
 │   │   ├── __init__.py
-│   │   └── service.py            # Faster-Whisper 기반 STT
+│   │   └── service.py            # Faster-Whisper 기반 ASR
 │   ├── nlu/                      # 자연어 이해 (NLU)
 │   │   ├── __init__.py
 │   │   └── service.py            # 의도 분석, NER
@@ -292,7 +292,7 @@ pytest tests/ -v
 | 방향        | 메시지 타입   | 설명                            |
 | ----------- | ------------- | ------------------------------- |
 | 로컬 → 서버 | `audio_chunk` | 녹음 중인 음성 청크 실시간 전송 |
-| 서버 → 로컬 | `stt_result`  | STT 변환 텍스트 결과            |
+| 서버 → 로컬 | `asr_result`  | ASR 변환 텍스트 결과            |
 | 서버 → 로컬 | `tool_calls`  | LLM 생성 MCP 명령               |
 | 서버 → 로컬 | `flow_step`   | 플로우 엔진 단계 정보           |
 | 서버 → 로컬 | `tts_chunk`   | TTS 음성 청크 실시간 전송       |
@@ -357,7 +357,7 @@ pytest tests/ -v
 3. 사용자 로그인 완료 → 서버가 리다이렉트로 앱 로컬 콜백에 auth_code 전달
 4. 앱이 auth_code를 서버로 전송(HTTP) → access/refresh 토큰 발급
 5. 앱이 WebSocket 연결 → 세션 생성
-6. V 키 → 오디오 스트림 전송(WS) → STT → 텍스트 반환
+6. V 키 → 오디오 스트림 전송(WS) → ASR → 텍스트 반환
 7. 서버 LLM(GPT-5-mini)로 명령 생성
 8. "일반 명령"이면 바로 MCP 실행 결과 수신
 9. "회원가입/결제 플로우"면 사이트별 플로우 엔진이 단계별로 진행
@@ -390,7 +390,7 @@ pytest tests/ -v
 - [Cartesia Korean TTS](https://cartesia.ai/languages/korean)
 - [CosyVoice 2.0 (Open Source)](https://www.siliconflow.com/articles/en/best-open-source-text-to-speech-models)
 
-### ASR/STT
+### ASR
 
 - [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)
 

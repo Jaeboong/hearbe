@@ -101,6 +101,7 @@ def main():
     parser.add_argument('--status', help='변경할 상태')
     parser.add_argument('--assign', help='담당자 (me = 나)')
     parser.add_argument('--comment', help='추가할 코멘트')
+    parser.add_argument('--summary', help='이슈 제목 변경')
     parser.add_argument('--priority', help='우선순위 (High/Medium/Low)')
     parser.add_argument('--points', type=int, help='Story Points')
 
@@ -118,6 +119,10 @@ def main():
 
     if args.comment:
         add_comment(jira, args.key, args.comment)
+
+    if args.summary:
+        update_fields(jira, args.key, summary=args.summary)
+        print(f"✅ {args.key} 제목 변경: {args.summary}")
 
     if args.priority:
         update_fields(jira, args.key, priority={'name': args.priority})

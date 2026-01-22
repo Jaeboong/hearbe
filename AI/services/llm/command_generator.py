@@ -1,39 +1,24 @@
 """
-명령 생성기 모듈
+자연어 → MCP 명령 변환기 (리팩토링 버전)
 
-자연어 입력을 MCP 브라우저 자동화 명령으로 변환합니다.
-context_rules의 빌더 함수를 사용하여 명령을 생성합니다.
+규칙 기반 매칭 + LLM fallback으로 명령을 생성합니다.
+실제 규칙 로직은 rules 모듈에 분리되어 있습니다.
 """
 
 import logging
-from typing import List, Optional
-from dataclasses import dataclass
+from typing import Optional
+from dataclasses import dataclass, field
 
-from .site_manager import get_site_manager, get_current_site, SiteConfig
-from .context_rules import (
-    # 데이터 클래스
-    GeneratedCommand,
-    # 상수
-    SITE_KEYWORDS,
-    SITE_ACCESS_TRIGGERS,
-    CART_ADD_TRIGGERS,
-    CART_GO_TRIGGERS,
-    LOGIN_SUBMIT_TRIGGERS,
-    CHECKOUT_TRIGGERS,
-    CLICK_TRIGGERS,
-    # 빌더 함수
-    build_site_access_commands,
-    build_search_with_navigation_commands,
-    build_add_to_cart_commands,
-    build_go_to_cart_commands,
-    build_login_page_commands,
-    build_login_submit_commands,
-    build_generic_click_commands,
-    # 유틸리티
-    extract_search_query,
-    detect_target_site,
-    extract_click_target,
-)
+from .site_manager import get_site_manager, get_current_site
+from .context_rules import GeneratedCommand
+from .rules import BaseRule
+from .rules.site_access import SiteAccessRule
+from .rules.select import SearchSelectRule
+from .rules.search import SearchRule
+from .rules.cart import CartRule
+from .rules.checkout import CheckoutRule
+from .rules.login import LoginRule
+from .rules.generic import GenericClickRule
 
 logger = logging.getLogger(__name__)
 
@@ -41,32 +26,44 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CommandResult:
     """명령 생성 결과"""
-    commands: List[GeneratedCommand]
-    response_text: str
-    matched_rule: str = ""
+    commands: list[GeneratedCommand] = field(default_factory=list)
+    response_text: str = ""
+    matched_rule: str = "none"
     requires_flow: bool = False
-    flow_type: Optional[str] = None
+    flow_type: str = ""
 
 
 class CommandGenerator:
     """
     자연어 → MCP 명령 변환기
-
-    규칙 기반 + 컨텍스트 인식으로 명령을 생성합니다.
-    실제 명령 생성은 context_rules의 빌더 함수에 위임합니다.
+    
+    규칙 모듈을 조합하여 명령을 생성하고,
+    실패 시 LLM fallback을 사용합니다.
     """
-
+    
     def __init__(self):
         self.site_manager = get_site_manager()
-
-    def generate(self, user_text: str, current_url: str = "") -> CommandResult:
+        self.llm_generator = None  # lazy init
+        
+        # 규칙 인스턴스 생성
+        self.rules: list[BaseRule] = [
+            SiteAccessRule(self.site_manager),
+            SearchSelectRule(self.site_manager),
+            SearchRule(self.site_manager),
+            CartRule(self.site_manager),
+            LoginRule(self.site_manager),
+            CheckoutRule(self.site_manager),
+            GenericClickRule(self.site_manager),
+        ]
+    
+    async def generate(self, user_text: str, current_url: str = "") -> CommandResult:
         """
-        자연어를 MCP 명령으로 변환
-
+        자연어를 MCP 명령으로 변환 (LLM fallback 포함)
+        
         Args:
             user_text: 사용자 입력 텍스트
             current_url: 현재 브라우저 URL
-
+            
         Returns:
             CommandResult: 생성된 명령 및 응답
         """
@@ -77,197 +74,130 @@ class CommandGenerator:
                 response_text="명령을 입력해주세요.",
                 matched_rule="empty"
             )
-
+        
         current_site = get_current_site(current_url)
-
-        # 규칙 체크 순서대로 실행
-        checkers = [
-            lambda: self._check_site_access(text),
-            lambda: self._check_search(text, current_url, current_site),
-            lambda: self._check_cart(text, current_site),
-            lambda: self._check_login(text, current_site, current_url),
-            lambda: self._check_checkout(text, current_site),
-            lambda: self._check_generic_click(text),
-        ]
-
-        for checker in checkers:
-            result = checker()
-            if result:
-                return result
-
-        return CommandResult(
-            commands=[],
-            response_text=f"'{text}' 명령을 어떻게 처리할지 모르겠습니다.",
-            matched_rule="none"
-        )
-
-    def _check_site_access(self, text: str) -> Optional[CommandResult]:
-        """사이트 접속 명령 체크"""
-        for keyword, site_id in SITE_KEYWORDS.items():
-            if keyword in text and any(t in text for t in SITE_ACCESS_TRIGGERS):
-                site = self.site_manager.get_site(site_id)
-                if site:
-                    return CommandResult(
-                        commands=build_site_access_commands(site),
-                        response_text=f"{site.name}에 접속합니다.",
-                        matched_rule="site_access"
-                    )
-        return None
-
-    def _check_search(
-        self,
-        text: str,
+        
+        # 규칙 순서대로 체크
+        for rule in self.rules:
+            result = rule.check(text, current_url, current_site)
+            if result and result.matched:
+                return CommandResult(
+                    commands=result.commands,
+                    response_text=result.response_text,
+                    matched_rule=result.rule_name
+                )
+        
+        # 규칙 매칭 실패 → LLM에게 위임
+        return await self._try_llm_fallback(text, current_url, current_site)
+    
+    async def _call_llm_with_context(
+        self, 
+        user_text: str, 
         current_url: str,
-        current_site: Optional[SiteConfig]
-    ) -> Optional[CommandResult]:
-        """검색 명령 체크"""
-        if "검색" not in text:
-            return None
-
-        query = extract_search_query(text)
-        if not query:
-            return None
-
-        target_site = detect_target_site(text, self.site_manager, current_site)
-        if not target_site:
-            return None
-
-        needs_navigation = not target_site.matches_domain(current_url)
-        commands = build_search_with_navigation_commands(target_site, query, needs_navigation)
-
-        return CommandResult(
-            commands=commands,
-            response_text=f"'{query}'를 {target_site.name}에서 검색합니다.",
-            matched_rule="search"
-        )
-
-    def _check_cart(
-        self,
-        text: str,
-        current_site: Optional[SiteConfig]
-    ) -> Optional[CommandResult]:
-        """장바구니 관련 명령 체크"""
-        if "장바구니" not in text:
-            return None
-
-        # 장바구니 담기
-        if any(kw in text for kw in CART_ADD_TRIGGERS):
-            commands = build_add_to_cart_commands(current_site)
-            matched_rule = "add_to_cart" if current_site else "add_to_cart_fallback"
-            return CommandResult(
-                commands=commands,
-                response_text="장바구니에 담고 있습니다.",
-                matched_rule=matched_rule
-            )
-
-        # 장바구니 이동
-        if any(kw in text for kw in CART_GO_TRIGGERS) or text == "장바구니":
-            commands = build_go_to_cart_commands(current_site)
-            matched_rule = "go_to_cart" if current_site else "go_to_cart_fallback"
-            return CommandResult(
-                commands=commands,
-                response_text="장바구니로 이동합니다.",
-                matched_rule=matched_rule
-            )
-
-        return None
-
-    def _check_login(
-        self,
-        text: str,
-        current_site: Optional[SiteConfig],
-        current_url: str = ""
-    ) -> Optional[CommandResult]:
-        """로그인 명령 체크"""
-        if "로그인" not in text:
-            return None
-
-        is_on_login_page = "login" in current_url.lower()
-
-        # 로그인 페이지에서 버튼 클릭 요청
-        if is_on_login_page and any(kw in text for kw in LOGIN_SUBMIT_TRIGGERS):
-            return CommandResult(
-                commands=build_login_submit_commands(),
-                response_text="로그인 버튼을 클릭합니다.",
-                matched_rule="login_submit"
-            )
-
-        # 로그인 페이지로 이동
-        commands = build_login_page_commands(current_site)
-        matched_rule = "login" if current_site else "login_fallback"
-        response = "로그인 페이지로 이동합니다." if current_site else "로그인 버튼을 찾고 있습니다."
-
-        return CommandResult(
-            commands=commands,
-            response_text=response,
-            matched_rule=matched_rule
-        )
-
-    def _check_checkout(self, text: str, current_site: Optional[SiteConfig] = None) -> Optional[CommandResult]:
-        """결제 명령 체크 - CheckoutFlowManager 사용"""
-        if not any(kw in text for kw in CHECKOUT_TRIGGERS):
-            return None
+        current_site
+    ) -> CommandResult:
+        """
+        LLM 호출 (공통 로직)
         
-        # CheckoutFlowManager에서 설정 로드
-        from services.flow.checkout_flow import get_checkout_manager
+        Args:
+            user_text: 사용자 입력 (실패 컨텍스트 포함 가능)
+            current_url: 현재 URL
+            current_site: 현재 사이트
+            
+        Returns:
+            CommandResult
+        """
+        import os
         
-        manager = get_checkout_manager()
-        
-        # 현재 사이트 확인
-        site_id = current_site.site_id if current_site else "coupang"
-        config = manager.get_config(site_id)
-        
-        if not config:
-            # 설정이 없으면 Flow Engine 위임
+        # GMS_API_KEY 확인
+        if not (os.getenv("GMS_API_KEY") or os.getenv("OPENAI_API_KEY")):
             return CommandResult(
                 commands=[],
-                response_text="결제를 진행하시겠습니까? 결제 과정은 단계별로 안내해 드리겠습니다.",
-                matched_rule="checkout_flow",
-                requires_flow=True,
-                flow_type="checkout"
+                response_text=f"'{user_text}' 명령을 어떻게 처리할지 모르겠습니다.",
+                matched_rule="none"
             )
         
-        # 첫 번째 단계 명령 생성
-        first_step = manager.get_next_step(site_id)
-        if not first_step:
-            return None
+        # lazy init llm_generator
+        if self.llm_generator is None:
+            from .llm_generator import LLMGenerator
+            self.llm_generator = LLMGenerator()
         
-        cmd_dicts = manager.generate_step_commands(first_step)
-        commands = [
-            GeneratedCommand(
-                tool_name=cmd["tool_name"],
-                arguments=cmd["arguments"],
-                description=cmd.get("description", "")
+        # 페이지 컨텍스트 구성
+        from .site_manager import get_page_type
+        page_type = get_page_type(current_url) if current_url else None
+        
+        # 사용 가능한 셀렉터 정보 수집
+        available_selectors = {}
+        if current_site and page_type:
+            page_selectors = current_site.get_page_selectors(page_type)
+            if page_selectors:
+                available_selectors = page_selectors.selectors
+        
+        # LLM에게 위임
+        try:
+            result = await self.llm_generator.generate(
+                user_text=user_text,
+                current_url=current_url,
+                page_type=page_type,
+                available_selectors=available_selectors
             )
-            for cmd in cmd_dicts
-        ]
+            
+            # LLMResult → CommandResult 변환
+            return CommandResult(
+                commands=result.commands,
+                response_text=result.response_text,
+                matched_rule="llm_fallback" if result.success else "llm_error"
+            )
+        except Exception as e:
+            import traceback
+            logger.error(f"LLM 생성 실패: {e}")
+            logger.error(traceback.format_exc())
+            return CommandResult(
+                commands=[],
+                response_text=f"'{user_text}' 명령 처리 중 오류가 발생했습니다.",
+                matched_rule="llm_error"
+            )
+    
+    async def _try_llm_fallback(self, user_text: str, current_url: str, current_site) -> CommandResult:
+        """LLM으로 명령 생성 시도 (규칙 실패 시)"""
+        return await self._call_llm_with_context(user_text, current_url, current_site)
+    
+    async def retry_with_llm(
+        self, 
+        original_text: str, 
+        current_url: str,
+        failed_command: Optional[GeneratedCommand] = None,
+        error_message: Optional[str] = None
+    ) -> CommandResult:
+        """
+        실행 실패 시 LLM으로 재시도
         
-        return CommandResult(
-            commands=commands,
-            response_text=first_step.prompt or f"{first_step.name}을(를) 진행합니다.",
-            matched_rule="checkout_step",
-            requires_flow=True,
-            flow_type="checkout"
-        )
-
-    def _check_generic_click(self, text: str) -> Optional[CommandResult]:
-        """일반 클릭 명령 체크"""
-        if not any(kw in text for kw in CLICK_TRIGGERS):
-            return None
-
-        target = extract_click_target(text)
-        if not target:
-            return None
-
-        return CommandResult(
-            commands=build_generic_click_commands(target),
-            response_text=f"'{target}'을 클릭합니다.",
-            matched_rule="generic_click"
-        )
-
-
-# 편의 함수
-def generate_commands(user_text: str, current_url: str = "") -> CommandResult:
-    """명령 생성 편의 함수"""
-    generator = CommandGenerator()
-    return generator.generate(user_text, current_url)
+        Args:
+            original_text: 원래 사용자 입력
+            current_url: 현재 URL
+            failed_command: 실패한 명령 (선택)
+            error_message: 실패 에러 메시지 (선택)
+            
+        Returns:
+            CommandResult: 재시도 명령
+        """
+        # 실패 컨텍스트를 포함한 프롬프트 구성
+        enhanced_text = original_text
+        if failed_command and error_message:
+            enhanced_text = (
+                f"{original_text}\n\n"
+                f"[이전 시도 실패]\n"
+                f"명령: {failed_command.tool_name}({failed_command.arguments})\n"
+                f"오류: {error_message}\n\n"
+                f"다른 방법을 시도해주세요."
+            )
+        
+        current_site = get_current_site(current_url)
+        result = await self._call_llm_with_context(enhanced_text, current_url, current_site)
+        
+        # matched_rule 수정 (재시도임을 표시)
+        if result.matched_rule == "llm_fallback":
+            result.matched_rule = "llm_retry"
+            result.response_text = f"재시도: {result.response_text}"
+        
+        return result

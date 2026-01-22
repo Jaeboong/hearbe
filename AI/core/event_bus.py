@@ -23,9 +23,9 @@ class EventType(Enum):
 
     # ASR (음성 인식) 이벤트
     AUDIO_CHUNK_RECEIVED = auto()
-    STT_PROCESSING_STARTED = auto()
-    STT_RESULT_READY = auto()
-    STT_ERROR = auto()
+    ASR_PROCESSING_STARTED = auto()
+    ASR_RESULT_READY = auto()
+    ASR_ERROR = auto()
 
     # NLU (자연어 이해) 이벤트
     INTENT_ANALYSIS_STARTED = auto()

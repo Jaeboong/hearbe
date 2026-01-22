@@ -1,0 +1,24 @@
+{
+  "page_type": "cart",
+  "url_pattern": "cart\\.coupang\\.com/cartView",
+  "description": "쿠팡 장바구니 페이지",
+  "selectors": {
+    "checkout_button": "#btnPay",
+    "select_all_checkbox": "input[type='checkbox']",
+    "cart_item_list": ".cart-product-list",
+    "cart_item": ".cart-product",
+    "item_checkbox": "input[type='checkbox']",
+    "item_title": ".product-name",
+    "item_price": ".price",
+    "quantity_input": "input[type='text']",
+    "quantity_plus": "button[aria-label='수량 증가']",
+    "quantity_minus": "button[aria-label='수량 감소']",
+    "delete_button": ".btn-delete",
+    "delete_selected": "[class*='order']:has-text('선택삭제')",
+    "delete_soldout": "[class*='order']:has-text('품절/판매종료상품 전체삭제')",
+    "total_price": ".total-price",
+    "order_steps": "[class*='order']",
+    "modal_add_rocket": "[class*='order']:has-text('로켓상품 추가하기')",
+    "modal_checkout_without_extra": "[class*='order']:has-text('추가금액 없이 구매하기')"
+  }
+}
