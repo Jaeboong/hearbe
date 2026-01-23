@@ -6,7 +6,7 @@
 
 WebSocket을 통해 **양방향 실시간 통신**을 수행합니다.
 - MCP 앱에서 오디오 스트림 전송
-- AI 서버에서 STT 결과, LLM 명령, TTS 음성 전송
+- AI 서버에서 ASR 결과, LLM 명령, TTS 음성 전송
 
 ## 연결 URL
 
@@ -41,9 +41,9 @@ Authorization: Bearer <임시_토큰>
 
 ### 1. 클라이언트 → 서버
 
-#### 1.1 `audio_chunk` - 오디오 스트림 전송
+#### 1.1 `audio_chunk` - 오디오 스트림 전송 (PTT Mode)
 
-**설명**: 마이크로부터 녹음한 오디오 데이터 청크 전송
+**설명**: Push-to-Talk 방식으로 녹음한 오디오 데이터 청크 전송
 
 **데이터 구조**:
 ```json
@@ -54,7 +54,8 @@ Authorization: Bearer <임시_토큰>
     "sample_rate": 16000,
     "channels": 1,
     "format": "pcm16",
-    "sequence": 123
+    "seq": 123,
+    "is_final": false
   },
   "timestamp": "2026-01-14T12:34:56.123Z",
   "session_id": "550e8400-e29b-41d4-a716-446655440000"
@@ -62,17 +63,37 @@ Authorization: Bearer <임시_토큰>
 ```
 
 **필드 설명**:
-- `audio`: Base64 인코딩된 오디오 바이너리
-- `sample_rate`: 샘플링 레이트 (Hz)
-- `channels`: 채널 수 (1=모노, 2=스테레오)
-- `format`: 오디오 포맷 (`pcm16`, `wav`, `mp3`)
-- `sequence`: 청크 순서 번호 (스트리밍 시 순서 보장)
+- `audio`: Base64 인코딩된 오디오 바이너리 (빈 문자열 가능)
+- `sample_rate`: 샘플링 레이트 (Hz), 16000 고정
+- `channels`: 채널 수, 1 (모노) 고정
+- `format`: 오디오 포맷, `pcm16` 고정
+- `seq`: 청크 순서 번호
+- `is_final`: **녹음 종료 여부** (PTT 핵심 필드)
+
+**PTT `is_final` 동작**:
+| is_final | 상황 | 서버 동작 |
+|----------|------|----------|
+| `false` | 녹음 중 (3초마다 자동 전송) | 버퍼에 누적만 |
+| `true` | 녹음 종료 (버튼 놓음) | 버퍼 transcribe 후 결과 전송 |
+
+**빈 오디오 + is_final=true**:
+녹음이 너무 짧을 경우 (< 0.5초), 오디오 없이 신호만 전송:
+```json
+{
+  "type": "audio_chunk",
+  "data": {
+    "audio": "",
+    "seq": 5,
+    "is_final": true
+  }
+}
+```
 
 ---
 
 #### 1.2 `command` - 사용자 명령 전송
 
-**설명**: 텍스트로 직접 명령 전송 (STT 우회)
+**설명**: 텍스트로 직접 명령 전송 (ASR 우회)
 
 **데이터 구조**:
 ```json
@@ -157,18 +178,21 @@ Authorization: Bearer <임시_토큰>
 
 ### 2. 서버 → 클라이언트
 
-#### 2.1 `stt_result` - STT 변환 결과
+#### 2.1 `asr_result` - ASR 변환 결과
 
-**설명**: 음성→텍스트 변환 결과
+**설명**: 음성→텍스트 변환 결과 (실시간 스트리밍)
 
 **데이터 구조**:
 ```json
 {
-  "type": "stt_result",
+  "type": "asr_result",
   "data": {
     "text": "쿠팡에서 우유 검색해줘",
     "confidence": 0.95,
-    "language": "ko"
+    "language": "ko",
+    "duration": 2.5,
+    "is_final": true,
+    "segment_id": "seg_1"
   },
   "timestamp": "2026-01-14T12:34:58Z",
   "session_id": "550e8400-e29b-41d4-a716-446655440000"
@@ -179,6 +203,9 @@ Authorization: Bearer <임시_토큰>
 - `text`: 인식된 텍스트
 - `confidence`: 신뢰도 (0.0 ~ 1.0)
 - `language`: 감지된 언어 코드
+- `duration`: 오디오 길이 (초)
+- `is_final`: 최종 결과 여부 (false=중간 결과)
+- `segment_id`: 세그먼트 식별자
 
 ---
 
@@ -326,7 +353,7 @@ Authorization: Bearer <임시_토큰>
   "type": "status",
   "data": {
     "state": "processing",
-    "message": "STT 처리 중...",
+    "message": "ASR 처리 중...",
     "progress": 50
   },
   "timestamp": "2026-01-14T12:34:57Z",
@@ -337,7 +364,7 @@ Authorization: Bearer <임시_토큰>
 **상태 값**:
 - `idle`: 대기 중
 - `recording`: 녹음 중
-- `processing`: 처리 중 (STT, LLM)
+- `processing`: 처리 중 (ASR, LLM)
 - `executing`: 도구 실행 중
 - `completed`: 완료
 - `error`: 오류 발생
@@ -367,7 +394,7 @@ Authorization: Bearer <임시_토큰>
 ```
 
 **에러 코드**:
-- `STT_FAILED`: STT 실패
+- `ASR_FAILED`: ASR 실패
 - `LLM_ERROR`: LLM 호출 오류
 - `TTS_FAILED`: TTS 실패
 - `TOOL_TIMEOUT`: 도구 실행 시간 초과
@@ -399,19 +426,44 @@ Authorization: Bearer <임시_토큰>
 
 ## 통신 흐름 예시
 
-### 시나리오: 쿠팡에서 우유 검색
+### 시나리오 1: PTT 음성 인식 (쿠팡에서 우유 검색)
 
 ```
-1. [Client → Server] audio_chunk (음성 스트림 전송)
-   → 서버가 Whisper로 STT 처리
+1. [Client] User holds SPACE key
 
-2. [Server → Client] stt_result
+2. [Client → Server] audio_chunk (녹음 중, 3초마다)
+   {
+     "type": "audio_chunk",
+     "data": {
+       "audio": "base64_encoded...",
+       "seq": 1,
+       "is_final": false
+     }
+   }
+   → 서버: 버퍼에 누적 (transcribe 안함)
+
+3. [Client] User releases SPACE key after 4.5 seconds
+
+4. [Client → Server] audio_chunk (녹음 종료)
+   {
+     "type": "audio_chunk",
+     "data": {
+       "audio": "base64_encoded...",
+       "seq": 2,
+       "is_final": true
+     }
+   }
+   → 서버: 전체 버퍼 (4.5초) transcribe
+
+5. [Server → Client] asr_result
    {
      "text": "쿠팡에서 우유 검색해줘",
-     "confidence": 0.95
+     "confidence": 0.95,
+     "is_final": true,
+     "segment_id": "seg_1"
    }
 
-3. [Server → Client] llm_command
+6. [Server → Client] llm_command
    {
      "intent": "search_product",
      "site": "coupang",
@@ -420,45 +472,45 @@ Authorization: Bearer <임시_토큰>
      }
    }
 
-4. [Server → Client] tool_call (쿠팡 이동)
+... (이후 tool_call, mcp_result 등 동일)
+```
+
+### 시나리오 2: 짧은 녹음 (< 0.5초)
+
+```
+1. [Client] User taps SPACE briefly (0.2 seconds)
+
+2. [Client] Skip audio, send signal only
    {
-     "request_id": "req_001",
-     "tool_name": "navigate_to_url",
-     "arguments": {
-       "url": "https://www.coupang.com"
+     "type": "audio_chunk",
+     "data": {
+       "audio": "",
+       "seq": 1,
+       "is_final": true
      }
    }
+   → 서버: 버퍼 비어있음, 아무것도 안함
 
-5. [Client → Server] mcp_result
-   {
-     "request_id": "req_001",
-     "success": true,
-     "result": {
-       "status": "navigated"
-     }
-   }
+Client output:
+[SKIP] Audio too short (0.20s < 0.5s), sending final signal only
+```
 
-6. [Server → Client] tool_call (검색)
-   {
-     "request_id": "req_002",
-     "tool_name": "fill_input",
-     "arguments": {
-       "selector": "#searchKeyword",
-       "value": "우유"
-     }
-   }
+### 시나리오 3: 긴 녹음 (> 3초)
 
-7. [Client → Server] mcp_result
-   {
-     "request_id": "req_002",
-     "success": true
-   }
+```
+1. [Client] User holds SPACE for 7 seconds
 
-8. [Server → Client] tts_audio
-   {
-     "audio": "...",
-     "text": "검색 결과 20개를 찾았습니다."
-   }
+2. [Client → Server] audio_chunk (3초 시점)
+   { "seq": 1, "is_final": false }  → 버퍼 누적
+
+3. [Client → Server] audio_chunk (6초 시점)
+   { "seq": 2, "is_final": false }  → 버퍼 누적
+
+4. [Client → Server] audio_chunk (7초, 릴리즈)
+   { "seq": 3, "is_final": true }   → 전체 7초 transcribe
+
+5. [Server → Client] asr_result
+   { "text": "...", "duration": 7.0 }
 ```
 
 ---

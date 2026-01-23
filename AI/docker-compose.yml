@@ -17,10 +17,12 @@ services:
     env_file:
       - .env
     volumes:
+      - .:/app
       - ./logs:/app/logs
       - ./flows:/app/flows
       - huggingface-cache:/root/.cache/huggingface
       - paddleocr-cache:/root/.paddleocr
+    command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     deploy:
       resources:
         reservations:

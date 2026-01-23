@@ -5,26 +5,39 @@ MCP 테스트용 API 서버
 test_command_cli.py에서 생성된 명령을 받아 Playwright로 실행합니다.
 
 사용법:
-    1. Chrome을 CDP 모드로 실행:
-       chrome.exe --remote-debugging-port=9222
-    
-    2. 이 서버 실행:
+    1. 이 서버 실행 (Chrome 자동 실행):
        cd c:\\ssafy\\공통\\AI
        python services/llm/tests/mcp_api_server.py
     
-    3. test_command_cli.py 실행:
+    2. test_command_cli.py 실행:
        python services/llm/tests/test_command_cli.py --exec
 """
 
 import asyncio
 import logging
+import os
+import subprocess
+import sys
+from pathlib import Path
 from typing import Dict, Any, List, Optional
 from contextlib import asynccontextmanager
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
+
+# Add parent directory to path for MCP imports
+project_root = Path(__file__).resolve().parents[3]
+common_root = project_root.parent
+mcp_root = common_root / "MCP"
+sys.path.insert(0, str(mcp_root))
+
+from browser.chrome_utils import ensure_chrome_env, find_chrome_path, get_env_value
+from browser.action_utils import (
+    click_text as click_text_util,
+    get_visible_buttons as get_visible_buttons_util,
+)
+from mcp.tool_utils import normalize_tool_call, resolve_frame_context
 
 # Playwright
 try:
@@ -69,7 +82,40 @@ class BrowserManager:
     def __init__(self):
         self._playwright: Optional[Playwright] = None
         self._browser: Optional[Browser] = None
-        self._cdp_url = "http://127.0.0.1:9222"
+        self._chrome_process: Optional[subprocess.Popen] = None
+        self._chrome_started = False
+        self._env_path = mcp_root / ".env"
+
+        chrome_path = ensure_chrome_env(self._env_path)
+        if chrome_path:
+            os.environ.setdefault("CHROME_PATH", chrome_path)
+
+        port_value = (
+            os.getenv("CHROME_DEBUG_PORT")
+            or get_env_value(self._env_path, "CHROME_DEBUG_PORT")
+            or os.getenv("CDP_PORT")
+            or "9222"
+        )
+        try:
+            self._chrome_port = int(port_value)
+        except ValueError:
+            self._chrome_port = 9222
+
+        user_dir_value = (
+            os.getenv("CHROME_USER_DATA_DIR")
+            or get_env_value(self._env_path, "CHROME_USER_DATA_DIR")
+            or os.getenv("CDP_USER_DATA_DIR")
+            or ""
+        )
+        if user_dir_value:
+            user_dir_path = Path(user_dir_value)
+            if not user_dir_path.is_absolute():
+                user_dir_path = mcp_root / user_dir_path
+            self._user_data_dir = user_dir_path
+        else:
+            self._user_data_dir = mcp_root / ".mcp_chrome_profile"
+
+        self._cdp_url = f"http://127.0.0.1:{self._chrome_port}"
 
     @property
     def is_connected(self) -> bool:
@@ -106,8 +152,63 @@ class BrowserManager:
                 })
         return pages
 
-    async def connect(self) -> bool:
-        """CDP로 Chrome에 연결"""
+    def _build_chrome_args(self, chrome_path: str) -> List[str]:
+        args = [
+            chrome_path,
+            f"--remote-debugging-port={self._chrome_port}",
+            f"--user-data-dir={self._user_data_dir.resolve()}",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--disable-popup-blocking",
+            "--window-size=1280,720",
+        ]
+        return args
+
+    async def _start_chrome(self) -> bool:
+        if self._chrome_process and self._chrome_process.poll() is None:
+            return True
+
+        chrome_path = find_chrome_path()
+        if not chrome_path:
+            logger.error("Chrome executable not found")
+            return False
+
+        self._user_data_dir.mkdir(parents=True, exist_ok=True)
+        args = self._build_chrome_args(chrome_path)
+        logger.info(f"Starting Chrome with args: {' '.join(args)}")
+
+        try:
+            self._chrome_process = subprocess.Popen(
+                args,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+            )
+            self._chrome_started = True
+            return True
+        except Exception as e:
+            logger.error(f"Failed to start Chrome: {e}")
+            return False
+
+    async def _try_connect(self, retries: int = 20, delay: float = 0.5) -> bool:
+        if self._playwright is None:
+            self._playwright = await async_playwright().start()
+
+        last_error = None
+        for _ in range(retries):
+            try:
+                self._browser = await self._playwright.chromium.connect_over_cdp(self._cdp_url)
+                return True
+            except Exception as e:
+                last_error = e
+                await asyncio.sleep(delay)
+
+        if last_error:
+            logger.error(f"브라우저 연결 실패: {last_error}")
+        return False
+
+    async def connect(self, auto_start: bool = True) -> bool:
+        """CDP로 Chrome에 연결 (필요 시 Chrome 자동 실행)"""
         if not HAS_PLAYWRIGHT:
             return False
 
@@ -115,8 +216,18 @@ class BrowserManager:
             return True
 
         try:
-            self._playwright = await async_playwright().start()
-            self._browser = await self._playwright.chromium.connect_over_cdp(self._cdp_url)
+            if auto_start:
+                ensure_chrome_env(self._env_path)
+            # 이미 실행된 Chrome에 먼저 연결 시도
+            connected = await self._try_connect(retries=2, delay=0.5)
+            if not connected and auto_start:
+                started = await self._start_chrome()
+                if not started:
+                    return False
+                connected = await self._try_connect(retries=20, delay=0.5)
+
+            if not connected:
+                return False
 
             # 페이지가 없으면 새로 생성
             if not self._page:
@@ -137,6 +248,16 @@ class BrowserManager:
         if self._playwright:
             await self._playwright.stop()
             self._playwright = None
+        if self._chrome_process and self._chrome_started:
+            try:
+                self._chrome_process.terminate()
+                self._chrome_process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self._chrome_process.kill()
+            except Exception:
+                pass
+        self._chrome_process = None
+        self._chrome_started = False
         logger.info("브라우저 연결 해제")
 
     async def execute_command(self, cmd: CommandItem) -> Dict[str, Any]:
@@ -145,32 +266,70 @@ class BrowserManager:
         if not page:
             return {"success": False, "error": "페이지 없음", "desc": cmd.desc}
 
-        action = cmd.action
-        args = cmd.args
+        action, args = normalize_tool_call(cmd.action, cmd.args)
 
         try:
             result = None
 
-            if action == "goto":
+            if action == "navigate_to_url":
                 url = args.get("url", "")
                 await page.goto(url, wait_until="domcontentloaded")
                 result = f"이동: {url}"
 
-            elif action == "click":
+            elif action == "click_element":
                 selector = args.get("selector", "")
-                await page.click(selector, timeout=5000)
+                context_type, context, error = resolve_frame_context(
+                    page,
+                    frame_selector=args.get("frame_selector"),
+                    frame_name=args.get("frame_name"),
+                    frame_url=args.get("frame_url"),
+                    frame_index=args.get("frame_index"),
+                )
+                if error:
+                    return {"success": False, "error": error, "desc": cmd.desc}
+                if context_type == "frame_locator":
+                    locator = context.locator(selector)
+                    await locator.click(timeout=5000)
+                else:
+                    await context.click(selector, timeout=5000)
                 result = f"클릭: {selector}"
 
-            elif action == "fill":
+            elif action == "fill_input":
                 selector = args.get("selector", "")
-                text = args.get("text", "")
-                await page.fill(selector, text)
+                text = args.get("value", "")
+                context_type, context, error = resolve_frame_context(
+                    page,
+                    frame_selector=args.get("frame_selector"),
+                    frame_name=args.get("frame_name"),
+                    frame_url=args.get("frame_url"),
+                    frame_index=args.get("frame_index"),
+                )
+                if error:
+                    return {"success": False, "error": error, "desc": cmd.desc}
+                if context_type == "frame_locator":
+                    locator = context.locator(selector)
+                    await locator.fill(text)
+                else:
+                    await context.fill(selector, text)
                 result = f"입력: {text}"
 
-            elif action == "press":
+            elif action == "press_key":
                 selector = args.get("selector", "")
                 key = args.get("key", "Enter")
-                await page.press(selector, key)
+                context_type, context, error = resolve_frame_context(
+                    page,
+                    frame_selector=args.get("frame_selector"),
+                    frame_name=args.get("frame_name"),
+                    frame_url=args.get("frame_url"),
+                    frame_index=args.get("frame_index"),
+                )
+                if error:
+                    return {"success": False, "error": error, "desc": cmd.desc}
+                if context_type == "frame_locator":
+                    locator = context.locator(selector)
+                    await locator.press(key)
+                else:
+                    await context.press(selector, key)
                 result = f"키 입력: {key}"
 
             elif action == "wait":
@@ -187,17 +346,17 @@ class BrowserManager:
                     await page.evaluate(f"window.scrollBy(0, -{amount})")
                 result = f"스크롤: {direction}"
 
-            elif action == "screenshot":
+            elif action == "get_visible_buttons":
+                buttons = await get_visible_buttons_util(page)
+                result = buttons
+
+            elif action == "take_screenshot":
                 path = args.get("path", "screenshot.png")
                 await page.screenshot(path=path)
                 result = f"스크린샷: {path}"
 
             elif action == "click_text":
                 text = args.get("text", "")
-                import sys
-                sys.path.insert(0, r"c:\ssafy\공통\MCP")
-                from browser.action_utils import click_text as click_text_util
-
                 click_result = await click_text_util(page, text)
                 if click_result["success"]:
                     result = click_result["result"]
@@ -223,6 +382,8 @@ browser = BrowserManager()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("MCP Test API Server 시작")
+    ensure_chrome_env(mcp_root / ".env")
+    await browser.connect(auto_start=True)
     yield
     await browser.disconnect()
     logger.info("MCP Test API Server 종료")
@@ -255,7 +416,7 @@ async def root():
 @app.post("/start")
 async def start_browser():
     """브라우저 연결"""
-    success = await browser.connect()
+    success = await browser.connect(auto_start=True)
     return {"success": success}
 
 
@@ -287,81 +448,10 @@ async def get_buttons():
     """현재 활성 페이지의 클릭 가능한 요소들 조회"""
     page = browser._page
     if not browser.is_connected or not page:
-        return {"success": False, "error": "브라우저 연결 안됨", "buttons": []}
+        return {"success": False, "error": "Browser not connected", "buttons": []}
 
-    try:
-        # 클릭 가능한 요소들 수집
-        elements = await page.evaluate("""
-            () => {
-                const results = [];
-
-                // 버튼 요소
-                document.querySelectorAll('button').forEach((el, i) => {
-                    if (el.offsetParent !== null) {  // visible check
-                        results.push({
-                            type: 'button',
-                            text: el.innerText.trim().substring(0, 50),
-                            selector: el.id ? `#${el.id}` : (el.className ? `button.${el.className.split(' ')[0]}` : `button:nth-of-type(${i+1})`),
-                            visible: true
-                        });
-                    }
-                });
-
-                // input[type=submit], input[type=button]
-                document.querySelectorAll('input[type="submit"], input[type="button"]').forEach((el, i) => {
-                    if (el.offsetParent !== null) {
-                        results.push({
-                            type: 'input-button',
-                            text: el.value || el.placeholder || '',
-                            selector: el.id ? `#${el.id}` : `input[type="${el.type}"]:nth-of-type(${i+1})`,
-                            visible: true
-                        });
-                    }
-                });
-
-                // 주요 링크 (role="button" 또는 특정 클래스)
-                document.querySelectorAll('a[role="button"], a.btn, a.button, [role="button"]').forEach((el, i) => {
-                    if (el.offsetParent !== null && el.innerText.trim()) {
-                        results.push({
-                            type: 'link-button',
-                            text: el.innerText.trim().substring(0, 50),
-                            selector: el.id ? `#${el.id}` : null,
-                            visible: true
-                        });
-                    }
-                });
-
-                // 구매/장바구니 관련 요소 (쇼핑몰 특화)
-                const shoppingSelectors = [
-                    '.prod-buy-btn', '.add-cart', '.buy-btn', '.cart-btn',
-                    '[class*="purchase"]', '[class*="buy"]', '[class*="cart"]',
-                    '[class*="order"]', '[class*="checkout"]'
-                ];
-                shoppingSelectors.forEach(sel => {
-                    document.querySelectorAll(sel).forEach(el => {
-                        if (el.offsetParent !== null && el.innerText.trim()) {
-                            const exists = results.some(r => r.text === el.innerText.trim().substring(0, 50));
-                            if (!exists) {
-                                results.push({
-                                    type: 'shopping-action',
-                                    text: el.innerText.trim().substring(0, 50),
-                                    selector: sel,
-                                    visible: true
-                                });
-                            }
-                        }
-                    });
-                });
-
-                return results.slice(0, 30);  // 최대 30개
-            }
-        """)
-
-        return {"success": True, "buttons": elements, "count": len(elements)}
-
-    except Exception as e:
-        logger.error(f"buttons 조회 실패: {type(e).__name__}: {e}")
-        return {"success": False, "error": f"{type(e).__name__}: {e}", "buttons": []}
+    buttons = await get_visible_buttons_util(page)
+    return {"success": True, "buttons": buttons, "count": len(buttons)}
 
 
 @app.post("/execute", response_model=ExecuteResponse)
@@ -402,8 +492,7 @@ def main():
     print("=" * 60)
     print("MCP Test API Server")
     print("=" * 60)
-    print("Chrome CDP 모드로 실행 후 이 서버를 시작하세요:")
-    print("  chrome.exe --remote-debugging-port=9222")
+    print("Chrome은 자동으로 CDP 모드로 실행됩니다.")
     print("=" * 60)
     
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

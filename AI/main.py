@@ -131,6 +131,12 @@ class AIServer:
             # Startup
             await event_bus.start()
             await self.initialize_services()
+
+            # Expose services to app state for HTTP routes
+            app.state.asr_service = self.asr_service
+            app.state.tts_service = self.tts_service
+            app.state.ocr_service = self.ocr_service
+
             await publish(EventType.SERVER_STARTED, source="main")
             logger.info("AI Server started")
 

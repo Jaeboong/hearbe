@@ -456,6 +456,7 @@ application-secret.properties
 MCP/logs/
 MCP/session.json
 MCP/chrome_profile/
+MCP/.mcp_chrome_profile/
 MCP/user_data_dir/
 MCP/playwright-state/
 

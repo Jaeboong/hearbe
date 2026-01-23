@@ -1,0 +1,24 @@
+{
+  "page_type": "product",
+  "url_pattern": "/vp/products/",
+  "description": "쿠팡 상품 상세 페이지",
+  "selectors": {
+    "search_input": "input[name=\"q\"]",
+    "search_button": "button.headerSearchBtn",
+    "add_to_cart": "button.prod-cart-btn",
+    "buy_now": "button.prod-buy-btn",
+    "quantity_plus": "button[aria-label='수량더하기']",
+    "quantity_minus": "button[aria-label='수량빼기']",
+    "product_title": ".prod-buy-header__title",
+    "price": ".total-price",
+    "original_price": ".origin-price",
+    "rocket_delivery": "[class*='rocket']",
+    "product_info": ".prod-description",
+    "option_select": ".prod-option__item",
+    "review_sort_best": "button.twc-font-bold",
+    "review_sort_latest": "button.twc-font-normal",
+    "review_helpful": "button:has-text('도움이 돼요')",
+    "review_report": "button:has-text('신고하기')",
+    "product_info_more": "button:has-text('상품정보 더보기')"
+  }
+}
