@@ -25,6 +25,8 @@ class EventType(Enum):
     TTS_PLAYBACK_FINISHED = auto()
 
     # Network 모듈 이벤트
+    WS_CONNECTED = auto()
+    WS_DISCONNECTED = auto()
     STT_RESULT_RECEIVED = auto()
     LLM_COMMAND_RECEIVED = auto()
     TTS_AUDIO_RECEIVED = auto()
