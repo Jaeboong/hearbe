@@ -30,50 +30,50 @@ class PageContext:
 
 AVAILABLE_COMMANDS = {
     "goto": {
-        "description": "URL로 페이지 이동",
-        "args": {"url": "이동할 URL (문자열)"},
-        "example": '{"action": "goto", "args": {"url": "https://www.coupang.com/"}, "desc": "쿠팡 홈으로 이동"}'
+        "description": "Navigate to a URL",
+        "args": {"url": "Destination URL"},
+        "example": '{"action": "goto", "args": {"url": "https://www.coupang.com/"}, "desc": "Go to Coupang"}'
     },
     "click": {
-        "description": "CSS 셀렉터로 요소 클릭",
+        "description": "Click an element by CSS selector",
         "args": {
-            "selector": "CSS 셀렉터",
-            "frame_selector": "iframe CSS 셀렉터 (선택)"
+            "selector": "CSS selector",
+            "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": '{"action": "click", "args": {"selector": "#login-btn"}, "desc": "로그인 버튼 클릭"}'
+        "example": '{"action": "click", "args": {"selector": "#login-btn"}, "desc": "Click login button"}'
     },
     "fill": {
-        "description": "입력 필드에 텍스트 입력",
+        "description": "Fill text into an input",
         "args": {
-            "selector": "CSS 셀렉터",
-            "text": "입력할 텍스트",
-            "frame_selector": "iframe CSS 셀렉터 (선택)"
+            "selector": "CSS selector",
+            "text": "Text to input",
+            "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": '{"action": "fill", "args": {"selector": "input[name=q]", "text": "생수"}, "desc": "검색어 입력"}'
+        "example": '{"action": "fill", "args": {"selector": "input[name=q]", "text": "ramen"}, "desc": "Type search keyword"}'
     },
     "press": {
-        "description": "키보드 키 입력",
+        "description": "Press a key in an input",
         "args": {
-            "selector": "CSS 셀렉터",
-            "key": "키 이름 (Enter, Tab 등)",
-            "frame_selector": "iframe CSS 셀렉터 (선택)"
+            "selector": "CSS selector",
+            "key": "Key name (Enter, Tab, etc.)",
+            "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": '{"action": "press", "args": {"selector": "input", "key": "Enter"}, "desc": "엔터 키 입력"}'
+        "example": '{"action": "press", "args": {"selector": "input", "key": "Enter"}, "desc": "Submit input"}'
     },
     "wait": {
-        "description": "지정된 시간 대기",
-        "args": {"ms": "밀리초 (숫자)"},
-        "example": '{"action": "wait", "args": {"ms": 1000}, "desc": "1초 대기"}'
+        "description": "Wait for a given time",
+        "args": {"ms": "Milliseconds"},
+        "example": '{"action": "wait", "args": {"ms": 1000}, "desc": "Wait 1 second"}'
     },
     "click_text": {
-        "description": "텍스트로 요소를 찾아 클릭",
-        "args": {"text": "찾을 텍스트"},
-        "example": '{"action": "click_text", "args": {"text": "장바구니"}, "desc": "장바구니 텍스트 클릭"}'
+        "description": "Find and click by visible text",
+        "args": {"text": "Text to match"},
+        "example": '{"action": "click_text", "args": {"text": "Cart"}, "desc": "Click text"}'
     },
     "scroll": {
-        "description": "페이지 스크롤",
-        "args": {"direction": "up 또는 down", "amount": "픽셀 수 (선택)"},
-        "example": '{"action": "scroll", "args": {"direction": "down", "amount": 500}, "desc": "아래로 스크롤"}'
+        "description": "Scroll the page",
+        "args": {"direction": "up or down", "amount": "Pixels (optional)"},
+        "example": '{"action": "scroll", "args": {"direction": "down", "amount": 500}, "desc": "Scroll down"}'
     },
     "extract": {
         "description": "Extract product data from a list",
@@ -83,12 +83,10 @@ AVAILABLE_COMMANDS = {
             "field_selectors": "Optional field->selector mapping",
             "limit": "Max items"
         },
-        "example": "{\\"action\\": \\"extract\\", \\"args\\": {\\"selector\\": \\".search-product\\", \\"fields\\": [\\"name\\", \\"price\\"], \\"limit\\": 20}, \\"desc\\": \\"Extract search results\\"}"
+        "example": '{"action": "extract", "args": {"selector": ".search-product", "fields": ["name", "price"], "limit": 20}, "desc": "Extract search results"}'
     }
-
 }
 
-# 페이지별 사용 가능한 액션
 PAGE_ACTIONS = {
     "home": ["search", "login", "navigate", "go_to_cart"],
     "search": ["select_product", "scroll", "next_page", "filter", "sort"],
@@ -192,6 +190,25 @@ class ContextBuilder:
         selectors_doc = self._format_selectors(page_context.selectors)
         search_results_section = self._format_search_results_section(search_results)
 
+        output_example = json.dumps(
+            {
+                "response": "short message",
+                "commands": [
+                    {"action": "tool", "args": {}, "desc": "description"}
+                ]
+            },
+            ensure_ascii=True,
+            indent=2
+        )
+        fallback_example = json.dumps(
+            {
+                "response": "Sorry, I could not understand the request. Please rephrase.",
+                "commands": []
+            },
+            ensure_ascii=True,
+            indent=2
+        )
+
         return f"""You are a shopping assistant that converts user requests into MCP tool calls.
 
 ## Current context
@@ -214,18 +231,10 @@ class ContextBuilder:
 4. Add wait before or after navigation when needed.
 
 ## Output format
-{{
-  "response": "short message",
-  "commands": [
-    {{"action": "tool", "args": {{}}, "desc": "description"}}
-  ]
-}}
+{output_example}
 
 If the request cannot be understood:
-{{
-  "response": "Sorry, I could not understand the request. Please rephrase.",
-  "commands": []
-}}
+{fallback_example}
 """
 
     def _format_commands(self) -> str:
