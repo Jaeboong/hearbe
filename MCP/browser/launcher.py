@@ -6,8 +6,10 @@ CDP(Chrome DevTools Protocol) 모드로 Chrome 자동 실행
 
 import asyncio
 import logging
+import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Optional
 import aiohttp
@@ -30,6 +32,7 @@ class ChromeLauncher:
         self._config = get_config().browser
         self._process: Optional[subprocess.Popen] = None
         self._cdp_url: Optional[str] = None
+        self._actual_user_data_dir: Optional[Path] = None  # 실제 사용되는 프로필 경로
 
     @property
     def is_running(self) -> bool:
@@ -55,12 +58,12 @@ class ChromeLauncher:
             logger.warning(f"Configured Chrome path not found: {self._config.chrome_path}")
         return chrome_path
 
-    def _build_chrome_args(self, chrome_path: str) -> list:
+    def _build_chrome_args(self, chrome_path: str, user_data_dir: Path) -> list:
         """Chrome 실행 인자 생성"""
         args = [
             chrome_path,
             f"--remote-debugging-port={self._config.debugging_port}",
-            f"--user-data-dir={self._config.user_data_dir}",
+            f"--user-data-dir={user_data_dir}",
             "--no-first-run",
             "--no-default-browser-check",
             f"--window-size={self._config.window_width},{self._config.window_height}",
@@ -113,34 +116,15 @@ class ChromeLauncher:
             )
             return False
 
-        # 사용자 프로필 디렉토리 생성
-        user_data_dir = Path(self._config.user_data_dir)
-        logger.info(f"User data dir (relative): {self._config.user_data_dir}")
-        logger.info(f"User data dir (absolute): {user_data_dir.absolute()}")
-
-        try:
-            user_data_dir.mkdir(parents=True, exist_ok=True)
-            logger.info(f"Successfully created user data directory: {user_data_dir.absolute()}")
-        except PermissionError as e:
-            logger.error(f"Permission denied creating directory: {user_data_dir.absolute()}")
-            logger.error(f"Error: {e}")
-            await publish(
-                EventType.BROWSER_ERROR,
-                data={"error": f"Permission denied: {e}"},
-                source="browser.launcher"
-            )
-            return False
-        except Exception as e:
-            logger.error(f"Failed to create user data directory: {e}")
-            await publish(
-                EventType.BROWSER_ERROR,
-                data={"error": str(e)},
-                source="browser.launcher"
-            )
-            return False
+        # 사용 가능한 프로필 디렉토리 찾기 (잠겨있으면 _1, _2 등 번호 붙여서 새로 생성)
+        # Chrome은 절대 경로를 요구하므로 resolve() 사용
+        base_user_data_dir = Path(self._config.user_data_dir).resolve()
+        user_data_dir = await self._find_available_profile_dir(base_user_data_dir)
+        self._actual_user_data_dir = user_data_dir
+        logger.info(f"Using profile directory: {user_data_dir}")
 
         # Chrome 실행
-        args = self._build_chrome_args(chrome_path)
+        args = self._build_chrome_args(chrome_path, user_data_dir)
         logger.info(f"Starting Chrome with args: {' '.join(args)}")
 
         try:
@@ -248,3 +232,84 @@ class ChromeLauncher:
         self._process = None
         self._cdp_url = None
         logger.info("Chrome stopped")
+
+    async def _find_available_profile_dir(self, base_dir: Path) -> Path:
+        """
+        사용 가능한 프로필 디렉토리 찾기
+        
+        기본 디렉토리가 잠겨있으면 _1, _2 등 번호를 붙여서 대체 디렉토리 사용
+        
+        Args:
+            base_dir: 기본 프로필 디렉토리 경로
+            
+        Returns:
+            Path: 사용 가능한 프로필 디렉토리 경로
+        """
+        # 먼저 기본 디렉토리 시도
+        if await self._is_profile_available(base_dir):
+            base_dir.mkdir(parents=True, exist_ok=True)
+            return base_dir
+        
+        logger.warning(f"Profile directory is locked: {base_dir}")
+        
+        # 잠겨있으면 _1, _2, ... 번호 붙여서 찾기
+        for i in range(1, 100):
+            alt_dir = base_dir.parent / f"{base_dir.name}_{i}"
+            if await self._is_profile_available(alt_dir):
+                alt_dir.mkdir(parents=True, exist_ok=True)
+                logger.info(f"Using alternative profile: {alt_dir}")
+                return alt_dir
+        
+        # 100개까지 다 잠겨있으면 (거의 불가능) 그냥 기본 디렉토리 반환
+        logger.error("Could not find available profile directory")
+        base_dir.mkdir(parents=True, exist_ok=True)
+        return base_dir
+
+    async def _is_profile_available(self, profile_dir: Path) -> bool:
+        """
+        프로필 디렉토리 사용 가능 여부 확인
+        
+        Args:
+            profile_dir: 확인할 프로필 디렉토리
+            
+        Returns:
+            bool: 사용 가능 여부
+        """
+        # 디렉토리가 없으면 사용 가능
+        if not profile_dir.exists():
+            return True
+        
+        # 잠금 파일 목록
+        lock_files = [
+            profile_dir / "lockfile",
+            profile_dir / "SingletonLock",
+            profile_dir / "SingletonCookie", 
+            profile_dir / "SingletonSocket",
+        ]
+        
+        # 잠금 파일이 하나라도 있으면 사용 불가
+        for lock_file in lock_files:
+            if lock_file.exists():
+                # 잠금 파일 삭제 시도
+                try:
+                    lock_file.unlink()
+                    logger.info(f"Removed lock file: {lock_file.name}")
+                except (PermissionError, OSError):
+                    logger.warning(f"Profile locked by: {lock_file.name}")
+                    return False
+        
+        return True
+
+    async def clean_profile(self):
+        """
+        프로필 디렉토리 완전 삭제 (수동 정리용)
+        """
+        user_data_dir = Path(self._config.user_data_dir)
+        if user_data_dir.exists():
+            try:
+                shutil.rmtree(user_data_dir, ignore_errors=True)
+                logger.info(f"Cleaned profile directory: {user_data_dir}")
+            except Exception as e:
+                logger.error(f"Failed to clean profile: {e}")
+
+

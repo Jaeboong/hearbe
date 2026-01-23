@@ -2,7 +2,8 @@
 
 # 오디오 처리
 pyaudio>=0.2.13          # 오디오 녹음/재생
-pynput>=1.7.6            # 핫키 처리
+keyboard>=0.13.5         # PTT 핫키 처리
+pynput>=1.7.6            # 핫키 처리 (기타)
 
 # 네트워크 통신
 websockets>=12.0         # WebSocket 클라이언트
