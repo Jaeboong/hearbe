@@ -32,7 +32,7 @@ AVAILABLE_COMMANDS = {
     "goto": {
         "description": "Navigate to a URL",
         "args": {"url": "Destination URL"},
-        "example": '{"action": "goto", "args": {"url": "https://www.coupang.com/"}, "desc": "Go to Coupang"}'
+        "example": """{"action": "goto", "args": {"url": "https://www.coupang.com/"}, "desc": "Go to Coupang"}"""
     },
     "click": {
         "description": "Click an element by CSS selector",
@@ -40,7 +40,7 @@ AVAILABLE_COMMANDS = {
             "selector": "CSS selector",
             "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": '{"action": "click", "args": {"selector": "#login-btn"}, "desc": "Click login button"}'
+        "example": """{"action": "click", "args": {"selector": "#login-btn"}, "desc": "Click login button"}"""
     },
     "fill": {
         "description": "Fill text into an input",
@@ -49,7 +49,7 @@ AVAILABLE_COMMANDS = {
             "text": "Text to input",
             "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": '{"action": "fill", "args": {"selector": "input[name=q]", "text": "ramen"}, "desc": "Type search keyword"}'
+        "example": """{"action": "fill", "args": {"selector": "input[name=q]", "text": "ramen"}, "desc": "Type search keyword"}"""
     },
     "press": {
         "description": "Press a key in an input",
@@ -58,22 +58,22 @@ AVAILABLE_COMMANDS = {
             "key": "Key name (Enter, Tab, etc.)",
             "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": '{"action": "press", "args": {"selector": "input", "key": "Enter"}, "desc": "Submit input"}'
+        "example": """{"action": "press", "args": {"selector": "input", "key": "Enter"}, "desc": "Submit input"}"""
     },
     "wait": {
         "description": "Wait for a given time",
         "args": {"ms": "Milliseconds"},
-        "example": '{"action": "wait", "args": {"ms": 1000}, "desc": "Wait 1 second"}'
+        "example": """{"action": "wait", "args": {"ms": 1000}, "desc": "Wait 1 second"}"""
     },
     "click_text": {
         "description": "Find and click by visible text",
         "args": {"text": "Text to match"},
-        "example": '{"action": "click_text", "args": {"text": "Cart"}, "desc": "Click text"}'
+        "example": """{"action": "click_text", "args": {"text": "Cart"}, "desc": "Click text"}"""
     },
     "scroll": {
         "description": "Scroll the page",
         "args": {"direction": "up or down", "amount": "Pixels (optional)"},
-        "example": '{"action": "scroll", "args": {"direction": "down", "amount": 500}, "desc": "Scroll down"}'
+        "example": """{"action": "scroll", "args": {"direction": "down", "amount": 500}, "desc": "Scroll down"}"""
     },
     "extract": {
         "description": "Extract product data from a list",
@@ -83,7 +83,7 @@ AVAILABLE_COMMANDS = {
             "field_selectors": "Optional field->selector mapping",
             "limit": "Max items"
         },
-        "example": '{"action": "extract", "args": {"selector": ".search-product", "fields": ["name", "price"], "limit": 20}, "desc": "Extract search results"}'
+        "example": """{"action": "extract", "args": {"selector": ".search-product", "fields": ["name", "price"], "limit": 20}, "desc": "Extract search results"}"""
     }
 }
 
