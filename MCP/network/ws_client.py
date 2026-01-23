@@ -63,7 +63,13 @@ class WSClient:
         Note: websocket.closed 속성은 비동기 환경에서 불안정할 수 있어
         단순히 websocket 객체 존재 여부만 확인하고, 실제 전송 시 예외 처리로 대응
         """
-        return self._websocket is not None
+        if self._websocket is None:
+            return False
+        if hasattr(self._websocket, "open"):
+            return bool(self._websocket.open)
+        if hasattr(self._websocket, "closed"):
+            return not bool(self._websocket.closed)
+        return True
     
     @property
     def session_id(self) -> str:
@@ -371,6 +377,7 @@ class WSClient:
         success = data.get("success", False)
         result = data.get("result", {})
         error = data.get("error")
+        page_data = data.get("page_data")
         
         logger.info(f"MCP result: request_id={request_id}, success={success}")
         
@@ -381,7 +388,8 @@ class WSClient:
                 "request_id": request_id,
                 "success": success,
                 "result": result,
-                "error": error
+                "error": error,
+                "page_data": page_data
             }
         )
     

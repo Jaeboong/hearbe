@@ -559,10 +559,12 @@ class WebSocketHandler:
         success = data.get("success", False)
         result = data.get("result", {})
         error = data.get("error")
+        page_data = data.get("page_data") or {}
+        products = page_data.get("products") if isinstance(page_data, dict) else None
 
         await publish(
             EventType.MCP_RESULT_RECEIVED,
-            data={"success": success, "result": result, "error": error},
+            data={"success": success, "result": result, "error": error, "page_data": page_data},
             session_id=session_id
         )
 
@@ -571,6 +573,17 @@ class WebSocketHandler:
             if session:
                 if self.session:
                     self.session.set_context(session_id, "mcp_result", result)
+                    if products:
+                        self.session.set_context(session_id, "search_results", products)
+                        try:
+                            payload = json.dumps(products, ensure_ascii=True)
+                            self.session.add_to_history(
+                                session_id,
+                                "system",
+                                f"SEARCH_RESULTS:{payload}"
+                            )
+                        except Exception:
+                            logger.warning("Failed to serialize search_results for history")
 
                 response_text = await self.llm.generate_response(session.context)
 
