@@ -4,6 +4,7 @@ LLM 프롬프트용 컨텍스트 빌더
 현재 페이지 정보, 대화 기록, 사용 가능한 명령어를 프롬프트로 구성합니다.
 """
 
+import json
 from dataclasses import dataclass
 from typing import Dict, List, Any, Optional
 
@@ -73,7 +74,18 @@ AVAILABLE_COMMANDS = {
         "description": "페이지 스크롤",
         "args": {"direction": "up 또는 down", "amount": "픽셀 수 (선택)"},
         "example": '{"action": "scroll", "args": {"direction": "down", "amount": 500}, "desc": "아래로 스크롤"}'
+    },
+    "extract": {
+        "description": "Extract product data from a list",
+        "args": {
+            "selector": "CSS selector for items",
+            "fields": "List of fields (name, price, rating, review_count)",
+            "field_selectors": "Optional field->selector mapping",
+            "limit": "Max items"
+        },
+        "example": "{\\"action\\": \\"extract\\", \\"args\\": {\\"selector\\": \\".search-product\\", \\"fields\\": [\\"name\\", \\"price\\"], \\"limit\\": 20}, \\"desc\\": \\"Extract search results\\"}"
     }
+
 }
 
 # 페이지별 사용 가능한 액션
@@ -147,84 +159,75 @@ class ContextBuilder:
         page_context: PageContext = None
     ) -> List[Dict[str, str]]:
         """
-        LLM API 호출용 메시지 리스트 생성
-        
-        Args:
-            user_text: 현재 사용자 입력
-            current_url: 현재 페이지 URL
-            conversation_history: 이전 대화 기록
-            page_context: 페이지 컨텍스트
-        
-        Returns:
-            OpenAI API messages 형식의 리스트
+        Build OpenAI messages for the current request.
         """
-        system_prompt = self._build_system_prompt(current_url, page_context)
-        
+        search_results = self._extract_search_results(conversation_history)
+        system_prompt = self._build_system_prompt(current_url, page_context, search_results)
+
         messages = [{"role": "system", "content": system_prompt}]
-        
-        # 최근 대화 기록 추가 (최대 5개)
+
+        # Keep the most recent conversation turns.
         if conversation_history:
             for msg in conversation_history[-5:]:
                 messages.append({
                     "role": msg.get("role", "user"),
                     "content": msg.get("content", "")
                 })
-        
-        # 현재 사용자 입력
+
         messages.append({"role": "user", "content": user_text})
-        
         return messages
-    
+
     def _build_system_prompt(
-        self, 
-        current_url: str, 
-        page_context: PageContext = None
+        self,
+        current_url: str,
+        page_context: PageContext = None,
+        search_results: List[Any] = None
     ) -> str:
-        """시스템 프롬프트 생성"""
-        
+        """Build the system prompt."""
         if page_context is None:
             site = get_site_manager().get_site_by_url(current_url)
             page_context = get_page_context(current_url, site)
-        
+
         commands_doc = self._format_commands()
         selectors_doc = self._format_selectors(page_context.selectors)
-        
-        return f"""당신은 시각장애인을 위한 웹 쇼핑 도우미입니다.
-사용자의 자연어 요청을 브라우저 자동화 명령으로 변환합니다.
+        search_results_section = self._format_search_results_section(search_results)
 
-## 현재 상황
-- 사이트: {page_context.site_name}
-- 페이지 타입: {page_context.page_type}
+        return f"""You are a shopping assistant that converts user requests into MCP tool calls.
+
+## Current context
+- Site: {page_context.site_name}
+- Page type: {page_context.page_type}
 - URL: {current_url}
-- 가능한 액션: {', '.join(page_context.available_actions)}
+- Available actions: {', '.join(page_context.available_actions)}
 
-## 사용 가능한 명령어
+## Available commands
 {commands_doc}
 
-## 현재 페이지 셀렉터 (있는 경우 우선 사용)
+## Page selectors
 {selectors_doc}
 
-## 중요 규칙
-1. 반드시 아래 JSON 형식으로만 응답하세요.
-2. 명령어는 순서대로 실행됩니다.
-3. 셀렉터가 확실하지 않으면 click_text를 사용하세요.
-4. 페이지 이동 후에는 wait 명령을 추가하세요.
+{search_results_section}
+## Rules
+1. Respond with JSON only.
+2. Commands are executed in order.
+3. If a selector is uncertain, use click_text.
+4. Add wait before or after navigation when needed.
 
-## 출력 형식 (반드시 이 JSON 형식으로)
+## Output format
 {{
-  "response": "사용자에게 할 말 (한국어)",
+  "response": "short message",
   "commands": [
-    {{"action": "명령어", "args": {{}}, "desc": "설명"}}
+    {{"action": "tool", "args": {{}}, "desc": "description"}}
   ]
 }}
 
-명령이 불가능하거나 이해할 수 없으면:
+If the request cannot be understood:
 {{
-  "response": "죄송합니다. 요청을 이해하지 못했습니다. 다시 말씀해 주세요.",
+  "response": "Sorry, I could not understand the request. Please rephrase.",
   "commands": []
 }}
 """
-    
+
     def _format_commands(self) -> str:
         """명령어 문서 포맷"""
         lines = []
@@ -241,4 +244,59 @@ class ContextBuilder:
         lines = []
         for name, selector in selectors.items():
             lines.append(f"- {name}: {selector}")
+        return "\n".join(lines)
+
+    def _extract_search_results(self, conversation_history: List[Dict[str, Any]] = None) -> List[Any]:
+        if not conversation_history:
+            return []
+
+        results: List[Any] = []
+        for msg in conversation_history:
+            if not isinstance(msg, dict):
+                continue
+            if isinstance(msg.get("search_results"), list):
+                results = msg.get("search_results") or []
+                continue
+            content = msg.get("content")
+            if not isinstance(content, str):
+                continue
+            if not content.startswith("SEARCH_RESULTS:"):
+                continue
+            payload = content[len("SEARCH_RESULTS:"):].strip()
+            try:
+                data = json.loads(payload)
+            except Exception:
+                continue
+            if isinstance(data, list):
+                results = data
+        return results
+
+    def _format_search_results_section(self, search_results: List[Any] = None) -> str:
+        if not search_results:
+            return ""
+
+        names: List[str] = []
+        for item in search_results:
+            if isinstance(item, dict):
+                name = item.get("name") or item.get("title") or item.get("product_name")
+            else:
+                name = str(item)
+            if name:
+                names.append(name.strip())
+
+        if not names:
+            return ""
+
+        max_items = 15
+        lines = ["## Search Results (most recent)"]
+        for name in names[:max_items]:
+            lines.append(f"- {name}")
+        if len(names) > max_items:
+            lines.append(f"... and {len(names) - max_items} more")
+
+        lines.append("")
+        lines.append("## Selection Rule")
+        lines.append("- If user text matches an item above, prefer click_text with that name.")
+        lines.append("- Do not run a new search when a match exists.")
+        lines.append("- If no match and the intent is search, run a new search.")
         return "\n".join(lines)

@@ -1,7 +1,7 @@
 """
-브라우저 제어 도구 모듈
+釉뚮씪?곗? ?쒖뼱 ?꾧뎄 紐⑤뱢
 
-Playwright를 사용하여 CDP로 연결된 브라우저 제어
+Playwright瑜??ъ슜?섏뿬 CDP濡??곌껐??釉뚮씪?곗? ?쒖뼱
 """
 
 import asyncio
@@ -22,9 +22,9 @@ logger = logging.getLogger(__name__)
 
 class BrowserTools:
     """
-    브라우저 제어 도구
+    釉뚮씪?곗? ?쒖뼱 ?꾧뎄
 
-    Playwright를 통해 CDP 연결된 Chrome 브라우저 조작
+    Playwright瑜??듯빐 CDP ?곌껐??Chrome 釉뚮씪?곗? 議곗옉
     """
 
     def __init__(self):
@@ -35,18 +35,18 @@ class BrowserTools:
 
     @property
     def is_connected(self) -> bool:
-        """브라우저 연결 상태"""
+        """釉뚮씪?곗? ?곌껐 ?곹깭"""
         return self._browser is not None and self._browser.is_connected()
 
     async def connect(self, cdp_url: str) -> bool:
         """
-        CDP URL로 브라우저에 연결
+        CDP URL濡?釉뚮씪?곗????곌껐
 
         Args:
             cdp_url: Chrome DevTools Protocol WebSocket URL
 
         Returns:
-            연결 성공 여부
+            ?곌껐 ?깃났 ?щ?
         """
         if self.is_connected:
             logger.warning("Already connected to browser")
@@ -57,7 +57,7 @@ class BrowserTools:
             self._browser = await self._playwright.chromium.connect_over_cdp(cdp_url)
             self._cdp_url = cdp_url
 
-            # 기존 페이지가 있으면 사용, 없으면 새로 생성
+            # 湲곗〈 ?섏씠吏媛 ?덉쑝硫??ъ슜, ?놁쑝硫??덈줈 ?앹꽦
             contexts = self._browser.contexts
             if contexts and contexts[0].pages:
                 self._page = contexts[0].pages[0]
@@ -74,7 +74,7 @@ class BrowserTools:
             return False
 
     async def disconnect(self):
-        """브라우저 연결 해제"""
+        """釉뚮씪?곗? ?곌껐 ?댁젣"""
         if self._browser:
             try:
                 await self._browser.close()
@@ -95,10 +95,10 @@ class BrowserTools:
 
     async def navigate_to_url(self, url: str) -> Dict[str, Any]:
         """
-        URL로 이동
+        URL濡??대룞
 
         Args:
-            url: 이동할 URL
+            url: ?대룞??URL
 
         Returns:
             {"success": bool, "current_url": str}
@@ -126,15 +126,14 @@ class BrowserTools:
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        요소 클릭
+        ?붿냼 ?대┃
 
         Args:
-            selector: CSS 선택자
-            wait_timeout: 대기 시간 (ms)
-            frame_selector: iframe CSS 선택자 (선택)
-            frame_name: iframe name 속성 (선택)
-            frame_url: iframe URL 일부 또는 정규식 (선택)
-            frame_index: iframe index (선택)
+            selector: CSS ?좏깮??            wait_timeout: ?湲??쒓컙 (ms)
+            frame_selector: iframe CSS ?좏깮??(?좏깮)
+            frame_name: iframe name ?띿꽦 (?좏깮)
+            frame_url: iframe URL ?쇰? ?먮뒗 ?뺢퇋??(?좏깮)
+            frame_index: iframe index (?좏깮)
 
         Returns:
             {"success": bool, "element_found": bool}
@@ -158,15 +157,12 @@ class BrowserTools:
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        입력 필드 채우기
-
+        ?낅젰 ?꾨뱶 梨꾩슦湲?
         Args:
-            selector: CSS 선택자
-            value: 입력할 값
-            frame_selector: iframe CSS 선택자 (선택)
-            frame_name: iframe name 속성 (선택)
-            frame_url: iframe URL 일부 또는 정규식 (선택)
-            frame_index: iframe index (선택)
+            selector: CSS ?좏깮??            value: ?낅젰??媛?            frame_selector: iframe CSS ?좏깮??(?좏깮)
+            frame_name: iframe name ?띿꽦 (?좏깮)
+            frame_url: iframe URL ?쇰? ?먮뒗 ?뺢퇋??(?좏깮)
+            frame_index: iframe index (?좏깮)
 
         Returns:
             {"success": bool}
@@ -208,15 +204,14 @@ class BrowserTools:
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        키보드 키 입력
+        ?ㅻ낫?????낅젰
 
         Args:
-            selector: CSS 선택자
-            key: 키 이름 (Enter, Tab 등)
-            frame_selector: iframe CSS 선택자 (선택)
-            frame_name: iframe name 속성 (선택)
-            frame_url: iframe URL 일부 또는 정규식 (선택)
-            frame_index: iframe index (선택)
+            selector: CSS ?좏깮??            key: ???대쫫 (Enter, Tab ??
+            frame_selector: iframe CSS ?좏깮??(?좏깮)
+            frame_name: iframe name ?띿꽦 (?좏깮)
+            frame_url: iframe URL ?쇰? ?먮뒗 ?뺢퇋??(?좏깮)
+            frame_index: iframe index (?좏깮)
 
         Returns:
             {"success": bool}
@@ -257,14 +252,13 @@ class BrowserTools:
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        요소의 텍스트 추출
+        ?붿냼???띿뒪??異붿텧
 
         Args:
-            selector: CSS 선택자
-            frame_selector: iframe CSS 선택자 (선택)
-            frame_name: iframe name 속성 (선택)
-            frame_url: iframe URL 일부 또는 정규식 (선택)
-            frame_index: iframe index (선택)
+            selector: CSS ?좏깮??            frame_selector: iframe CSS ?좏깮??(?좏깮)
+            frame_name: iframe name ?띿꽦 (?좏깮)
+            frame_url: iframe URL ?쇰? ?먮뒗 ?뺢퇋??(?좏깮)
+            frame_index: iframe index (?좏깮)
 
         Returns:
             {"success": bool, "text": str}
@@ -301,13 +295,87 @@ class BrowserTools:
             logger.error(f"Get text failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def click_text(self, text: str) -> Dict[str, Any]:
+    async def extract(
+        self,
+        selector: str,
+        fields: Optional[list] = None,
+        field_selectors: Optional[Dict[str, str]] = None,
+        limit: int = 20,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
         """
-        텍스트로 요소 클릭 (프레임 포함)
+        Extract structured items from a list.
 
         Args:
-            text: 찾을 텍스트
+            selector: CSS selector for list items
+            fields: Field names to extract (default: ["name"])
+            field_selectors: Optional field -> selector mapping
+            limit: Max number of items to extract
+        """
+        if not self._page:
+            return {"success": False, "error": "Not connected to browser"}
 
+        try:
+            context_type, context, error = resolve_frame_context(
+                self._page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error}
+
+            locator = context.locator(selector)
+            count = await locator.count()
+            if count == 0:
+                return {"success": False, "error": "Element not found", "products": []}
+
+            max_items = min(limit, count)
+            fields = fields or ["name"]
+            field_selectors = field_selectors or {}
+            products: list[Dict[str, Any]] = []
+
+            for i in range(max_items):
+                item = locator.nth(i)
+                item_data: Dict[str, Any] = {"index": i + 1}
+
+                for field in fields:
+                    text = ""
+                    field_selector = field_selectors.get(field)
+                    if field_selector:
+                        target = item.locator(field_selector)
+                        if await target.count() > 0:
+                            value = await target.first.text_content()
+                            text = value.strip() if value else ""
+                    elif field in ("name", "title"):
+                        value = await item.text_content()
+                        text = value.strip() if value else ""
+
+                    item_data[field] = text
+
+                products.append(item_data)
+
+            return {
+                "success": True,
+                "products": products,
+                "count": len(products),
+                "page_url": self._page.url if self._page else "",
+            }
+
+        except Exception as e:
+            logger.error(f"Extract failed: {e}")
+            return {"success": False, "error": str(e), "products": []}
+
+    async def click_text(self, text: str) -> Dict[str, Any]:
+        """
+        ?띿뒪?몃줈 ?붿냼 ?대┃ (?꾨젅???ы븿)
+
+        Args:
+            text: 李얠쓣 ?띿뒪??
         Returns:
             {"success": bool, "result": str}
         """
@@ -322,11 +390,10 @@ class BrowserTools:
 
     async def get_visible_buttons(self, max_items: int = 200) -> Dict[str, Any]:
         """
-        페이지에서 보이는 버튼 요소 조회
+        ?섏씠吏?먯꽌 蹂댁씠??踰꾪듉 ?붿냼 議고쉶
 
         Args:
-            max_items: 최대 항목 수
-
+            max_items: 理쒕? ??ぉ ??
         Returns:
             {"success": bool, "buttons": list, "count": int}
         """
@@ -342,10 +409,9 @@ class BrowserTools:
 
     async def wait(self, ms: int = 1000) -> Dict[str, Any]:
         """
-        대기
-
+        ?湲?
         Args:
-            ms: 대기 시간 (ms)
+            ms: ?湲??쒓컙 (ms)
 
         Returns:
             {"success": bool}
@@ -357,10 +423,10 @@ class BrowserTools:
 
     async def take_screenshot(self, full_page: bool = False) -> Dict[str, Any]:
         """
-        스크린샷 캡처
+        ?ㅽ겕由곗꺑 罹≪쿂
 
         Args:
-            full_page: 전체 페이지 캡처 여부
+            full_page: ?꾩껜 ?섏씠吏 罹≪쿂 ?щ?
 
         Returns:
             {"success": bool, "screenshot_base64": str}
@@ -380,11 +446,11 @@ class BrowserTools:
 
     async def scroll(self, direction: str, amount: int = 500) -> Dict[str, Any]:
         """
-        페이지 스크롤
+        ?섏씠吏 ?ㅽ겕濡?
 
         Args:
-            direction: 스크롤 방향 ("up" 또는 "down")
-            amount: 스크롤 양 (px)
+            direction: ?ㅽ겕濡?諛⑺뼢 ("up" ?먮뒗 "down")
+            amount: ?ㅽ겕濡???(px)
 
         Returns:
             {"success": bool}
@@ -404,14 +470,14 @@ class BrowserTools:
 
     async def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """
-        도구 실행
+        ?꾧뎄 ?ㅽ뻾
 
         Args:
-            tool_name: 도구 이름
-            arguments: 도구 인자
+            tool_name: ?꾧뎄 ?대쫫
+            arguments: ?꾧뎄 ?몄옄
 
         Returns:
-            도구 실행 결과
+            ?꾧뎄 ?ㅽ뻾 寃곌낵
         """
         tool_name, args = normalize_tool_call(tool_name, arguments)
 
@@ -420,6 +486,7 @@ class BrowserTools:
             "click_element": self.click_element,
             "fill_input": self.fill_input,
             "get_text": self.get_text,
+            "extract": self.extract,
             "take_screenshot": self.take_screenshot,
             "scroll": self.scroll,
             "press_key": self.press_key,

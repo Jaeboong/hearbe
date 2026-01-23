@@ -185,7 +185,16 @@ class LLMGenerator:
     
     def _validate_command(self, action: str, args: Dict[str, Any]) -> bool:
         """명령 유효성 검증"""
-        valid_actions = ["goto", "click", "fill", "press", "wait", "click_text", "scroll"]
+        valid_actions = [
+            "goto",
+            "click",
+            "fill",
+            "press",
+            "wait",
+            "click_text",
+            "scroll",
+            "extract",
+        ]
         
         if action not in valid_actions:
             return False
@@ -199,7 +208,9 @@ class LLMGenerator:
             return False
         if action == "click_text" and "text" not in args:
             return False
-        
+        if action == "extract" and "selector" not in args:
+            return False
+
         return True
     
     def clear_history(self):

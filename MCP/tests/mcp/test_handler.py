@@ -67,7 +67,7 @@ class TestMCPHandler:
         handler._tools.connect = AsyncMock(return_value=True)
         
         event = Event(
-            event_type=EventType.BROWSER_READY,
+            type=EventType.BROWSER_READY,
             data={"cdp_url": "ws://localhost:9222"},
             source="test"
         )
@@ -97,7 +97,7 @@ class TestMCPHandler:
         
         # cdp_url 없는 이벤트
         event = Event(
-            event_type=EventType.BROWSER_READY,
+            type=EventType.BROWSER_READY,
             data={},
             source="test"
         )
@@ -121,7 +121,7 @@ class TestMCPHandler:
         handler._tools.connect = AsyncMock(return_value=False)
         
         event = Event(
-            event_type=EventType.BROWSER_READY,
+            type=EventType.BROWSER_READY,
             data={"cdp_url": "ws://invalid:9222"},
             source="test"
         )
@@ -154,7 +154,7 @@ class TestMCPHandler:
         )
         
         event = Event(
-            event_type=EventType.MCP_TOOL_CALL,
+            type=EventType.MCP_TOOL_CALL,
             data={
                 "request_id": "req-123",
                 "tool_name": "navigate_to_url",
@@ -189,7 +189,7 @@ class TestMCPHandler:
         
         with patch("mcp.handler.publish") as mock_publish:
             event = Event(
-                event_type=EventType.MCP_TOOL_CALL,
+                type=EventType.MCP_TOOL_CALL,
                 data={
                     "request_id": "req-456",
                     "tool_name": "navigate_to_url",
@@ -217,7 +217,7 @@ class TestMCPHandler:
         
         with patch("mcp.handler.publish") as mock_publish:
             event = Event(
-                event_type=EventType.MCP_TOOL_CALL,
+                type=EventType.MCP_TOOL_CALL,
                 data={
                     "request_id": "req-789",
                     # tool_name 누락
@@ -242,7 +242,7 @@ class TestMCPHandler:
         
         # data가 None인 이벤트
         event = Event(
-            event_type=EventType.MCP_TOOL_CALL,
+            type=EventType.MCP_TOOL_CALL,
             data=None,
             source="test"
         )
@@ -305,7 +305,7 @@ class TestMCPHandler:
         handler._tools.disconnect = AsyncMock()
         
         event = Event(
-            event_type=EventType.APP_SHUTDOWN,
+            type=EventType.APP_SHUTDOWN,
             data={},
             source="test"
         )
@@ -344,18 +344,17 @@ class TestMCPHandlerIntegration:
         
         handler = MCPHandler()
         handler.setup_event_handlers()
+        await event_bus.start()
         
         # 결과를 저장할 변수
-        mcp_ready_received = False
-        tool_result_received = False
+        mcp_ready_event = asyncio.Event()
+        tool_result_event = asyncio.Event()
         
         async def on_mcp_ready(event):
-            nonlocal mcp_ready_received
-            mcp_ready_received = True
+            mcp_ready_event.set()
         
         async def on_mcp_result(event):
-            nonlocal tool_result_received
-            tool_result_received = True
+            tool_result_event.set()
         
         # 결과 이벤트 구독
         event_bus.subscribe(EventType.MCP_SERVER_READY, on_mcp_ready)
@@ -369,9 +368,8 @@ class TestMCPHandlerIntegration:
         )
         
         # 이벤트 처리 대기
-        await asyncio.sleep(0.5)
+        await asyncio.wait_for(mcp_ready_event.wait(), timeout=5)
         
-        assert mcp_ready_received is True
         assert handler.is_ready is True
         
         # 2. MCP_TOOL_CALL 이벤트 발행
@@ -386,12 +384,11 @@ class TestMCPHandlerIntegration:
         )
         
         # 이벤트 처리 대기
-        await asyncio.sleep(1.0)
-        
-        assert tool_result_received is True
+        await asyncio.wait_for(tool_result_event.wait(), timeout=10)
         
         # 정리
         await handler.stop()
+        await event_bus.stop()
 
 
 import asyncio

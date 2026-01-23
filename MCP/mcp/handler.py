@@ -1,4 +1,4 @@
-"""
+﻿"""
 MCP 핸들러 모듈
 
 MCP_TOOL_CALL 이벤트를 처리하고 브라우저 제어 도구 실행
@@ -99,11 +99,19 @@ class MCPHandler:
         result = await self._tools.execute_tool(tool_name, arguments)
 
         # 결과 발행
+        page_data = None
+        if isinstance(result, dict) and result.get("products"):
+            page_data = {
+                "products": result.get("products", []),
+                "url": result.get("page_url")
+            }
+
         await self._publish_result(
             request_id=request_id,
             success=result.get("success", False),
             result=result,
-            error=result.get("error")
+            error=result.get("error"),
+            page_data=page_data
         )
 
     async def _publish_result(
@@ -111,7 +119,8 @@ class MCPHandler:
         request_id: str,
         success: bool,
         result: dict = None,
-        error: str = None
+        error: str = None,
+        page_data: dict = None
     ):
         """도구 실행 결과 발행"""
         await publish(
@@ -120,7 +129,8 @@ class MCPHandler:
                 "request_id": request_id,
                 "success": success,
                 "result": result,
-                "error": error
+                "error": error,
+                "page_data": page_data
             },
             source="mcp.handler"
         )

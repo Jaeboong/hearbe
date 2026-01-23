@@ -96,6 +96,7 @@ def build_click_text_command(text: str, description: str = "") -> GeneratedComma
         arguments={"text": text},
         description=description or f"'{text}' 텍스트 클릭"
     )
+
 def build_extract_products_command(
     site: Optional[SiteConfig],
     current_url: str = "",
