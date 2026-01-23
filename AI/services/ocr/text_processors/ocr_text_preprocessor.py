@@ -1,16 +1,48 @@
 """
 OCR 텍스트 전처리 모듈 (OCR Text Preprocessing Module)
 
-이 모듈은 OCR(광학 문자 인식) 결과가 LLM(거대 언어 모델)으로 전달되어 요약되기 전에
-텍스트를 정제하고 필터링하는 기능을 제공합니다.
-노이즈, 신뢰도가 낮은 결과, 의미 없는 문자 등을 제거하여 요약 품질을 높입니다.
+이 모듈은 OCR(광학 문자 인식) 결과의 텍스트를 정제하고 필터링하는 **중앙 모듈**입니다.
+다른 모듈(ocr_text_merger.py, ocr_llm_summarizer.py 등)에서 import하여 사용합니다.
+
+주요 기능:
+- 텍스트 정규화 (normalize_text)
+- 의미 있는 텍스트 판별 (is_meaningful_text)
+- 점수/길이/패턴 기반 필터링 (filter_texts)
+- 전처리 통계 포함 처리 (preprocess_ocr_texts)
+
+사용 예시:
+    from ocr_text_preprocessor import normalize_text, is_meaningful_text, filter_texts
 """
 
 import re
 from typing import Dict, List, Tuple
 
 
-def _is_meaningful_text(text: str) -> bool:
+# =============================================================================
+# 공개 API (Public API) - 다른 모듈에서 import하여 사용
+# =============================================================================
+
+def normalize_text(text: str) -> str:
+    """
+    중복 비교를 위한 텍스트 정규화.
+    
+    특수문자, 공백을 제거하고 소문자로 변환합니다.
+    유사도 비교나 중복 검사에 사용됩니다.
+    
+    Args:
+        text: 정규화할 텍스트
+        
+    Returns:
+        str: 정규화된 텍스트 (한글/영문/숫자만 포함, 소문자)
+        
+    Example:
+        >>> normalize_text("Hello, 안녕! 123")
+        'hello안녕123'
+    """
+    return re.sub(r"[^0-9a-zA-Z가-힣]", "", text).lower()
+
+
+def is_meaningful_text(text: str) -> bool:
     """
     텍스트에 의미 있는 한글이나 영어가 포함되어 있는지 확인합니다.
     
@@ -37,6 +69,55 @@ def _is_meaningful_text(text: str) -> bool:
     # 한글/영어가 포함되어 있고, 유효 문자 비율이 50%를 넘어야 의미 있는 텍스트로 판단합니다.
     return (has_korean or has_english_word) and alphanumeric_ratio > 0.5
 
+
+def filter_texts(
+    texts: List[str],
+    scores: List[float],
+    min_score: float = 0.7,
+    min_length: int = 2,
+) -> List[Tuple[str, float]]:
+    """
+    점수/길이/패턴 기준으로 텍스트를 필터링합니다.
+    
+    ocr_text_merger.py 등 다른 모듈에서 import하여 사용하는 공용 API입니다.
+    preprocess_ocr_texts()보다 간단한 버전으로, 통계 없이 필터링만 수행합니다.
+    
+    Args:
+        texts: OCR로 인식된 텍스트 리스트
+        scores: 각 텍스트에 대한 신뢰도 점수 리스트
+        min_score: 최소 신뢰도 임계값 (기본: 0.7)
+        min_length: 최소 텍스트 길이 (기본: 2)
+        
+    Returns:
+        List[Tuple[str, float]]: [(텍스트, 점수), ...] 형태의 필터링된 리스트
+        
+    Example:
+        >>> from ocr_text_preprocessor import filter_texts
+        >>> filtered = filter_texts(["안녕하세요", "a", "!!!"], [0.9, 0.8, 0.5], min_score=0.7)
+        >>> # [("안녕하세요", 0.9)]
+    """
+    filtered: List[Tuple[str, float]] = []
+    
+    for text, score in zip(texts, scores):
+        if not isinstance(text, str):
+            continue
+        text = text.strip()
+        if not text:
+            continue
+        if score < min_score:
+            continue
+        if len(text) < min_length:
+            continue
+        if not is_meaningful_text(text):
+            continue
+        filtered.append((text, score))
+    
+    return filtered
+
+
+# =============================================================================
+# 상세 전처리 (통계 포함)
+# =============================================================================
 
 def preprocess_ocr_texts(
     texts: List[str],
@@ -106,8 +187,8 @@ def preprocess_ocr_texts(
             continue
             
         # 3. 패턴 검사 (의미 있는 텍스트인지 확인)
-        # _is_meaningful_text 함수를 호출하여 내용을 검사합니다.
-        if not _is_meaningful_text(text):
+        # is_meaningful_text 함수를 호출하여 내용을 검사합니다.
+        if not is_meaningful_text(text):
             stats["filtered_by_pattern"] += 1
             if len(filtered_examples["by_pattern"]) < 3:
                 filtered_examples["by_pattern"].append(f'"{text}"')

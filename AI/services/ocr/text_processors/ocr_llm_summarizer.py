@@ -39,9 +39,9 @@ except ImportError:
 # 기본 설정 상수
 # ==========================================
 # 입력 파일 기본 경로 (테스트용)
-DEFAULT_INPUT = os.path.join("output", "초코파이_detail_res_texts.json")
+DEFAULT_INPUT = os.path.join("output", "샴푸_res_texts.json")
 # 출력 파일 기본 경로
-DEFAULT_OUTPUT = os.path.join("output", "초코파이_texts_summary.json")
+DEFAULT_OUTPUT = os.path.join("output", "샴푸_texts_summary.json")
 
 # 텍스트 전처리 모듈 임포트 시도
 try:
@@ -243,6 +243,70 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
             else:
                 # 모든 시도 실패 시 예외 발생
                 raise RuntimeError(f"LLM 요청이 {max_retries}회 재시도 후에도 실패했습니다: {last_error}") from last_error
+
+
+# =============================================================================
+# 공개 API (Public API) - 외부 모듈에서 호출 가능
+# =============================================================================
+
+def summarize_texts(
+    texts: List[str],
+    product_type: ProductType = None,
+    verbose: bool = True
+) -> Dict:
+    """
+    텍스트 리스트를 받아 LLM으로 요약합니다.
+    외부 모듈(ocr_pipeline.py)에서 호출 가능한 공개 API입니다.
+    
+    Args:
+        texts: OCR로 추출된 텍스트 리스트 (전처리 완료된 상태)
+        product_type: 제품 타입 (None이면 자동 감지)
+        verbose: 진행 상황 출력 여부
+        
+    Returns:
+        Dict: LLM 요약 결과
+            - product_type: 제품 타입
+            - product_name: 제품명
+            - confidence: 신뢰도
+            - summary: 요약 문장 리스트
+            - keywords: 키워드별 정보
+            
+    Example:
+        >>> from ocr_llm_summarizer import summarize_texts
+        >>> from product_type_detector import ProductType
+        >>> 
+        >>> texts = ["케라시스 샴푸", "600ml", "케라틴 성분"]
+        >>> result = summarize_texts(texts, ProductType.BEAUTY_HAIRCARE)
+        >>> print(result["summary"])
+    """
+    if not texts:
+        return {
+            "product_type": "OTHER",
+            "product_name": "알 수 없음",
+            "confidence": 0.0,
+            "summary": ["텍스트가 없어 요약할 수 없습니다."],
+            "keywords": {},
+            "error": "입력 텍스트가 비어있습니다."
+        }
+    
+    # 타입이 지정되지 않으면 자동 감지
+    if product_type is None:
+        product_type = detect_product_type(texts)
+        if verbose:
+            type_desc = get_type_description(product_type)
+            print(f"    제품 타입 자동 감지: {type_desc} ({product_type.value})")
+    
+    # 프롬프트 구성
+    prompt = _build_prompt(texts, product_type)
+    
+    # LLM 호출
+    if verbose:
+        print("    LLM API 호출 중...", end="", flush=True)
+    summary = _call_openai(prompt)
+    if verbose:
+        print(" 완료!")
+    
+    return summary
 
 
 def _write_json(path: str, data: Dict) -> None:
