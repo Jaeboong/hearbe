@@ -8,6 +8,7 @@ from ..context.context_rules import (
     extract_search_query,
     detect_target_site,
     build_search_with_navigation_commands
+    build_extract_products_command
 )
 
 
@@ -29,7 +30,10 @@ class SearchRule(BaseRule):
         needs_navigation = not target_site.matches_domain(current_url)
         commands = build_search_with_navigation_commands(
             target_site, query, needs_navigation, current_url
-        )
+        )        extract_cmd = build_extract_products_command(target_site, current_url)
+        if extract_cmd:
+            commands.append(extract_cmd)
+
 
         return RuleResult(
             matched=True,

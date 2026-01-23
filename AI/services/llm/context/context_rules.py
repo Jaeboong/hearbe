@@ -96,6 +96,57 @@ def build_click_text_command(text: str, description: str = "") -> GeneratedComma
         arguments={"text": text},
         description=description or f"'{text}' 텍스트 클릭"
     )
+def build_extract_products_command(
+    site: Optional[SiteConfig],
+    current_url: str = "",
+    limit: int = 20,
+) -> Optional[GeneratedCommand]:
+    """
+    Build an extract command for search results.
+
+    Intended to run after search to capture product names for follow-up selection.
+    """
+    from ..sites.site_manager import get_selector
+
+    selectors: Dict[str, str] = {}
+    if site:
+        page = site.get_page_selectors("search")
+        if page and page.selectors:
+            selectors = page.selectors
+
+    item_selector = (
+        selectors.get("product_list")
+        or selectors.get("product_item")
+        or (get_selector(current_url, "product_list") if current_url else None)
+        or (get_selector(current_url, "product_item") if current_url else None)
+    )
+    if not item_selector:
+        return None
+
+    field_selectors: Dict[str, str] = {}
+    title_selector = selectors.get("product_title") or selectors.get("product_name")
+    if title_selector:
+        field_selectors["name"] = title_selector
+    if selectors.get("product_price"):
+        field_selectors["price"] = selectors["product_price"]
+    if selectors.get("product_rating"):
+        field_selectors["rating"] = selectors["product_rating"]
+    if selectors.get("product_review"):
+        field_selectors["review_count"] = selectors["product_review"]
+
+    fields = list(field_selectors.keys()) or ["name"]
+
+    return GeneratedCommand(
+        tool_name="extract",
+        arguments={
+            "selector": item_selector,
+            "fields": fields,
+            "field_selectors": field_selectors,
+            "limit": limit,
+        },
+        description="Extract search results"
+    )
+
 
 
 # =============================================================================
