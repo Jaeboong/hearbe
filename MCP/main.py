@@ -70,6 +70,15 @@ class Application:
         self.modules["ws_client"] = WSClient()
         self.modules["ws_client"].setup_event_handlers()
 
+        # Audio 모듈 (PTT 녹음)
+        try:
+            from audio.audio_manager import AudioManager
+            self.modules["audio"] = AudioManager(hotkey="space")
+            self.modules["audio"].setup_event_handlers()
+        except ImportError as e:
+            logger.warning(f"Audio module not available: {e}")
+            logger.warning("Install pyaudio and keyboard for voice support")
+
         # 콘솔 입력 모듈 (테스트용)
         if self.console_mode:
             from debug.console_input import ConsoleInputManager
@@ -103,7 +112,12 @@ class Application:
         if "console_input" in self.modules:
             await self.modules["console_input"].start()
 
+        # Audio 모듈 시작 (PTT 녹음)
+        if "audio" in self.modules:
+            await self.modules["audio"].start()
+
         logger.info("=== MCP Desktop App is now running ===")
+        logger.info("Hold SPACE to record voice command, release to send")
         if self.console_mode:
             logger.info("Console input mode: ON (type 'exit' to quit)")
         logger.info("Press Ctrl+C to exit")
@@ -116,6 +130,8 @@ class Application:
         await publish(EventType.APP_SHUTDOWN, source="main")
 
         # 모듈 종료
+        if "audio" in self.modules:
+            await self.modules["audio"].stop()
         if "console_input" in self.modules:
             await self.modules["console_input"].stop()
         if "ws_client" in self.modules:
