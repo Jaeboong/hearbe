@@ -234,6 +234,26 @@ application-*.properties
 node_modules/
 jspm_packages/
 
+# Yarn PnP (Plug'n'Play)
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Vite
+dist-ssr
+
+# Lerna
+lerna-debug.log*
+
+# Visual Studio
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
 # Testing
 coverage/
 
@@ -252,6 +272,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+lerna-debug.log*
 
 # Local env files
 .env*.local
