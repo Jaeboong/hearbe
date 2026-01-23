@@ -197,7 +197,7 @@ class WebSocketHandler:
         # Create or retrieve session
         session = self.session.get_session(session_id) if self.session else None
         if not session and self.session:
-            session = self.session.create_session()
+            session = self.session.create_session(session_id=session_id)
 
         # Initialize per-session state
         self._audio_queues[session_id] = asyncio.Queue(maxsize=MAX_QUEUE_SIZE)
@@ -472,37 +472,41 @@ class WebSocketHandler:
                 await self._handle_flow_input(session_id, text)
                 return
 
-            # NLU: intent analysis
+            # Initialize defaults
+            intent = None
+            resolved_text = text
+
+            # NLU: intent analysis (optional)
             if self.nlu:
                 context = session.context
                 intent = await self.nlu.analyze_intent(text, context)
                 resolved_text = await self.nlu.resolve_reference(text, context)
 
-                # LLM: command generation
-                if self.llm:
-                    response = await self.llm.generate_commands(
-                        resolved_text,
-                        intent,
-                        session
-                    )
+            # LLM: command generation (works with or without NLU)
+            if self.llm:
+                response = await self.llm.generate_commands(
+                    resolved_text,
+                    intent,
+                    session
+                )
 
-                    # Check if flow delegation required
-                    if response.requires_flow and self.flow:
-                        flow_type = response.flow_type
-                        site = session.current_site or "coupang"
-                        step = await self.flow.start_flow(flow_type, site, session)
-                        await self._send_flow_step(session_id, step)
-                    else:
-                        if response.commands:
-                            await self._send_tool_calls(session_id, response.commands)
+                # Check if flow delegation required
+                if response.requires_flow and self.flow:
+                    flow_type = response.flow_type
+                    site = session.current_site or "coupang"
+                    step = await self.flow.start_flow(flow_type, site, session)
+                    await self._send_flow_step(session_id, step)
+                else:
+                    if response.commands:
+                        await self._send_tool_calls(session_id, response.commands)
 
-                    # TTS response
-                    if response.text and self.tts:
-                        await self._send_tts_response(session_id, response.text)
+                # TTS response
+                if response.text and self.tts:
+                    await self._send_tts_response(session_id, response.text)
 
-                    # Add to conversation history
-                    if self.session:
-                        self.session.add_to_history(session_id, "assistant", response.text)
+                # Add to conversation history
+                if self.session:
+                    self.session.add_to_history(session_id, "assistant", response.text)
 
         except Exception as e:
             logger.error(f"Text processing failed: {e}")
@@ -612,7 +616,7 @@ class WebSocketHandler:
         await connection_manager.send_message(session_id, msg)
 
     async def _send_tool_calls(self, session_id: str, commands: list):
-        """Send MCP tool calls"""
+        """Send MCP tool calls - broadcasts to all clients for pipeline testing"""
         msg = WSMessage(
             type=MessageType.TOOL_CALLS,
             data={
@@ -627,7 +631,10 @@ class WebSocketHandler:
             },
             session_id=session_id
         )
-        await connection_manager.send_message(session_id, msg)
+        # TODO: [TEMP] Broadcasting to all clients for testing
+        # In production, send only to the originating session
+        logger.info(f"[BROADCAST] Sending {len(commands)} tool calls to all clients")
+        await connection_manager.broadcast(msg)
 
     async def _send_flow_step(self, session_id: str, step):
         """Send flow step"""
