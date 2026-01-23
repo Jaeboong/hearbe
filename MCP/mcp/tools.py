@@ -73,8 +73,47 @@ class BrowserTools:
             await self.disconnect()
             return False
 
+    async def _get_active_page(self) -> Optional[Page]:
+        """
+        현재 활성 페이지 가져오기
+        
+        기존 페이지가 닫혔거나 없으면 새로 생성
+        
+        Returns:
+            활성 Page 객체 또는 None
+        """
+        if not self.is_connected:
+            return None
+        
+        try:
+            contexts = self._browser.contexts
+            
+            # 기존 컨텍스트와 페이지가 있으면 사용
+            if contexts:
+                for context in contexts:
+                    pages = context.pages
+                    if pages:
+                        # 열린 페이지 중 첫 번째 반환
+                        for page in pages:
+                            if not page.is_closed():
+                                return page
+            
+            # 유효한 페이지가 없으면 새로 생성
+            logger.info("No active page found, creating new one")
+            if contexts:
+                context = contexts[0]
+            else:
+                context = await self._browser.new_context()
+            
+            page = await context.new_page()
+            return page
+            
+        except Exception as e:
+            logger.error(f"Failed to get active page: {e}")
+            return None
+
     async def disconnect(self):
-        """釉뚮씪?곗? ?곌껐 ?댁젣"""
+        """브라우저 연결 해제"""
         if self._browser:
             try:
                 await self._browser.close()
@@ -89,26 +128,26 @@ class BrowserTools:
                 pass
             self._playwright = None
 
-        self._page = None
         self._cdp_url = None
         logger.info("Disconnected from browser")
 
     async def navigate_to_url(self, url: str) -> Dict[str, Any]:
         """
-        URL濡??대룞
+        URL로 이동
 
         Args:
-            url: ?대룞??URL
+            url: 이동할 URL
 
         Returns:
             {"success": bool, "current_url": str}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
-            await self._page.goto(url, wait_until="domcontentloaded")
-            current_url = self._page.url
+            await page.goto(url, wait_until="domcontentloaded")
+            current_url = page.url
             logger.info(f"Navigated to: {current_url}")
             return {"success": True, "current_url": current_url}
 
@@ -157,22 +196,26 @@ class BrowserTools:
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        ?낅젰 ?꾨뱶 梨꾩슦湲?
+        입력 필드 채우기
+        
         Args:
-            selector: CSS ?좏깮??            value: ?낅젰??媛?            frame_selector: iframe CSS ?좏깮??(?좏깮)
-            frame_name: iframe name ?띿꽦 (?좏깮)
-            frame_url: iframe URL ?쇰? ?먮뒗 ?뺢퇋??(?좏깮)
-            frame_index: iframe index (?좏깮)
+            selector: CSS 선택자
+            value: 입력할 값
+            frame_selector: iframe CSS 선택자 (선택)
+            frame_name: iframe name 속성 (선택)
+            frame_url: iframe URL 일부 또는 정규식 (선택)
+            frame_index: iframe index (선택)
 
         Returns:
             {"success": bool}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
             context_type, context, error = resolve_frame_context(
-                self._page,
+                page,
                 frame_selector=frame_selector,
                 frame_name=frame_name,
                 frame_url=frame_url,
@@ -204,24 +247,26 @@ class BrowserTools:
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        ?ㅻ낫?????낅젰
+        키보드 키 입력
 
         Args:
-            selector: CSS ?좏깮??            key: ???대쫫 (Enter, Tab ??
-            frame_selector: iframe CSS ?좏깮??(?좏깮)
-            frame_name: iframe name ?띿꽦 (?좏깮)
-            frame_url: iframe URL ?쇰? ?먮뒗 ?뺢퇋??(?좏깮)
-            frame_index: iframe index (?좏깮)
+            selector: CSS 선택자
+            key: 키 이름 (Enter, Tab 등)
+            frame_selector: iframe CSS 선택자 (선택)
+            frame_name: iframe name 속성 (선택)
+            frame_url: iframe URL 일부 또는 정규식 (선택)
+            frame_index: iframe index (선택)
 
         Returns:
             {"success": bool}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
             context_type, context, error = resolve_frame_context(
-                self._page,
+                page,
                 frame_selector=frame_selector,
                 frame_name=frame_name,
                 frame_url=frame_url,
@@ -252,23 +297,25 @@ class BrowserTools:
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
-        ?붿냼???띿뒪??異붿텧
+        요소의 텍스트 추출
 
         Args:
-            selector: CSS ?좏깮??            frame_selector: iframe CSS ?좏깮??(?좏깮)
-            frame_name: iframe name ?띿꽦 (?좏깮)
-            frame_url: iframe URL ?쇰? ?먮뒗 ?뺢퇋??(?좏깮)
-            frame_index: iframe index (?좏깮)
+            selector: CSS 선택자
+            frame_selector: iframe CSS 선택자 (선택)
+            frame_name: iframe name 속성 (선택)
+            frame_url: iframe URL 일부 또는 정규식 (선택)
+            frame_index: iframe index (선택)
 
         Returns:
             {"success": bool, "text": str}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
             context_type, context, error = resolve_frame_context(
-                self._page,
+                page,
                 frame_selector=frame_selector,
                 frame_name=frame_name,
                 frame_url=frame_url,
@@ -315,12 +362,13 @@ class BrowserTools:
             field_selectors: Optional field -> selector mapping
             limit: Max number of items to extract
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
             context_type, context, error = resolve_frame_context(
-                self._page,
+                page,
                 frame_selector=frame_selector,
                 frame_name=frame_name,
                 frame_url=frame_url,
@@ -363,7 +411,7 @@ class BrowserTools:
                 "success": True,
                 "products": products,
                 "count": len(products),
-                "page_url": self._page.url if self._page else "",
+                "page_url": page.url,
             }
 
         except Exception as e:
@@ -379,11 +427,12 @@ class BrowserTools:
         Returns:
             {"success": bool, "result": str}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
-            return await click_text_util(self._page, text)
+            return await click_text_util(page, text)
         except Exception as e:
             logger.error(f"Click text failed: {e}")
             return {"success": False, "error": str(e)}
@@ -397,11 +446,12 @@ class BrowserTools:
         Returns:
             {"success": bool, "buttons": list, "count": int}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser", "buttons": []}
 
         try:
-            buttons = await get_visible_buttons_util(self._page, max_items=max_items)
+            buttons = await get_visible_buttons_util(page, max_items=max_items)
             return {"success": True, "buttons": buttons, "count": len(buttons)}
         except Exception as e:
             logger.error(f"Get visible buttons failed: {e}")
@@ -431,11 +481,12 @@ class BrowserTools:
         Returns:
             {"success": bool, "screenshot_base64": str}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
-            screenshot_bytes = await self._page.screenshot(full_page=full_page)
+            screenshot_bytes = await page.screenshot(full_page=full_page)
             screenshot_base64 = base64.b64encode(screenshot_bytes).decode("utf-8")
             logger.info(f"Screenshot taken (full_page={full_page})")
             return {"success": True, "screenshot_base64": screenshot_base64}
@@ -455,12 +506,13 @@ class BrowserTools:
         Returns:
             {"success": bool}
         """
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
             delta = -amount if direction == "up" else amount
-            await self._page.mouse.wheel(0, delta)
+            await page.mouse.wheel(0, delta)
             logger.info(f"Scrolled {direction} by {amount}px")
             return {"success": True}
 
@@ -514,12 +566,13 @@ class BrowserTools:
         frame_url: Optional[str] = None,
         frame_index: Optional[int] = None,
     ) -> Dict[str, Any]:
-        if not self._page:
+        page = await self._get_active_page()
+        if not page:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
             context_type, context, error = resolve_frame_context(
-                self._page,
+                page,
                 frame_selector=frame_selector,
                 frame_name=frame_name,
                 frame_url=frame_url,
