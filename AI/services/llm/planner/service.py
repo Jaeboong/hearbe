@@ -76,7 +76,6 @@ class LLMPlanner(ILLMPlanner):
         # 1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
         decision = self._routing_policy.decide(user_text, intent, rule_result)
-<<<<<<<< ec41d44595c5f18a79df0dc3b50df2ae793390f6:AI/services/llm/planner/service.py
 
         # 2. LLM fallback by policy
         if decision.use_llm:
@@ -89,31 +88,11 @@ class LLMPlanner(ILLMPlanner):
                     current_url=current_url,
                     conversation_history=conversation_history
                 )
-
-========
-        # 2. LLM fallback by policy
-        if decision.use_llm:
-            if self._use_llm_fallback and self._llm_generator:
-                logger.info(
-                    f"LLM routing: rule={rule_result.matched_rule}, reason={decision.reason}, text='{user_text}'"
-                )
-                llm_result = await self._llm_generator.generate(
-                    user_text=user_text,
-                    current_url=current_url,
-                    conversation_history=conversation_history
-                )
-
->>>>>>>> 10efa089b1065e1eb7177c98c6e0f984c4a40f6e:AI/services/llm/service.py
+                
                 if llm_result.success and llm_result.commands:
                     return self._llm_result_to_response(llm_result)
-
-                logger.warning(f"LLM fallback ??: {llm_result.error}")
-<<<<<<<< ec41d44595c5f18a79df0dc3b50df2ae793390f6:AI/services/llm/planner/service.py
-            else:
-                logger.info("LLM fallback disabled or not initialized; using rule result")
-========
->>>>>>>> 10efa089b1065e1eb7177c98c6e0f984c4a40f6e:AI/services/llm/service.py
-
+                else:
+                    logger.info("LLM fallback disabled or not initialized; using rule result")
         return self._to_response(rule_result)
 
     def _to_response(self, result: CommandResult) -> LLMResponse:
