@@ -11,7 +11,7 @@ public class SessionNotFoundException extends BusinessException {
         super(ErrorCode.SESSION_NOT_FOUND);
     }
 
-    public SessionNotFoundException(Long sessionId) {
+    public SessionNotFoundException(Integer sessionId) {
         super(ErrorCode.SESSION_NOT_FOUND, "공유 세션을 찾을 수 없습니다. ID: " + sessionId);
     }
 
