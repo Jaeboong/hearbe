@@ -11,7 +11,7 @@ public class UserNotFoundException extends BusinessException {
         super(ErrorCode.USER_NOT_FOUND);
     }
 
-    public UserNotFoundException(Long userId) {
+    public UserNotFoundException(Integer userId) {
         super(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다. ID: " + userId);
     }
 

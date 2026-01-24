@@ -11,7 +11,7 @@ public class WishlistItemNotFoundException extends BusinessException {
         super(ErrorCode.WISHLIST_ITEM_NOT_FOUND);
     }
 
-    public WishlistItemNotFoundException(Long wishlistItemId) {
+    public WishlistItemNotFoundException(Integer wishlistItemId) {
         super(ErrorCode.WISHLIST_ITEM_NOT_FOUND, "찜한 상품을 찾을 수 없습니다. ID: " + wishlistItemId);
     }
 }

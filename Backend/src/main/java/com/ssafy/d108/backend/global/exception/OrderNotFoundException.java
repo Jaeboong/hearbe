@@ -11,7 +11,7 @@ public class OrderNotFoundException extends BusinessException {
         super(ErrorCode.ORDER_NOT_FOUND);
     }
 
-    public OrderNotFoundException(Long orderId) {
+    public OrderNotFoundException(Integer orderId) {
         super(ErrorCode.ORDER_NOT_FOUND, "주문 내역을 찾을 수 없습니다. ID: " + orderId);
     }
 }

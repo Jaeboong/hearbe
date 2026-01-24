@@ -26,12 +26,12 @@ public class SharingSessionLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sharing_session_id")
-    private Long sharingSessionId;
+    @Column(name = "id")
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "host_user_id", nullable = false)
-    private User hostUser;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @CreationTimestamp
     @Column(name = "started_at", nullable = false, updatable = false)
