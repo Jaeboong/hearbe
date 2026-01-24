@@ -1,129 +1,143 @@
+-- DDL for Ear Shopping (영문 컬럼명, products 테이블 제거)
+-- 시각장애인용 AI 음성 쇼핑 플랫폼
+
+-- ========================================
+-- 테이블 생성
+-- ========================================
+
 CREATE TABLE `platforms` (
-	`platform_id`	int	NOT NULL	AUTO_INCREMENT,
-	`platform_name`	varchar(10)	NULL,
-	`base_url`	varchar(500)	NOT NULL
-);
-
-CREATE TABLE `wishlist_items` (
-	`wishlist_item_id`	int	NOT NULL	AUTO_INCREMENT,
-	`user_id`	varchar(30)	NOT NULL,
-	`product_metadata`	json	NULL,
-	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
-	`platform_id`	int	NOT NULL
-);
-
-CREATE TABLE `welfare_cards` (
-	`welfare_card_id`	int	NOT NULL	AUTO_INCREMENT,
-	`user_id`	varchar(30)	NOT NULL,
-	`cvc`	varchar(5)	NULL	COMMENT 'CVC 번호 (AES-256 암호화 필수)',
-	`issue_date`	date	NOT NULL	COMMENT '발급일자',
-	`expiration_date`	date	NOT NULL	COMMENT '유효기간',
-	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
-	`updated_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE `cart_items` (
-	`cart_item_id`	int	NOT NULL	AUTO_INCREMENT,
-	`user_id`	varchar(30)	NOT NULL,
-	`product_metadata`	json	NULL,
-	`quantity`	int	NOT NULL	DEFAULT 1,
-	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
+	`id` int NOT NULL AUTO_INCREMENT,
+	`platform_name` varchar(50) NULL,
+	`base_url` varchar(500) NOT NULL,
+	PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `users` (
-	`user_id`	varchar(30)	NOT NULL,
-	`username`	varchar(15)	NULL,
-	`password`	varchar(30)	NULL,
-	`phone_number`	varchar(20)	NOT NULL,
-	`simple_password`	varchar(6)	NULL,
-	`user_type`	ENUM('BLIND', 'BIG', 'COMMON', 'SHARING')	NOT NULL	DEFAULT 'BLIND',
-	`last_login_at`	timestamp	NULL,
-	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE `sharing_session_logs` (
-	`sharing_session_id`	int	NOT NULL	AUTO_INCREMENT,
-	`host_user_id`	varchar(30)	NOT NULL,
-	`started_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
-	`ended_at`	timestamp	NULL,
-	`session_status`	ENUM('active', 'completed', 'terminated')	NOT NULL	DEFAULT 'active'
-);
-
-CREATE TABLE `order_items` (
-	`order_item_id`	int	NOT NULL	AUTO_INCREMENT,
-	`order_id`	int	NOT NULL,
-	`product_name`	varchar(100)	NULL,
-	`metadata`	json	NULL,
-	`price`	varchar(100)	NOT NULL,
-	`quantity`	int	NOT NULL	DEFAULT 1
+	`id` int NOT NULL AUTO_INCREMENT,
+	`login_id` varchar(30) NOT NULL,
+	`email` varchar(100) NULL,
+	`password` varchar(255) NOT NULL,
+	`phone_number` varchar(20) NOT NULL,
+	`simple_password` varchar(6) NULL,
+	`username` varchar(15) NULL,
+	`user_type` ENUM('BLIND', 'BIG', 'COMMON', 'SHARING') NOT NULL DEFAULT 'BLIND',
+	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `UQ_LOGIN_ID` (`login_id`),
+	UNIQUE KEY `UQ_PHONE` (`phone_number`)
 );
 
 CREATE TABLE `profiles` (
-	`profile_id`	int	NOT NULL	AUTO_INCREMENT,
-	`user_id`	varchar(30)	NOT NULL,
-	`gender`	varchar(1)	NULL,
-	`height`	float	NULL,
-	`weight`	float	NULL,
-	`birth_date`	date	NULL,
-	`updated_at`	timestamp	NULL	DEFAULT CURRENT_TIMESTAMP
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL,
+	`gender` ENUM('M', 'F') NULL,
+	`height` float NULL,
+	`weight` float NULL,
+	`birth_date` date NULL,
+	`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `UQ_PROFILE_USER` (`user_id`)
+);
+
+CREATE TABLE `welfare_cards` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL,
+	`cvc` varchar(5) NULL COMMENT 'CVC 번호 (AES-256 암호화 필수)',
+	`issue_date` date NOT NULL,
+	`expiration_date` date NOT NULL,
+	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `UQ_WELFARE_USER` (`user_id`)
+);
+
+CREATE TABLE `cart_items` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL,
+	`product_metadata` json NULL,
+	`quantity` int NOT NULL DEFAULT 1,
+	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	KEY `idx_cart_user` (`user_id`)
+);
+
+CREATE TABLE `wishlist_items` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL,
+	`platform_id` int NOT NULL,
+	`product_metadata` json NULL,
+	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	KEY `idx_wishlist_user_platform` (`user_id`, `platform_id`)
 );
 
 CREATE TABLE `orders` (
-	`order_id`	int	NOT NULL	AUTO_INCREMENT,
-	`user_id`	varchar(30)	NOT NULL,
-	`order_detail_url`	varchar(1000)	NULL,
-	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
-	`updated_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL,
+	`order_detail_url` varchar(1000) NULL,
+	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	KEY `idx_orders_user_created` (`user_id`, `created_at`)
 );
 
-ALTER TABLE `platforms` ADD CONSTRAINT `PK_PLATFORMS` PRIMARY KEY (
-	`platform_id`
+CREATE TABLE `order_items` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`order_id` int NOT NULL,
+	`product_name` varchar(100) NULL,
+	`metadata` json NULL,
+	`price` varchar(100) NOT NULL,
+	`quantity` int NOT NULL DEFAULT 1,
+	PRIMARY KEY (`id`),
+	KEY `idx_order_items_order` (`order_id`)
 );
 
-ALTER TABLE `wishlist_items` ADD CONSTRAINT `PK_WISHLIST_ITEMS` PRIMARY KEY (
-	`wishlist_item_id`
+CREATE TABLE `sharing_session_logs` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL COMMENT 'host user id',
+	`started_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`ended_at` timestamp NULL,
+	`session_status` ENUM('active', 'completed', 'terminated') NOT NULL DEFAULT 'active',
+	PRIMARY KEY (`id`)
 );
 
-ALTER TABLE `welfare_cards` ADD CONSTRAINT `PK_WELFARE_CARDS` PRIMARY KEY (
-	`welfare_card_id`
-);
+-- ========================================
+-- Foreign Key 제약조건
+-- ========================================
 
-ALTER TABLE `cart_items` ADD CONSTRAINT `PK_CART_ITEMS` PRIMARY KEY (
-	`cart_item_id`
-);
+-- profiles
+ALTER TABLE `profiles` 
+	ADD CONSTRAINT `FK_profiles_user` 
+	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `users` ADD CONSTRAINT `PK_USERS` PRIMARY KEY (
-	`user_id`
-);
+-- welfare_cards
+ALTER TABLE `welfare_cards` 
+	ADD CONSTRAINT `FK_welfare_cards_user` 
+	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `sharing_session_logs` ADD CONSTRAINT `PK_SHARING_SESSION_LOGS` PRIMARY KEY (
-	`sharing_session_id`
-);
+-- cart_items
+ALTER TABLE `cart_items` 
+	ADD CONSTRAINT `FK_cart_items_user` 
+	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `order_items` ADD CONSTRAINT `PK_ORDER_ITEMS` PRIMARY KEY (
-	`order_item_id`
-);
+-- wishlist_items
+ALTER TABLE `wishlist_items` 
+	ADD CONSTRAINT `FK_wishlist_items_user` 
+	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+	ADD CONSTRAINT `FK_wishlist_items_platform` 
+	FOREIGN KEY (`platform_id`) REFERENCES `platforms` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `profiles` ADD CONSTRAINT `PK_PROFILES` PRIMARY KEY (
-	`profile_id`
-);
+-- orders
+ALTER TABLE `orders` 
+	ADD CONSTRAINT `FK_orders_user` 
+	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `orders` ADD CONSTRAINT `PK_ORDERS` PRIMARY KEY (
-	`order_id`
-);
+-- order_items
+ALTER TABLE `order_items` 
+	ADD CONSTRAINT `FK_order_items_order` 
+	FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `wishlist_items` ADD CONSTRAINT `FK_WISHLIST_ITEMS_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
-ALTER TABLE `wishlist_items` ADD CONSTRAINT `FK_WISHLIST_ITEMS_PLATFORM_ID` FOREIGN KEY (`platform_id`) REFERENCES `platforms` (`platform_id`);
-
-ALTER TABLE `welfare_cards` ADD CONSTRAINT `FK_WELFARE_CARDS_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
-
-ALTER TABLE `cart_items` ADD CONSTRAINT `FK_CART_ITEMS_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
-
-ALTER TABLE `sharing_session_logs` ADD CONSTRAINT `FK_SHARING_SESSION_LOGS_HOST_USER_ID` FOREIGN KEY (`host_user_id`) REFERENCES `users` (`user_id`);
-
-ALTER TABLE `order_items` ADD CONSTRAINT `FK_ORDER_ITEMS_ORDER_ID` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`);
-
-ALTER TABLE `profiles` ADD CONSTRAINT `FK_PROFILES_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
-
-ALTER TABLE `orders` ADD CONSTRAINT `FK_ORDERS_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
-
+-- sharing_session_logs
+ALTER TABLE `sharing_session_logs` 
+	ADD CONSTRAINT `FK_sharing_session_logs_host` 
+	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
