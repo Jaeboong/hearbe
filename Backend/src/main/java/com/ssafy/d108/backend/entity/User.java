@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -20,27 +22,31 @@ import org.hibernate.annotations.CreationTimestamp;
 public class User {
 
     @Id
-    @Column(name = "user_id", length = 30, nullable = false)
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "username", length = 15)
-    private String username;
+    @Column(name = "login_id", length = 30, nullable = false, unique = true)
+    private String loginId;
 
-    @Column(name = "password", length = 30)
+    @Column(name = "email", length = 100)
+    private String email;
+
+    @Column(name = "password", length = 255, nullable = false)
     private String password;
 
-    @Column(name = "phone_number", length = 20, nullable = false)
+    @Column(name = "phone_number", length = 20, nullable = false, unique = true)
     private String phoneNumber;
 
     @Column(name = "simple_password", length = 6)
     private String simplePassword;
 
+    @Column(name = "username", length = 15)
+    private String username;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
     private UserType userType = UserType.BLIND;
-
-    @Column(name = "last_login_at")
-    private LocalDateTime lastLoginAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

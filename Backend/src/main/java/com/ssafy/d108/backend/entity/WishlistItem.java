@@ -27,12 +27,16 @@ public class WishlistItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "wishlist_item_id")
-    private Long wishlistItemId;
+    @Column(name = "id")
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "platform_id", nullable = false)
+    private Platform platform;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "product_metadata", columnDefinition = "json")
@@ -41,8 +45,4 @@ public class WishlistItem {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "platform_id", nullable = false)
-    private Platform platform;
 }

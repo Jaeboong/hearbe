@@ -19,10 +19,10 @@ public class Platform {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "platform_id")
-    private Long platformId;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "platform_name", length = 10)
+    @Column(name = "platform_name", length = 50)
     private String platformName;
 
     @Column(name = "base_url", length = 500, nullable = false)
