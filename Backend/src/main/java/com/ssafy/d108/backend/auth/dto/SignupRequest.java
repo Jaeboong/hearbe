@@ -2,6 +2,7 @@ package com.ssafy.d108.backend.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssafy.d108.backend.entity.UserType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -54,4 +55,11 @@ public class SignupRequest {
     @JsonProperty("simple_password")
     @Pattern(regexp = "^[0-9]{6}$", message = "간편 비밀번호는 6자리 숫자여야 합니다.")
     private String simplePassword;
+
+    /**
+     * 복지카드 정보 (BLIND 타입일 경우 필수)
+     */
+    @JsonProperty("welfare_card")
+    @Valid
+    private WelfareCardRequest welfareCard;
 }
