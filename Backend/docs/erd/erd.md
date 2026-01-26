@@ -1,143 +1,134 @@
--- DDL for Ear Shopping (영문 컬럼명, products 테이블 제거)
--- 시각장애인용 AI 음성 쇼핑 플랫폼
+CREATE TABLE `플랫폼` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`플랫폼 이름`	varchar(10)	NULL,
+	`base_url`	varchar(500)	NOT NULL
+);
 
--- ========================================
--- 테이블 생성
--- ========================================
+CREATE TABLE `위시리스트상품` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`user_id`	varchar(30)	NOT NULL,
+	`platform_id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`상품이름`	varchar(100)	NULL,
+	`가격`	int	NULL,
+	`상품url`	varchar(500)	NULL	DEFAULT NULL,
+	`상품 이미지 url`	varchar(1000)	NULL,
+	`생성일시`	timestamp	NOT NULL	DEFAULT TRUE
+);
 
-CREATE TABLE `platforms` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`platform_name` varchar(50) NULL,
-	`base_url` varchar(500) NOT NULL,
-	PRIMARY KEY (`id`)
+CREATE TABLE `복지카드` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`아이디`	varchar(30)	NOT NULL,
+	`카드번호`	varchar(50)	NULL,
+	`cvc`	varchar(5)	NULL	COMMENT 'CVC 번호 (AES-256 암호화 필수)',
+	`카드사`	varchar(30)	NULL,
+	`발급일`	date	NOT NULL	COMMENT '발급일자',
+	`유효기간`	date	NOT NULL	COMMENT '유효기간',
+	`셍성일시`	timestamp	NOT NULL	COMMENT 'CURRENT_TIMESTAMP',
+	`수정일시`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `장바구니_상품` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`user_id`	varchar(30)	NOT NULL,
+	`플랫폼아이디`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`상품이름`	varchar(100)	NULL,
+	`가격`	int	NULL,
+	`수량`	int	NOT NULL	DEFAULT 1,
+	`상품url`	varchar(500)	NULL	DEFAULT NULL,
+	`상품 이미지 url`	varchar(1000)	NULL,
+	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `users` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`login_id` varchar(30) NOT NULL,
-	`email` varchar(100) NULL,
-	`password` varchar(255) NOT NULL,
-	`phone_number` varchar(20) NOT NULL,
-	`simple_password` varchar(6) NULL,
-	`username` varchar(15) NULL,
-	`user_type` ENUM('BLIND', 'BIG', 'COMMON', 'SHARING') NOT NULL DEFAULT 'BLIND',
-	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`),
-	UNIQUE KEY `UQ_LOGIN_ID` (`login_id`),
-	UNIQUE KEY `UQ_PHONE` (`phone_number`)
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`아이디`	varchar(30)	NULL,
+	`이메일`	varchar(50)	NULL,
+	`비밀번호`	varchar(30)	NULL,
+	`전화번호`	varchar(20)	NOT NULL,
+	`간편비밀번호`	varchar(6)	NULL	DEFAULT NULL,
+	`이름`	varchar(15)	NULL,
+	`유저타입`	enum	NOT NULL	DEFAULT 'BLIND',
+	`생성일`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `profiles` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`user_id` int NOT NULL,
-	`gender` ENUM('M', 'F') NULL,
-	`height` float NULL,
-	`weight` float NULL,
-	`birth_date` date NULL,
-	`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`),
-	UNIQUE KEY `UQ_PROFILE_USER` (`user_id`)
+CREATE TABLE `공유세션` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`호스트유저`	varchar(30)	NOT NULL,
+	`시작시각`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+	`종료시각`	timestamp	NULL	DEFAULT NULL,
+	`세션상태`	enum	NOT NULL	DEFAULT 'active'
 );
 
-CREATE TABLE `welfare_cards` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`user_id` int NOT NULL,
-	`cvc` varchar(5) NULL COMMENT 'CVC 번호 (AES-256 암호화 필수)',
-	`issue_date` date NOT NULL,
-	`expiration_date` date NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`),
-	UNIQUE KEY `UQ_WELFARE_USER` (`user_id`)
+CREATE TABLE `주문상품` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`order_id`	int	NOT NULL,
+	`상품이름`	varchar(100)	NULL,
+	`상품url`	varchar(500)	NOT NULL	DEFAULT NULL,
+	`배송조회url`	varchar(1000)	NULL,
+	`가격`	int	NOT NULL,
+	`상품 이미지 url`	varchar(1000)	NULL,
+	`수량`	int	NOT NULL	DEFAULT 1
 );
 
-CREATE TABLE `cart_items` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`user_id` int NOT NULL,
-	`product_metadata` json NULL,
-	`quantity` int NOT NULL DEFAULT 1,
-	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`),
-	KEY `idx_cart_user` (`user_id`)
+CREATE TABLE `프로필` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`아이디`	varchar(30)	NOT NULL,
+	`성별`	enum	NULL,
+	`몸무게`	float	NULL	DEFAULT NULL,
+	`생년월일`	date	NULL	DEFAULT NULL,
+	`updated_at`	timestamp	NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `wishlist_items` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`user_id` int NOT NULL,
-	`platform_id` int NOT NULL,
-	`product_metadata` json NULL,
-	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`),
-	KEY `idx_wishlist_user_platform` (`user_id`, `platform_id`)
+CREATE TABLE `주문` (
+	`id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`platform_id`	int	NOT NULL	DEFAULT AUTO_INCREMENT,
+	`user_id`	varchar(30)	NOT NULL,
+	`주문내역url`	varchar(1000)	NULL	DEFAULT NULL,
+	`created_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+	`updated_at`	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `orders` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`user_id` int NOT NULL,
-	`order_detail_url` varchar(1000) NULL,
-	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`),
-	KEY `idx_orders_user_created` (`user_id`, `created_at`)
+ALTER TABLE `플랫폼` ADD CONSTRAINT `PK_플랫폼` PRIMARY KEY (
+	`id`
 );
 
-CREATE TABLE `order_items` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`order_id` int NOT NULL,
-	`product_name` varchar(100) NULL,
-	`metadata` json NULL,
-	`price` varchar(100) NOT NULL,
-	`quantity` int NOT NULL DEFAULT 1,
-	PRIMARY KEY (`id`),
-	KEY `idx_order_items_order` (`order_id`)
+ALTER TABLE `위시리스트상품` ADD CONSTRAINT `PK_위시리스트상품` PRIMARY KEY (
+	`id`
 );
 
-CREATE TABLE `sharing_session_logs` (
-	`id` int NOT NULL AUTO_INCREMENT,
-	`user_id` int NOT NULL COMMENT 'host user id',
-	`started_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`ended_at` timestamp NULL,
-	`session_status` ENUM('active', 'completed', 'terminated') NOT NULL DEFAULT 'active',
-	PRIMARY KEY (`id`)
+ALTER TABLE `복지카드` ADD CONSTRAINT `PK_복지카드` PRIMARY KEY (
+	`id`
 );
 
--- ========================================
--- Foreign Key 제약조건
--- ========================================
+ALTER TABLE `장바구니_상품` ADD CONSTRAINT `PK_장바구니_상품` PRIMARY KEY (
+	`id`
+);
 
--- profiles
-ALTER TABLE `profiles` 
-	ADD CONSTRAINT `FK_profiles_user` 
-	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `users` ADD CONSTRAINT `PK_USERS` PRIMARY KEY (
+	`id`
+);
 
--- welfare_cards
-ALTER TABLE `welfare_cards` 
-	ADD CONSTRAINT `FK_welfare_cards_user` 
-	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `공유세션` ADD CONSTRAINT `PK_공유세션` PRIMARY KEY (
+	`id`
+);
 
--- cart_items
-ALTER TABLE `cart_items` 
-	ADD CONSTRAINT `FK_cart_items_user` 
-	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `주문상품` ADD CONSTRAINT `PK_주문상품` PRIMARY KEY (
+	`id`
+);
 
--- wishlist_items
-ALTER TABLE `wishlist_items` 
-	ADD CONSTRAINT `FK_wishlist_items_user` 
-	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-	ADD CONSTRAINT `FK_wishlist_items_platform` 
-	FOREIGN KEY (`platform_id`) REFERENCES `platforms` (`id`) ON DELETE CASCADE;
+ALTER TABLE `프로필` ADD CONSTRAINT `PK_프로필` PRIMARY KEY (
+	`id`
+);
 
--- orders
-ALTER TABLE `orders` 
-	ADD CONSTRAINT `FK_orders_user` 
-	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `주문` ADD CONSTRAINT `PK_주문` PRIMARY KEY (
+	`id`,
+	`platform_id`
+);
 
--- order_items
-ALTER TABLE `order_items` 
-	ADD CONSTRAINT `FK_order_items_order` 
-	FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE;
+ALTER TABLE `주문` ADD CONSTRAINT `FK_플랫폼_TO_주문_1` FOREIGN KEY (
+	`platform_id`
+)
+REFERENCES `플랫폼` (
+	`id`
+);
 
--- sharing_session_logs
-ALTER TABLE `sharing_session_logs` 
-	ADD CONSTRAINT `FK_sharing_session_logs_host` 
-	FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;

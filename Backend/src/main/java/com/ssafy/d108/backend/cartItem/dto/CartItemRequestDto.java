@@ -1,6 +1,5 @@
 package com.ssafy.d108.backend.cartItem.dto;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

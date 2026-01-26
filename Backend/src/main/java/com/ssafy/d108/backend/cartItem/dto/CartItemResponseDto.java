@@ -11,7 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 public class CartItemResponseDto {
 
-
     private Integer cartItemId;
 
     private Integer userId;
