@@ -46,13 +46,11 @@ class LLMConfig:
 
 @dataclass
 class TTSConfig:
-    """TTS (음성 합성) 설정"""
-    provider: str = "elevenlabs"  # elevenlabs, minimax, cartesia, cosyvoice
-    api_key: Optional[str] = None
-    voice_id: str = "korean_female_1"
-    model_id: str = "eleven_flash_v2_5"
+    """TTS (음성 합성) 설정 - Google Cloud TTS"""
     sample_rate: int = 24000
     streaming: bool = True
+    google_credentials_path: Optional[str] = None
+    google_voice_name: str = "ko-KR-Chirp3-HD-Leda"  # Chirp 3 HD 한국어 음성
 
 
 @dataclass
@@ -195,14 +193,12 @@ class ConfigManager:
             timeout=self._get_env_int("LLM_TIMEOUT", 30)
         )
 
-        # TTS 설정
+        # TTS 설정 (Google Cloud TTS)
         tts = TTSConfig(
-            provider=self._get_env("TTS_PROVIDER", "elevenlabs"),
-            api_key=self._get_env("TTS_API_KEY") or self._get_env("ELEVENLABS_API_KEY") or None,
-            voice_id=self._get_env("TTS_VOICE_ID", "korean_female_1"),
-            model_id=self._get_env("TTS_MODEL_ID", "eleven_flash_v2_5"),
             sample_rate=self._get_env_int("TTS_SAMPLE_RATE", 24000),
-            streaming=self._get_env_bool("TTS_STREAMING", True)
+            streaming=self._get_env_bool("TTS_STREAMING", True),
+            google_credentials_path=self._get_env("GOOGLE_APPLICATION_CREDENTIALS") or None,
+            google_voice_name=self._get_env("TTS_GOOGLE_VOICE", "ko-KR-Chirp3-HD-Leda")
         )
 
         # OCR 설정
