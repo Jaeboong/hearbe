@@ -235,6 +235,11 @@ class LLMGenerator:
             "get_visible_buttons",
             "get_text",
             "get_pages",
+            "navigate_to_url",
+            "click_element",
+            "fill_input",
+            "press_key",
+            "take_screenshot",
         ]
         
         if action not in valid_actions:
@@ -252,6 +257,12 @@ class LLMGenerator:
         if action == "extract" and "selector" not in args:
             return False
         if action == "get_text" and "selector" not in args:
+            return False
+        if action == "click_element" and "selector" not in args:
+            return False
+        if action == "fill_input" and ("selector" not in args or "value" not in args):
+            return False
+        if action == "press_key" and "selector" not in args:
             return False
 
         return True
