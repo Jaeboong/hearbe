@@ -1,0 +1,38 @@
+.global-back-button {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    z-index: 2000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s;
+    border: none;
+}
+
+.global-back-button:active {
+    transform: scale(0.95);
+}
+
+/* Variant: Yellow Circle, Navy Arrow (For Navy Backgrounds) */
+.global-back-button.yellow {
+    background-color: #FFF064;
+    color: #141C29;
+}
+
+/* Variant: Navy Circle, Yellow Arrow (For Store/White Backgrounds) */
+.global-back-button.navy {
+    background-color: #141C29;
+    color: #FFF064;
+}
+
+.back-arrow-svg {
+    width: 50%;
+    height: 50%;
+    fill: currentColor;
+}
