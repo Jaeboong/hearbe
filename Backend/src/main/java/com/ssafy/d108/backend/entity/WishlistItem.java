@@ -1,6 +1,5 @@
 package com.ssafy.d108.backend.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,8 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "wishlist_items")
@@ -30,17 +27,31 @@ public class WishlistItem {
     @Column(name = "id")
     private Integer id;
 
+    // 누가 찜했는가?
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // 어느 플랫폼의 상품인가? (N:1 관계)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "platform_id", nullable = false)
     private Platform platform;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "product_metadata", columnDefinition = "json")
-    private JsonNode productMetadata;
+    @Column(name = "name", length = 255, nullable = false)
+    private String name;
+
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity = 1;
+
+    // 상품 상세 페이지 링크 (긴 URL 대비 TEXT 타입)
+    @Column(name = "url", columnDefinition = "TEXT")
+    private String url;
+
+    @Column(name = "img_url", columnDefinition = "TEXT")
+    private String imgUrl;
+
+    @Column(name = "price", nullable = false)
+    private Long price;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

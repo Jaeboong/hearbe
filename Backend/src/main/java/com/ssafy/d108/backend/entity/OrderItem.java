@@ -1,6 +1,6 @@
 package com.ssafy.d108.backend.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,8 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "order_items")
@@ -28,20 +27,37 @@ public class OrderItem {
     @Column(name = "id")
     private Integer id;
 
+    // 어떤 주문 그룹에 속하는지 (기존 필드 유지)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "product_name", length = 100)
-    private String productName;
+    // 누가 주문했는지 (요청하신 user_id)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "metadata", columnDefinition = "json")
-    private JsonNode metadata;
+    // 어느 플랫폼에서 구매한 상품인지
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "platform_id", nullable = false)
+    private Platform platform;
 
-    @Column(name = "price", length = 100, nullable = false)
-    private String price;
+    @Column(name = "name", length = 255, nullable = false)
+    private String name;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 1;
+
+    @Column(name = "url", columnDefinition = "TEXT")
+    private String url;
+
+    @Column(name = "img_url", columnDefinition = "TEXT")
+    private String imgUrl;
+
+    @Column(name = "price", nullable = false)
+    private Long price;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }
