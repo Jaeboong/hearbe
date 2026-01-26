@@ -48,13 +48,14 @@ class AudioManager:
         - AUDIO_READY: audio_chunk 데이터 준비 시 발행
     """
     
-    def __init__(self, hotkey: str = "space"):
+    def __init__(self, hotkey: str = "space", input_device_index: Optional[int] = None):
         if pyaudio is None:
             raise ImportError("pyaudio not installed. Run: pip install pyaudio")
         if keyboard is None:
             raise ImportError("keyboard not installed. Run: pip install keyboard")
         
         self.hotkey = hotkey
+        self.input_device_index = input_device_index
         self.audio: Optional[pyaudio.PyAudio] = None
         self.stream = None
         self.running = False
@@ -86,6 +87,29 @@ class AudioManager:
             device_info = self.audio.get_device_info_by_host_api_device_index(0, i)
             if device_info.get('maxInputChannels') > 0:
                 logger.info(f"  [{i}] {device_info.get('name')}")
+
+        if self.input_device_index is not None:
+            try:
+                device_info = self.audio.get_device_info_by_host_api_device_index(
+                    0, self.input_device_index
+                )
+                if device_info.get('maxInputChannels') > 0:
+                    logger.info(
+                        f"Using input device index {self.input_device_index}: "
+                        f"{device_info.get('name')}"
+                    )
+                else:
+                    logger.warning(
+                        f"Input device index {self.input_device_index} has no input channels; "
+                        "falling back to default device"
+                    )
+                    self.input_device_index = None
+            except Exception as e:
+                logger.warning(
+                    f"Invalid input device index {self.input_device_index}: {e}; "
+                    "falling back to default device"
+                )
+                self.input_device_index = None
     
     def _start_recording(self):
         """녹음 시작"""
@@ -98,12 +122,18 @@ class AudioManager:
             self.record_start_time = time.time()
         
         try:
+            stream_kwargs = {
+                "format": FORMAT,
+                "channels": CHANNELS,
+                "rate": SAMPLE_RATE,
+                "input": True,
+                "frames_per_buffer": CHUNK_SIZE,
+            }
+            if self.input_device_index is not None:
+                stream_kwargs["input_device_index"] = self.input_device_index
+
             self.stream = self.audio.open(
-                format=FORMAT,
-                channels=CHANNELS,
-                rate=SAMPLE_RATE,
-                input=True,
-                frames_per_buffer=CHUNK_SIZE
+                **stream_kwargs
             )
             logger.info("Recording started")
             publish_sync(EventType.RECORDING_STARTED, source="audio")

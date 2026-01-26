@@ -40,6 +40,7 @@ BUFFER_THRESHOLD_BYTES = 32000      # ~1 second of audio
 BUFFER_OVERLAP_BYTES = 6400         # 200ms overlap for continuity
 MAX_BUFFER_SIZE = 320000            # 10 seconds max (memory limit)
 MAX_QUEUE_SIZE = 50                 # Max pending chunks per session
+MAX_TEXT_QUEUE_SIZE = 20            # Max pending text messages per session
 
 # PTT (Push-to-Talk) mode: client controls recording
 # Server simply transcribes whatever audio chunks it receives
@@ -189,6 +190,8 @@ class WebSocketHandler:
         self._worker_tasks: Dict[str, asyncio.Task] = {}
         self._chunk_counters: Dict[str, int] = {}
         self._segment_counters: Dict[str, int] = {}
+        self._text_queues: Dict[str, asyncio.Queue] = {}
+        self._text_tasks: Dict[str, asyncio.Task] = {}
 
     async def handle_connection(self, websocket: WebSocket, session_id: str):
         """Handle WebSocket connection lifecycle"""
@@ -204,10 +207,15 @@ class WebSocketHandler:
         self._audio_buffers[session_id] = b""
         self._chunk_counters[session_id] = 0
         self._segment_counters[session_id] = 0
+        self._text_queues[session_id] = asyncio.Queue(maxsize=MAX_TEXT_QUEUE_SIZE)
 
         # Start ASR worker task
         self._worker_tasks[session_id] = asyncio.create_task(
             self._asr_worker(session_id)
+        )
+        # Start text worker task
+        self._text_tasks[session_id] = asyncio.create_task(
+            self._text_worker(session_id)
         )
 
         # Send connection confirmation
@@ -252,12 +260,20 @@ class WebSocketHandler:
                 await task
             except asyncio.CancelledError:
                 pass
+        if session_id in self._text_tasks:
+            task = self._text_tasks.pop(session_id)
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
         # Clear buffers and queues
         self._audio_queues.pop(session_id, None)
         self._audio_buffers.pop(session_id, None)
         self._chunk_counters.pop(session_id, None)
         self._segment_counters.pop(session_id, None)
+        self._text_queues.pop(session_id, None)
 
         logger.debug(f"Session resources cleaned up: {session_id}")
 
@@ -359,7 +375,7 @@ class WebSocketHandler:
 
             # Process through NLU/LLM pipeline only on final result
             if is_final and asr_result.text.strip():
-                await self._process_text_input(session_id, asr_result.text)
+                await self._enqueue_text(session_id, asr_result.text)
 
         except Exception as e:
             logger.error(f"Audio processing failed: {e}")
@@ -454,7 +470,7 @@ class WebSocketHandler:
             segment_id="text_input"
         )
         await self._send_asr_result(session_id, result)
-        await self._process_text_input(session_id, text)
+        await self._enqueue_text(session_id, text)
 
     async def _process_text_input(self, session_id: str, text: str):
         """Process text through NLU -> LLM -> TTS pipeline"""
@@ -499,6 +515,12 @@ class WebSocketHandler:
                 else:
                     if response.commands:
                         await self._send_tool_calls(session_id, response.commands)
+                    else:
+                        logger.info(
+                            "No commands generated for session=%s text='%s'",
+                            session_id,
+                            resolved_text[:80]
+                        )
 
                 # TTS response
                 if response.text and self.tts:
@@ -529,9 +551,9 @@ class WebSocketHandler:
         """Handle user confirmation response"""
         confirmed = data.get("confirmed", False)
         if confirmed:
-            await self._process_text_input(session_id, "yes")
+            await self._enqueue_text(session_id, "yes")
         else:
-            await self._process_text_input(session_id, "no")
+            await self._enqueue_text(session_id, "no")
 
     async def _handle_cancel(self, session_id: str):
         """Handle cancel request"""
@@ -554,6 +576,44 @@ class WebSocketHandler:
         if self.tts:
             await self._send_tts_response(session_id, "Cancelled")
 
+    async def _enqueue_text(self, session_id: str, text: str):
+        """Enqueue text for NLU/LLM processing (non-blocking)."""
+        queue = self._text_queues.get(session_id)
+        if not queue:
+            logger.warning(f"No text queue for session: {session_id}")
+            return
+        if not text:
+            return
+
+        try:
+            queue.put_nowait(text)
+        except asyncio.QueueFull:
+            logger.warning(f"Text queue full, dropping oldest: {session_id}")
+            try:
+                queue.get_nowait()
+                queue.put_nowait(text)
+            except asyncio.QueueEmpty:
+                pass
+
+    async def _text_worker(self, session_id: str):
+        """Process queued text inputs sequentially."""
+        queue = self._text_queues.get(session_id)
+        if not queue:
+            return
+
+        logger.debug(f"Text worker started: {session_id}")
+        try:
+            while True:
+                try:
+                    text = await asyncio.wait_for(queue.get(), timeout=30.0)
+                except asyncio.TimeoutError:
+                    continue
+                await self._process_text_input(session_id, text)
+        except asyncio.CancelledError:
+            logger.debug(f"Text worker cancelled: {session_id}")
+        except Exception as e:
+            logger.error(f"Text worker error: {session_id}: {e}")
+
     async def _handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
         """Handle MCP execution result from client"""
         success = data.get("success", False)
@@ -561,6 +621,15 @@ class WebSocketHandler:
         error = data.get("error")
         page_data = data.get("page_data") or {}
         products = page_data.get("products") if isinstance(page_data, dict) else None
+        page_url = None
+        if isinstance(page_data, dict):
+            page_url = page_data.get("url")
+        if not page_url and isinstance(result, dict):
+            page_url = (
+                result.get("current_url")
+                or result.get("page_url")
+                or result.get("url")
+            )
 
         await publish(
             EventType.MCP_RESULT_RECEIVED,
@@ -573,6 +642,8 @@ class WebSocketHandler:
             if session:
                 if self.session:
                     self.session.set_context(session_id, "mcp_result", result)
+                    if page_url:
+                        session.current_url = page_url
                     if products:
                         self.session.set_context(session_id, "search_results", products)
                         try:

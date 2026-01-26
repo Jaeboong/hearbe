@@ -7,6 +7,7 @@ LLM 기반 명령 생성기
 import json
 import logging
 import os
+import asyncio
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
@@ -111,10 +112,17 @@ class LLMGenerator:
             conversation_history=history,
             page_context=page_context
         )
+        logger.info(
+            "LLM request: model=%s, text_len=%d, url=%s",
+            self.model,
+            len(user_text),
+            current_url or "(empty)"
+        )
         
         try:
-            # OpenAI API 호출
-            response = self.client.chat.completions.create(
+            # OpenAI API 호출 (blocking -> thread)
+            response = await asyncio.to_thread(
+                self.client.chat.completions.create,
                 model=self.model,
                 messages=messages,
                 response_format={"type": "json_object"},
@@ -123,7 +131,14 @@ class LLMGenerator:
             
             # 응답 파싱
             content = response.choices[0].message.content
+            logger.info("LLM response received: chars=%d", len(content or ""))
             result = self._parse_response(content)
+            logger.info(
+                "LLM parsed: success=%s, commands=%d, response_text_len=%d",
+                result.success,
+                len(result.commands),
+                len(result.response_text or "")
+            )
             
             # 로컬 기록 모드면 대화 추가
             if conversation_history is None:
@@ -150,13 +165,29 @@ class LLMGenerator:
             data = json.loads(content)
             
             response_text = data.get("response", "")
-            commands_data = data.get("commands", [])
+            commands_data = data.get("commands")
+            if commands_data is None:
+                commands_data = data.get("tool_calls")
+                if commands_data is None:
+                    commands_data = data.get("actions")
+            if commands_data is None:
+                logger.warning(
+                    "LLM response missing commands/tool_calls. keys=%s content=%s",
+                    list(data.keys()),
+                    self._truncate(content)
+                )
+                commands_data = []
             
             commands = []
             for cmd in commands_data:
-                action = cmd.get("action", "")
-                args = cmd.get("args", {})
-                desc = cmd.get("desc", "")
+                action = (
+                    cmd.get("tool_name")
+                    or cmd.get("action")
+                    or cmd.get("tool")
+                    or ""
+                )
+                args = cmd.get("arguments") or cmd.get("args") or {}
+                desc = cmd.get("description") or cmd.get("desc") or ""
                 
                 # 유효한 명령인지 검증
                 if self._validate_command(action, args):
@@ -168,11 +199,18 @@ class LLMGenerator:
                 else:
                     logger.warning(f"유효하지 않은 명령 무시: {cmd}")
             
-            return LLMResult(
+            result = LLMResult(
                 commands=commands,
                 response_text=response_text,
                 success=True
             )
+            if not commands:
+                logger.warning(
+                    "LLM produced no commands. response_text=%s content=%s",
+                    self._truncate(response_text),
+                    self._truncate(content)
+                )
+            return result
             
         except json.JSONDecodeError as e:
             logger.error(f"JSON 파싱 실패: {e}, content: {content[:200]}")
@@ -194,6 +232,7 @@ class LLMGenerator:
             "click_text",
             "scroll",
             "extract",
+            "get_visible_buttons",
         ]
         
         if action not in valid_actions:
@@ -212,6 +251,14 @@ class LLMGenerator:
             return False
 
         return True
+
+    @staticmethod
+    def _truncate(text: Optional[str], limit: int = 400) -> str:
+        if not text:
+            return ""
+        if len(text) <= limit:
+            return text
+        return f"{text[:limit]}...<truncated>"
     
     def clear_history(self):
         """로컬 대화 기록 초기화"""

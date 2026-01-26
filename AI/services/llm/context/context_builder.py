@@ -32,7 +32,7 @@ AVAILABLE_COMMANDS = {
     "goto": {
         "description": "Navigate to a URL",
         "args": {"url": "Destination URL"},
-        "example": """{"action": "goto", "args": {"url": "https://www.coupang.com/"}, "desc": "Go to Coupang"}"""
+        "example": """{"tool_name": "goto", "arguments": {"url": "https://www.coupang.com/"}, "description": "Go to Coupang"}"""
     },
     "click": {
         "description": "Click an element by CSS selector",
@@ -40,7 +40,7 @@ AVAILABLE_COMMANDS = {
             "selector": "CSS selector",
             "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": """{"action": "click", "args": {"selector": "#login-btn"}, "desc": "Click login button"}"""
+        "example": """{"tool_name": "click", "arguments": {"selector": "#login-btn"}, "description": "Click login button"}"""
     },
     "fill": {
         "description": "Fill text into an input",
@@ -49,7 +49,7 @@ AVAILABLE_COMMANDS = {
             "text": "Text to input",
             "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": """{"action": "fill", "args": {"selector": "input[name=q]", "text": "ramen"}, "desc": "Type search keyword"}"""
+        "example": """{"tool_name": "fill", "arguments": {"selector": "input[name=q]", "text": "ramen"}, "description": "Type search keyword"}"""
     },
     "press": {
         "description": "Press a key in an input",
@@ -58,22 +58,22 @@ AVAILABLE_COMMANDS = {
             "key": "Key name (Enter, Tab, etc.)",
             "frame_selector": "iframe CSS selector (optional)"
         },
-        "example": """{"action": "press", "args": {"selector": "input", "key": "Enter"}, "desc": "Submit input"}"""
+        "example": """{"tool_name": "press", "arguments": {"selector": "input", "key": "Enter"}, "description": "Submit input"}"""
     },
     "wait": {
         "description": "Wait for a given time",
         "args": {"ms": "Milliseconds"},
-        "example": """{"action": "wait", "args": {"ms": 1000}, "desc": "Wait 1 second"}"""
+        "example": """{"tool_name": "wait", "arguments": {"ms": 1000}, "description": "Wait 1 second"}"""
     },
     "click_text": {
         "description": "Find and click by visible text",
         "args": {"text": "Text to match"},
-        "example": """{"action": "click_text", "args": {"text": "Cart"}, "desc": "Click text"}"""
+        "example": """{"tool_name": "click_text", "arguments": {"text": "Cart"}, "description": "Click text"}"""
     },
     "scroll": {
         "description": "Scroll the page",
         "args": {"direction": "up or down", "amount": "Pixels (optional)"},
-        "example": """{"action": "scroll", "args": {"direction": "down", "amount": 500}, "desc": "Scroll down"}"""
+        "example": """{"tool_name": "scroll", "arguments": {"direction": "down", "amount": 500}, "description": "Scroll down"}"""
     },
     "extract": {
         "description": "Extract product data from a list",
@@ -83,7 +83,12 @@ AVAILABLE_COMMANDS = {
             "field_selectors": "Optional field->selector mapping",
             "limit": "Max items"
         },
-        "example": """{"action": "extract", "args": {"selector": ".search-product", "fields": ["name", "price"], "limit": 20}, "desc": "Extract search results"}"""
+        "example": """{"tool_name": "extract", "arguments": {"selector": ".search-product", "fields": ["name", "price"], "limit": 20}, "description": "Extract search results"}"""
+    },
+    "get_visible_buttons": {
+        "description": "Get visible clickable buttons on the page",
+        "args": {"max_items": "Max number of buttons (optional)"},
+        "example": """{"tool_name": "get_visible_buttons", "arguments": {"max_items": 200}, "description": "List visible buttons"}"""
     }
 }
 
@@ -194,7 +199,7 @@ class ContextBuilder:
             {
                 "response": "short message",
                 "commands": [
-                    {"action": "tool", "args": {}, "desc": "description"}
+                    {"tool_name": "tool", "arguments": {}, "description": "description"}
                 ]
             },
             ensure_ascii=True,
@@ -229,6 +234,7 @@ class ContextBuilder:
 2. Commands are executed in order.
 3. If a selector is uncertain, use click_text.
 4. Add wait before or after navigation when needed.
+5. Always include a "commands" array. If no command is needed, return an empty list and ask a clarifying question in "response".
 
 ## Output format
 {output_example}

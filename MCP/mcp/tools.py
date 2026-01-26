@@ -87,16 +87,16 @@ class BrowserTools:
         
         try:
             contexts = self._browser.contexts
-            
-            # 기존 컨텍스트와 페이지가 있으면 사용
+
+            # Return the most recently opened page if available.
             if contexts:
+                open_pages = []
                 for context in contexts:
-                    pages = context.pages
-                    if pages:
-                        # 열린 페이지 중 첫 번째 반환
-                        for page in pages:
-                            if not page.is_closed():
-                                return page
+                    for page in context.pages:
+                        if not page.is_closed():
+                            open_pages.append(page)
+                if open_pages:
+                    return open_pages[-1]
             
             # 유효한 페이지가 없으면 새로 생성
             logger.info("No active page found, creating new one")
