@@ -1,5 +1,7 @@
 package com.ssafy.d108.backend.auth.controller;
 
+import com.ssafy.d108.backend.auth.dto.FindIdRequest;
+import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
 import com.ssafy.d108.backend.auth.dto.SignupRequest;
@@ -47,5 +49,24 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 아이디 찾기 (A형 - 복지카드 인증)
+     */
+    @Operation(summary = "아이디 찾기", description = "복지카드 정보로 아이디 찾기 (A형 전용)")
+    @PostMapping("/find-id")
+    public ResponseEntity<ApiResponse<FindIdResponse>> findId(@Valid @RequestBody FindIdRequest request) {
+        FindIdResponse response = authService.findId(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 로그아웃
+     */
+    @Operation(summary = "로그아웃", description = "로그아웃 처리 (추후 토큰 만료 로직 포함)")
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        return ResponseEntity.ok(ApiResponse.success(null, "로그아웃 되었습니다."));
     }
 }
