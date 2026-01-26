@@ -22,6 +22,7 @@ class AudioConfig:
     channels: int = 1
     chunk_size: int = 1024
     hotkey: str = "v"
+    input_device_index: Optional[int] = None
 
 
 @dataclass
@@ -136,6 +137,17 @@ class ConfigManager:
             logger.warning(f"Invalid integer value for {key}, using default: {default}")
             return default
 
+    def _get_env_int_optional(self, key: str) -> Optional[int]:
+        """환경 변수를 Optional int로 가져오기"""
+        value = self._get_env(key, "").strip()
+        if not value:
+            return None
+        try:
+            return int(value)
+        except ValueError:
+            logger.warning(f"Invalid integer value for {key}, ignoring: {value}")
+            return None
+
     def _get_env_bool(self, key: str, default: bool) -> bool:
         """환경 변수를 boolean으로 가져오기"""
         value = self._get_env(key, str(default)).lower()
@@ -148,7 +160,8 @@ class ConfigManager:
             sample_rate=self._get_env_int("AUDIO_SAMPLE_RATE", 16000),
             channels=self._get_env_int("AUDIO_CHANNELS", 1),
             chunk_size=self._get_env_int("AUDIO_CHUNK_SIZE", 1024),
-            hotkey=self._get_env("HOTKEY", "v")
+            hotkey=self._get_env("HOTKEY", "v"),
+            input_device_index=self._get_env_int_optional("AUDIO_INPUT_DEVICE_INDEX")
         )
 
         # Browser 설정

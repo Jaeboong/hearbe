@@ -73,7 +73,10 @@ class Application:
         # Audio 모듈 (PTT 녹음)
         try:
             from audio.audio_manager import AudioManager
-            self.modules["audio"] = AudioManager(hotkey="space")
+            self.modules["audio"] = AudioManager(
+                hotkey=self.config.audio.hotkey,
+                input_device_index=self.config.audio.input_device_index
+            )
             self.modules["audio"].setup_event_handlers()
         except ImportError as e:
             logger.warning(f"Audio module not available: {e}")

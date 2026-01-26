@@ -40,12 +40,16 @@ class LLMPlanner(ILLMPlanner):
         
         # LLM fallback 활성화 시
         if self._use_llm_fallback:
-            api_key = os.environ.get("OPENAI_API_KEY")
+            api_key = (
+                os.environ.get("GMS_API_KEY")
+                or os.environ.get("GMS_KEY")
+                or os.environ.get("OPENAI_API_KEY")
+            )
             if api_key:
                 self._llm_generator = LLMGenerator(api_key=api_key)
                 logger.info("LLMPlanner initialized with LLM fallback")
             else:
-                logger.warning("OPENAI_API_KEY not set, LLM fallback disabled")
+                logger.warning("No LLM API key set (GMS_API_KEY/GMS_KEY/OPENAI_API_KEY), LLM fallback disabled")
                 self._use_llm_fallback = False
         else:
             logger.info("LLMPlanner initialized (rule-based only)")
@@ -92,7 +96,11 @@ class LLMPlanner(ILLMPlanner):
                 if llm_result.success and llm_result.commands:
                     return self._llm_result_to_response(llm_result)
                 else:
-                    logger.info("LLM fallback disabled or not initialized; using rule result")
+                    logger.info(
+                        "LLM fallback returned no commands (success=%s, error=%s); using rule result",
+                        llm_result.success,
+                        llm_result.error
+                    )
         return self._to_response(rule_result)
 
     def _to_response(self, result: CommandResult) -> LLMResponse:
