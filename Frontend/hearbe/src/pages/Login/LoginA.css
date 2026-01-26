@@ -1,0 +1,214 @@
+/* 1. 색상 변수 설정: 여기서 색만 바꾸면 전체 테마가 바뀝니다 */
+:root {
+  --main-yellow: #FFF064;
+  --bg-dark: #141C29;
+  --input-radius: 24px;
+}
+
+/* 2. 전체 레이아웃 */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  background-color: var(--bg-dark);
+  color: var(--main-yellow);
+  font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+  letter-spacing: 3px;
+  padding: 40px;
+  box-sizing: border-box;
+  /* 패딩이 전체 크기에 포함되도록 */
+  width: 50vw;
+  height: 50vh;
+  min-height: 35vh;
+  transform: scale(2);
+  transform-origin: 0 0;
+}
+
+/* 3. 로그인 박스 */
+.login-box {
+  width: 100%;
+  max-width: 1400px;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 8px solid var(--main-yellow);
+  border-radius: 20px;
+  background-color: transparent;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+/* 4. 로고 */
+.logo-area {
+  margin-bottom: 20px;
+}
+
+.logo-image {
+  width: 350px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 5. 폼 영역 */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 폼 내부 요소들 가운데 정렬 */
+  gap: 40px;
+}
+
+/* ID/PW 입력 그룹 */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  /* 버튼이랑 너비 통일 */
+  border: 8px solid var(--main-yellow);
+  border-radius: var(--input-radius);
+  background-color: var(--bg-dark);
+  overflow: hidden;
+}
+
+.login-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 30px;
+  /* 폰트가 크니까 패딩으로 높이 조절 */
+  color: var(--main-yellow);
+  font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+  font-size: 80px;
+  font-weight: bold;
+  outline: none;
+  letter-spacing: 3px;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder {
+  color: var(--main-yellow);
+  font-weight: bold;
+  opacity: 0.9;
+}
+
+/* 첫 번째 입력창(아이디) 밑줄 */
+.first-input {
+  border-bottom: 8px solid var(--main-yellow);
+}
+
+/* 6. 로그인 버튼 */
+.login-button {
+  width: 80%;
+  background-color: var(--main-yellow);
+  color: var(--bg-dark);
+  font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+  font-size: 100px;
+  font-weight: 900;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 20px;
+}
+
+.login-button:hover {
+  opacity: 0.9;
+}
+
+/* 7. 옵션 (체크박스 등) */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 80%;
+  margin-top: 20px;
+  color: var(--main-yellow);
+  font-weight: bold;
+  font-size: 60px;
+}
+
+/* --- 커스텀 체크박스 시작 --- */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  /* 글자 줄바꿈 없도록 */
+  white-space: nowrap;
+}
+
+/* 기본 체크박스 숨김 */
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* 가짜 체크박스 (네모) */
+.checkmark {
+  height: 70px;
+  width: 70px;
+  background-color: transparent;
+  border: 10px solid var(--main-yellow);
+
+  border-radius: 12px;
+  position: relative;
+  flex-shrink: 0;
+  /* 찌그러짐 방지 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+/* 체크되었을 때 배경 채우기 */
+.checkbox-container input:checked~.checkmark {
+  background-color: var(--main-yellow);
+}
+
+/* 체크 표시 (V 모양 만들기) - 이게 빠져 있었어! */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+
+  /* 체크 위치와 크기 */
+  left: 20px;
+  top: 5px;
+  width: 15px;
+  height: 35px;
+
+  border: solid var(--bg-dark);
+  border-width: 0 16px 16px 0;
+  transform: rotate(45deg);
+}
+
+/* 체크되면 V 표시 보이기 */
+.checkbox-container input:checked~.checkmark:after {
+  display: block;
+}
+
+/* --- 커스텀 체크박스 끝 --- */
+
+
+/* 9. 하단 링크 (아이디 찾기/비밀번호 찾기/회원가입) */
+.login-footer {
+  margin-top: 40px;
+  display: flex;
+  gap: 30px;
+  color: var(--main-yellow);
+  font-weight: bold;
+  font-size: 60px;
+}
+
+.login-separator {
+  opacity: 0.5;
+}
