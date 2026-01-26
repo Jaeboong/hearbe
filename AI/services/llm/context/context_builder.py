@@ -85,10 +85,26 @@ AVAILABLE_COMMANDS = {
         },
         "example": """{"tool_name": "extract", "arguments": {"selector": ".search-product", "fields": ["name", "price"], "limit": 20}, "description": "Extract search results"}"""
     },
+    "get_text": {
+        "description": "Get text content from an element",
+        "args": {
+            "selector": "CSS selector",
+            "frame_selector": "iframe CSS selector (optional)",
+            "frame_name": "iframe name (optional)",
+            "frame_url": "iframe URL match (optional)",
+            "frame_index": "iframe index (optional)"
+        },
+        "example": """{"tool_name": "get_text", "arguments": {"selector": ".total-price"}, "description": "Read total price"}"""
+    },
     "get_visible_buttons": {
         "description": "Get visible clickable buttons on the page",
         "args": {"max_items": "Max number of buttons (optional)"},
         "example": """{"tool_name": "get_visible_buttons", "arguments": {"max_items": 200}, "description": "List visible buttons"}"""
+    },
+    "get_pages": {
+        "description": "List open browser pages/tabs",
+        "args": {},
+        "example": """{"tool_name": "get_pages", "arguments": {}, "description": "List open tabs"}"""
     }
 }
 
