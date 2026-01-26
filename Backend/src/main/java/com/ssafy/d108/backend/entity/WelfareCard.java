@@ -33,6 +33,12 @@ public class WelfareCard {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Column(name = "card_company", length = 50)
+    private String cardCompany;
+
+    @Column(name = "card_number", length = 20, nullable = false)
+    private String cardNumber;
+
     @Column(name = "cvc", length = 5)
     private String cvc;
 
