@@ -233,6 +233,8 @@ class LLMGenerator:
             "scroll",
             "extract",
             "get_visible_buttons",
+            "get_text",
+            "get_pages",
         ]
         
         if action not in valid_actions:
@@ -248,6 +250,8 @@ class LLMGenerator:
         if action == "click_text" and "text" not in args:
             return False
         if action == "extract" and "selector" not in args:
+            return False
+        if action == "get_text" and "selector" not in args:
             return False
 
         return True
