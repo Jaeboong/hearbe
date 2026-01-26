@@ -35,6 +35,10 @@ public class Order {
     @Column(name = "order_detail_url", length = 1000)
     private String orderDetailUrl;
 
+    // 주문 전체 배송 조회를 위한 필드 추가
+    @Column(name = "delivery_url", length = 1000)
+    private String deliveryUrl;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

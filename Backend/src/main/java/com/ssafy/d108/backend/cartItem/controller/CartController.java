@@ -1,4 +1,4 @@
-package com.ssafy.d108.backend.cart.controller;
+package com.ssafy.d108.backend.cartItem.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
