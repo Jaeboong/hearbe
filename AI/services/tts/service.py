@@ -45,11 +45,28 @@ class TTSService(ITTSService):
             from google.cloud import texttospeech as tts_module
             texttospeech = tts_module
 
-        # 인증 설정
-        credentials_path = self._config.google_credentials_path
+        # 인증 설정: config value or env var
+        credentials_path = (
+            self._config.google_credentials_path
+            or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+        )
+
         if credentials_path:
+            # Convert relative path to absolute for Docker compatibility
+            if not os.path.isabs(credentials_path):
+                credentials_path = os.path.abspath(credentials_path)
+
+            # Verify file exists
+            if not os.path.exists(credentials_path):
+                raise FileNotFoundError(
+                    f"Google credentials file not found: {credentials_path}. "
+                    f"CWD: {os.getcwd()}"
+                )
+
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
             logger.info(f"Using Google credentials from: {credentials_path}")
+        else:
+            logger.warning("No Google credentials path configured, using ADC")
 
         # 클라이언트 초기화
         self._google_client = texttospeech.TextToSpeechClient()

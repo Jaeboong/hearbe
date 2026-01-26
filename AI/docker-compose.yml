@@ -14,6 +14,7 @@ services:
       - OPENAI_API_KEY=${GMS_KEY}
       - OPENAI_BASE_URL=https://gms.ssafy.io/gmsapi/api.openai.com/v1
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/config/google-service-account.json
     env_file:
       - .env
     volumes:
