@@ -65,6 +65,11 @@ class Application:
         self.modules["mcp"] = MCPHandler()
         self.modules["mcp"].setup_event_handlers()
 
+        # Network 모듈 (AI 서버 연결)
+        from network.ws_client import WSClient
+        self.modules["ws_client"] = WSClient()
+        self.modules["ws_client"].setup_event_handlers()
+
         # 콘솔 입력 모듈 (테스트용)
         if self.console_mode:
             from debug.console_input import ConsoleInputManager
@@ -90,6 +95,10 @@ class Application:
         if "browser" in self.modules:
             await self.modules["browser"].start()
 
+        # WebSocket 클라이언트 시작 (AI 서버 연결)
+        if "ws_client" in self.modules:
+            await self.modules["ws_client"].start()
+
         # 콘솔 입력 시작
         if "console_input" in self.modules:
             await self.modules["console_input"].start()
@@ -109,6 +118,8 @@ class Application:
         # 모듈 종료
         if "console_input" in self.modules:
             await self.modules["console_input"].stop()
+        if "ws_client" in self.modules:
+            await self.modules["ws_client"].stop()
         if "mcp" in self.modules:
             await self.modules["mcp"].stop()
         if "browser" in self.modules:
