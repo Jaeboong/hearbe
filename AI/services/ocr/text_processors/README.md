@@ -16,8 +16,11 @@
 | LLM 요약 생성 | ✅ 완료 | `ocr_llm_summarizer.py` |
 | 이미지 URL 필터링/다운로드 | ✅ 완료 | `image_fetcher.py` |
 | 통합 파이프라인 | ✅ 완료 | `ocr_pipeline.py` |
-| **웹 연동 (자동 트리거)** | ❌ 미구현 | - |
-| **MCP Playwright 통합** | ❌ 미구현 | - |
+| **WebSocket 연동** | ✅ 완료 | `services/summarizer/` |
+| **HTML 파서** | ✅ 완료 | `services/summarizer/html_parser.py` |
+| **MCP → OCR → TTS 통합** | ✅ 완료 | `api/websocket.py` |
+
+> 📖 상세 문서: [MCP_OCR_INTEGRATION.md](/docs/MCP_OCR_INTEGRATION.md)
 
 ---
 

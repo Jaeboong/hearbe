@@ -12,7 +12,7 @@ Real-time bidirectional communication:
 import logging
 import json
 import asyncio
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 from fastapi import WebSocket, WebSocketDisconnect
 from dataclasses import dataclass, asdict
@@ -20,6 +20,18 @@ from enum import Enum
 
 from core.event_bus import EventType, publish
 from core.interfaces import SessionState, ASRResult
+
+# Summarizer imports (HTML parser + OCR integrator)
+try:
+    from services.summarizer import (
+        parse_product_html,
+        format_for_tts,
+        detect_site,
+        get_ocr_integrator,
+    )
+    SUMMARIZER_AVAILABLE = True
+except ImportError:
+    SUMMARIZER_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +75,7 @@ class MessageType(str, Enum):
     TTS_CHUNK = "tts_chunk"
     STATUS = "status"
     ERROR = "error"
+    OCR_PROGRESS = "ocr_progress"  # OCR 처리 진행 상황
 
 
 @dataclass
@@ -615,12 +628,20 @@ class WebSocketHandler:
             logger.error(f"Text worker error: {session_id}: {e}")
 
     async def _handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
-        """Handle MCP execution result from client"""
+        """
+        Handle MCP execution result from client
+
+        처리 흐름 (스트리밍 방식):
+        1. HTML 파싱 → TTS #1 (즉시, 빠른 응답)
+        2. OCR 처리 → TTS #2, #3... (청크 단위, 순차 응답)
+        """
         success = data.get("success", False)
         result = data.get("result", {})
         error = data.get("error")
         page_data = data.get("page_data") or {}
         products = page_data.get("products") if isinstance(page_data, dict) else None
+
+        # Extract page URL
         page_url = None
         if isinstance(page_data, dict):
             page_url = page_data.get("url")
@@ -631,35 +652,146 @@ class WebSocketHandler:
                 or result.get("url")
             )
 
+        # Extract HTML content and image URLs
+        html_content = None
+        detail_images = []
+        if isinstance(page_data, dict):
+            html_content = page_data.get("html")
+            detail_images = page_data.get("detail_images") or []
+        if not html_content and isinstance(result, dict):
+            html_content = result.get("html")
+        if not detail_images and isinstance(result, dict):
+            detail_images = result.get("detail_images") or result.get("images") or []
+
         await publish(
             EventType.MCP_RESULT_RECEIVED,
             data={"success": success, "result": result, "error": error, "page_data": page_data},
             session_id=session_id
         )
 
-        if self.llm:
+        session = self.session.get_session(session_id) if self.session else None
+        if session and self.session:
+            self.session.set_context(session_id, "mcp_result", result)
+            if page_url:
+                session.current_url = page_url
+            if products:
+                self.session.set_context(session_id, "search_results", products)
+                try:
+                    payload = json.dumps(products, ensure_ascii=True)
+                    self.session.add_to_history(
+                        session_id,
+                        "system",
+                        f"SEARCH_RESULTS:{payload}"
+                    )
+                except Exception:
+                    logger.warning("Failed to serialize search_results for history")
+
+        # === Path 1: HTML 파싱 → 빠른 TTS 응답 ===
+        if SUMMARIZER_AVAILABLE and html_content:
+            try:
+                site = detect_site(page_url or "")
+                product_info = parse_product_html(html_content, site=site, url=page_url or "")
+
+                if product_info.is_valid():
+                    html_summary = format_for_tts(product_info, include_details=True)
+                    logger.info(f"HTML 파싱 완료: {product_info.product_name}")
+
+                    if self.tts:
+                        await self._send_tts_response(session_id, html_summary)
+
+                    # OCR용 이미지 URL 업데이트 (HTML에서 추출된 것 우선)
+                    if product_info.detail_images:
+                        detail_images = product_info.detail_images
+
+            except Exception as e:
+                logger.error(f"HTML 파싱 실패: {e}")
+
+        # === Path 2: OCR 처리 → LLM 요약 → TTS 응답 ===
+        if SUMMARIZER_AVAILABLE and detail_images:
+            # OCR 처리를 백그라운드 태스크로 실행
+            asyncio.create_task(
+                self._process_ocr_batch(session_id, detail_images, page_url)
+            )
+        elif self.llm and session:
+            # HTML/OCR 없을 경우 기존 LLM 응답 사용
+            response_text = await self.llm.generate_response(session.context)
+            if self.tts:
+                await self._send_tts_response(session_id, response_text)
+
+    async def _process_ocr_batch(
+        self,
+        session_id: str,
+        image_urls: List[str],
+        page_url: Optional[str] = None
+    ):
+        """
+        모든 이미지를 한번에 OCR 처리 후 LLM 요약
+
+        흐름:
+        1. 모든 이미지 OCR 처리 (한번에)
+        2. OCR 텍스트를 LLM에 전달하여 요약
+        3. 요약 결과를 TTS로 전송
+        """
+        try:
+            ocr_integrator = get_ocr_integrator()
+            site = detect_site(page_url or "")
+
+            logger.info(f"OCR 배치 처리 시작: {len(image_urls)}개 이미지")
+
+            # 진행 상황 전송
+            await self._send_ocr_progress(session_id, "started", 0, len(image_urls))
+
+            # 모든 이미지를 한번에 OCR 처리
+            ocr_result = await ocr_integrator.process_single_batch(image_urls, site=site)
+
+            await self._send_ocr_progress(session_id, "ocr_completed", 50, len(image_urls))
+
+            if ocr_result.error:
+                logger.error(f"OCR 처리 오류: {ocr_result.error}")
+                await self._send_ocr_progress(session_id, "error", 0, len(image_urls), error=ocr_result.error)
+                return
+
+            # OCR 결과가 있으면 TTS로 전송
+            if ocr_result.summary and self.tts:
+                tts_text = ocr_result.format_for_tts()
+                await self._send_tts_response(session_id, tts_text)
+
+            # OCR 결과를 세션 컨텍스트에 저장 (나중에 Q&A에서 사용)
             session = self.session.get_session(session_id) if self.session else None
-            if session:
-                if self.session:
-                    self.session.set_context(session_id, "mcp_result", result)
-                    if page_url:
-                        session.current_url = page_url
-                    if products:
-                        self.session.set_context(session_id, "search_results", products)
-                        try:
-                            payload = json.dumps(products, ensure_ascii=True)
-                            self.session.add_to_history(
-                                session_id,
-                                "system",
-                                f"SEARCH_RESULTS:{payload}"
-                            )
-                        except Exception:
-                            logger.warning("Failed to serialize search_results for history")
+            if session and self.session:
+                self.session.set_context(session_id, "ocr_result", ocr_result.to_dict())
 
-                response_text = await self.llm.generate_response(session.context)
+            await self._send_ocr_progress(session_id, "completed", 100, len(image_urls))
+            logger.info(f"OCR 배치 처리 완료: {session_id}")
 
-                if self.tts:
-                    await self._send_tts_response(session_id, response_text)
+        except Exception as e:
+            logger.error(f"OCR 배치 처리 실패: {e}")
+            await self._send_ocr_progress(session_id, "error", 0, len(image_urls), error=str(e))
+
+    async def _send_ocr_progress(
+        self,
+        session_id: str,
+        status: str,
+        progress: int,
+        total_images: int,
+        current_chunk: int = 0,
+        total_chunks: int = 0,
+        error: Optional[str] = None
+    ):
+        """OCR 처리 진행 상황 전송"""
+        msg = WSMessage(
+            type=MessageType.OCR_PROGRESS,
+            data={
+                "status": status,
+                "progress": progress,
+                "total_images": total_images,
+                "current_chunk": current_chunk,
+                "total_chunks": total_chunks,
+                "error": error
+            },
+            session_id=session_id
+        )
+        await connection_manager.send_message(session_id, msg)
 
     # ========================================================================
     # Message sending helpers

@@ -27,7 +27,7 @@ AI/
 │   │   └── service.py            # 자연어 → MCP 명령 변환
 │   ├── tts/                      # 음성 합성 (TTS)
 │   │   ├── __init__.py
-│   │   └── service.py            # ElevenLabs/MiniMax 등
+│   │   └── service.py            # Google Cloud TTS Chirp
 │   ├── ocr/                      # 이미지 인식 (OCR)
 │   │   ├── __init__.py
 │   │   └── service.py            # 상품 이미지, 키패드 인식
@@ -186,20 +186,28 @@ pytest tests/ -v
 
 ## 4. 음성 합성 (TTS - Text to Speech)
 
-### 4.1 TTS 모델 선정
+### 4.1 Google Cloud TTS Chirp3 HD
 
-프로젝트 요구사항 (한국어, 실시간 저지연, 고품질)에 따른 TTS 후보:
+**Google Cloud Text-to-Speech API**의 최신 Chirp3 HD 모델을 사용합니다.
 
-| 순위 | 모델                      | 지연시간 | 한국어          | 가격             | 비고                   |
-| ---- | ------------------------- | -------- | --------------- | ---------------- | ---------------------- |
-| 1    | **ElevenLabs Flash v2.5** | ~75ms    | O (32개 언어)   | 월 10,000자 무료 | 실시간 에이전트 최적화 |
-| 2    | **MiniMax Speech-02-HD**  | -        | O (악센트 인식) | $0.05/1,000자    | 아시아 언어 특화, 저렴 |
-| 3    | **Cartesia Sonic 2**      | **40ms** | O               | -                | 업계 최저 지연         |
-| 4    | **CosyVoice 2.0**         | 150ms    | O               | 무료 (오픈소스)  | 자체 호스팅 가능       |
+| 항목 | 내용 |
+| ---- | ---- |
+| 모델 | Chirp3 HD |
+| 언어 | 한국어 (ko-KR) |
+| 오디오 형식 | LINEAR16 (PCM 16-bit) |
+| 샘플레이트 | 24000 Hz |
+| 가격 | $16 / 1백만 문자 (월 1백만 자 무료) |
 
-**개발/MVP 단계:** MiniMax Speech-02 (저렴, 한국어 품질 우수)
-**프로덕션 단계:** ElevenLabs Flash v2.5 (안정성, 문서화, 실시간 성능)
-**보안 중시:** CosyVoice 2.0 자체호스팅 (결제 데이터 처리 시)
+**사용 가능한 한국어 음성:**
+
+| ID | 이름 | 성별 |
+| -- | ---- | ---- |
+| `ko-KR-Chirp3-HD-Leda` | Leda | 여성 |
+| `ko-KR-Chirp3-HD-Aoede` | Aoede | 여성 |
+| `ko-KR-Chirp3-HD-Kore` | Kore | 여성 |
+| `ko-KR-Chirp3-HD-Puck` | Puck | 남성 |
+| `ko-KR-Chirp3-HD-Charon` | Charon | 남성 |
+| `ko-KR-Chirp3-HD-Fenrir` | Fenrir | 남성 |
 
 ### 4.2 실시간 음성 스트리밍
 
@@ -327,8 +335,8 @@ pytest tests/ -v
 │         ▼                    ▼                    ▼             │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
 │  │ ASR Service  │    │ LLM Planner  │    │ TTS Service  │       │
-│  │(Faster-Whisper)   │ (GPT-5-mini) │    │(ElevenLabs/  │       │
-│  │              │    │              │    │ MiniMax)     │       │
+│  │(Faster-Whisper)   │ (GPT-5-mini) │    │(Google Cloud │       │
+│  │              │    │              │    │ TTS Chirp)   │       │
 │  └──────────────┘    └──────────────┘    └──────────────┘       │
 │                              │                                  │
 │                              ▼                                  │
@@ -375,7 +383,6 @@ pytest tests/ -v
 - 음성 데이터 저장 없음 (스트리밍 처리 후 폐기)
 - 결제/2차 비밀번호는 로컬 입력만 허용
 - 토큰은 단기 access + refresh 로테이션
-- TTS 서비스 자체호스팅 옵션 제공 (CosyVoice 2.0)
 
 ---
 
@@ -383,12 +390,9 @@ pytest tests/ -v
 
 ### TTS 서비스
 
-- [ElevenLabs Korean TTS](https://elevenlabs.io/text-to-speech/korean)
-- [ElevenLabs Models](https://elevenlabs.io/docs/overview/models)
-- [MiniMax Speech-02](https://fal.ai/models/fal-ai/minimax/speech-02-hd)
-- [MiniMax Pricing](https://www.minimax.io/price)
-- [Cartesia Korean TTS](https://cartesia.ai/languages/korean)
-- [CosyVoice 2.0 (Open Source)](https://www.siliconflow.com/articles/en/best-open-source-text-to-speech-models)
+- [Google Cloud TTS 문서](https://cloud.google.com/text-to-speech/docs)
+- [Chirp 모델 소개](https://cloud.google.com/text-to-speech/docs/chirp)
+- [Python 클라이언트](https://cloud.google.com/python/docs/reference/texttospeech/latest)
 
 ### ASR
 
