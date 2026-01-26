@@ -1,39 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-OCR 텍스트 병합 모듈
-
-여러 OCR 결과의 텍스트를 점수 기반으로 병합하고 중복을 제거합니다.
-OCR 처리는 korean_ocr.py에서 수행하고, 이 모듈은 텍스트 병합만 담당합니다.
-텍스트 전처리는 ocr_text_preprocessor.py에서 import하여 사용합니다.
-
-=============================================================================
-사용 방법
-=============================================================================
-
-1. 병렬 OCR 결과 병합 (권장):
-    from korean_ocr import process_images_parallel
-    from ocr_text_merger import merge_ocr_results
-    
-    # OCR 처리 (korean_ocr에서)
-    ocr_results = process_images_parallel(["img1.jpg", "img2.jpg"], max_workers=4)
-    
-    # 텍스트 병합 (이 모듈)
-    merged = merge_ocr_results(ocr_results)
-    print(merged["rec_texts"])
-
-2. JSON 파일에서 병합:
-    from ocr_text_merger import merge_ocr_texts
-    
-    merged = merge_ocr_texts(
-        inputs=["result1.json", "result2.json"],
-        min_score=0.7,
-        similarity_threshold=0.9
-    )
-
-3. CLI 사용:
-    python ocr_text_merger.py --inputs result1.json result2.json --output merged.json
-"""
-
 import argparse
 import json
 import os
@@ -41,24 +6,16 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple, Any
 
-# =============================================================================
-# 텍스트 전처리 모듈에서 공용 함수 import
-# =============================================================================
 try:
     from .ocr_text_preprocessor import normalize_text, filter_texts
 except ImportError:
     from ocr_text_preprocessor import normalize_text, filter_texts
 
 
-# =============================================================================
-# 텍스트 병합
-# =============================================================================
-
 def _merge_entries(
     entries: Iterable[Dict],
     similarity_threshold: float,
 ) -> List[Dict]:
-    """정규화 및 유사도 기준으로 중복 병합."""
     merged: List[Dict] = []
     for entry in entries:
         text = entry.get("text", "")
@@ -101,46 +58,12 @@ def _merge_entries(
     return merged
 
 
-# =============================================================================
-# OCR 결과 병합 (주요 API)
-# =============================================================================
-
 def merge_ocr_results(
     ocr_results: List[Dict[str, Any]],
     min_score: float = 0.7,
     min_length: int = 2,
     similarity_threshold: float = 0.9,
 ) -> Dict:
-    """
-    OCR 결과 리스트를 받아 텍스트를 병합합니다.
-    
-    korean_ocr.process_image() 또는 process_images_parallel()의 결과를 받아
-    텍스트를 병합하고 중복을 제거합니다.
-    
-    Args:
-        ocr_results: OCR 결과 Dict 리스트. 각 Dict는 다음 형태:
-            - rec_texts: 텍스트 리스트
-            - rec_scores: 신뢰도 리스트
-            - source (optional): 소스 식별자
-        min_score: 최소 신뢰도 (기본: 0.7)
-        min_length: 최소 텍스트 길이 (기본: 2)
-        similarity_threshold: 중복 판정 유사도 임계값 (기본: 0.9)
-        
-    Returns:
-        Dict: 병합된 결과
-            - rec_texts: 병합된 텍스트 리스트
-            - rec_scores: 해당 신뢰도 리스트
-            - items: 상세 정보 (텍스트, 점수, 소스)
-            - count: 병합된 텍스트 수
-            
-    Example:
-        >>> from korean_ocr import process_images_parallel
-        >>> from ocr_text_merger import merge_ocr_results
-        >>> 
-        >>> results = process_images_parallel(["img1.jpg", "img2.jpg"])
-        >>> merged = merge_ocr_results(results)
-        >>> print(merged["rec_texts"])
-    """
     entries: List[Dict] = []
     
     for result in ocr_results:
@@ -162,12 +85,7 @@ def merge_ocr_results(
     }
 
 
-# =============================================================================
-# JSON 파일 기반 병합
-# =============================================================================
-
 def _load_json_texts(path: str) -> Tuple[List[str], List[float]]:
-    """OCR JSON 파일에서 텍스트/점수 로드."""
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     texts = data.get("rec_texts", []) or []
@@ -183,18 +101,6 @@ def merge_ocr_texts(
     min_length: int = 2,
     similarity_threshold: float = 0.9,
 ) -> Dict:
-    """
-    여러 JSON 파일의 OCR 텍스트를 병합합니다.
-    
-    Args:
-        inputs: OCR 결과 JSON 파일 경로 리스트
-        min_score: 최소 신뢰도 (기본: 0.7)
-        min_length: 최소 텍스트 길이 (기본: 2)
-        similarity_threshold: 중복 판정 유사도 임계값 (기본: 0.9)
-        
-    Returns:
-        Dict: 병합된 결과
-    """
     ocr_results = []
     for json_path in inputs:
         texts, scores = _load_json_texts(json_path)
@@ -212,34 +118,16 @@ def merge_ocr_texts(
     )
 
 
-# =============================================================================
-# 유틸리티
-# =============================================================================
-
 def _write_json(path: str, data: Dict) -> None:
-    """JSON 결과 저장."""
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-# =============================================================================
-# CLI
-# =============================================================================
-
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="여러 OCR JSON 파일의 텍스트를 병합합니다."
-    )
-    parser.add_argument(
-        "--inputs", nargs="+", required=True, 
-        help="OCR 결과 JSON 파일 경로들"
-    )
-    parser.add_argument(
-        "--output", 
-        default=os.path.join("output", "merged_ocr_texts.json"),
-        help="출력 파일 경로"
-    )
+    parser = argparse.ArgumentParser(description="OCR 텍스트 병합")
+    parser.add_argument("--inputs", nargs="+", required=True)
+    parser.add_argument("--output", default=os.path.join("output", "merged_ocr_texts.json"))
     parser.add_argument("--min-score", type=float, default=0.7)
     parser.add_argument("--min-length", type=int, default=2)
     parser.add_argument("--similarity-threshold", type=float, default=0.9)

@@ -1,175 +1,189 @@
 # OCR Text Processors
 
-OCR 결과를 추출/정제하고, 제품 타입을 감지한 뒤 LLM 요약을 생성하는 통합 파이프라인입니다.
+상품 이미지에서 OCR 텍스트를 추출하고, LLM을 사용해 요약을 생성하는 파이프라인입니다.
 
 ---
 
-## 🚀 빠른 시작 (통합 파이프라인)
+## 📊 구현 현황
+
+| 기능 | 상태 | 담당 모듈 |
+|------|------|----------|
+| 한국어 OCR 처리 | ✅ 완료 | `korean_ocr.py` |
+| 긴 이미지 분할 처리 | ✅ 완료 | `long_image_processor.py` |
+| 텍스트 전처리/필터링 | ✅ 완료 | `ocr_text_preprocessor.py` |
+| 텍스트 병합 | ✅ 완료 | `ocr_text_merger.py` |
+| 상품 타입 감지 | ✅ 완료 | `product_type_detector.py` |
+| LLM 요약 생성 | ✅ 완료 | `ocr_llm_summarizer.py` |
+| 이미지 URL 필터링/다운로드 | ✅ 완료 | `image_fetcher.py` |
+| 통합 파이프라인 | ✅ 완료 | `ocr_pipeline.py` |
+| **웹 연동 (자동 트리거)** | ❌ 미구현 | - |
+| **MCP Playwright 통합** | ❌ 미구현 | - |
+
+---
+
+## 🚀 빠른 시작
 
 ```bash
-# 단일 이미지 처리 (자동으로 전체 파이프라인 실행)
+# 단일 이미지 처리
 python ocr_pipeline.py --input 샴푸.jpg
 
-# 여러 이미지 병합 처리 (상품 상세페이지 등)
+# 여러 이미지 병합 처리
 python ocr_pipeline.py --inputs img1.jpg img2.jpg img3.jpg
+
+# URL 기반 처리
+python ocr_pipeline.py --urls "https://..." --site coupang
 ```
 
----
-
-## 📊 파이프라인 다이어그램
-
-### 전체 구조
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                           ocr_pipeline.py                                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  [단일 이미지]                           [다중 이미지]                          │
-│  process_product_image()                process_multiple_images()            │
-│         │                                        │                           │
-│         ▼                                        ▼                           │
-│  ┌─────────────────────┐                ┌─────────────────────┐              │
-│  │  korean_ocr.py      │                │  korean_ocr.py      │              │
-│  │  process_image()    │                │  process_images_    │              │
-│  └──────────┬──────────┘                │  parallel()         │              │
-│             │                           └──────────┬──────────┘              │
-│             ▼                                      │                         │
-│  ┌─────────────────────────────┐       ┌──────────┴──────────┐               │
-│  │     이미지 높이 체크          │       │  각 이미지마다 아래   │                │
-│  └──────────┬──────────────────┘       │  과정 병렬 수행      │                │
-│             │                           └──────────┬──────────┘              │
-│     ┌───────┴───────┐                             │                          │
-│     ▼               ▼                             ▼                          │
-│  ≤2000px        >2000px                    ┌─────────────┐                   │
-│  (일반)          (긴 이미지)                 │ 높이 체크    │                   │
-│     │               │                      └──────┬──────┘                   │
-│     │               ▼                      ┌──────┴──────┐                   │
-│     │      ┌─────────────────────┐         ▼             ▼                   │
-│     │      │ long_image_         │     ≤2000px       >2000px                 │
-│     │      │ processor.py        │         │             │                   │
-│     │      │                     │         │             ▼                   │
-│     │      │ 1. 이미지 분할       │         │    ┌────────────────┐            │
-│     │      │    (2000px 단위)    │         │    │ 분할 → OCR →   │             │
-│     │      │                     │         │    │ 청크별 병합     │            │
-│     │      │ 2. 청크별 OCR       │         │    └────────┬───────┘            │
-│     │      │                     │         │             │                   │
-│     │      │ 3. 결과 병합        │         └──────┬──────┘                    │
-│     │      │    (중복 제거)      │                │                           │
-│     │      └──────────┬──────────┘                ▼                          │
-│     │                 │                   ┌─────────────────┐                │
-│     ▼                 ▼                   │ 2. 병합         │                 │
-│  ┌─────────────────────┐                  │ merge_ocr_      │                │
-│  │   OCR 결과           │                  │ results() ⭐    │                │
-│  │   {rec_texts,       │                  └────────┬────────┘                 │
-│  │    rec_scores}      │                           │                          │
-│  └──────────┬──────────┘                           │                          │
-│             │                                      │                          │
-│             ▼                                      ▼                          │
-│  ┌─────────────────────────────────────────────────────────────────┐         │
-│  │                    3. 전처리 (ocr_text_preprocessor)             │         │
-│  │                    filter_texts() - 노이즈/저신뢰도 제거          │          │
-│  └─────────────────────────────┬───────────────────────────────────┘         │
-│                                │                                              │
-│                                ▼                                              │
-│  ┌─────────────────────────────────────────────────────────────────┐          │
-│  │                    4. 텍스트 추출 (extract_texts_only)           │          │
-│  │                    ["텍스트1", "텍스트2", ...] (LLM 토큰 절약)     │          │
-│  └─────────────────────────────┬───────────────────────────────────┘         │
-│                                │                                              │
-│                                ▼                                              │
-│  ┌─────────────────────────────────────────────────────────────────┐         │
-│  │                    5. 타입 감지 (product_type_detector)          │         │
-│  │                    detect_product_type() → ProductType          │         │
-│  └─────────────────────────────┬───────────────────────────────────┘         │
-│                                │                                              │
-│                                ▼                                              │
-│  ┌─────────────────────────────────────────────────────────────────┐         │
-│  │                    6. LLM 요약 (ocr_llm_summarizer)              │         │
-│  │                    summarize_texts() → 최종 요약                 │         │
-│  └─────────────────────────────┬───────────────────────────────────┘         │
-│                                │                                              │
-│                                ▼                                              │
-│                          최종 결과 출력                                        │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
-
-### 케이스별 처리 단계
-
-| 케이스 | 이미지 높이 | 처리 단계 |
-|-------|-----------|---------|
-| 단일 일반 이미지 | ≤2000px | OCR → 전처리 → 추출 → 타입 → LLM (5단계) |
-| 단일 긴 이미지 | >2000px | 분할 → 청크 OCR → 병합 → 전처리 → 추출 → 타입 → LLM |
-| 다중 일반 이미지 | 각각 ≤2000px | 병렬 OCR → 병합 → 전처리 → 추출 → 타입 → LLM (6단계) |
-| 다중 혼합 이미지 | 일부 >2000px | 병렬(각각 분할 처리) → 병합 → 전처리 → 추출 → 타입 → LLM |
-
----
-
-## 📁 파일 구조
-
-| 파일 | 역할 | 비고 |
-|-----|-----|-----|
-| `ocr_pipeline.py` | **통합 파이프라인 (메인 진입점)** ⭐ | 권장 사용 |
-| `korean_ocr.py` | PaddleOCR 기반 OCR 실행 + 긴 이미지 자동 분할 | |
-| `long_image_processor.py` | 긴 이미지 슬라이딩 윈도우 분할 OCR | korean_ocr에서 자동 호출 |
-| `ocr_text_preprocessor.py` | OCR 텍스트 정제/필터링 (중앙 모듈) | |
-| `ocr_text_merger.py` | 여러 OCR 결과 병합 + 중복 제거 | |
-| `product_type_detector.py` | 제품 타입 분류 + 타입별 키워드 매핑 | |
-| `ocr_llm_summarizer.py` | 타입별 프롬프트 구성 후 LLM 요약 생성 | |
-| `extract_rec_texts.py` | OCR JSON에서 `rec_texts`만 추출 (유틸리티) | 독립 사용 가능 |
-
----
-
-## 사용 예시
-
-### 1) 통합 파이프라인 (권장) ⭐
-
-```bash
-# 단일 이미지 - 자동으로 전체 과정 수행
-python ocr_pipeline.py --input ../tests/fixtures/샴푸.jpg
-
-# 여러 이미지 병합 (상품 상세페이지 등)
-python ocr_pipeline.py --inputs detail1.jpg detail2.jpg detail3.jpg
-
-# 조용히 실행 (진행 상황 출력 없이)
-python ocr_pipeline.py --input 샴푸.jpg --quiet
-```
-
-### 2) 코드에서 import
+### Python에서 사용
 
 ```python
-from ocr_pipeline import process_product_image, process_multiple_images
+from ocr_pipeline import process_product_image, process_product_from_urls
 
 # 단일 이미지
 result = process_product_image("샴푸.jpg")
 print(result["summary"])
 
-# 여러 이미지 병합
-result = process_multiple_images(["img1.jpg", "img2.jpg"])
-print(result["summary"])
+# URL 기반 (MCP Playwright에서 추출한 URL 리스트)
+result = process_product_from_urls(urls, site="coupang")
+print(result["summary"])  # TTS용 요약
 ```
 
-### 3) 개별 모듈 사용 (기존 방식)
+---
 
-```bash
-# OCR 실행
-python korean_ocr.py --input ../tests/fixtures/sample.jpg
+## 📁 파일 구조
 
-# 텍스트 추출
-python extract_rec_texts.py --input output/sample_ocr_result.json
+| 파일 | 역할 |
+|-----|-----|
+| `ocr_pipeline.py` | **통합 파이프라인 (메인 진입점)** |
+| `korean_ocr.py` | PaddleOCR 기반 OCR + 긴 이미지 자동 분할 |
+| `long_image_processor.py` | 슬라이딩 윈도우 분할 OCR |
+| `ocr_text_preprocessor.py` | 텍스트 정제/필터링 |
+| `ocr_text_merger.py` | 여러 OCR 결과 병합 + 중복 제거 |
+| `product_type_detector.py` | 제품 타입 분류 (30개 카테고리) |
+| `ocr_llm_summarizer.py` | 타입별 프롬프트 + LLM 요약 |
+| `image_fetcher.py` | 이미지 URL 필터링/다운로드 |
+| `extract_rec_texts.py` | OCR JSON에서 텍스트 추출 유틸 |
 
-# LLM 요약
-python ocr_llm_summarizer.py --input output/sample_ocr_result_texts.json
+---
+
+## 📊 파이프라인 흐름
+
+```
+[이미지 입력]
+      ↓
+[korean_ocr] OCR 처리 (긴 이미지는 자동 분할)
+      ↓
+[ocr_text_merger] 텍스트 병합 + 중복 제거
+      ↓
+[ocr_text_preprocessor] 전처리 (노이즈/저신뢰도 제거)
+      ↓
+[product_type_detector] 상품 타입 감지
+      ↓
+[ocr_llm_summarizer] LLM 요약 생성
+      ↓
+[TTS용 요약 텍스트 출력]
+```
+
+---
+
+## 🚧 미구현 부분 (TODO)
+
+> **팀원 분들께**: 아래 기능들은 프론트엔드/Playwright 연동이 필요합니다.
+
+### 1. 웹 연동 - 자동 OCR 트리거
+
+**현재 상태:**
+- 이미지 URL 리스트를 수동으로 전달해야 함
+- `process_product_from_urls(urls)` 형태로 직접 호출 필요
+
+**필요한 구현:**
+- 상품 페이지 접속 시 자동으로 OCR 파이프라인 실행
+- URL 패턴 감지 (쿠팡/네이버 상품 페이지인지 판별)
+- 트리거 조건 정의 (페이지 로드 완료, 버튼 클릭 등)
+
+---
+
+### 2. MCP Playwright 통합
+
+**현재 상태:**
+- CSS 셀렉터만 정의됨 (`image_fetcher.py`)
+  - 쿠팡: `.product-detail-content-inside img`
+  - 네이버: `#INTRODUCE img`
+
+**필요한 구현:**
+```python
+# 예상 구현 흐름
+async def extract_product_images(page_url: str):
+    # 1. Playwright로 페이지 접속
+    # 2. CSS 셀렉터로 img 태그 추출
+    # 3. src 속성에서 URL 추출
+    # 4. process_product_from_urls() 호출
+    pass
+```
+
+**구현 시 참고:**
+- `image_fetcher.get_selector(site)` - 사이트별 CSS 셀렉터 반환
+- `image_fetcher.filter_product_images(urls)` - 광고/배너 URL 필터링
+
+---
+
+### 3. API 인터페이스
+
+**현재 상태:**
+- CLI 및 Python 함수 호출만 지원
+
+**필요한 구현 (선택):**
+- REST API 엔드포인트 (Flask/FastAPI)
+- WebSocket 인터페이스 (실시간 처리)
+
+**예상 API 형태:**
+```
+POST /api/ocr/process
+Body: { "urls": ["...", "..."], "site": "coupang" }
+Response: { "summary": [...], "product_name": "..." }
+```
+
+---
+
+## 📝 연동 시 필요한 입출력 형식
+
+### 입력 (OCR 파이프라인 호출 시)
+
+```python
+# 방법 1: 이미지 경로
+process_product_image("path/to/image.jpg")
+
+# 방법 2: URL 리스트 (Playwright에서 추출)
+process_product_from_urls(
+    image_urls=["https://...", "https://..."],
+    site="coupang"  # 또는 "naver", "auto"
+)
+```
+
+### 출력 (TTS에서 사용)
+
+```json
+{
+  "product_type": "BEAUTY_HAIRCARE",
+  "product_name": "케라시스 샴푸",
+  "summary": [
+    "이 제품은 케라시스 데미지 클리닉 샴푸입니다.",
+    "손상된 모발을 위한 집중 케어 샴푸입니다.",
+    "용량은 600ml입니다."
+  ],
+  "keywords": {
+    "용량": {"answer": "600ml", "status": "found"},
+    "성분": {"answer": "케라틴, 아르간오일", "status": "found"}
+  }
+}
 ```
 
 ---
 
 ## 환경 변수 (.env)
 
-`AI/services/ocr/text_processors/.env`에 API 키를 설정합니다.
-
 ```env
-GMS_KEY=your_gms_api_key_here
+GMS_KEY=your_api_key_here
 OPENAI_MODEL=gpt-5-mini
 ```
 
@@ -178,35 +192,9 @@ OPENAI_MODEL=gpt-5-mini
 ## 설치 의존성
 
 ```bash
-# PaddlePaddle (CUDA 11.8)
+# PaddlePaddle (GPU)
 python -m pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
-
-# PaddlePaddle (CPU)
-python -m pip install paddlepaddle==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
 
 # PaddleOCR + 기타
 python -m pip install paddleocr pillow requests python-dotenv
-```
-
----
-
-## 출력 예시
-
-```json
-{
-  "product_type": "BEAUTY_HAIRCARE",
-  "product_name": "케라시스 데미지 클리닉 샴푸",
-  "confidence": 0.85,
-  "summary": [
-    "이 제품은 케라시스 데미지 클리닉 샴푸입니다.",
-    "손상된 모발을 위한 집중 케어 샴푸입니다.",
-    "용량은 600ml이며, 케라틴 성분이 함유되어 있습니다."
-  ],
-  "keywords": {
-    "용량": {"answer": "600ml", "status": "found"},
-    "성분": {"answer": "케라틴, 아르간오일", "status": "found"}
-  },
-  "source_image": "샴푸.jpg",
-  "processing_time": 3.2
-}
 ```
