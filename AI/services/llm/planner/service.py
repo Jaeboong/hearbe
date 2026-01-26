@@ -16,6 +16,7 @@ from core.interfaces import (
 from ..generators.command_generator import CommandGenerator, CommandResult
 from ..generators.llm_generator import LLMGenerator, LLMResult
 from .routing import LLMRoutingPolicy
+from .selection import select_from_results
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,12 @@ class LLMPlanner(ILLMPlanner):
 
         # 1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
+
+        # 1.5. Selection from recent search results (no trigger words)
+        if rule_result.matched_rule == "none":
+            selection = select_from_results(user_text, session)
+            if selection:
+                return selection
         decision = self._routing_policy.decide(user_text, intent, rule_result)
 
         # 2. LLM fallback by policy

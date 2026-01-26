@@ -177,13 +177,11 @@ class BrowserExtractionMixin:
             return {"success": False, "error": "Not connected to browser", "pages": []}
                                                                                                                                                                                                                                                                                
         try:
-            current = None
             pages: list[Dict[str, Any]] = []
             for context in self._browser.contexts:
                 for page in context.pages:
                     if page.is_closed():
                         continue
-                    current = page  # 마지막 열린 페이지가 current
                     url = page.url or ""
                     title = ""
                     if "/" in url:
@@ -195,9 +193,12 @@ class BrowserExtractionMixin:
                             "index": len(pages),
                             "url": url,
                             "title": title or url,
-                            "is_current": page == current,
+                            "is_current": False,
                         }
                     )
+
+            if pages:
+                pages[-1]["is_current"] = True
             return {"success": True, "pages": pages, "count": len(pages)}
         except Exception as e:
             logger.error(f"Get pages failed: {e}")

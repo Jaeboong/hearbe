@@ -12,6 +12,7 @@ from .browser_connection import BrowserConnectionMixin
 from .browser_actions import BrowserActionsMixin
 from .browser_extraction import BrowserExtractionMixin
 from .browser_utilities import BrowserUtilitiesMixin
+from .browser_tabs import BrowserTabsMixin
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,7 @@ class BrowserTools(
     BrowserActionsMixin,
     BrowserExtractionMixin,
     BrowserUtilitiesMixin,
+    BrowserTabsMixin,
 ):
     """
     브라우저 제어 도구
@@ -59,6 +61,7 @@ class BrowserTools(
             "click_text": self.click_text,
             "get_visible_buttons": self.get_visible_buttons,
             "get_pages": self.get_pages,
+            "wait_for_new_page": self.wait_for_new_page,
         }
 
         if tool_name not in tools:
@@ -67,7 +70,15 @@ class BrowserTools(
         tool_func = tools[tool_name]
 
         try:
-            return await tool_func(**args)
+            result = await tool_func(**args)
+            if isinstance(result, dict):
+                try:
+                    page = await self._get_active_page()
+                    if page and page.url:
+                        result.setdefault("current_url", page.url)
+                except Exception:
+                    pass
+            return result
         except TypeError as e:
             return {"success": False, "error": f"Invalid arguments: {e}"}
 

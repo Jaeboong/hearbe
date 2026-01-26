@@ -105,6 +105,11 @@ AVAILABLE_COMMANDS = {
         "description": "List open browser pages/tabs",
         "args": {},
         "example": """{"tool_name": "get_pages", "arguments": {}, "description": "List open tabs"}"""
+    },
+    "take_screenshot": {
+        "description": "Capture a screenshot",
+        "args": {"full_page": "Capture full page if true (optional)"},
+        "example": """{"tool_name": "take_screenshot", "arguments": {"full_page": true}, "description": "Capture full page screenshot"}"""
     }
 }
 
@@ -124,6 +129,8 @@ PAGE_ACTIONS = {
 
 def detect_page_type(url: str) -> str:
     """URL에서 페이지 타입 감지"""
+    if not url:
+        return "home"
     url_lower = url.lower()
     
     if "login" in url_lower or "signin" in url_lower:
