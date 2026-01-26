@@ -82,6 +82,14 @@ class Application:
             logger.warning(f"Audio module not available: {e}")
             logger.warning("Install pyaudio and keyboard for voice support")
 
+        # Audio Player 모듈 (TTS 재생)
+        try:
+            from audio.player import AudioPlayer
+            self.modules["audio_player"] = AudioPlayer()
+            self.modules["audio_player"].start()
+        except ImportError as e:
+            logger.warning(f"Audio player not available: {e}")
+
         # 콘솔 입력 모듈 (테스트용)
         if self.console_mode:
             from debug.console_input import ConsoleInputManager
@@ -133,6 +141,8 @@ class Application:
         await publish(EventType.APP_SHUTDOWN, source="main")
 
         # 모듈 종료
+        if "audio_player" in self.modules:
+            self.modules["audio_player"].shutdown()
         if "audio" in self.modules:
             await self.modules["audio"].stop()
         if "console_input" in self.modules:

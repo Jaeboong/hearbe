@@ -536,7 +536,9 @@ class WebSocketHandler:
                         )
 
                 # TTS response
+                logger.debug(f"TTS check: text='{response.text[:50] if response.text else None}...', tts={self.tts is not None}")
                 if response.text and self.tts:
+                    logger.info(f"Sending TTS response: '{response.text[:80]}...'")
                     await self._send_tts_response(session_id, response.text)
 
                 # Add to conversation history
@@ -686,6 +688,19 @@ class WebSocketHandler:
                 except Exception:
                     logger.warning("Failed to serialize search_results for history")
 
+                # === Path 0: 검색 결과 → TTS 응답 ===
+                if self.tts and products:
+                    product_count = len(products)
+                    if product_count > 0:
+                        first_product = products[0]
+                        name = first_product.get("name", "상품")
+                        price = first_product.get("price", "")
+                        tts_text = f"{product_count}개 상품을 찾았습니다. 첫 번째는 {name}"
+                        if price:
+                            tts_text += f", 가격 {price}"
+                        tts_text += "입니다."
+                        await self._send_tts_response(session_id, tts_text)
+
         # === Path 1: HTML 파싱 → 빠른 TTS 응답 ===
         if SUMMARIZER_AVAILABLE and html_content:
             try:
@@ -712,11 +727,7 @@ class WebSocketHandler:
             asyncio.create_task(
                 self._process_ocr_batch(session_id, detail_images, page_url)
             )
-        elif self.llm and session:
-            # HTML/OCR 없을 경우 기존 LLM 응답 사용
-            response_text = await self.llm.generate_response(session.context)
-            if self.tts:
-                await self._send_tts_response(session_id, response_text)
+        # Note: 중간 MCP 결과(navigate, type, click 등)는 TTS 없이 조용히 처리
 
     async def _process_ocr_batch(
         self,
@@ -869,9 +880,11 @@ class WebSocketHandler:
     async def _send_tts_response(self, session_id: str, text: str):
         """Send TTS response (streaming)"""
         if not self.tts:
+            logger.warning("TTS service not available")
             return
 
         try:
+            chunk_count = 0
             async for chunk in self.tts.synthesize_stream(text):
                 msg = WSMessage(
                     type=MessageType.TTS_CHUNK,
@@ -883,6 +896,8 @@ class WebSocketHandler:
                     session_id=session_id
                 )
                 await connection_manager.send_message(session_id, msg)
+                chunk_count += 1
+            logger.info(f"TTS completed: {chunk_count} chunks sent for '{text[:50]}...'")
 
         except Exception as e:
             logger.error(f"TTS streaming failed: {e}")
