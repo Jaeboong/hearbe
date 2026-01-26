@@ -48,6 +48,17 @@ class TTSService(ITTSService):
         # 인증 설정
         credentials_path = self._config.google_credentials_path
         if credentials_path:
+            # Convert relative path to absolute (for Docker compatibility)
+            if not os.path.isabs(credentials_path):
+                credentials_path = os.path.abspath(credentials_path)
+
+            # Verify file exists before setting env var
+            if not os.path.exists(credentials_path):
+                raise FileNotFoundError(
+                    f"Google credentials file not found: {credentials_path}. "
+                    f"CWD: {os.getcwd()}"
+                )
+
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
             logger.info(f"Using Google credentials from: {credentials_path}")
 
