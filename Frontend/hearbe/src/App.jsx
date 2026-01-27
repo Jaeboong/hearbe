@@ -3,7 +3,7 @@ import Login from './pages/Login/LoginA';
 import SignUp from './pages/SignUp/SignUpA';
 import SelectMall from './pages/SelectMall/SelectMallA';
 import StoreBrowser from './pages/StoreBrowser/StoreBrowserA';
-import Cart from './pages/Cart/CartA';
+import Cart from './pages/Mypage/CartA';
 import Mypage from './pages/Mypage/MypageA';
 import MemberInfo from './pages/Mypage/MemberInfoA';
 import CardManagement from './pages/Mypage/CardManagementA';
