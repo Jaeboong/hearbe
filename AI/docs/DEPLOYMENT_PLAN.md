@@ -108,7 +108,45 @@ curl -sS https://www.jhserver.shop/docs | head -n 5
 
 ---
 
-## 7. 운영 체크리스트
+## 7. 클라이언트 환경 변수 (MCP/.env)
+
+클라이언트는 **MCP/.env**만 사용하며, 서버 주소만 배포 주소로 맞추면 됩니다.
+
+```ini
+WS_URL=wss://www.jhserver.shop/ws
+AUTH_URL=https://www.jhserver.shop/auth
+```
+
+- `PUBLIC_BASE_URL`은 MCP에서 사용하지 않으면 제거 가능
+- 클라이언트에는 API 키/서비스 계정 JSON을 두지 않음
+
+---
+
+## 8. 클라이언트 E2E 테스트 절차
+
+> 목표: A(로컬) ↔ B(배포) 전체 흐름이 끝까지 연결되는지 확인
+
+### 7.1 사전 확인 (B 서버)
+```bash
+curl -sS https://www.jhserver.shop/ | head -n 1
+wscat -c wss://www.jhserver.shop/ws
+```
+
+### 7.2 클라이언트 설정 (A 로컬)
+- HTTP Base URL: `https://www.jhserver.shop`
+- WebSocket URL: `wss://www.jhserver.shop/ws`
+
+### 7.3 실제 플로우 테스트
+1. MCP 앱 실행 (로컬 EXE 또는 `python main.py`)
+2. PTT로 음성 입력 (예: “쿠팡에서 우유 검색해줘”)
+3. tool_calls 수신 확인 (콘솔 로그 또는 UI 상태)
+4. 브라우저 자동화 실행 확인 (검색 결과 페이지 이동)
+5. OCR/HTML 결과가 서버로 전송되는지 확인
+6. TTS 응답이 로컬에서 재생되는지 확인
+
+---
+
+## 9. 운영 체크리스트
 
 - [ ] Docker 컨테이너 `herewego-ai` 정상 기동
 - [ ] GPU 사용 가능 여부 확인 (`/usr/lib/wsl/lib/nvidia-smi -L`)
@@ -117,21 +155,34 @@ curl -sS https://www.jhserver.shop/docs | head -n 5
 
 ---
 
-## 8. 문제 발생 시 (빠른 트러블슈팅)
+## 10. 문제 발생 시 (빠른 트러블슈팅)
 
-### 8.1 Docker 빌드 실패 (DNS)
+### 9.1 Docker 빌드 실패 (DNS)
 - Docker Hub 연결 실패 시 `resolv.conf` DNS 확인
 
-### 8.2 ASR 모델 로딩 실패
+### 9.2 ASR 모델 로딩 실패
 - 캐시 볼륨 삭제 후 재다운로드
 
-### 8.3 HTTPS 502/405
+### 9.3 HTTPS 502/405
 - Nginx proxy_pass가 127.0.0.1:8000으로 연결되는지 확인
 - 405는 HEAD 요청일 수 있으므로 GET으로 확인
 
+### 9.4 WebSocket 404
+- Nginx에 `/ws` 업그레이드 설정 필요
+- `location /ws`에 `Upgrade`/`Connection` 헤더 추가
+
+### 9.5 ASR 모델 다운로드 오류 (Xet/CAS)
+- `HF_HUB_DISABLE_XET=1` 설정 후 재시작
+
+### 9.6 Docker 빌드 캐시 오류
+- `docker builder prune -f` 후 재빌드
+
+### 9.7 `websocket` 응답이 localhost로 나오는 경우
+- `PUBLIC_BASE_URL` 또는 `PUBLIC_WS_URL` 환경변수 설정
+
 ---
 
-## 9. WebSocket 메시지 요약
+## 11. WebSocket 메시지 요약
 
 > 상세 스키마는 `docs/WEBSOCKET_PROTOCOL.md`를 따름
 
@@ -150,7 +201,7 @@ curl -sS https://www.jhserver.shop/docs | head -n 5
 
 ---
 
-## 10. 운영용 Compose 권장안 (no-reload)
+## 12. 운영용 Compose 권장안 (no-reload)
 
 운영 배포에서는 `--reload`를 제거한 별도 파일을 권장합니다.
 
@@ -162,7 +213,7 @@ services:
 
 ---
 
-## 11. 보안/키 관리 정책
+## 13. 보안/키 관리 정책
 
 - Google 서비스 계정 JSON은 **B 서버에만 존재**
 - `.env`는 서버에만 배포 (로컬 A에는 키 저장 금지)
@@ -170,7 +221,7 @@ services:
 
 ---
 
-## 12. 향후 개선 방향
+## 14. 향후 개선 방향
 
 - 브랜치별 HF 캐시 분리
 - 운영용 compose 파일 분리 (no-reload)
