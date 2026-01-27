@@ -4,6 +4,7 @@ import SignUp from './pages/SignUp/SignUpA';
 import SelectMall from './pages/SelectMall/SelectMallA';
 import StoreBrowser from './pages/StoreBrowser/StoreBrowserA';
 import Cart from './pages/Cart/CartA';
+import Mypage from './pages/Mypage/MypageA';
 
 import './App.css';
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/mall" element={<SelectMall />} />
         <Route path="/store" element={<StoreBrowser />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/mypage" element={<Mypage />} />
       </Routes>
     </>
   )

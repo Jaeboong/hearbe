@@ -41,7 +41,7 @@ const SelectMall = () => {
                         <img src={iconCart} alt="Cart" className="nav-icon" />
                         <span>카트</span>
                     </div>
-                    <div className="nav-item">
+                    <div className="nav-item" onClick={() => navigate('/mypage')}>
                         <img src={iconUser} alt="My" className="nav-icon" />
                         <span>마이</span>
                     </div>

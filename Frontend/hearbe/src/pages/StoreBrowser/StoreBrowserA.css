@@ -44,17 +44,34 @@
 }
 
 /* Menu Bubble */
+/* Menu Bubble */
 .menu-bubble {
     position: fixed;
-    bottom: clamp(90px, 22vw, 180px);
+    bottom: clamp(100px, 25vw, 200px);
     left: clamp(16px, 4vw, 32px);
     background-color: #141C29;
-    border-radius: clamp(15px, 4vw, 30px);
-    padding: clamp(15px, 4vw, 30px) clamp(25px, 6vw, 50px);
-    box-shadow: 0 clamp(2px, 0.6vw, 5px) clamp(10px, 2.5vw, 20px) rgba(0, 0, 0, 0.5);
+    border-radius: clamp(20px, 5vw, 40px);
+    padding: clamp(20px, 5vw, 40px) clamp(30px, 8vw, 60px);
+    box-shadow: 0 clamp(4px, 1vw, 8px) clamp(15px, 4vw, 30px) rgba(0, 0, 0, 0.6);
     z-index: 1205;
     animation: fadeIn 0.3s ease-out;
-    border: clamp(1px, 0.25vw, 2px) solid #FFF064;
+    border: none;
+    /* Removed border */
+}
+
+/* Speech Bubble Tail */
+.menu-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    /* Adjust based on tail size */
+    left: 40px;
+    /* Adjust to align with hamburger button */
+    border-width: 15px 15px 0;
+    border-style: solid;
+    border-color: #141C29 transparent;
+    display: block;
+    width: 0;
 }
 
 @keyframes fadeIn {
@@ -72,20 +89,21 @@
 .menu-list {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    /* Increased gap */
 }
 
 .menu-item {
-    font-size: clamp(18px, 6vw, 36px);
+    font-size: clamp(24px, 8vw, 48px);
+    /* Increased 1.3x */
     font-weight: bold;
     color: #FFF064;
     display: flex;
     align-items: center;
-    gap: clamp(12px, 3vw, 24px);
-    padding: clamp(8px, 2vw, 15px) 0;
+    gap: clamp(16px, 4vw, 32px);
+    /* Increased gap */
+    padding: clamp(16px, 4vw, 30px) 0;
     cursor: pointer;
-    border-bottom: clamp(1px, 0.25vw, 2px) solid rgba(255, 240, 100, 0.2);
+    /* border-bottom: 2px solid rgba(255, 240, 100, 0.3); */
+    /* Underline added */
 }
 
 .menu-item:last-child {
@@ -93,8 +111,10 @@
 }
 
 .menu-icon {
-    width: clamp(24px, 6vw, 40px);
-    height: clamp(24px, 6vw, 40px);
+    width: clamp(47px, 12vw, 78px);
+    /* Increased 1.3x */
+    height: clamp(47px, 12vw, 78px);
+    /* Increased 1.3x */
     object-fit: contain;
 }
 
@@ -115,7 +135,7 @@
     font-size: clamp(24px, 6vw, 40px);
     cursor: pointer;
     box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(5px, 1.5vw, 10px) rgba(0, 0, 0, 0.5);
-    border: clamp(1px, 0.25vw, 2px) solid #FFF064;
+    border: none;
 }
 
 /* Close X inside Hamburger (if used) */
