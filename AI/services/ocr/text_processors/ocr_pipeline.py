@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 
 try:
     from .korean_ocr import process_image, process_images_parallel
-    from .ocr_text_preprocessor import filter_texts, preprocess_ocr_texts
+    from .ocr_text_preprocessor import filter_texts, preprocess_ocr_texts, is_meaningful_text
     from .ocr_text_merger import merge_ocr_results
     from .product_type_detector import (
         ProductType,
@@ -26,7 +26,7 @@ try:
     )
 except ImportError:
     from korean_ocr import process_image, process_images_parallel
-    from ocr_text_preprocessor import filter_texts, preprocess_ocr_texts
+    from ocr_text_preprocessor import filter_texts, preprocess_ocr_texts, is_meaningful_text
     from ocr_text_merger import merge_ocr_results
     from product_type_detector import (
         ProductType,
@@ -69,6 +69,54 @@ def _summary_only(summary: Dict) -> Dict:
     return {"summary": summary.get("summary", [])}
 
 
+def _cap_texts(texts: List[str], max_items: int = 200) -> List[str]:
+    if max_items <= 0:
+        return []
+    if len(texts) <= max_items:
+        return texts
+    return texts[:max_items]
+
+
+_IMPORTANT_TOKENS = (
+    "특가", "할인", "세일", "반값", "쿠폰", "무료배송",
+    "원산지", "제조", "브랜드", "유통기한", "보관",
+    "용량", "중량", "구성", "증정", "1+1", "2+1",
+    "원", "%", "kg", "g", "ml", "l", "개", "입", "팩", "박스"
+)
+
+
+def _is_important_text(text: str) -> bool:
+    for token in _IMPORTANT_TOKENS:
+        if token in text:
+            return True
+    # 숫자 + 단위/통화 패턴
+    import re
+    return bool(re.search(r"\d+\s*(원|%|kg|g|ml|l|개|입|팩|박스)", text.lower()))
+
+
+def _filter_texts_with_keyword_override(
+    texts: List[str],
+    scores: List[float],
+    min_score: float = 0.7,
+    min_length: int = 2,
+) -> List[tuple[str, float]]:
+    filtered: List[tuple[str, float]] = []
+    for text, score in zip(texts, scores):
+        if not isinstance(text, str):
+            continue
+        text = text.strip()
+        if not text:
+            continue
+        if len(text) < min_length:
+            continue
+        if not is_meaningful_text(text):
+            continue
+        if score < min_score and not _is_important_text(text):
+            continue
+        filtered.append((text, score))
+    return filtered
+
+
 def process_product_image(
     image_path: str,
     output_dir: str = "output",
@@ -99,8 +147,9 @@ def process_product_image(
     texts = extract_rec_texts_from_data(ocr_result)
     scores = ocr_result.get("rec_scores", [1.0] * len(texts))
     
-    filtered = filter_texts(texts, scores, min_score=0.7, min_length=2)
+    filtered = _filter_texts_with_keyword_override(texts, scores, min_score=0.7, min_length=2)
     filtered_texts = [text for text, score in filtered]
+    filtered_texts = _cap_texts(filtered_texts, max_items=200)
     step_time = time.time() - step_start
     
     if verbose:
@@ -188,8 +237,9 @@ def process_multiple_images(
     texts = extract_rec_texts_from_data(merged)
     scores = merged.get("rec_scores", [1.0] * len(texts))
     
-    filtered = filter_texts(texts, scores, min_score=0.7, min_length=2)
+    filtered = _filter_texts_with_keyword_override(texts, scores, min_score=0.7, min_length=2)
     filtered_texts = [text for text, score in filtered]
+    filtered_texts = _cap_texts(filtered_texts, max_items=200)
     step_time = time.time() - step_start
     
     if verbose:
