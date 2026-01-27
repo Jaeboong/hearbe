@@ -1,3 +1,4 @@
+# OCR 텍스트를 LLM으로 요약
 import argparse
 import json
 import os
@@ -15,6 +16,11 @@ from product_type_detector import (
     get_type_description,
     is_keyword_valid_for_type
 )
+
+try:
+    from .utils import compute_summary_hash, load_summary_cache, save_summary_cache
+except ImportError:
+    from utils import compute_summary_hash, load_summary_cache, save_summary_cache
 
 try:
     from dotenv import load_dotenv
@@ -52,13 +58,9 @@ def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]
     keywords = get_keywords_for_type(product_type)
     type_desc = get_type_description(product_type)
     
-    keyword_lines = []
-    for i, kw in enumerate(keywords):
-        if i == 0:
-            keyword_lines.append(f'    "{kw}": {{ "answer": "...", "evidence": ["..."], "status": "found|not_found" }}')
-        else:
-            keyword_lines.append(f'    "{kw}": {{...}}')
-    keyword_schema = ",\n".join(keyword_lines)
+    # 프롬프트 간소화: 첫 키워드만 전체 예시, 나머지는 생략
+    first_keyword = keywords[0] if keywords else "예시"
+    keyword_schema = f'    "{first_keyword}": {{ "answer": "...", "status": "found|not_found" }},\n    // 나머지 {len(keywords)-1}개 키워드도 동일 형식'
     
     system = (
         "당신은 시각장애인을 위해 한국어 OCR 텍스트를 요약하고 분석하는 어시스턴트입니다. "
@@ -94,7 +96,7 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
     if not api_key:
         raise RuntimeError("GMS_KEY 환경변수가 설정되지 않았습니다.")
 
-    model = os.environ.get("OPENAI_MODEL", "gpt-5-mini")
+    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"
 
     messages = [
@@ -164,7 +166,9 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
 def summarize_texts(
     texts: List[str],
     product_type: ProductType = None,
-    verbose: bool = True
+    verbose: bool = True,
+    use_cache: bool = True,
+    prompt_version: str = "v1",
 ) -> Dict:
     if not texts:
         return {
@@ -182,11 +186,27 @@ def summarize_texts(
             type_desc = get_type_description(product_type)
             print(f"    제품 타입 자동 감지: {type_desc} ({product_type.value})")
     
+    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    if use_cache:
+        summary_hash = compute_summary_hash(
+            texts=texts,
+            product_type=product_type.value,
+            model=model,
+            prompt_version=prompt_version,
+        )
+        cached = load_summary_cache(summary_hash)
+        if cached:
+            if verbose:
+                print("    LLM summary cache hit")
+            return cached
+
     prompt = _build_prompt(texts, product_type)
     
     if verbose:
         print("    LLM API 호출 중...", end="", flush=True)
     summary = _call_openai(prompt)
+    if use_cache:
+        save_summary_cache(summary_hash, summary)
     if verbose:
         print(" 완료!")
     

@@ -1,5 +1,6 @@
+# 상품 유형 분류 및 키워드 정의
 from enum import Enum
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 
 class ProductType(str, Enum):
@@ -163,7 +164,7 @@ TYPE_DETECTION_KEYWORDS: Dict[ProductType, List[str]] = {
         "칩", "크래커", "웨하스", "파이", "캔디"
     ],
     ProductType.음료: [
-        "음료", "주스", "커피", "차", "탄산", "물", "우유", "두유", "소주", "맥주", "와인", "주류",
+        "음료", "주스", "커피", "차", "탄산", "물", "두유", "소주", "맥주", "와인", "주류",
         "이온음료", "에너지드링크", "음료수", "드링크"
     ],
     ProductType.즉석식품: [
@@ -360,3 +361,64 @@ def get_type_description(product_type: ProductType) -> str:
 def is_keyword_valid_for_type(product_type: ProductType, keyword: str) -> bool:
     valid_keywords = get_keywords_for_type(product_type)
     return keyword in valid_keywords
+
+
+# 타입 오버라이드 규칙
+_TYPE_OVERRIDE_RULES = {
+    "electronics": {
+        "strong": ("HDMI", "IPS", "FHD"),
+        "weak": ("Hz", "인치", "모니터", "디스플레이"),
+    },
+    "fresh_food": {
+        "strong": ("유통기한", "보관", "냉장", "냉동"),
+        "weak": ("산지", "제철"),
+    },
+}
+
+
+def _find_type_by_description(fragment: str) -> ProductType:
+    """설명에 특정 문자열이 포함된 ProductType 찾기"""
+    for pt in ProductType:
+        if fragment in get_type_description(pt):
+            return pt
+    return None
+
+
+def override_product_type(
+    texts: List[str],
+    current_type: ProductType
+) -> ProductType:
+    """OCR 텍스트 기반으로 제품 타입 오버라이드"""
+    joined = " ".join(texts)
+    scores = {}
+    strong_hits = {}
+
+    for key, rules in _TYPE_OVERRIDE_RULES.items():
+        strong = rules["strong"]
+        weak = rules["weak"]
+        s_hits = sum(1 for token in strong if token in joined)
+        w_hits = sum(1 for token in weak if token in joined)
+        strong_hits[key] = s_hits
+        scores[key] = s_hits * 3 + w_hits
+
+    # strong 키워드 2개 이상 매칭 시 타입 오버라이드
+    if strong_hits["electronics"] >= 2:
+        pt = _find_type_by_description("전자")
+        if pt:
+            return pt
+    if strong_hits["fresh_food"] >= 2:
+        pt = _find_type_by_description("신선")
+        if pt:
+            return pt
+
+    # 점수 차이가 충분히 클 때 오버라이드
+    if scores["electronics"] - scores["fresh_food"] >= 2 and scores["electronics"] >= 4:
+        pt = _find_type_by_description("전자")
+        if pt:
+            return pt
+    if scores["fresh_food"] - scores["electronics"] >= 2 and scores["fresh_food"] >= 4:
+        pt = _find_type_by_description("신선")
+        if pt:
+            return pt
+
+    return current_type

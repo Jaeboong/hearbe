@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# 상품 페이지 이미지 URL 수집·다운로드
 import os
 import re
 import hashlib

@@ -1,6 +1,11 @@
-# -*- coding: utf-8 -*-
+# PaddleOCR 기반 한글 OCR 실행
 from paddleocr import PaddleOCR
 from typing import List, Dict, Any, Optional
+
+try:
+    from .utils import get_image_size
+except ImportError:
+    from utils import get_image_size
 
 DEFAULT_MODEL_NAME = "korean_PP-OCRv5_mobile_rec"
 DEFAULT_DEVICE = "gpu:0"
@@ -56,12 +61,6 @@ def extract_texts_with_scores(ocr_result: List[Any]) -> List[Dict[str, Any]]:
 
 
 DEFAULT_MAX_HEIGHT = 2500
-
-
-def get_image_size(image_path: str) -> tuple:
-    from PIL import Image
-    with Image.open(image_path) as img:
-        return img.size
 
 
 def process_image(
