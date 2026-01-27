@@ -91,7 +91,7 @@ body {
 }
 
 .signup-box {
-    width: clamp(280px, 90vw, 600px);
+    width: clamp(300px, 95vw, 750px);
     padding: clamp(8px, 2vw, 16px);
     display: flex;
     flex-direction: column;
@@ -226,47 +226,47 @@ body {
 
 /* 등록 완료 후 카드 정보 표시 박스 */
 .card-info-display {
-    padding: 3vw;
+    padding: clamp(16px, 3vw, 30px);
     display: flex;
     flex-direction: column;
-    gap: 2vw;
-    border: 0.4vw solid var(--accent-yellow);
-    border-radius: 2vw;
-    margin: 0 1.5vw 1.5vw 1.5vw;
+    gap: clamp(10px, 2vw, 20px);
+    border: clamp(2px, 0.4vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
+    margin: 0 clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px);
 }
 
 .info-row {
     display: flex;
     flex-direction: column;
-    gap: 0.5vw;
+    gap: clamp(4px, 0.5vw, 8px);
 }
 
 .info-row-flex {
     display: flex;
-    gap: 3vw;
+    gap: clamp(16px, 3vw, 32px);
 }
 
 .info-col {
     display: flex;
     flex-direction: column;
-    gap: 0.5vw;
+    gap: clamp(4px, 0.5vw, 8px);
     flex: 1;
 }
 
 .info-label-main {
-    font-size: 3vw;
+    font-size: clamp(14px, 3vw, 24px);
     color: var(--accent-yellow);
     font-weight: bold;
     opacity: 0.8;
 }
 
 .info-val-main {
-    font-size: 4vw;
+    font-size: clamp(20px, 4vw, 36px);
     color: var(--accent-yellow);
     font-weight: 900;
-    padding-left: 1vw;
-    border-bottom: 0.2vw solid var(--accent-yellow);
-    padding-bottom: 1vw;
+    padding-left: clamp(4px, 1vw, 8px);
+    border-bottom: clamp(1px, 0.2vw, 2px) solid var(--accent-yellow);
+    padding-bottom: clamp(4px, 1vw, 8px);
 }
 
 /* =========================================
@@ -498,14 +498,17 @@ body:has(.modal-overlay) .global-back-button {
    ========================================= */
 .card-form-box {
     width: 100%;
-    border: 0.6vw solid var(--accent-yellow);
-    border-radius: 2vw;
-    padding: 3vw;
+    border: clamp(3px, 0.6vw, 6px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 20px);
+    padding: clamp(16px, 3vw, 30px);
     background-color: transparent;
     display: flex;
     flex-direction: column;
-    gap: 2vw;
+    gap: clamp(10px, 2vw, 20px);
     box-sizing: border-box;
+    max-width: 600px;
+    /* Safety cap */
+    margin: 0 auto;
 }
 
 .card-form-header {
@@ -521,35 +524,35 @@ body:has(.modal-overlay) .global-back-button {
 }
 
 .small-card-icon {
-    width: 5vw;
+    width: clamp(24px, 5vw, 50px);
     height: auto;
 }
 
 .form-field-group {
     display: flex;
     flex-direction: column;
-    gap: 1vw;
+    gap: clamp(4px, 1vw, 10px);
     width: 100%;
 }
 
 .form-field-group label {
-    font-size: 3vw;
+    font-size: clamp(14px, 3vw, 24px);
     font-weight: bold;
     color: var(--accent-yellow);
-    margin-left: 0.5vw;
+    margin-left: clamp(2px, 0.5vw, 5px);
 }
 
 .modal-input {
-    border: 0.4vw solid var(--accent-yellow);
-    border-radius: 1.5vw;
-    padding: 1.5vw;
-    font-size: 3.5vw;
+    border: clamp(2px, 0.4vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(6px, 1.5vw, 15px);
+    padding: clamp(8px, 1.5vw, 16px);
+    font-size: clamp(16px, 3.5vw, 28px);
     box-sizing: border-box;
 }
 
 .form-row-group {
     display: flex;
-    gap: 2vw;
+    gap: clamp(10px, 2vw, 20px);
     width: 100%;
 }
 

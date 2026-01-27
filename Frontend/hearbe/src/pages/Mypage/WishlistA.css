@@ -1,6 +1,6 @@
-/* Cart Page Styles */
+/* Wishlist Page Styles */
 
-.cart-container {
+.wishlist-container {
     min-height: 100vh;
     background-color: #1E2A3A;
     padding: clamp(20px, 5vw, 40px);
@@ -9,17 +9,17 @@
 }
 
 /* Back Button Override */
-.cart-container .global-back-button.arrow-only {
+.wishlist-container .global-back-button.arrow-only {
     left: clamp(20px, 5vw, 40px);
     top: clamp(20px, 5vw, 40px);
 }
 
-.cart-container .global-back-button.arrow-only .back-arrow-svg {
+.wishlist-container .global-back-button.arrow-only .back-arrow-svg {
     width: clamp(40px, 10vw, 80px);
     height: clamp(40px, 10vw, 80px);
 }
 
-.cart-content {
+.wishlist-content {
     display: flex;
     gap: clamp(30px, 5vw, 60px);
     max-width: 1400px;
@@ -28,7 +28,7 @@
 }
 
 /* Sidebar */
-.cart-sidebar {
+.wishlist-sidebar {
     flex: 0 0 clamp(200px, 25vw, 300px);
 }
 
@@ -66,7 +66,7 @@
 }
 
 /* Main Content */
-.cart-main {
+.wishlist-main {
     flex: 1;
 }
 
@@ -79,151 +79,122 @@
 }
 
 /* Mall Section */
-.cart-mall-section {
+.mall-section {
     margin-bottom: clamp(30px, 5vw, 50px);
 }
 
-.cart-mall-header {
+.mall-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
-    background-color: #1E2A3A;
-    border: clamp(2px, 0.4vw, 4px) solid #4A6FA5;
+    background-color: #4A6FA5;
     border-radius: clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px) 0 0;
-    border-bottom: none;
+    margin-bottom: clamp(2px, 0.4vw, 4px);
 }
 
-.cart-mall-name {
+.mall-name {
     font-size: clamp(20px, 3.5vw, 32px);
     font-weight: 900;
-    color: #4A6FA5;
+    color: #FFFFFF;
     margin: 0;
     font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
 }
 
-/* Items List */
-.cart-items-list {
-    display: flex;
-    flex-direction: column;
-}
-
-.cart-item {
-    display: flex;
-    align-items: center;
-    gap: clamp(16px, 3vw, 24px);
-    padding: clamp(16px, 3vw, 24px);
-    background-color: #FFFFFF;
-    border-bottom: clamp(1px, 0.2vw, 2px) solid #E0E0E0;
-}
-
-.cart-item:first-child {
-    border-top: clamp(2px, 0.4vw, 4px) solid #4A6FA5;
-}
-
-.cart-item-image {
-    width: clamp(60px, 12vw, 80px);
-    height: clamp(60px, 12vw, 80px);
-    object-fit: cover;
-    border-radius: clamp(6px, 1.5vw, 10px);
-    flex-shrink: 0;
-}
-
-.cart-item-details {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: clamp(6px, 1.5vw, 10px);
-}
-
-.cart-item-name {
-    font-size: clamp(16px, 3vw, 22px);
+.delete-all-btn {
+    padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
+    background-color: #FFF064;
     color: #1E2A3A;
-    font-weight: bold;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-}
-
-.cart-item-price {
-    font-size: clamp(16px, 3vw, 22px);
-    color: #1E2A3A;
-    font-weight: 900;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-}
-
-/* Item Controls */
-.cart-item-controls {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(10px, 2vw, 16px);
-    align-items: flex-end;
-    flex-shrink: 0;
-}
-
-.quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: clamp(8px, 1.5vw, 12px);
-}
-
-.quantity-btn {
-    width: clamp(28px, 6vw, 36px);
-    height: clamp(28px, 6vw, 36px);
-    border: clamp(1px, 0.2vw, 2px) solid #CCCCCC;
-    background-color: #F5F5F5;
-    color: #1E2A3A;
-    font-size: clamp(16px, 3.5vw, 24px);
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: clamp(4px, 1vw, 6px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-    transition: background-color 0.2s;
-}
-
-.quantity-btn:hover {
-    background-color: #E0E0E0;
-}
-
-.quantity-value {
-    min-width: clamp(30px, 6vw, 40px);
-    text-align: center;
-    font-size: clamp(16px, 3vw, 22px);
-    font-weight: bold;
-    color: #1E2A3A;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-}
-
-.cart-delete-btn {
-    padding: clamp(6px, 1.5vw, 10px) clamp(12px, 2.5vw, 16px);
-    background-color: #9C2121;
-    color: #F5F5F5;
     border: none;
-    border-radius: clamp(4px, 1vw, 6px);
-    font-size: clamp(14px, 2.5vw, 18px);
+    border-radius: clamp(6px, 1.5vw, 10px);
+    font-size: clamp(14px, 2.5vw, 20px);
     font-weight: 900;
     cursor: pointer;
     font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
 }
 
-.cart-delete-btn:hover {
+.delete-all-btn:hover {
     opacity: 0.9;
 }
 
-/* Mall Footer */
-.cart-mall-footer {
-    padding: clamp(16px, 3vw, 24px);
-    background-color: #FFFFFF;
+/* Items List */
+.items-list {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: clamp(2px, 0.4vw, 4px);
 }
 
-.checkout-btn {
-    padding: clamp(12px, 2.5vw, 18px) clamp(24px, 4vw, 36px);
-    background-color: #FFF064;
+.wishlist-item {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 3vw, 24px);
+    padding: clamp(16px, 3vw, 24px);
+    background-color: #FFFFFF;
+    border-radius: clamp(4px, 1vw, 8px);
+}
+
+.item-checkbox {
+    flex-shrink: 0;
+}
+
+.item-checkbox input[type="checkbox"] {
+    width: clamp(18px, 4vw, 24px);
+    height: clamp(18px, 4vw, 24px);
+    cursor: pointer;
+}
+
+.item-image {
+    width: clamp(80px, 15vw, 120px);
+    height: clamp(80px, 15vw, 120px);
+    object-fit: cover;
+    border-radius: clamp(6px, 1.5vw, 10px);
+    flex-shrink: 0;
+}
+
+.item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.5vw, 10px);
+}
+
+.item-date {
+    font-size: clamp(12px, 2vw, 16px);
+    color: #666666;
+    font-weight: bold;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.item-name {
+    font-size: clamp(16px, 3vw, 22px);
     color: #1E2A3A;
+    font-weight: bold;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    line-height: 1.4;
+}
+
+.item-price {
+    font-size: clamp(18px, 3.5vw, 26px);
+    color: #1E2A3A;
+    font-weight: 900;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Item Actions */
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 12px);
+    flex-shrink: 0;
+}
+
+.add-cart-btn,
+.delete-btn {
+    padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
     border: none;
     border-radius: clamp(6px, 1.5vw, 10px);
-    font-size: clamp(16px, 3vw, 24px);
+    font-size: clamp(14px, 2.5vw, 20px);
     font-weight: 900;
     cursor: pointer;
     font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
@@ -231,12 +202,23 @@
     white-space: nowrap;
 }
 
-.checkout-btn:hover {
+.add-cart-btn {
+    background-color: #FFF064;
+    color: #1E2A3A;
+}
+
+.delete-btn {
+    background-color: #9C2121;
+    color: #F5F5F5;
+}
+
+.add-cart-btn:hover,
+.delete-btn:hover {
     opacity: 0.9;
 }
 
 /* Empty State */
-.empty-cart {
+.empty-wishlist {
     text-align: center;
     padding: clamp(60px, 10vw, 100px);
     font-size: clamp(20px, 4vw, 32px);
@@ -247,30 +229,35 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .cart-content {
+    .wishlist-content {
         flex-direction: column;
     }
 
-    .cart-sidebar {
+    .wishlist-sidebar {
         flex: none;
     }
 
-    .cart-item {
+    .wishlist-item {
         flex-wrap: wrap;
     }
 
-    .cart-item-controls {
+    .item-actions {
         flex-direction: row;
         width: 100%;
-        justify-content: space-between;
-        align-items: center;
     }
 
-    .cart-mall-footer {
-        justify-content: stretch;
+    .add-cart-btn,
+    .delete-btn {
+        flex: 1;
     }
 
-    .checkout-btn {
+    .mall-header {
+        flex-direction: column;
+        gap: clamp(10px, 2vw, 16px);
+        align-items: stretch;
+    }
+
+    .delete-all-btn {
         width: 100%;
     }
 }

@@ -102,7 +102,7 @@
     /* Increased gap */
     padding: clamp(16px, 4vw, 30px) 0;
     cursor: pointer;
-    /* border-bottom: 2px solid rgba(255, 240, 100, 0.3); */
+    border-bottom: 2px solid rgba(255, 240, 100, 0.3);
     /* Underline added */
 }
 

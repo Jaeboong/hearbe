@@ -1,0 +1,369 @@
+/* Card Management Page Styles */
+
+.cardmgmt-container {
+    min-height: 100vh;
+    background-color: #1E2A3A;
+    padding: clamp(20px, 5vw, 40px);
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Back Button Override */
+.cardmgmt-container .global-back-button.arrow-only {
+    left: clamp(20px, 5vw, 40px);
+    top: clamp(20px, 5vw, 40px);
+}
+
+.cardmgmt-container .global-back-button.arrow-only .back-arrow-svg {
+    width: clamp(40px, 10vw, 80px);
+    height: clamp(40px, 10vw, 80px);
+}
+
+.cardmgmt-content {
+    display: flex;
+    gap: clamp(30px, 5vw, 60px);
+    max-width: 1400px;
+    margin: clamp(80px, 15vw, 120px) auto 0;
+    padding: 0 clamp(20px, 3vw, 40px);
+}
+
+/* Sidebar */
+.cardmgmt-sidebar {
+    flex: 0 0 clamp(200px, 25vw, 300px);
+}
+
+.sidebar-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    color: #FFF064;
+    margin-bottom: clamp(30px, 5vw, 50px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2vw, 16px);
+}
+
+.sidebar-item {
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: bold;
+    color: #FFF064;
+    padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
+    border-radius: clamp(8px, 2vw, 12px);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 240, 100, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: #141C29;
+}
+
+/* Main Content */
+.cardmgmt-main {
+    flex: 1;
+}
+
+.content-title {
+    font-size: clamp(28px, 4.5vw, 42px);
+    font-weight: 900;
+    color: #FFF064;
+    margin-bottom: clamp(30px, 5vw, 50px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Current Card Display */
+.current-card-display {
+    padding: clamp(20px, 4vw, 40px);
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border-radius: clamp(12px, 2vw, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 3vw, 24px);
+    margin-bottom: clamp(30px, 5vw, 50px);
+}
+
+.card-info-row {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 12px);
+}
+
+.card-info-row-flex {
+    display: flex;
+    gap: clamp(20px, 4vw, 40px);
+}
+
+.card-info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 12px);
+}
+
+.card-label {
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: bold;
+    color: #FFF064;
+    opacity: 0.8;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.card-value {
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: 900;
+    color: #FFF064;
+    padding-left: clamp(8px, 1.5vw, 12px);
+    border-bottom: clamp(1px, 0.2vw, 2px) solid #FFF064;
+    padding-bottom: clamp(8px, 1.5vw, 12px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Change Button */
+.change-card-btn {
+    width: 100%;
+    padding: clamp(16px, 3vw, 24px);
+    background-color: #FFF064;
+    color: #1E2A3A;
+    border: none;
+    border-radius: clamp(8px, 2vw, 12px);
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: opacity 0.2s;
+}
+
+.change-card-btn:hover {
+    opacity: 0.9;
+}
+
+/* Modal Overlay */
+.card-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1E2A3A;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(20px, 4vw, 40px);
+}
+
+.card-modal-box {
+    width: clamp(400px, 90vw, 800px);
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: #1E2A3A;
+    border: clamp(3px, 0.6vw, 6px) solid #FFF064;
+    border-radius: clamp(16px, 3vw, 24px);
+    padding: clamp(30px, 5vw, 50px);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(20px, 4vw, 30px);
+}
+
+.card-modal-close {
+    position: absolute;
+    top: clamp(15px, 3vw, 25px);
+    right: clamp(15px, 3vw, 25px);
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 900;
+    color: #FFF064;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+}
+
+.card-modal-title {
+    font-size: clamp(32px, 7vw, 48px);
+    font-weight: 900;
+    color: #FFF064;
+    text-align: center;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.card-modal-desc {
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: bold;
+    color: #FFF064;
+    text-align: center;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Camera Area */
+.card-camera-area {
+    width: 100%;
+    max-width: 600px;
+    height: 40vh;
+    border: clamp(3px, 0.6vw, 6px) solid #FFF064;
+    border-radius: clamp(12px, 2vw, 16px);
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-video-stream {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-camera-text {
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: bold;
+    color: #FFF064;
+    margin-bottom: clamp(10px, 2vw, 20px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.card-camera-icon {
+    width: clamp(60px, 15vw, 100px);
+    height: auto;
+}
+
+/* Shutter Button */
+.card-shutter-button {
+    width: clamp(60px, 15vw, 90px);
+    height: clamp(60px, 15vw, 90px);
+    border-radius: 50%;
+    border: clamp(3px, 0.6vw, 6px) solid #FFF064;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-top: clamp(20px, 4vw, 30px);
+}
+
+.card-shutter-inner {
+    width: clamp(45px, 12vw, 70px);
+    height: clamp(45px, 12vw, 70px);
+    border-radius: 50%;
+    background-color: #FFF064;
+    transition: transform 0.1s;
+}
+
+.card-shutter-button:active .card-shutter-inner {
+    transform: scale(0.9);
+}
+
+/* Form Content */
+.card-form-content {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 3vw, 24px);
+}
+
+.card-form-header-area {
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 2vw, 16px);
+    justify-content: center;
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 900;
+    color: #FFF064;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.small-card-icon {
+    width: clamp(30px, 6vw, 50px);
+    height: auto;
+}
+
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 12px);
+}
+
+.form-field-group label {
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: bold;
+    color: #FFF064;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.card-modal-input {
+    padding: clamp(12px, 2.5vw, 18px);
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border-radius: clamp(8px, 2vw, 12px);
+    background-color: #1E2A3A;
+    color: #FFF064;
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: bold;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    outline: none;
+}
+
+.form-row-group {
+    display: flex;
+    gap: clamp(16px, 3vw, 24px);
+}
+
+.form-field-group.half {
+    flex: 1;
+}
+
+.card-button-group {
+    display: flex;
+    gap: clamp(16px, 3vw, 24px);
+    margin-top: clamp(10px, 2vw, 20px);
+}
+
+.card-retake-btn,
+.card-register-btn {
+    flex: 1;
+    padding: clamp(14px, 3vw, 20px);
+    border-radius: clamp(8px, 2vw, 12px);
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.card-retake-btn {
+    background-color: transparent;
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    color: #FFF064;
+}
+
+.card-register-btn {
+    background-color: #FFF064;
+    color: #1E2A3A;
+}
+
+.card-retake-btn:hover,
+.card-register-btn:hover {
+    opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cardmgmt-content {
+        flex-direction: column;
+    }
+
+    .cardmgmt-sidebar {
+        flex: none;
+    }
+}

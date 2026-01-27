@@ -250,7 +250,11 @@ const SignUp = () => {
         }
 
         // 4. 휴대전화번호 검증 (11자리)
-        const phoneNumbers = formData.phone.replace(/[^\\d]/g, '');
+        const phoneNumbers = formData.phone.replace(/[^0-9]/g, '');
+        console.log("Debug Phone:", formData.phone);
+        console.log("Debug Stripped:", phoneNumbers);
+        console.log("Debug Length:", phoneNumbers.length);
+
         if (phoneNumbers.length !== 11) {
             setErrorMessage("휴대전화번호는 11자리 숫자여야 합니다.");
             setShowError(true);
@@ -364,7 +368,7 @@ const SignUp = () => {
                             className="signup-input"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            maxLength={11}
+                            maxLength={13}
                         />
                     </div>
                 </div>
