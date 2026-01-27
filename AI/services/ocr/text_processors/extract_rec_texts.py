@@ -7,12 +7,16 @@ DEFAULT_INPUT = os.path.join("output", "초코파이_detail_res.json")
 DEFAULT_OUTPUT = os.path.join("output", "초코파이_detail_res_texts.json")
 
 
+def extract_rec_texts_from_data(data: dict) -> list:
+    rec_texts = data.get("rec_texts", [])
+    return [text for text in rec_texts if text.strip()]
+
+
 def extract_rec_texts(input_path: str, output_path: str = None) -> list:
     with open(input_path, "r", encoding="utf-8") as f:
         data = json.load(f)
     
-    rec_texts = data.get("rec_texts", [])
-    rec_texts = [text for text in rec_texts if text.strip()]
+    rec_texts = extract_rec_texts_from_data(data)
     
     if output_path is None:
         input_file = Path(input_path)
