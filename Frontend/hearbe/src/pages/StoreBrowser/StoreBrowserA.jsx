@@ -5,7 +5,7 @@ import iconUser from '../../assets/icon-user.png';
 import iconCart from '../../assets/icon-cart.png'; // Updated
 import iconShare from '../../assets/icon-share.png'; // New Share Icon
 import iconCard from '../../assets/icon-cart.png';
-import hLogoOrigin from '../../assets/h-logo-origin.jpg'; // Using the origin logo
+import logo from '../../assets/logoA.png';
 
 import BackButton from '../common/BackButtonA';
 
@@ -84,7 +84,7 @@ const StoreBrowser = () => {
                     <div className="sharing-header">
                         <div className="sharing-pill">화면 공유 중 (코드: {inviteCode})</div>
                         <div className="participant-pill">
-                            <img src={hLogoOrigin} alt="User" className="p-icon" />
+                            <img src={logo} alt="User" className="p-icon" />
                             <span>참가자 (1명)</span>
                         </div>
                     </div>

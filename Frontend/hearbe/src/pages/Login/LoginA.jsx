@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import hLogo from '../../assets/h-logo.png';
+import logo from '../../assets/logoA.png';
 import { findUser } from '../../utils/userStorage';
 import './LoginA.css';
 
@@ -29,7 +29,7 @@ const Login = () => {
             <div className="login-box">
                 {/* Logo Section */}
                 <div className="logo-area">
-                    <img src={hLogo} alt="Logo" className="logo-image" />
+                    <img src={logo} alt="Logo" className="logo-image" />
                 </div>
 
                 {/* Input Section */}

@@ -71,43 +71,43 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    letter-spacing: 0.2vw;
+    letter-spacing: clamp(1px, 0.2vw, 2px);
     width: 100%;
     background-color: #141C29;
-    padding-bottom: 5vw;
+    padding-bottom: clamp(20px, 5vw, 40px);
     /* Scroll buffer */
 }
 
 /* Back Button Component Override */
 .signup-container .global-back-button.arrow-only {
-    left: 4vw;
-    top: 4vw;
+    left: clamp(12px, 4vw, 32px);
+    top: clamp(12px, 4vw, 32px);
     transform: none;
 }
 
 .signup-container .global-back-button.arrow-only .back-arrow-svg {
-    width: 8vw;
-    height: 8vw;
+    width: clamp(48px, 16vw, 96px);
+    height: clamp(48px, 16vw, 96px);
 }
 
 .signup-box {
-    width: 90vw;
-    padding: 2vw;
+    width: clamp(280px, 90vw, 600px);
+    padding: clamp(8px, 2vw, 16px);
     display: flex;
     flex-direction: column;
-    gap: 3vw;
+    gap: clamp(12px, 3vw, 24px);
     box-sizing: border-box;
-    margin-top: 5vw;
+    margin-top: clamp(20px, 5vw, 40px);
 }
 
 .signup-logo-area {
     display: flex;
     justify-content: center;
-    margin-bottom: 2vw;
+    margin-bottom: clamp(8px, 2vw, 16px);
 }
 
 .signup-logo-image {
-    width: 30vw;
+    width: clamp(210px, 52.5vw, 420px);
     height: auto;
     object-fit: contain;
 }
@@ -115,9 +115,9 @@ body {
 /* 뒤로가기 화살표 (fallback if not using component) */
 .back-arrow {
     position: absolute;
-    top: 3vw;
-    left: 3vw;
-    font-size: 8vw;
+    top: clamp(12px, 3vw, 24px);
+    left: clamp(12px, 3vw, 24px);
+    font-size: clamp(24px, 8vw, 48px);
     color: var(--accent-yellow);
     cursor: pointer;
     font-weight: bold;
@@ -127,8 +127,8 @@ body {
    4. 입력 폼 (Input) 스타일
    ========================================= */
 .form-group-outline {
-    border: 0.5vw solid var(--accent-yellow);
-    border-radius: 2vw;
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
     background-color: var(--bg-dark);
     overflow: hidden;
     display: flex;
@@ -138,32 +138,32 @@ body {
 .input-row {
     display: flex;
     align-items: center;
-    padding: 2vw;
+    padding: clamp(8px, 2vw, 16px);
     font-weight: bold;
-    font-size: 4vw;
+    font-size: clamp(14px, 4vw, 24px);
 }
 
 .border-bottom {
-    border-bottom: 0.5vw solid var(--accent-yellow);
+    border-bottom: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
 }
 
 .header-row {
-    padding-left: 2vw;
-    gap: 2vw;
+    padding-left: clamp(8px, 2vw, 16px);
+    gap: clamp(8px, 2vw, 16px);
 }
 
 .input-icon {
-    width: 8vw;
-    height: 8vw;
+    width: clamp(24px, 8vw, 48px);
+    height: clamp(24px, 8vw, 48px);
     object-fit: contain;
 }
 
 .signup-input {
     flex: 1;
     border: none;
-    padding: 1vw;
-    font-size: 5vw;
-    letter-spacing: 0.2vw;
+    padding: clamp(4px, 1vw, 8px);
+    font-size: clamp(16px, 5vw, 28px);
+    letter-spacing: clamp(1px, 0.2vw, 2px);
     height: auto;
     min-width: 0;
 }
@@ -175,20 +175,20 @@ body {
 
 /* 중복확인 버튼 */
 .check-btn {
-    padding: 1.5vw 3vw;
-    border-radius: 1.5vw;
-    font-size: 4vw;
+    padding: clamp(6px, 1.5vw, 12px) clamp(12px, 3vw, 24px);
+    border-radius: clamp(6px, 1.5vw, 12px);
+    font-size: clamp(14px, 4vw, 24px);
     white-space: nowrap;
     flex-shrink: 0;
-    letter-spacing: 0.1vw;
-    margin-left: 2vw;
+    letter-spacing: clamp(0.5px, 0.1vw, 1px);
+    margin-left: clamp(8px, 2vw, 16px);
 }
 
 /* 라벨 텍스트 */
 .label {
     flex-grow: 1;
-    font-size: 6vw;
-    letter-spacing: 0.2vw;
+    font-size: clamp(18px, 6vw, 36px);
+    letter-spacing: clamp(1px, 0.2vw, 2px);
 }
 
 /* =========================================
@@ -200,27 +200,27 @@ body {
 
 /* 메인 화면의 카메라 실행 버튼 영역 */
 .camera-area {
-    border: 0.6vw solid var(--accent-yellow);
-    border-radius: 2vw;
+    border: clamp(2px, 0.6vw, 5px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2vw;
-    margin: 0 1.5vw 1.5vw 1.5vw;
+    gap: clamp(8px, 2vw, 16px);
+    margin: 0 clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px);
     background-color: transparent;
-    padding: 4vw;
-    min-height: 25vw;
+    padding: clamp(12px, 4vw, 32px);
+    min-height: clamp(80px, 25vw, 200px);
 }
 
 .camera-text {
     font-weight: bold;
-    font-size: 5vw;
-    letter-spacing: 0.2vw;
+    font-size: clamp(16px, 5vw, 28px);
+    letter-spacing: clamp(1px, 0.2vw, 2px);
 }
 
 .camera-icon-img {
-    width: 20vw;
+    width: clamp(60px, 20vw, 140px);
     height: auto;
 }
 
@@ -273,33 +273,41 @@ body {
    6. 약관 동의 (Terms) 섹션
    ========================================= */
 .terms-section {
-    padding: 3vw;
-    gap: 2vw;
-    align-items: flex-start;
+    padding: clamp(8px, 2vw, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2vw, 16px);
 }
 
 .term-row {
     display: flex;
-    align-items: center;
-    gap: 2vw;
+    align-items: flex-start;
+    gap: clamp(8px, 2vw, 16px);
     cursor: pointer;
     width: 100%;
 }
 
+.term-row:first-child {
+    align-items: center;
+}
+
 .check-circle {
-    width: 5vw;
-    height: 5vw;
-    border: 0.5vw solid var(--accent-yellow);
+    width: clamp(18px, 6vw, 36px);
+    height: clamp(18px, 6vw, 36px);
+    min-width: clamp(18px, 6vw, 36px);
+    min-height: clamp(18px, 6vw, 36px);
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3.5vw;
+    font-size: clamp(12px, 4vw, 24px);
     font-weight: 900;
     color: var(--bg-dark);
     background-color: transparent;
     transition: background-color 0.2s;
-    -webkit-text-stroke: 0.1vw var(--bg-dark);
+    -webkit-text-stroke: clamp(1px, 0.3vw, 3px) var(--bg-dark);
+    flex-shrink: 0;
 }
 
 .check-circle.checked {
@@ -307,21 +315,23 @@ body {
 }
 
 .term-text {
-    font-size: 4vw;
+    font-size: clamp(18px, 5.5vw, 32px);
     font-weight: bold;
 }
 
 .bold {
     font-weight: 900;
+    font-size: clamp(20px, 6.5vw, 38px);
 }
 
 /* 회원가입 제출 버튼 */
 .signup-submit-btn {
-    font-size: 6vw;
-    padding: 3vw;
-    border-radius: 2vw;
-    margin-top: 2vw;
+    font-size: clamp(20px, 7vw, 42px);
+    padding: clamp(12px, 3vw, 24px);
+    border-radius: clamp(8px, 2vw, 16px);
+    margin-top: clamp(8px, 2vw, 16px);
     width: 100%;
+    min-height: 44px;
 }
 
 /* =========================================
@@ -333,13 +343,19 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(20, 28, 41, 0.95);
+    background-color: #1E2A3A;
     z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2vw;
+    padding: clamp(8px, 2vw, 16px);
     backdrop-filter: blur(5px);
+}
+
+/* 모달이 열렸을 때 뒤로가기 버튼 숨기기 */
+.modal-overlay~.signup-container .global-back-button,
+body:has(.modal-overlay) .global-back-button {
+    display: none;
 }
 
 .modal-content {
@@ -363,19 +379,19 @@ body {
 
 /* 팝업 박스 본체 */
 .modal-box {
-    width: 90vw;
-    max-width: 90vw;
-    max-height: 90vh;
+    width: clamp(300px, 98vw, 900px);
+    max-width: 98vw;
+    max-height: 92vh;
     overflow-y: auto;
-    border: 0.5vw solid var(--accent-yellow);
-    border-radius: 2vw;
-    padding: 4vw;
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
+    padding: clamp(12px, 4vw, 32px) clamp(16px, 5vw, 40px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2vw;
+    gap: clamp(8px, 2vw, 16px);
     box-sizing: border-box;
-    background-color: var(--bg-dark);
+    background-color: #141C29;
     position: relative;
 }
 
@@ -383,9 +399,9 @@ body {
 .modal-close-x,
 .modal-close-btn {
     position: absolute;
-    top: 2vw;
-    right: 2vw;
-    font-size: 8vw;
+    top: clamp(8px, 2.5vw, 20px);
+    right: clamp(8px, 2.5vw, 20px);
+    font-size: clamp(32px, 12vw, 64px);
     font-weight: 1000;
     color: var(--accent-yellow);
     cursor: pointer;
@@ -399,34 +415,35 @@ body {
 }
 
 .modal-title {
-    font-size: 7vw;
+    font-size: clamp(36px, 11vw, 64px);
     font-weight: 900;
     color: var(--accent-yellow);
-    letter-spacing: 0.2vw;
+    letter-spacing: clamp(1px, 0.2vw, 2px);
     text-align: center;
 }
 
 .modal-desc {
-    font-size: 4vw;
+    font-size: clamp(16px, 5vw, 28px);
     font-weight: 900;
     color: var(--accent-yellow);
-    margin-bottom: 2vw;
+    margin-bottom: clamp(8px, 2vw, 16px);
     text-align: center;
-    letter-spacing: 0.2vw;
+    letter-spacing: clamp(1px, 0.2vw, 2px);
 }
 
 /* 모달 내 카메라 영역 */
 .modal-camera-area {
-    width: 100%;
-    border: 0.4vw solid var(--accent-yellow);
-    border-radius: 2vw;
+    width: 85%;
+    max-width: 600px;
+    border: clamp(2px, 0.4vw, 3px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #000;
-    height: 60vh;
+    height: 40vh;
     position: relative;
     overflow: hidden;
 }
@@ -451,25 +468,22 @@ body {
 
 /* 셔터 버튼 */
 .shutter-button {
-    width: 8vw;
-    height: 8vw;
+    width: clamp(40px, 12vw, 80px);
+    height: clamp(40px, 12vw, 80px);
     border-radius: 50%;
     background-color: transparent;
-    border: 0.5vw solid var(--accent-yellow);
-    position: absolute;
-    bottom: 3vw;
-    left: 50%;
-    transform: translateX(-50%);
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    position: relative;
     cursor: pointer;
-    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: clamp(12px, 3vw, 24px);
 }
 
 .shutter-inner {
-    width: 6vw;
-    height: 6vw;
+    width: clamp(28px, 9vw, 60px);
+    height: clamp(28px, 9vw, 60px);
     border-radius: 50%;
     background-color: var(--accent-yellow);
     transition: transform 0.1s;
@@ -497,12 +511,13 @@ body {
 .card-form-header {
     display: flex;
     align-items: center;
-    gap: 1.5vw;
-    font-size: 4vw;
+    gap: clamp(6px, 1.5vw, 12px);
+    font-size: clamp(36px, 11vw, 64px);
     font-weight: 900;
     color: var(--accent-yellow);
-    margin-bottom: 1vw;
+    margin-bottom: clamp(4px, 1vw, 8px);
     justify-content: center;
+    white-space: nowrap;
 }
 
 .small-card-icon {
@@ -542,11 +557,42 @@ body {
     flex: 1;
 }
 
+/* 카드 버튼 그룹 */
+.card-button-group {
+    display: flex;
+    gap: clamp(8px, 2vw, 16px);
+    width: 100%;
+    margin-top: clamp(8px, 1.5vw, 12px);
+}
+
+.card-retake-btn,
 .card-register-btn {
-    font-size: 4.5vw;
-    padding: 2vw;
-    border-radius: 1.5vw;
-    margin-top: 2vw;
+    flex: 1;
+    font-size: clamp(20px, 6.5vw, 38px);
+    padding: clamp(12px, 3vw, 20px);
+    border-radius: clamp(6px, 1.5vw, 12px);
+    font-family: var(--font-main);
+    font-weight: 900;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: none;
+    min-height: 44px;
+}
+
+.card-retake-btn {
+    background-color: transparent;
+    border: clamp(2px, 0.4vw, 3px) solid var(--accent-yellow);
+    color: var(--accent-yellow);
+}
+
+.card-register-btn {
+    background-color: var(--accent-yellow);
+    color: var(--bg-dark);
+}
+
+.card-retake-btn:hover,
+.card-register-btn:hover {
+    opacity: 0.9;
 }
 
 /* =========================================

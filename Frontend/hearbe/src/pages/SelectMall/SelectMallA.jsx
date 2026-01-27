@@ -17,6 +17,10 @@ const SelectMall = () => {
             navigate('/store', { state: { url: 'https://m.shopping.naver.com/' } });
         } else if (mall === 'coupang') {
             navigate('/store', { state: { url: 'https://m.coupang.com/' } });
+        } else if (mall === '11st') {
+            navigate('/store', { state: { url: 'https://m.11st.co.kr/' } });
+        } else if (mall === 'emart') {
+            navigate('/store', { state: { url: 'https://m.ssg.com/' } });
         } else if (mall === 'cart') {
             navigate('/cart');
         }
@@ -46,25 +50,38 @@ const SelectMall = () => {
 
             {/* Content */}
             <div className="mall-content">
-                {/* Coupang */}
-                <div className="mall-card coupang-card" onClick={() => handleSelectMall('coupang')}>
-                    <div className="mall-icon-box coupang-box">
-                        <img src={iconCoupang} alt="Coupang" className="mall-logo-img" />
+                <div className="mall-scroll-container">
+                    {/* Coupang (1) */}
+                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('coupang')}>
+                        <div className="mall-square-box coupang-box">
+                            <span className="mall-number">1</span>
+                            <img src={iconCoupang} alt="Coupang" className="mall-logo-img" />
+                        </div>
                     </div>
-                    <div className="mall-text">1</div>
-                </div>
 
-                {/* Mic Center */}
-                <div className="mic-center">
-                    <img src={iconMic} alt="Mic" className="mic-icon" />
-                </div>
-
-                {/* Naver */}
-                <div className="mall-card naver-card" onClick={() => handleSelectMall('naver')}>
-                    <div className="mall-icon-box naver-box">
-                        <img src={iconNaver} alt="Naver" className="mall-logo-img" />
+                    {/* Naver (2) */}
+                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('naver')}>
+                        <div className="mall-square-box naver-box">
+                            <span className="mall-number">2</span>
+                            <img src={iconNaver} alt="Naver" className="mall-logo-img" />
+                        </div>
                     </div>
-                    <div className="mall-text">2</div>
+
+                    {/* 11st (3) */}
+                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('11st')}>
+                        <div className="mall-square-box mall-11st-box">
+                            <span className="mall-number">3</span>
+                            <div className="mall-logo-placeholder">11st</div>
+                        </div>
+                    </div>
+
+                    {/* Emart (4) */}
+                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('emart')}>
+                        <div className="mall-square-box mall-emart-box">
+                            <span className="mall-number">4</span>
+                            <div className="mall-logo-placeholder">SSG</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

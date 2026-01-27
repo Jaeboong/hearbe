@@ -1,23 +1,14 @@
 .store-container {
-    width: 50vw;
-    height: 50vh;
-    transform: scale(2);
-    transform-origin: 0 0;
+    width: 100vw;
+    height: 100vh;
     position: relative;
     background-color: #f2f2f2;
 }
 
 /* Back Button Component Override */
 .store-container .global-back-button {
-    transform: scale(0.5);
-    /* Counteract x2 scale */
-    transform-origin: top left;
-    left: 40px;
-    top: 40px;
-}
-
-.store-container .global-back-button .back-arrow-svg {
-    /* Auto size */
+    left: clamp(12px, 4vw, 32px);
+    top: clamp(12px, 4vw, 32px);
 }
 
 .store-iframe {
@@ -29,45 +20,41 @@
 /* --- Hamburger & Menu --- */
 .hamburger-overlay {
     position: fixed;
-    bottom: 50px;
-    left: 40px;
-    width: 100px;
-    height: 100px;
+    bottom: clamp(20px, 5vw, 40px);
+    left: clamp(16px, 4vw, 32px);
+    width: clamp(60px, 15vw, 100px);
+    height: clamp(60px, 15vw, 100px);
     background-color: #141C29;
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: clamp(6px, 1.5vw, 12px);
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(5px, 1.5vw, 10px) rgba(0, 0, 0, 0.5);
     z-index: 1200;
 }
 
 .hamburger-line {
-    width: 50px;
-    height: 6px;
+    width: clamp(25px, 6vw, 50px);
+    height: clamp(3px, 0.8vw, 6px);
     background-color: #FFF064;
-    border-radius: 3px;
+    border-radius: clamp(2px, 0.4vw, 3px);
 }
 
 /* Menu Bubble */
 .menu-bubble {
     position: fixed;
-    bottom: 180px;
-    left: 40px;
+    bottom: clamp(90px, 22vw, 180px);
+    left: clamp(16px, 4vw, 32px);
     background-color: #141C29;
-    /* Navy Background */
-    border-radius: 30px;
-    /* Larger radius */
-    padding: 30px 50px;
-    /* Larger padding */
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    border-radius: clamp(15px, 4vw, 30px);
+    padding: clamp(15px, 4vw, 30px) clamp(25px, 6vw, 50px);
+    box-shadow: 0 clamp(2px, 0.6vw, 5px) clamp(10px, 2.5vw, 20px) rgba(0, 0, 0, 0.5);
     z-index: 1205;
     animation: fadeIn 0.3s ease-out;
-    border: 2px solid #FFF064;
-    /* Yellow border for contrast */
+    border: clamp(1px, 0.25vw, 2px) solid #FFF064;
 }
 
 @keyframes fadeIn {
@@ -90,17 +77,15 @@
 }
 
 .menu-item {
-    font-size: 50px;
-    /* Increased font size */
+    font-size: clamp(18px, 6vw, 36px);
     font-weight: bold;
     color: #FFF064;
-    /* Yellow text */
     display: flex;
     align-items: center;
-    gap: 30px;
-    padding: 15px 0;
+    gap: clamp(12px, 3vw, 24px);
+    padding: clamp(8px, 2vw, 15px) 0;
     cursor: pointer;
-    border-bottom: 2px solid rgba(255, 240, 100, 0.2);
+    border-bottom: clamp(1px, 0.25vw, 2px) solid rgba(255, 240, 100, 0.2);
 }
 
 .menu-item:last-child {
@@ -108,33 +93,29 @@
 }
 
 .menu-icon {
-    width: 50px;
-    /* generic icon size */
-    height: 50px;
+    width: clamp(24px, 6vw, 40px);
+    height: clamp(24px, 6vw, 40px);
     object-fit: contain;
 }
 
 /* Close Button in Bubble */
 .close-bubble {
     position: absolute;
-    top: -30px;
-    right: -30px;
+    top: clamp(-12px, -3vw, -24px);
+    right: clamp(-12px, -3vw, -24px);
     background: #141C29;
     color: #FFF064;
-    width: 100px;
-    /* Increased to match hamburger */
-    height: 100px;
-    /* Increased to match hamburger */
+    width: clamp(60px, 15vw, 100px);
+    height: clamp(60px, 15vw, 100px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 50px;
-    /* Increased font size */
+    font-size: clamp(24px, 6vw, 40px);
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    border: 2px solid #FFF064;
+    box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(5px, 1.5vw, 10px) rgba(0, 0, 0, 0.5);
+    border: clamp(1px, 0.25vw, 2px) solid #FFF064;
 }
 
 /* Close X inside Hamburger (if used) */
@@ -151,16 +132,14 @@
     top: 0;
     left: 0;
     width: 100%;
-    padding: 20px;
+    padding: clamp(8px, 2vw, 16px);
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Center horizontally */
-    gap: 20px;
+    gap: clamp(8px, 2vw, 16px);
     z-index: 1100;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
     pointer-events: none;
-    /* Let clicks pass through */
 }
 
 /* Making children clickable */

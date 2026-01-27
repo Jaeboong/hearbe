@@ -2,7 +2,7 @@
 :root {
   --main-yellow: #FFF064;
   --bg-dark: #141C29;
-  --input-radius: 1.5vw;
+  --input-radius: clamp(8px, 1.5vw, 12px);
 }
 
 /* 2. 전체 레이아웃 */
@@ -15,48 +15,48 @@
   background-color: var(--bg-dark);
   color: var(--main-yellow);
   font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-  letter-spacing: 0.2vw;
-  padding: 2vw;
+  letter-spacing: clamp(1px, 0.2vw, 2px);
+  padding: clamp(8px, 2vw, 16px);
   box-sizing: border-box;
   width: 100%;
 }
 
 /* Back Button Component Override */
 .login-container .global-back-button.arrow-only {
-  left: 4vw;
-  top: 4vw;
+  left: clamp(12px, 4vw, 32px);
+  top: clamp(12px, 4vw, 32px);
   transform: none;
   /* Ensure no scale */
 }
 
 .login-container .global-back-button.arrow-only .back-arrow-svg {
-  width: 8vw;
+  width: clamp(24px, 8vw, 48px);
   /* Smaller size as requested */
-  height: 8vw;
+  height: clamp(24px, 8vw, 48px);
 }
 
 /* 3. 로그인 박스 */
 .login-box {
-  width: 90vw;
+  width: clamp(280px, 90vw, 600px);
   max-width: 90vw;
-  padding: 4vw;
+  padding: clamp(12px, 4vw, 32px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 0.5vw solid var(--main-yellow);
-  border-radius: 2vw;
+  border: clamp(2px, 0.5vw, 4px) solid var(--main-yellow);
+  border-radius: clamp(8px, 2vw, 16px);
   background-color: transparent;
-  gap: 3vw;
+  gap: clamp(12px, 3vw, 24px);
   box-sizing: border-box;
 }
 
 /* 4. 로고 */
 .logo-area {
-  margin-bottom: 3vw;
+  margin-bottom: clamp(12px, 3vw, 24px);
 }
 
 .logo-image {
-  width: 30vw;
+  width: clamp(160px, 40vw, 320px);
   height: auto;
   object-fit: contain;
 }
@@ -75,7 +75,7 @@
   display: flex;
   flex-direction: column;
   width: 85%;
-  border: 0.5vw solid var(--main-yellow);
+  border: clamp(2px, 0.5vw, 4px) solid var(--main-yellow);
   border-radius: var(--input-radius);
   background-color: var(--bg-dark);
   overflow: hidden;
@@ -85,13 +85,13 @@
   width: 100%;
   background: transparent;
   border: none;
-  padding: 2.5vw;
+  padding: clamp(10px, 2.5vw, 20px);
   color: var(--main-yellow);
   font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-  font-size: 5vw;
+  font-size: clamp(16px, 5vw, 28px);
   font-weight: bold;
   outline: none;
-  letter-spacing: 0.2vw;
+  letter-spacing: clamp(1px, 0.2vw, 2px);
   box-sizing: border-box;
 }
 
@@ -103,7 +103,7 @@
 
 /* 첫 번째 입력창(아이디) 밑줄 */
 .first-input {
-  border-bottom: 0.5vw solid var(--main-yellow);
+  border-bottom: clamp(2px, 0.5vw, 4px) solid var(--main-yellow);
 }
 
 /* 6. 로그인 버튼 */
@@ -112,14 +112,15 @@
   background-color: var(--main-yellow);
   color: var(--bg-dark);
   font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-  font-size: 6vw;
+  font-size: clamp(20px, 7vw, 36px);
   font-weight: 900;
   border: none;
-  border-radius: 2vw;
+  border-radius: clamp(8px, 2vw, 16px);
   cursor: pointer;
   transition: opacity 0.2s;
-  padding: 2.5vw 0;
-  margin-top: 2vw;
+  padding: clamp(12px, 3vw, 24px) 0;
+  margin-top: clamp(8px, 2vw, 16px);
+  min-height: 44px;
 }
 
 .login-button:hover {
@@ -132,17 +133,17 @@
   align-items: center;
   justify-content: flex-start;
   width: 85%;
-  margin-top: 2vw;
+  margin-top: clamp(8px, 2vw, 16px);
   color: var(--main-yellow);
   font-weight: bold;
-  font-size: 3.5vw;
+  font-size: clamp(14px, 4.5vw, 24px);
 }
 
 /* --- 커스텀 체크박스 시작 --- */
 .checkbox-container {
   display: flex;
   align-items: center;
-  gap: 1.5vw;
+  gap: clamp(6px, 1.5vw, 12px);
   cursor: pointer;
   position: relative;
   user-select: none;
@@ -160,11 +161,11 @@
 
 /* 가짜 체크박스 (네모) */
 .checkmark {
-  height: 4vw;
-  width: 4vw;
+  height: clamp(16px, 4vw, 24px);
+  width: clamp(16px, 4vw, 24px);
   background-color: transparent;
-  border: 0.4vw solid var(--main-yellow);
-  border-radius: 0.8vw;
+  border: clamp(2px, 0.4vw, 3px) solid var(--main-yellow);
+  border-radius: clamp(3px, 0.8vw, 6px);
   position: relative;
   flex-shrink: 0;
   display: flex;
@@ -183,12 +184,12 @@
   content: "";
   position: absolute;
   display: none;
-  left: 1.2vw;
-  top: 0.4vw;
-  width: 1vw;
-  height: 2vw;
+  left: clamp(5px, 1.2vw, 8px);
+  top: clamp(2px, 0.4vw, 3px);
+  width: clamp(4px, 1vw, 6px);
+  height: clamp(8px, 2vw, 12px);
   border: solid var(--bg-dark);
-  border-width: 0 0.5vw 0.5vw 0;
+  border-width: 0 clamp(2px, 0.5vw, 3px) clamp(2px, 0.5vw, 3px) 0;
   transform: rotate(45deg);
 }
 
@@ -201,12 +202,15 @@
 
 /* 9. 하단 링크 (아이디 찾기/비밀번호 찾기/회원가입) */
 .login-footer {
-  margin-top: 4vw;
+  margin-top: clamp(16px, 4vw, 32px);
   display: flex;
-  gap: 3vw;
+  flex-wrap: nowrap;
+  gap: clamp(8px, 2vw, 16px);
   color: var(--main-yellow);
   font-weight: bold;
-  font-size: 3.5vw;
+  font-size: clamp(14px, 4.5vw, 24px);
+  white-space: nowrap;
+  justify-content: center;
 }
 
 .login-separator {

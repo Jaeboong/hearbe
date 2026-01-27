@@ -5,7 +5,7 @@ import iconLock from '../../assets/icon-lock.png';
 import iconCard from '../../assets/icon-card.png';
 import iconPhone from '../../assets/icon-phone.png';
 import iconCamera from '../../assets/icon-camera.png';
-import hLogo from '../../assets/h-logo.png';
+import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './SignUpA.css';
 import BackButton from '../common/BackButtonA';
@@ -311,7 +311,7 @@ const SignUp = () => {
             <div className="signup-box">
                 {/* Logo Section */}
                 <div className="signup-logo-area">
-                    <img src={hLogo} alt="Logo" className="signup-logo-image" />
+                    <img src={logo} alt="Logo" className="signup-logo-image" />
                 </div>
 
                 {/* ID Section */}
@@ -448,8 +448,8 @@ const SignUp = () => {
                         {modalStep === 'camera' ? (
                             // 1단계: 카메라 촬영 화면
                             <>
-                                <div className="modal-title">장애인 복지카드 촬영하기</div>
-                                <div className="modal-desc">장애인 복지 카드를 촬영합니다.</div>
+                                <div className="modal-title">카드 촬영</div>
+                                <div className="modal-desc">장애인 복지카드를 촬영해주세요.</div>
 
                                 <div className="modal-camera-area">
                                     {stream ? (
@@ -460,24 +460,26 @@ const SignUp = () => {
                                             <img src={iconCamera} alt="Camera" className="modal-camera-icon" />
                                         </>
                                     )}
-                                    {stream && (
-                                        <div className="shutter-button" onClick={handleSnap}>
-                                            <div className="shutter-inner"></div>
-                                        </div>
-                                    )}
                                 </div>
+
+                                {stream && (
+                                    <div className="shutter-button" onClick={handleSnap}>
+                                        <div className="shutter-inner"></div>
+                                    </div>
+                                )}
                             </>
                         ) : (
                             // 2단계: 카드 정보 확인 폼 (여기도 modal-box 안이라서 팝업처럼 보임)
                             <>
-                                <div className="modal-title" style={{ fontSize: '50px' }}>정보 확인</div>
-                                <div className="modal-desc" style={{ marginBottom: '30px' }}>인식된 정보를 확인해주세요.</div>
 
                                 <div className="card-form-box" style={{ width: '100%', padding: '0', background: 'transparent', border: 'none', boxShadow: 'none' }}>
                                     <div className="card-form-header" style={{ justifyContent: 'center' }}>
                                         <img src={iconCard} alt="card" className="small-card-icon" />
                                         <span>장애인 복지카드 정보</span>
                                     </div>
+
+                                    <div className="modal-desc" style={{ marginBottom: '10px' }}>인식된 정보를 확인해주세요.</div>
+
 
                                     <div className="form-field-group">
                                         <label>카드사</label>
@@ -500,35 +502,44 @@ const SignUp = () => {
                                         </div>
                                     </div>
 
-                                    <button className="card-register-btn" onClick={handleCardRegister}>카드 등록하기</button>
+
+                                    <div className="card-button-group">
+                                        <button className="card-retake-btn" onClick={() => setModalStep('camera')}>다시 촬영</button>
+                                        <button className="card-register-btn" onClick={handleCardRegister}>카드 등록</button>
+                                    </div>
                                 </div>
                             </>
                         )}
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Error Message Modal */}
-            {showError && (
-                <div className="modal-overlay" onClick={() => setShowError(false)}>
-                    <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="error-message">{errorMessage}</div>
-                        <button className="error-confirm-btn" onClick={() => setShowError(false)}>확인</button>
+            {
+                showError && (
+                    <div className="modal-overlay" onClick={() => setShowError(false)}>
+                        <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
+                            <div className="error-message">{errorMessage}</div>
+                            <button className="error-confirm-btn" onClick={() => setShowError(false)}>확인</button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Success Message Modal */}
-            {showSuccess && (
-                <div className="modal-overlay" onClick={() => { }}>
-                    <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="success-icon">🎉</div>
-                        <div className="error-message">회원가입이 완료되었습니다!</div>
-                        <button className="error-confirm-btn" onClick={() => navigate('/login')}>로그인하러 가기</button>
+            {
+                showSuccess && (
+                    <div className="modal-overlay" onClick={() => { }}>
+                        <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
+                            <div className="success-icon">🎉</div>
+                            <div className="error-message">회원가입이 완료되었습니다!</div>
+                            <button className="error-confirm-btn" onClick={() => navigate('/login')}>로그인하러 가기</button>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 
