@@ -17,6 +17,7 @@ from ..generators.command_generator import CommandGenerator, CommandResult
 from ..generators.llm_generator import LLMGenerator, LLMResult
 from .routing import LLMRoutingPolicy
 from .selection import select_from_results
+from .fallback import build_llm_fallback_response
 
 logger = logging.getLogger(__name__)
 
@@ -102,12 +103,18 @@ class LLMPlanner(ILLMPlanner):
                 
                 if llm_result.success and llm_result.commands:
                     return self._llm_result_to_response(llm_result)
-                else:
-                    logger.info(
-                        "LLM fallback returned no commands (success=%s, error=%s); using rule result",
-                        llm_result.success,
-                        llm_result.error
+                if llm_result.success:
+                    fallback = build_llm_fallback_response(
+                        user_text=user_text,
+                        response_text=llm_result.response_text
                     )
+                    if fallback:
+                        return fallback
+                logger.info(
+                    "LLM fallback returned no commands (success=%s, error=%s); using rule result",
+                    llm_result.success,
+                    llm_result.error
+                )
         return self._to_response(rule_result)
 
     def _to_response(self, result: CommandResult) -> LLMResponse:
