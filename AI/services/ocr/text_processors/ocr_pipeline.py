@@ -117,6 +117,61 @@ def _filter_texts_with_keyword_override(
     return filtered
 
 
+_TYPE_RULES = {
+    "electronics": {
+        "strong": ("HDMI", "IPS", "FHD"),
+        "weak": ("Hz", "??", "???", "?????"),
+    },
+    "fresh_food": {
+        "strong": ("????", "??", "??", "??"),
+        "weak": ("??", "??"),
+    },
+}
+
+
+def _find_product_type_by_value_fragment(fragment: str) -> Optional[ProductType]:
+    for pt in ProductType:
+        if fragment in pt.value:
+            return pt
+    return None
+
+
+def _override_product_type(
+    texts: List[str],
+    current_type: ProductType
+) -> ProductType:
+    joined = " ".join(texts)
+    scores = {}
+    strong_hits = {}
+    for key, rules in _TYPE_RULES.items():
+        strong = rules["strong"]
+        weak = rules["weak"]
+        s_hits = sum(1 for token in strong if token in joined)
+        w_hits = sum(1 for token in weak if token in joined)
+        strong_hits[key] = s_hits
+        scores[key] = s_hits * 3 + w_hits
+
+    if strong_hits["electronics"] >= 2:
+        pt = _find_product_type_by_value_fragment("??")
+        if pt:
+            return pt
+    if strong_hits["fresh_food"] >= 2:
+        pt = _find_product_type_by_value_fragment("??")
+        if pt:
+            return pt
+
+    if scores["electronics"] - scores["fresh_food"] >= 2 and scores["electronics"] >= 4:
+        pt = _find_product_type_by_value_fragment("??")
+        if pt:
+            return pt
+    if scores["fresh_food"] - scores["electronics"] >= 2 and scores["fresh_food"] >= 4:
+        pt = _find_product_type_by_value_fragment("??")
+        if pt:
+            return pt
+
+    return current_type
+
+
 def process_product_image(
     image_path: str,
     output_dir: str = "output",
@@ -162,6 +217,7 @@ def process_product_image(
         print("\n🏷️  [4/5] 제품 타입 감지 중...")
     step_start = time.time()
     product_type = detect_product_type(filtered_texts)
+    product_type = _override_product_type(filtered_texts, product_type)
     type_desc = get_type_description(product_type)
     step_time = time.time() - step_start
     if verbose:
@@ -253,6 +309,7 @@ def process_multiple_images(
         print("\n🏷️  [5/6] 제품 타입 감지 중...")
     step_start = time.time()
     product_type = detect_product_type(filtered_texts)
+    product_type = _override_product_type(filtered_texts, product_type)
     type_desc = get_type_description(product_type)
     step_time = time.time() - step_start
     if verbose:
