@@ -1,7 +1,7 @@
 package com.ssafy.d108.backend.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ssafy.d108.backend.entity.UserType;
+import com.ssafy.d108.backend.entity.enums.UserType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -28,11 +28,9 @@ public class SignupRequest {
     private String loginId;
 
     @NotBlank(message = "비밀번호는 필수입니다.")
-    @Size(min = 8, max = 30, message = "비밀번호는 8~20자 사이여야 합니다.")
     private String password;
 
     @JsonProperty("password_check")
-    @NotBlank(message = "비밀번호 확인은 필수입니다.")
     private String passwordCheck;
 
     @NotBlank(message = "이름은 필수입니다.")

@@ -1,5 +1,6 @@
 package com.ssafy.d108.backend.entity;
 
+import com.ssafy.d108.backend.entity.enums.Gender;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;

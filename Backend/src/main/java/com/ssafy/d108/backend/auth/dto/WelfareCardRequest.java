@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
 /**
@@ -29,13 +30,16 @@ public class WelfareCardRequest {
     private String cardNumber;
 
     @JsonProperty("issue_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "발급일은 필수입니다.")
     private LocalDate issueDate;
 
     @JsonProperty("expiration_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "만료일은 필수입니다.")
     private LocalDate expirationDate;
 
+    @JsonProperty("cvc")
     @NotNull(message = "CVC는 필수입니다.")
     @Pattern(regexp = "^[0-9]{3,5}$", message = "CVC는 3~5자리 숫자여야 합니다.")
     private String cvc;
