@@ -81,7 +81,7 @@ def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]
         f"{keyword_schema}\n"
         "  }\n"
         "}\n"
-        "요약(summary)은 3-5문장으로 짧고 간결하게 작성하세요."
+        "요약(summary)은 3-5문장으로 작성하세요. 시각장애인을 위한 정보를 제공해야 합니다."
     )
     
     user = "분석할 OCR 텍스트:\n" + numbered

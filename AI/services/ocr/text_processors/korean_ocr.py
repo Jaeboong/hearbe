@@ -55,7 +55,7 @@ def extract_texts_with_scores(ocr_result: List[Any]) -> List[Dict[str, Any]]:
     return results
 
 
-DEFAULT_MAX_HEIGHT = 2000
+DEFAULT_MAX_HEIGHT = 2500
 
 
 def get_image_size(image_path: str) -> tuple:
@@ -68,7 +68,9 @@ def process_image(
     image_path: str,
     max_height: int = DEFAULT_MAX_HEIGHT,
     save_chunks: bool = False,
-    output_dir: str = "output"
+    save_vis: bool = True,
+    output_dir: str = "output",
+    ocr_instance: Optional[PaddleOCR] = None
 ) -> Dict[str, Any]:
     import os
     import json
@@ -77,7 +79,8 @@ def process_image(
     width, height = get_image_size(image_path)
     print(f"이미지 크기: {width}x{height}px")
     
-    ocr_instance = create_ocr_instance()
+    if ocr_instance is None:
+        ocr_instance = create_ocr_instance()
     
     if height > max_height:
         print(f"긴 이미지 감지 (높이 {height}px > {max_height}px) → 분할 처리")
@@ -98,13 +101,15 @@ def process_image(
         print(f"일반 이미지 (높이 {height}px <= {max_height}px) → 직접 처리")
         
         ocr_raw_result = ocr_instance.predict(image_path)
-        
-        os.makedirs(output_dir, exist_ok=True)
-        for res in ocr_raw_result:
-            res.save_to_img(output_dir)
-        print(f"시각화 이미지 저장: {output_dir}/")
-        
+
+        if save_vis:
+            os.makedirs(output_dir, exist_ok=True)
+            for res in ocr_raw_result:
+                res.save_to_img(output_dir)
+            print(f"Saved visualization images: {output_dir}/")
+
         texts_with_scores = extract_texts_with_scores(ocr_raw_result)
+
         
         result = {
             "rec_texts": [item["text"] for item in texts_with_scores],
@@ -132,21 +137,28 @@ def process_images_parallel(
     max_workers: int = 4,
     max_height: int = DEFAULT_MAX_HEIGHT,
     save_results: bool = False,
+    save_vis: bool = True,
     output_dir: str = "output"
 ) -> List[Dict[str, Any]]:
     from concurrent.futures import ThreadPoolExecutor, as_completed
     from pathlib import Path
+    import threading
     import os
     
     os.makedirs(output_dir, exist_ok=True)
+    thread_local = threading.local()
     
     def process_single(image_path: str) -> Dict[str, Any]:
         try:
+            if not hasattr(thread_local, "ocr_instance"):
+                thread_local.ocr_instance = create_ocr_instance()
             result = process_image(
                 image_path,
                 max_height=max_height,
                 save_chunks=save_results,
-                output_dir=output_dir
+                save_vis=save_vis,
+                output_dir=output_dir,
+                ocr_instance=thread_local.ocr_instance
             )
             result["source"] = Path(image_path).name
             return result
@@ -161,6 +173,8 @@ def process_images_parallel(
             }
     
     results = []
+    if isinstance(DEFAULT_DEVICE, str) and DEFAULT_DEVICE.startswith("gpu"):
+        max_workers = min(max_workers, 2)
     print(f"병렬 OCR 처리 시작: {len(image_paths)}개 이미지, {max_workers} 워커")
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
