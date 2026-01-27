@@ -46,4 +46,30 @@ export const authAPI = {
             return { available: true };
         }
     },
+
+    // 사용자 프로필 조회 API
+    getUserProfile: async () => {
+        const token = localStorage.getItem('accessToken');
+
+        if (!token) {
+            throw new Error('No access token found');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/auth/mypage`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('401');
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    }
 };

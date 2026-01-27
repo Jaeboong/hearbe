@@ -137,6 +137,73 @@
     opacity: 0.8;
 }
 
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: clamp(60px, 10vw, 100px);
+    color: #FFF064;
+}
+
+.spinner {
+    width: clamp(40px, 8vw, 60px);
+    height: clamp(40px, 8vw, 60px);
+    border: clamp(4px, 1vw, 6px) solid #FFF064;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto clamp(20px, 4vw, 30px);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-state p {
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: bold;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Error State */
+.error-state {
+    text-align: center;
+    padding: clamp(60px, 10vw, 100px);
+    color: #FFF064;
+}
+
+.error-message {
+    font-size: clamp(20px, 3.5vw, 28px);
+    font-weight: 900;
+    margin-bottom: clamp(10px, 2vw, 16px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.error-detail {
+    font-size: clamp(16px, 2.5vw, 22px);
+    color: #F5F5F5;
+    margin-bottom: clamp(20px, 4vw, 30px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.retry-btn {
+    padding: clamp(12px, 2.5vw, 18px) clamp(24px, 4vw, 36px);
+    background-color: #FFF064;
+    color: #1E2A3A;
+    border: none;
+    border-radius: clamp(8px, 2vw, 12px);
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: opacity 0.2s;
+}
+
+.retry-btn:hover {
+    opacity: 0.9;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .memberinfo-content {
