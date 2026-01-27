@@ -36,10 +36,10 @@ public class WelfareCard {
     @Column(name = "card_company", length = 50)
     private String cardCompany;
 
-    @Column(name = "card_number", length = 20, nullable = false)
+    @Column(name = "card_number", length = 255, nullable = false)
     private String cardNumber;
 
-    @Column(name = "cvc", length = 5)
+    @Column(name = "cvc", length = 255)
     private String cvc;
 
     @Column(name = "issue_date", nullable = false)
