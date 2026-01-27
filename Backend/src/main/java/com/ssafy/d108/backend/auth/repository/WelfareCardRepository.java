@@ -19,4 +19,6 @@ public interface WelfareCardRepository extends JpaRepository<WelfareCard, Intege
 
     Optional<WelfareCard> findByCardNumberAndCardCompanyAndIssueDateAndExpirationDateAndCvc(
             String cardNumber, String cardCompany, LocalDate issueDate, LocalDate expirationDate, String cvc);
+
+    void deleteByUserId(Integer userId);
 }
