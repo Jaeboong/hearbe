@@ -96,7 +96,7 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
     if not api_key:
         raise RuntimeError("GMS_KEY 환경변수가 설정되지 않았습니다.")
 
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    model = os.environ.get("OPENAI_MODEL", "gpt-5-mini")
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"
 
     messages = [
