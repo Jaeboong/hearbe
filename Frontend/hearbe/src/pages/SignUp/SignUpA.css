@@ -156,15 +156,16 @@ body {
     width: 8vw;
     height: 8vw;
     object-fit: contain;
-    margin-right: 2vw;
 }
 
 .signup-input {
+    flex: 1;
     border: none;
     padding: 1vw;
     font-size: 5vw;
-    letter-spacing: 0.1vw;
+    letter-spacing: 0.2vw;
     height: auto;
+    min-width: 0;
 }
 
 .signup-input::placeholder {

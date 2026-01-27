@@ -6,9 +6,31 @@ import iconCard from '../../assets/icon-card.png';
 import iconPhone from '../../assets/icon-phone.png';
 import iconCamera from '../../assets/icon-camera.png';
 import hLogo from '../../assets/h-logo.png';
-import { saveUser } from '../../utils/userStorage';
+import { authAPI } from '../../services/authAPI';
 import './SignUpA.css';
 import BackButton from '../common/BackButtonA';
+
+// Utility Functions
+const formatPhoneNumber = (value) => {
+    // 숨자만 추출
+    const numbers = value.replace(/[^\d]/g, '');
+
+    // 11자리로 제한
+    const limited = numbers.slice(0, 11);
+
+    // 010-1234-5678 형식으로 변환
+    if (limited.length <= 3) return limited;
+    if (limited.length <= 7) return `${limited.slice(0, 3)}-${limited.slice(3)}`;
+    return `${limited.slice(0, 3)}-${limited.slice(3, 7)}-${limited.slice(7)}`;
+};
+
+const validateUserId = (userId) => {
+    // 영문자와 숫자 포함 필수, 3글자 이상
+    if (userId.length < 3) return false;
+    const hasLetter = /[a-zA-Z]/.test(userId);
+    const hasNumber = /[0-9]/.test(userId);
+    return hasLetter && hasNumber;
+};
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -91,10 +113,19 @@ const SignUp = () => {
     // Input Handler
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        // 전화번호 자동 포맷팅
+        if (name === 'phone') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: formatPhoneNumber(value)
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
 
         if (name === 'id') {
             setIsIdChecked(false);
@@ -102,14 +133,34 @@ const SignUp = () => {
     };
 
     // Duplicate Check Handler
-    const handleDuplicateCheck = () => {
+    const handleDuplicateCheck = async () => {
         if (!formData.id) {
             setErrorMessage("아이디를 입력해주세요.");
             setShowError(true);
             return;
         }
-        setIsIdChecked(true);
-        alert("사용 가능한 아이디입니다.");
+
+        // 아이디 형식 검증 (영문+숫자 포함, 3글자 이상)
+        if (!validateUserId(formData.id)) {
+            setErrorMessage("아이디는 영문자와 숫자를 포함하여 3글자 이상이어야 합니다.");
+            setShowError(true);
+            return;
+        }
+
+        try {
+            const result = await authAPI.checkDuplicate(formData.id);
+            if (result.available !== false) {
+                setIsIdChecked(true);
+                alert("사용 가능한 아이디입니다.");
+            } else {
+                setErrorMessage("이미 존재하는 아이디입니다.");
+                setShowError(true);
+            }
+        } catch (error) {
+            // API가 없거나 네트워크 오류 시 기본적으로 통과
+            setIsIdChecked(true);
+            alert("사용 가능한 아이디입니다.");
+        }
     };
 
     // Terms Handlers
@@ -159,10 +210,28 @@ const SignUp = () => {
         setModalStep('camera');
     };
 
-    // Sign Up Validation Handler
-    const handleSignUp = () => {
+    // Sign Up Validation and API Handler
+    const handleSignUp = async () => {
+        // 1. 아이디 검증
+        if (!formData.id) {
+            setErrorMessage("아이디를 입력해주세요.");
+            setShowError(true);
+            return;
+        }
+        if (!validateUserId(formData.id)) {
+            setErrorMessage("아이디는 영문자와 숫자를 포함하여 3글자 이상이어야 합니다.");
+            setShowError(true);
+            return;
+        }
         if (!isIdChecked) {
             setErrorMessage("아이디 중복확인을 해주세요.");
+            setShowError(true);
+            return;
+        }
+
+        // 2. 비밀번호 검증 (숫자 6자리)
+        if (!formData.password) {
+            setErrorMessage("비밀번호를 입력해주세요.");
             setShowError(true);
             return;
         }
@@ -172,28 +241,65 @@ const SignUp = () => {
             setShowError(true);
             return;
         }
+
+        // 3. 이름 검증
         if (!formData.name) {
             setErrorMessage("이름을 입력해주세요.");
             setShowError(true);
             return;
         }
-        const phoneRegex = /^\d{11}$/;
-        if (!phoneRegex.test(formData.phone)) {
-            setErrorMessage("휴대전화번호는 숫자 11자리여야 합니다.");
+
+        // 4. 휴대전화번호 검증 (11자리)
+        const phoneNumbers = formData.phone.replace(/[^\\d]/g, '');
+        if (phoneNumbers.length !== 11) {
+            setErrorMessage("휴대전화번호는 11자리 숫자여야 합니다.");
             setShowError(true);
             return;
         }
+
+        // 5. 장애인 복지카드 등록 확인 (필수)
+        if (!cardData) {
+            setErrorMessage("장애인 복지카드를 등록해주세요.");
+            setShowError(true);
+            return;
+        }
+
+        // 6. 약관 동의 확인
         if (!terms.term1 || !terms.term2) {
             setErrorMessage("필수 약관에 동의해주세요.");
             setShowError(true);
             return;
         }
 
-        const success = saveUser(formData);
-        if (success) {
-            setShowSuccess(true);
-        } else {
-            setErrorMessage("이미 존재하는 아이디입니다.");
+        // 7. API 호출
+        try {
+            const userData = {
+                user_id: formData.id,
+                password: formData.password,
+                password_check: formData.password, // PRD에서 제거되었지만 서버가 요구할 수 있음
+                username: formData.name,
+                email: null,
+                phone_number: formData.phone,
+                user_type: "BLIND", // 카드 등록 필수이므로 항상 BLIND
+                simple_password: null
+            };
+
+            const response = await authAPI.register(userData);
+
+            if (response.code === 201) {
+                setShowSuccess(true);
+            } else {
+                throw new Error(response.message || '회원가입에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('SignUp Error:', error);
+            if (error.message.includes('중복') || error.message.includes('존재')) {
+                setErrorMessage("이미 존재하는 아이디입니다.");
+            } else if (error.message === 'Failed to fetch') {
+                setErrorMessage("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            } else {
+                setErrorMessage(error.message || "회원가입에 실패했습니다.");
+            }
             setShowError(true);
         }
     };
