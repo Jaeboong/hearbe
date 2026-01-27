@@ -54,9 +54,21 @@ public class AuthService {
      */
     @Transactional
     public Integer signup(SignupRequest request) {
-        // 비밀번호 일치 검증
-        if (!request.getPassword().equals(request.getPasswordCheck())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        // 비밀번호 정책 검증
+        if (request.getUserType() == UserType.BLIND) {
+            // A형: 비밀번호(간편비밀번호)가 6자리 숫자인지 확인
+            if (!request.getPassword().matches("^[0-9]{6}$")) {
+                throw new IllegalArgumentException("A형 사용자의 비밀번호는 6자리 숫자여야 합니다.");
+            }
+            // A형은 password_check 확인 안 함 (또는 동일하다고 가정)
+        } else {
+            // B/C형: 비밀번호 8~20자 확인 및 password_check 일치 확인
+            if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
+                throw new IllegalArgumentException("비밀번호는 8~20자 사이여야 합니다.");
+            }
+            if (request.getPasswordCheck() == null || !request.getPassword().equals(request.getPasswordCheck())) {
+                throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            }
         }
 
         // BLIND 타입 복지카드 필수 검증
