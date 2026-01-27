@@ -378,6 +378,8 @@ class WSClient:
         result = data.get("result", {})
         error = data.get("error")
         page_data = data.get("page_data")
+        tool_name = data.get("tool_name")
+        arguments = data.get("arguments")
         
         logger.info(f"MCP result: request_id={request_id}, success={success}")
         
@@ -389,7 +391,9 @@ class WSClient:
                 "success": success,
                 "result": result,
                 "error": error,
-                "page_data": page_data
+                "page_data": page_data,
+                "tool_name": tool_name,
+                "arguments": arguments
             }
         )
     
