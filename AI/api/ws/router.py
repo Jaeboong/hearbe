@@ -35,6 +35,8 @@ class WebSocketRouter:
                 await self._handlers.handle_user_confirm(session_id, data)
             elif msg_type == MessageType.CANCEL:
                 await self._handlers.handle_cancel(session_id)
+            elif msg_type == MessageType.INTERRUPT:
+                await self._handlers.handle_interrupt(session_id)
             elif msg_type == MessageType.MCP_RESULT:
                 await self._handlers.handle_mcp_result(session_id, data)
             else:

@@ -79,6 +79,7 @@ class AudioPlayer(IAudioPlayer):
     def _register_handlers(self):
         """Register event handlers"""
         subscribe(EventType.TTS_AUDIO_RECEIVED, self._on_tts_audio_received)
+        subscribe(EventType.HOTKEY_PRESSED, self._on_hotkey_pressed)
         logger.info("AudioPlayer event handlers registered")
 
     def _start_playback_thread(self):
@@ -176,6 +177,12 @@ class AudioPlayer(IAudioPlayer):
             source="audio.player"
         )
         logger.info("TTS playback finished")
+
+    def _on_hotkey_pressed(self, event):
+        """Stop TTS playback on barge-in hotkey"""
+        if self.is_playing():
+            logger.info("Hotkey pressed - stopping TTS playback")
+            self.stop()
 
     def play(self, audio_data: bytes) -> None:
         """

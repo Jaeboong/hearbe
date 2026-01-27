@@ -29,6 +29,7 @@ class MessageType(str, Enum):
     AUDIO_CHUNK = "audio_chunk"  # PTT 오디오 청크
     USER_INPUT = "user_input"
     MCP_RESULT = "mcp_result"
+    INTERRUPT = "interrupt"
     
     # Server → Client
     ASR_RESULT = "asr_result"
@@ -80,6 +81,7 @@ class WSClient:
         """이벤트 핸들러 등록"""
         event_bus.subscribe(EventType.MCP_RESULT, self._on_mcp_result)
         event_bus.subscribe(EventType.AUDIO_READY, self._on_audio_ready)  # PTT 오디오
+        event_bus.subscribe(EventType.HOTKEY_PRESSED, self._on_hotkey_pressed)
         event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
         logger.info("WSClient event handlers registered")
     
@@ -395,6 +397,16 @@ class WSClient:
                 "tool_name": tool_name,
                 "arguments": arguments
             }
+        )
+
+    async def _on_hotkey_pressed(self, event):
+        """Send interrupt to server on barge-in hotkey"""
+        if not self.is_connected:
+            return
+
+        await self.send_message(
+            MessageType.INTERRUPT,
+            {"reason": "hotkey"}
         )
     
     async def _on_shutdown(self, _event):

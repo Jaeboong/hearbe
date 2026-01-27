@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 Text handler: user_input -> NLU/LLM/Flow -> TTS/tool_calls
+
+Coordinates text processing pipeline and delegates to specialized handlers.
 """
 
 import asyncio
 import logging
-import re
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any
 
 from core.interfaces import ASRResult
-from ..search_reader import build_search_read_tts
+from .search_query_handler import SearchQueryHandler
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,14 @@ MAX_TEXT_QUEUE_SIZE = 20  # Max pending text messages per session
 
 
 class TextHandler:
-    """Handles text input pipeline and flow steps."""
+    """
+    Handles text input pipeline and flow steps.
+
+    Responsibilities:
+    - Queue/worker management for text inputs
+    - Routing to appropriate handlers (Flow, Search, LLM)
+    - Coordinating NLU/LLM pipeline
+    """
 
     def __init__(self, nlu_service, llm_planner, flow_engine, session_manager, sender, action_feedback):
         self._nlu = nlu_service
@@ -27,14 +35,21 @@ class TextHandler:
         self._sender = sender
         self._action_feedback = action_feedback
 
+        # Specialized handlers
+        self._search_query_handler = SearchQueryHandler(session_manager, sender)
+
+        # Queue management
         self._text_queues: Dict[str, asyncio.Queue] = {}
         self._text_tasks: Dict[str, asyncio.Task] = {}
+        self._interrupt_epochs: Dict[str, int] = {}
 
     async def create_session(self, session_id: str):
+        """Create text processing queue and worker for session."""
         self._text_queues[session_id] = asyncio.Queue(maxsize=MAX_TEXT_QUEUE_SIZE)
         self._text_tasks[session_id] = asyncio.create_task(self._text_worker(session_id))
 
     async def cleanup_session(self, session_id: str):
+        """Clean up session resources."""
         task = self._text_tasks.pop(session_id, None)
         if task:
             task.cancel()
@@ -43,8 +58,26 @@ class TextHandler:
             except asyncio.CancelledError:
                 pass
         self._text_queues.pop(session_id, None)
+        self._interrupt_epochs.pop(session_id, None)
+
+    async def interrupt(self, session_id: str):
+        """Interrupt current processing and prioritize new input."""
+        self._interrupt_epochs[session_id] = self._interrupt_epochs.get(session_id, 0) + 1
+
+        queue = self._text_queues.get(session_id)
+        if queue:
+            while not queue.empty():
+                try:
+                    queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    break
+
+        session = self._session.get_session(session_id) if self._session else None
+        if session and self._flow and self._flow.is_flow_active(session_id):
+            await self._flow.cancel_flow(session)
 
     async def handle_user_input(self, session_id: str, text: str):
+        """Handle text input from user."""
         result = ASRResult(
             text=text,
             confidence=1.0,
@@ -57,19 +90,21 @@ class TextHandler:
         await self.enqueue_text(session_id, text)
 
     async def handle_user_confirm(self, session_id: str, data: Dict[str, Any]):
+        """Handle user confirmation (yes/no)."""
         confirmed = data.get("confirmed", False)
         await self.enqueue_text(session_id, "yes" if confirmed else "no")
 
     async def handle_cancel(self, session_id: str):
+        """Handle cancellation request."""
         session = self._session.get_session(session_id) if self._session else None
         if session and self._flow:
             await self._flow.cancel_flow(session)
 
         await self._sender.send_status(session_id, "cancelled", "Cancelled")
-
         await self._sender.send_tts_response(session_id, "Cancelled")
 
     async def enqueue_text(self, session_id: str, text: str):
+        """Enqueue text for processing."""
         queue = self._text_queues.get(session_id)
         if not queue:
             logger.warning(f"No text queue for session: {session_id}")
@@ -88,6 +123,7 @@ class TextHandler:
                 pass
 
     async def _text_worker(self, session_id: str):
+        """Background worker that processes queued text inputs."""
         queue = self._text_queues.get(session_id)
         if not queue:
             return
@@ -106,142 +142,120 @@ class TextHandler:
             logger.error(f"Text worker error: {session_id}: {e}")
 
     async def _process_text_input(self, session_id: str, text: str):
+        """
+        Process text input through the pipeline.
+
+        Flow:
+        1. Check if flow is active -> delegate to flow handler
+        2. Check if search query -> delegate to search query handler
+        3. Otherwise -> NLU/LLM pipeline
+        """
         try:
             session = self._session.get_session(session_id) if self._session else None
             if not session:
                 return
+            epoch = self._interrupt_epochs.get(session_id, 0)
 
             if self._session:
                 self._session.add_to_history(session_id, "user", text)
 
+            # Flow handling (highest priority)
             if self._flow and self._flow.is_flow_active(session_id):
                 await self._handle_flow_input(session_id, text)
                 return
 
-            # Search results readout handling (before NLU/LLM)
-            handled = await self._handle_search_read_request(session_id, text, session)
+            # Search query handling (second priority, before LLM)
+            handled = await self._search_query_handler.handle_query(session_id, text, session)
             if handled:
                 return
 
-            intent = None
-            resolved_text = text
+            if self._is_interrupted(session_id, epoch):
+                return
 
-            if self._nlu:
-                context = session.context
-                intent = await self._nlu.analyze_intent(text, context)
-                resolved_text = await self._nlu.resolve_reference(text, context)
-
-            if self._llm:
-                response = await self._llm.generate_commands(
-                    resolved_text,
-                    intent,
-                    session
-                )
-
-                if response.requires_flow and self._flow:
-                    flow_type = response.flow_type
-                    site = session.current_site or "coupang"
-                    step = await self._flow.start_flow(flow_type, site, session)
-                    await self._sender.send_flow_step(session_id, step)
-                else:
-                    if response.commands:
-                        await self._sender.send_tool_calls(session_id, response.commands)
-                    else:
-                        logger.info(
-                            "No commands generated for session=%s text='%s'",
-                            session_id,
-                            resolved_text[:80]
-                        )
-
-                pending_msg = None
-                if response.commands:
-                    pending_msg = self._action_feedback.register_commands(
-                        session_id,
-                        response.commands,
-                        session.current_url or ""
-                    )
-
-                if pending_msg:
-                    logger.info(f"Sending pending TTS response: '{pending_msg[:80]}...'")
-                    await self._sender.send_tts_response(session_id, pending_msg)
-                    if self._session:
-                        self._session.add_to_history(session_id, "assistant", pending_msg)
-                elif response.text:
-                    logger.info(f"Sending TTS response: '{response.text[:80]}...'")
-                    await self._sender.send_tts_response(session_id, response.text)
-                    if self._session:
-                        self._session.add_to_history(session_id, "assistant", response.text)
-
-                # If no response text and no pending message, keep silent.
+            # NLU/LLM pipeline (default)
+            await self._handle_llm_pipeline(session_id, text, session, epoch)
 
         except Exception as e:
             logger.error(f"Text processing failed: {e}")
             await self._sender.send_error(session_id, "Processing error")
 
-    async def _handle_search_read_request(
-        self,
-        session_id: str,
-        text: str,
-        session
-    ) -> bool:
+    async def _handle_llm_pipeline(self, session_id: str, text: str, session, epoch: int):
         """
-        Handle commands like:
-        - "현재 페이지 모든 상품 읽어줘"
-        - "전체 읽어줘"
-        - "n개 더 읽어줘"
+        Handle text through NLU/LLM pipeline.
+
+        Steps:
+        1. NLU: intent analysis & reference resolution
+        2. LLM: command generation
+        3. Send commands or start flow
+        4. Send TTS response
         """
-        results = session.context.get("search_results") if session else None
-        if not isinstance(results, list) or not results:
-            return False
+        intent = None
+        resolved_text = text
 
-        normalized = text.strip().lower()
-        if not normalized:
-            return False
+        # NLU processing
+        if self._nlu:
+            context = session.context
+            intent = await self._nlu.analyze_intent(text, context)
+            resolved_text = await self._nlu.resolve_reference(text, context)
 
-        if not self._is_read_request(normalized):
-            return False
+        # LLM processing
+        if not self._llm:
+            return
 
-        mode, count = self._parse_read_request(normalized)
-        total = len(results)
-        start_index = session.context.get("search_read_index", 0)
-
-        if mode == "all":
-            start_index = 0
-            count = total
-        elif mode == "more":
-            count = count or 4
-        else:
-            return False
-
-        tts_text, next_index, has_more = build_search_read_tts(
-            results,
-            start_index=start_index,
-            count=count,
-            include_total=(mode == "all" and start_index == 0)
+        response = await self._llm.generate_commands(
+            resolved_text,
+            intent,
+            session
         )
-        self._session.set_context(session_id, "search_read_index", next_index)
+        if self._is_interrupted(session_id, epoch):
+            return
 
-        if has_more:
-            tts_text += " 더 읽어드릴까요? 'n개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
-        await self._sender.send_tts_response(session_id, tts_text)
-        return True
+        # Flow or command execution
+        if response.requires_flow and self._flow:
+            flow_type = response.flow_type
+            site = session.current_site or "coupang"
+            step = await self._flow.start_flow(flow_type, site, session)
+            if self._is_interrupted(session_id, epoch):
+                return
+            await self._sender.send_flow_step(session_id, step)
+        else:
+            if response.commands:
+                if self._is_interrupted(session_id, epoch):
+                    return
+                await self._sender.send_tool_calls(session_id, response.commands)
+            else:
+                logger.info(
+                    "No commands generated for session=%s text='%s'",
+                    session_id,
+                    resolved_text[:80]
+                )
 
-    def _is_read_request(self, normalized: str) -> bool:
-        keywords = ["읽어", "읽어줘", "읽어주", "읽어줄래", "들려", "들려줘"]
-        target = ["상품", "검색", "검색결과", "결과", "전체", "모든", "현재"]
-        return any(k in normalized for k in keywords) and any(t in normalized for t in target)
+        # Action feedback & TTS response
+        pending_msg = None
+        if response.commands:
+            pending_msg = self._action_feedback.register_commands(
+                session_id,
+                response.commands,
+                session.current_url or ""
+            )
 
-    def _parse_read_request(self, normalized: str) -> Tuple[Optional[str], Optional[int]]:
-        if "전체" in normalized or "모든" in normalized:
-            return "all", None
-        if "더" in normalized:
-            match = re.search(r"(\\d+)\\s*개", normalized)
-            if match:
-                return "more", int(match.group(1))
-            return "more", None
-        return None, None
+        if pending_msg:
+            if self._is_interrupted(session_id, epoch):
+                return
+            logger.info(f"Sending pending TTS response: '{pending_msg[:80]}...'")
+            await self._sender.send_tts_response(session_id, pending_msg)
+            if self._session:
+                self._session.add_to_history(session_id, "assistant", pending_msg)
+        elif response.text:
+            if self._is_interrupted(session_id, epoch):
+                return
+            logger.info(f"Sending TTS response: '{response.text[:80]}...'")
+            await self._sender.send_tts_response(session_id, response.text)
+            if self._session:
+                self._session.add_to_history(session_id, "assistant", response.text)
 
     async def _handle_flow_input(self, session_id: str, text: str):
+        """Handle input when flow is active."""
         session = self._session.get_session(session_id) if self._session else None
         if not session:
             return
@@ -252,3 +266,6 @@ class TextHandler:
 
         if next_step.prompt:
             await self._sender.send_tts_response(session_id, next_step.prompt)
+
+    def _is_interrupted(self, session_id: str, epoch: int) -> bool:
+        return self._interrupt_epochs.get(session_id, 0) != epoch
