@@ -4,7 +4,9 @@ import './SelectMallA.css';
 import iconUser from '../../assets/icon-user.png';
 import iconMic from '../../assets/mike.png';
 import iconHome from '../../assets/home.png';
-import iconCart from '../../assets/cart.png'; // Use cart.png
+import iconCart from '../../assets/icon-cart.png'; // Use cart.png
+import iconNaver from '../../assets/naver.png';
+import iconCoupang from '../../assets/coupang.png';
 import BackButton from '../common/BackButtonA';
 
 const SelectMall = () => {
@@ -22,7 +24,7 @@ const SelectMall = () => {
 
     return (
         <div className="mall-container">
-            <BackButton onClick={() => navigate('/login')} />
+            <BackButton onClick={() => navigate('/login')} variant="arrow-only" />
             {/* Header */}
             <div className="mall-header">
                 <div className="header-title">쇼핑몰 선택</div>
@@ -44,12 +46,12 @@ const SelectMall = () => {
 
             {/* Content */}
             <div className="mall-content">
-                {/* Naver */}
-                <div className="mall-card naver-card" onClick={() => handleSelectMall('naver')}>
-                    <div className="mall-icon-box naver-box">
-                        <span className="n-logo">N</span>
+                {/* Coupang */}
+                <div className="mall-card coupang-card" onClick={() => handleSelectMall('coupang')}>
+                    <div className="mall-icon-box coupang-box">
+                        <img src={iconCoupang} alt="Coupang" className="mall-logo-img" />
                     </div>
-                    <div className="mall-text">1 네이버</div>
+                    <div className="mall-text">1</div>
                 </div>
 
                 {/* Mic Center */}
@@ -57,12 +59,12 @@ const SelectMall = () => {
                     <img src={iconMic} alt="Mic" className="mic-icon" />
                 </div>
 
-                {/* Coupang */}
-                <div className="mall-card coupang-card" onClick={() => handleSelectMall('coupang')}>
-                    <div className="mall-icon-box coupang-box">
-                        <span className="c-logo">coupang</span>
+                {/* Naver */}
+                <div className="mall-card naver-card" onClick={() => handleSelectMall('naver')}>
+                    <div className="mall-icon-box naver-box">
+                        <img src={iconNaver} alt="Naver" className="mall-logo-img" />
                     </div>
-                    <div className="mall-text">2 쿠팡</div>
+                    <div className="mall-text">2</div>
                 </div>
             </div>
         </div>

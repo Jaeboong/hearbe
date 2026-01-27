@@ -1,21 +1,16 @@
 /* --- 1. 변수 설정 (유지보수 편하게!) --- */
 :root {
     --cart-bg: #141C29;
-    /* 다크 네이비 */
     --cart-accent: #FFF064;
-    /* 쨍한 노랑 */
     --cart-item-bg: #1a2436;
-    /* 아이템 배경 (살짝 밝은 네이비) */
     --cart-delete-bg: #A81A1A;
-    /* 어두운 빨강 */
     --cart-delete-text: #FAFAFA;
-    /* 흰색 텍스트 */
 }
 
 /* --- 2. 전체 레이아웃 --- */
 .cart-container {
-    width: 50vw;
-    height: 50vh;
+    width: 100%;
+    min-height: 100vh;
     background-color: var(--cart-bg);
     color: var(--cart-accent);
     display: flex;
@@ -23,205 +18,90 @@
     align-items: center;
     padding: 0;
     overflow-y: auto;
-    /* 스크롤 가능 */
     position: relative;
     font-family: 'Sans-serif', system-ui;
     box-sizing: border-box;
-    transform: scale(2);
-    transform-origin: 0 0;
+}
 
+/* Back Button Component Override */
+.cart-container .global-back-button.arrow-only {
+    left: 4vw;
+    top: 4vw;
+    transform: none;
+}
+
+.cart-container .global-back-button.arrow-only .back-arrow-svg {
+    width: 8vw;
+    height: 8vw;
 }
 
 /* 헤더 영역 */
 .cart-header {
     width: 100%;
-    max-width: 1200px;
+    margin-top: 10vw;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 40px;
-    margin-top: 20px;
-    margin-left: 100px;
-    /* 뒤로가기 버튼 공간 확보 */
+    padding: 2vw;
+    padding-left: 20vw;
+    /* Space for back button */
     box-sizing: border-box;
+    margin-bottom: 2vw;
 }
 
 .cart-title {
-    font-size: 80px;
+    font-size: 8vw;
     font-weight: 900;
-    color: var(--cart-accent);
-    letter-spacing: 3px;
 }
 
-/* 장바구니 비었을 때 */
+/* --- 3. 비어있을 때 --- */
 .cart-empty-message {
-    width: 100%;
-    height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 70px;
-    font-weight: bold;
-    color: var(--cart-accent);
+    margin-top: 20vw;
+    font-size: 5vw;
     opacity: 0.7;
-    /* 살짝 투명하게 */
-
-    letter-spacing: 3px;
+    font-weight: bold;
 }
 
-/* --- 3. 리스트 영역 --- */
+/* --- 4. 리스트 영역 --- */
 .cart-list-area {
-    width: 95%;
-    max-width: 1800px;
+    width: 90%;
     display: flex;
     flex-direction: column;
-    gap: 40px;
-    padding-bottom: 250px;
-    letter-spacing: 3px;
-    /* 하단 결제 버튼에 가려지지 않게 여유 공간 */
+    gap: 4vw;
+    padding-bottom: 22vw;
+    /* Bottom bar height + buffer */
 }
 
-/* 쇼핑몰 그룹 박스 */
 .mall-group {
-    width: 100%;
     display: flex;
     flex-direction: column;
-    border: 4px solid var(--cart-accent);
-    /* 테두리 조금 더 잘 보이게 */
-    border-radius: 20px;
-    overflow: hidden;
-    background-color: var(--cart-bg);
+    gap: 2vw;
 }
 
-/* 몰 헤더 (노란 배경) */
 .mall-header-bar {
-    background-color: var(--cart-accent);
-    padding: 20px 40px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    padding: 0 1vw;
+    margin-bottom: 1vw;
 }
 
 .mall-name {
-    font-size: 40px;
+    font-size: 5vw;
     font-weight: 900;
-    color: var(--cart-bg);
-    /* 반전 색상 */
+}
+
+/* 커스텀 체크박스 (전체선택 등) */
+.checkbox-container {
     display: flex;
     align-items: center;
-    gap: 15px;
-}
-
-/* 선택/해제 버튼 */
-.mall-select-btn {
-    background-color: var(--cart-bg);
-    color: var(--cart-accent);
-    border: none;
-    border-radius: 10px;
-    padding: 10px 25px;
-    font-size: 25px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.mall-select-btn:hover {
-    opacity: 0.8;
-}
-
-/* --- 4. 아이템 리스트 (상품) --- */
-.cart-item-row {
-    display: flex;
-    align-items: center;
-    padding: 30px 40px;
-    border-top: 2px solid var(--cart-accent);
-    /* 구분선 */
-    gap: 30px;
-    background-color: var(--cart-bg);
-}
-
-/* 상품 이미지 박스 */
-.item-img-box {
-    width: 200px;
-    height: 200px;
-    background-color: white;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    /* 찌그러짐 방지 */
-    overflow: hidden;
-}
-
-.item-img {
-    width: 90%;
-    height: 90%;
-    object-fit: contain;
-}
-
-/* 상품 정보 텍스트 */
-.item-details {
-    flex: 1;
-    /* 남은 공간 다 차지 */
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.item-date {
-    font-size: 50px;
-    font-weight: bold;
-    opacity: 0.8;
-}
-
-.item-name {
-    font-size: 50px;
-    font-weight: bold;
-    line-height: 1.3;
-}
-
-.item-price-row {
-    font-size: 50px;
-    font-weight: 900;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.item-qty-badge {
-    font-size: 50px;
-    font-weight: bold;
-    /* 노란색 반투명 배경 */
-    padding: 5px 15px;
-    border-radius: 8px;
-}
-
-/* 삭제 버튼 */
-.row-delete-btn {
-    background-color: var(--cart-accent);
-    color: var(--cart-bg);
-    padding: 15px 25px;
-    font-size: 50px;
-    font-weight: bold;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-}
-
-/* --- 5. 장바구니 전용 체크박스 --- */
-.cart-checkbox-wrapper {
-    display: flex;
-    align-items: center;
+    gap: 2vw;
     cursor: pointer;
     position: relative;
-    width: 50px;
-    height: 50px;
-    flex-shrink: 0;
+    user-select: none;
 }
 
-/* 기본 인풋 숨김 */
-.cart-checkbox-wrapper input {
+.checkbox-container input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
@@ -229,43 +109,192 @@
     width: 0;
 }
 
-/* 커스텀 체크 박스 */
 .cart-checkmark {
-    height: 40px;
-    width: 40px;
+    height: 5vw;
+    width: 5vw;
     background-color: transparent;
-    border: 4px solid var(--cart-bg);
-    /* 배경이 노랑일 땐 네이비 테두리 */
-    border-radius: 8px;
+    border: 0.4vw solid var(--cart-accent);
+    border-radius: 1vw;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
 }
 
-/* 만약 배경이 어두운 곳(아이템 리스트)에 있으면 노란 테두리로 */
-.cart-item-row .cart-checkmark {
-    border-color: var(--cart-accent);
+.checkbox-container input:checked~.cart-checkmark {
+    background-color: var(--cart-accent);
 }
 
-/* 체크 표시 (V) */
 .cart-checkmark:after {
     content: "";
     display: none;
-    width: 10px;
-    height: 20px;
-    border: solid var(--cart-accent);
-    /* 기본은 노란 체크 */
-    border-width: 0 5px 5px 0;
-    transform: rotate(45deg) translate(-2px, -2px);
+    width: 1.5vw;
+    height: 2.5vw;
+    border: solid var(--cart-bg);
+    border-width: 0 0.6vw 0.6vw 0;
+    transform: rotate(45deg);
+    margin-top: -0.5vw;
 }
 
-/* 배경이 노란 곳(헤더)에서는 체크 색을 네이비로 */
-.mall-header-bar .cart-checkmark:after {
-    border-color: var(--cart-bg);
-}
-
-/* 체크 되었을 때 V 보이기 */
-.cart-checkbox-wrapper input:checked~.cart-checkmark:after {
+.checkbox-container input:checked~.cart-checkmark:after {
     display: block;
+}
+
+/* Mall Actions (선택삭제) */
+.mall-actions button {
+    background: transparent;
+    border: 0.2vw solid var(--cart-accent);
+    color: var(--cart-accent);
+    padding: 1vw 2vw;
+    font-size: 3vw;
+    border-radius: 1vw;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* --- 5. 카트 아이템 카드 --- */
+.cart-item-card {
+    background-color: var(--cart-item-bg);
+    border-radius: 2vw;
+    padding: 3vw;
+    display: flex;
+    align-items: center;
+    gap: 3vw;
+    position: relative;
+    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.2);
+}
+
+/* Item Image */
+.item-image-box {
+    width: 20vw;
+    height: 20vw;
+    background-color: #fff;
+    border-radius: 2vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.item-img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+/* Item Info */
+.item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+}
+
+.item-name {
+    font-size: 4vw;
+    font-weight: bold;
+    line-height: 1.3;
+    word-break: keep-all;
+}
+
+.item-meta {
+    font-size: 3.5vw;
+    opacity: 0.8;
+}
+
+.item-price {
+    font-size: 5vw;
+    font-weight: 900;
+    margin-top: 1vw;
+}
+
+/* Quantity Controls */
+.item-quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+    margin-top: 1vw;
+}
+
+.qty-btn {
+    width: 6vw;
+    height: 6vw;
+    border-radius: 50%;
+    border: 0.2vw solid var(--cart-accent);
+    background: transparent;
+    color: var(--cart-accent);
+    font-size: 4vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.qty-val {
+    font-size: 4.5vw;
+    font-weight: bold;
+    min-width: 5vw;
+    text-align: center;
+}
+
+/* Delete Button (X) */
+.item-delete-btn {
+    position: absolute;
+    top: 3vw;
+    right: 3vw;
+    background: transparent;
+    border: none;
+    color: var(--cart-accent);
+    font-size: 5vw;
+    font-weight: 1000;
+    cursor: pointer;
+    padding: 1vw;
+    /* Touch target */
+}
+
+/* --- 6. 하단 고정 바 (총 결제금액) --- */
+.cart-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20vw;
+    /* Approx 20% of screen height */
+    background-color: var(--cart-bg);
+    /* Or darker shade */
+    border-top: 0.4vw solid var(--cart-accent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5vw;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+.total-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+}
+
+.total-label {
+    font-size: 4vw;
+    font-weight: bold;
+}
+
+.total-amount {
+    font-size: 7vw;
+    font-weight: 900;
+    color: var(--cart-accent);
+}
+
+.checkout-btn {
+    background-color: var(--cart-accent);
+    color: var(--cart-bg);
+    border: none;
+    padding: 2.5vw 6vw;
+    font-size: 5vw;
+    font-weight: 900;
+    border-radius: 2vw;
+    cursor: pointer;
+    box-shadow: 0 0.5vw 2vw rgba(255, 240, 100, 0.3);
 }

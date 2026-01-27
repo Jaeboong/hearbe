@@ -1,198 +1,197 @@
+/* --- SelectMallA.css Optimized by Choco --- */
+
+:root {
+    /* 🎨 색상 변수: 나중에 여기만 바꾸면 전체 테마가 바껴! */
+    --color-bg-main: #1E2A3A;
+    --color-bg-card: #141C29;
+    --color-accent: #FFF064;
+    /* 텍스트 및 테두리 포인트 색상 */
+    --color-naver: #03C75A;
+    --color-coupang: #E11724;
+
+    /* 🔠 폰트 변수 */
+    --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* 기본 설정 및 레이아웃 */
 .mall-container {
     display: flex;
     flex-direction: column;
-    width: 50vw;
-    min-height: 50vh;
-    transform: scale(2);
-    transform-origin: 0 0;
-    background-color: #141C29;
-    color: #FFF064;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--color-bg-main);
+    color: var(--color-accent);
+    font-family: var(--font-main);
+    position: relative;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    /* 전체 박스 모델 통일 */
 }
 
-.mall-header {
+/* --- 공통 유틸리티 (Flex 정렬 중복 제거) --- */
+.mall-header,
+.mall-content,
+.mic-center,
+.mall-icon-box {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 40px;
-    /* Reduced from default if needed, or keep. Backbutton is absolute. */
-    margin-top: 20px;
-    /* Add margin to avoid BackButton overlap */
+}
+
+/* --- Header Section --- */
+.mall-header {
+    padding: 2vw;
+    margin-top: 1vw;
+    position: relative;
+    min-height: 12vw;
+    margin-bottom: 2vw;
+    /* Left align title, overriding common center utility */
+    justify-content: flex-start;
+    /* Add padding to clear the absolute Back Button (Left 2.5vw + Width 6vw + Gap 6.5vw = 15vw) */
+    padding-left: 18vw;
 }
 
 .header-title {
-    font-size: 80px;
-    font-weight: 500;
-    letter-spacing: 2px;
+    font-size: 8vw;
+    font-weight: 900;
+    letter-spacing: 0.1vw;
+    color: var(--color-accent);
+    z-index: 10;
+    max-width: 50vw;
+    white-space: nowrap;
 }
 
 .header-nav {
+    position: absolute;
+    right: 3vw;
+    top: 1.5vw;
     display: flex;
-    gap: 40px;
+    gap: 3vw;
+    z-index: 20;
 }
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 0.5vw;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease;
 }
 
 .nav-item:hover {
-    transform: translateY(-10px);
+    transform: translateY(-0.5vw);
 }
 
 .nav-icon {
-    width: 60px;
-    height: 60px;
-    /* Force size for icons */
+    width: 9vw;
+    height: 9vw;
     object-fit: contain;
-    /* If icons are actually rectangular, this keeps aspect ratio if contain */
 }
 
-/* Content */
+.nav-item span {
+    font-size: 3vw;
+    font-weight: bold;
+    color: var(--color-accent);
+}
+
+/* --- Content Section --- */
 .mall-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 50px;
-    width: 100%;
-    margin-top: 50px;
+    flex-grow: 1;
+    gap: 4vw;
+    padding-bottom: 5vw;
+    padding-top: 2vw;
+    margin-top: auto;
 }
 
 /* Mall Cards */
 .mall-card {
-    width: 400px;
-    height: 500px;
-    /* Increased height */
-    border-radius: 40px;
-    cursor: pointer;
+    background-color: var(--color-bg-card);
+    border: 0.6vw solid var(--color-accent);
+    border-radius: 5vw;
+    /* Adjusted padding for 2x size */
+    padding: 2vw;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 30px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.mall-card:hover {
-    transform: translateY(-20px);
-    box-shadow: 0 0 30px rgba(255, 240, 100, 0.3);
-    /* Yellowish glow */
-}
-
-.naver-card {
-    background-color: #03C75A;
-}
-
-.coupang-card {
-    background-color: #E61828;
-}
-
-/* Override placeholder if real img loads transparently */
-img.nav-icon {
-    background-color: transparent;
-}
-
-.nav-item span {
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.mall-content {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 60px;
-    padding-bottom: 60px;
-}
-
-.mall-card {
-    border: 6px solid #FFF064;
-    border-radius: 40px;
-    padding: 60px 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 40px;
-    width: 500px;
-    height: 500px;
+    width: 35vw;
+    height: 35vw;
     box-sizing: border-box;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    gap: 2vw;
 }
 
 .mall-card:hover {
     transform: scale(1.05);
-}
-
-.mall-icon-box {
-    width: 250px;
-    height: 250px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 30px;
-}
-
-.naver-box {
-    background-color: #03C75A;
-}
-
-.n-logo {
-    color: white;
-    font-size: 150px;
-    font-weight: 900;
-}
-
-.coupang-box {
-    background-color: transparent;
-    /* Coupang logo is complex, placeholder red burst */
-    background-image: radial-gradient(circle, #E11724 60%, transparent 65%);
-    /* Simple stylized burst/logo simulation */
-    position: relative;
-    border: 4px dashed #E11724;
-    /* Fallback visual */
-}
-
-.c-logo {
-    color: white;
-    /* In reality, the logo text is overlaid */
-    font-size: 50px;
-    font-weight: bold;
-    z-index: 2;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 1vw rgba(255, 240, 100, 0.2);
 }
 
 .mall-text {
-    font-size: 60px;
+    font-size: 10vw;
     font-weight: 900;
-    color: #FFF064;
+    color: var(--color-accent);
+    line-height: 1;
 }
 
-.mic-center {
+/* --- Icon Boxes (Naver & Coupang) --- */
+.mall-icon-box {
+    /* 2x Size logic: ~24vw */
+    width: 24vw;
+    height: 24vw;
+    border-radius: 2vw;
+    overflow: visible;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    /* Essential for absolute positioning of number */
 }
 
-.mic-icon {
-    width: 200px;
-    height: auto;
-    filter: drop-shadow(0 0 10px #FFF064);
-    /* Glow effect */
-}
-
-.back-arrow {
+/* Number Overlay */
+.mall-number {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    font-size: 80px;
-    color: #FFF064;
-    cursor: pointer;
-    font-weight: bold;
+    top: -1vw;
+    left: -1vw;
+    font-size: 8vw;
+    font-weight: 900;
+    color: var(--color-accent);
+    /* Yellow text */
+    /* Optional: shadow to separate from image */
+    text-shadow: 0.2vw 0.2vw 0.5vw rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+/* Naver Specific */
+.naver-box {
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Coupang Specific */
+.coupang-box {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* New Logo Image Class */
+.mall-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Removed scale(1.2) */
+}
+
+/* --- Mic Icon --- */
+.mic-icon {
+    width: 15vw;
+    height: auto;
+    filter: drop-shadow(0 0 0.5vw var(--color-accent));
 }

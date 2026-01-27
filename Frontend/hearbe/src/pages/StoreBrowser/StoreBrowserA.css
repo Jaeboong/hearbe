@@ -7,6 +7,19 @@
     background-color: #f2f2f2;
 }
 
+/* Back Button Component Override */
+.store-container .global-back-button {
+    transform: scale(0.5);
+    /* Counteract x2 scale */
+    transform-origin: top left;
+    left: 40px;
+    top: 40px;
+}
+
+.store-container .global-back-button .back-arrow-svg {
+    /* Auto size */
+}
+
 .store-iframe {
     width: 100%;
     height: 100%;
@@ -39,168 +52,130 @@
     border-radius: 3px;
 }
 
-.close-x {
-    font-size: 70px;
-    color: #FFF064;
-    font-weight: 900;
-    line-height: 1;
-}
-
 /* Menu Bubble */
 .menu-bubble {
     position: fixed;
     bottom: 180px;
     left: 40px;
     background-color: #141C29;
-    border-radius: 20px;
-    padding: 50px;
+    /* Navy Background */
+    border-radius: 30px;
+    /* Larger radius */
+    padding: 30px 50px;
+    /* Larger padding */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    z-index: 1205;
+    animation: fadeIn 0.3s ease-out;
+    border: 2px solid #FFF064;
+    /* Yellow border for contrast */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-list {
     display: flex;
     flex-direction: column;
     gap: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    z-index: 1100;
-}
-
-/* Bubble Arrow */
-.menu-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -20px;
-    left: 40px;
-    /* Align with button */
-    border-width: 20px 20px 0;
-    border-style: solid;
-    border-color: #141C29 transparent transparent transparent;
+    /* Increased gap */
 }
 
 .menu-item {
+    font-size: 50px;
+    /* Increased font size */
+    font-weight: bold;
+    color: #FFF064;
+    /* Yellow text */
     display: flex;
     align-items: center;
     gap: 30px;
+    padding: 15px 0;
     cursor: pointer;
+    border-bottom: 2px solid rgba(255, 240, 100, 0.2);
+}
+
+.menu-item:last-child {
+    border-bottom: none;
 }
 
 .menu-icon {
-    width: 60px;
-    height: auto;
+    width: 50px;
+    /* generic icon size */
+    height: 50px;
     object-fit: contain;
 }
 
-.menu-text {
+/* Close Button in Bubble */
+.close-bubble {
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    background: #141C29;
+    color: #FFF064;
+    width: 100px;
+    /* Increased to match hamburger */
+    height: 100px;
+    /* Increased to match hamburger */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 50px;
+    /* Increased font size */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #FFF064;
+}
+
+/* Close X inside Hamburger (if used) */
+.close-x {
     font-size: 50px;
     font-weight: 900;
     color: #FFF064;
-    border-bottom: 3px solid rgba(255, 240, 100, 0.3);
-    padding-bottom: 5px;
-    white-space: nowrap;
+    line-height: 1;
 }
 
-/* --- Share Modal --- */
-.modal-overlay-dark {
+/* --- Sharing Mode UI --- */
+.sharing-header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 2000;
+    padding: 20px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    backdrop-filter: blur(5px);
-}
-
-.share-modal-box {
-    background-color: #141C29;
-    border-radius: 40px;
-    padding: 60px 100px;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 40px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-}
-
-.share-title {
-    font-size: 60px;
-    font-weight: 900;
-    color: #FFF064;
-}
-
-.share-code-box {
-    border: 6px solid #FFF064;
-    border-radius: 30px;
-    padding: 30px 80px;
-    font-size: 100px;
-    font-weight: 900;
-    color: #FFF064;
-    background-color: transparent;
-    letter-spacing: 20px;
-}
-
-.share-desc {
-    font-size: 40px;
-    font-weight: bold;
-    color: white;
-}
-
-.share-btn-row {
-    display: flex;
-    gap: 40px;
-    margin-top: 20px;
-}
-
-.share-btn-cancel,
-.share-btn-enter {
-    background-color: transparent;
-    border: 4px solid #FFF064;
-    color: #FFF064;
-    font-size: 50px;
-    font-weight: 900;
-    padding: 20px 60px;
-    border-radius: 20px;
-    cursor: pointer;
-}
-
-.share-btn-enter {
-    background-color: #FFF064;
-    color: #141C29;
-}
-
-/* --- Sharing UI --- */
-.sharing-header {
-    position: fixed;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
+    /* Center horizontally */
     gap: 20px;
-    z-index: 1500;
-    align-items: center;
-    width: 90%;
-    justify-content: space-between;
+    z-index: 1100;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+    pointer-events: none;
+    /* Let clicks pass through */
 }
 
-.sharing-pill {
-    background-color: #141C29;
-    color: #FFF064;
-    padding: 20px 40px;
-    border-radius: 40px;
-    font-size: 35px;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
+/* Making children clickable */
+.sharing-pill,
 .participant-pill {
-    background-color: #141C29;
+    pointer-events: auto;
+    background-color: rgba(20, 28, 41, 0.9);
     color: #FFF064;
     padding: 15px 30px;
-    border-radius: 40px;
-    font-size: 30px;
+    border-radius: 50px;
     font-weight: bold;
+    font-size: 35px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -212,43 +187,131 @@
 
 .sharing-bottom-bar {
     position: fixed;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background-color: #141C29;
     display: flex;
-    gap: 10px;
-    padding: 20px;
-    border-radius: 30px;
-    z-index: 1500;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    justify-content: space-around;
+    padding: 20px 0;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    z-index: 1300;
 }
 
 .sharing-btn {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 20px 40px;
-    border-radius: 20px;
+    background: transparent;
     border: none;
-    font-size: 35px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     color: #FFF064;
+    font-size: 30px;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    cursor: pointer;
 }
 
-.sharing-btn.primary {
-    background-color: rgba(255, 240, 100, 0.1);
+.s-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
 
 .sharing-btn.highlight {
     background-color: #FFF064;
     color: #141C29;
-    font-weight: 900;
+    padding: 10px 40px;
+    border-radius: 20px;
+    flex-direction: row;
+    height: 100px;
+    align-self: center;
 }
 
-.s-icon {
-    width: 35px;
-    height: auto;
+.sharing-btn.primary {
+    /* Special style for 'Buy' etc */
+    font-weight: bold;
+}
+
+/* Share Modal (Popup) */
+.share-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-modal-content {
+    width: 900px;
+    /* Wider */
+    background-color: #141C29;
+    /* Navy Background */
+    border-radius: 50px;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    text-align: center;
+    border: 4px solid #141C29;
+    /* Edge matching */
+}
+
+.share-modal-title {
+    font-size: 70px;
+    font-weight: 900;
+    color: #FFF064;
+    /* Yellow Title */
+}
+
+.share-code-box {
+    border: 4px solid #FFF064;
+    border-radius: 40px;
+    padding: 20px 100px;
+    font-size: 100px;
+    font-weight: 900;
+    color: #FFF064;
+    margin: 20px 0;
+    letter-spacing: 20px;
+}
+
+.share-modal-desc {
+    font-size: 45px;
+    color: #FAFAFA;
+    /* White text */
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.share-modal-btns {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+    justify-content: center;
+}
+
+.sm-btn {
+    padding: 20px 60px;
+    border-radius: 20px;
+    border: 4px solid #FFF064;
+    font-size: 50px;
+    font-weight: 900;
+    cursor: pointer;
+    min-width: 250px;
+}
+
+.sm-btn.cancel {
+    background-color: transparent;
+    color: #FAFAFA;
+}
+
+.sm-btn.confirm {
+    background-color: #FFF064;
+    color: #141C29;
 }

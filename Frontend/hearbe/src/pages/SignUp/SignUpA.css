@@ -18,7 +18,6 @@ body {
 /* =========================================
    2. 유틸리티 & 공통 스타일
    ========================================= */
-/* 공통 Flex 정렬 */
 .flex-col-center {
     display: flex;
     flex-direction: column;
@@ -31,7 +30,7 @@ body {
     justify-content: center;
 }
 
-/* 공통 버튼 스타일 (노란 배경 + 남색 글씨) */
+/* 공통 버튼 스타일 */
 .check-btn,
 .signup-submit-btn,
 .error-confirm-btn,
@@ -72,43 +71,53 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    letter-spacing: 3px;
-
-    /* 대형 화면용 스케일링 유지 */
-    width: 50vw;
-    height: 50vh;
-    transform: scale(2);
-    transform-origin: 0 0;
+    letter-spacing: 0.2vw;
+    width: 100%;
     background-color: #141C29;
+    padding-bottom: 5vw;
+    /* Scroll buffer */
+}
+
+/* Back Button Component Override */
+.signup-container .global-back-button.arrow-only {
+    left: 4vw;
+    top: 4vw;
+    transform: none;
+}
+
+.signup-container .global-back-button.arrow-only .back-arrow-svg {
+    width: 8vw;
+    height: 8vw;
 }
 
 .signup-box {
-    width: 100%;
-    max-width: 1300px;
-    padding: 50px;
+    width: 90vw;
+    padding: 2vw;
     display: flex;
     flex-direction: column;
-    gap: 50px;
+    gap: 3vw;
+    box-sizing: border-box;
+    margin-top: 5vw;
 }
 
 .signup-logo-area {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 2vw;
 }
 
 .signup-logo-image {
-    width: 350px;
+    width: 30vw;
     height: auto;
     object-fit: contain;
 }
 
-/* 뒤로가기 화살표 */
+/* 뒤로가기 화살표 (fallback if not using component) */
 .back-arrow {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    font-size: 100px;
+    top: 3vw;
+    left: 3vw;
+    font-size: 8vw;
     color: var(--accent-yellow);
     cursor: pointer;
     font-weight: bold;
@@ -118,8 +127,8 @@ body {
    4. 입력 폼 (Input) 스타일
    ========================================= */
 .form-group-outline {
-    border: 6px solid var(--accent-yellow);
-    border-radius: 24px;
+    border: 0.5vw solid var(--accent-yellow);
+    border-radius: 2vw;
     background-color: var(--bg-dark);
     overflow: hidden;
     display: flex;
@@ -129,32 +138,33 @@ body {
 .input-row {
     display: flex;
     align-items: center;
-    padding: 30px;
+    padding: 2vw;
     font-weight: bold;
-    font-size: 50px;
+    font-size: 4vw;
 }
 
 .border-bottom {
-    border-bottom: 6px solid var(--accent-yellow);
+    border-bottom: 0.5vw solid var(--accent-yellow);
 }
 
 .header-row {
-    padding-left: 30px;
-    gap: 30px;
+    padding-left: 2vw;
+    gap: 2vw;
 }
 
 .input-icon {
-    width: 120px;
-    height: 120px;
+    width: 8vw;
+    height: 8vw;
     object-fit: contain;
+    margin-right: 2vw;
 }
 
 .signup-input {
     border: none;
-    padding: 30px;
-    font-size: 70px;
-    letter-spacing: 2px;
-    height: 60px;
+    padding: 1vw;
+    font-size: 5vw;
+    letter-spacing: 0.1vw;
+    height: auto;
 }
 
 .signup-input::placeholder {
@@ -164,129 +174,131 @@ body {
 
 /* 중복확인 버튼 */
 .check-btn {
-    padding: 20px 50px;
-    border-radius: 16px;
-    font-size: 60px;
+    padding: 1.5vw 3vw;
+    border-radius: 1.5vw;
+    font-size: 4vw;
     white-space: nowrap;
     flex-shrink: 0;
-    letter-spacing: 2px;
+    letter-spacing: 0.1vw;
+    margin-left: 2vw;
 }
 
 /* 라벨 텍스트 */
 .label {
     flex-grow: 1;
-    font-size: 80px;
-    letter-spacing: 3px;
+    font-size: 6vw;
+    letter-spacing: 0.2vw;
 }
 
 /* =========================================
    5. 카드 섹션 (메인 화면)
    ========================================= */
 .card-section {
-    padding: 5px;
+    padding: 0.5vw;
 }
 
 /* 메인 화면의 카메라 실행 버튼 영역 */
 .camera-area {
-    border: 8px solid var(--accent-yellow);
-    border-radius: 20px;
+    border: 0.6vw solid var(--accent-yellow);
+    border-radius: 2vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
-    margin: 0 25px 25px 25px;
+    justify-content: center;
+    gap: 2vw;
+    margin: 0 1.5vw 1.5vw 1.5vw;
     background-color: transparent;
-    padding: 80px 50px;
-    min-height: 400px;
+    padding: 4vw;
+    min-height: 25vw;
 }
 
 .camera-text {
     font-weight: bold;
-    font-size: 70px;
-    letter-spacing: 3px;
+    font-size: 5vw;
+    letter-spacing: 0.2vw;
 }
 
 .camera-icon-img {
-    width: 300px;
+    width: 20vw;
     height: auto;
 }
 
 /* 등록 완료 후 카드 정보 표시 박스 */
 .card-info-display {
-    padding: 40px;
+    padding: 3vw;
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    border: 4px solid var(--accent-yellow);
-    border-radius: 20px;
-    margin: 0 25px 25px 25px;
+    gap: 2vw;
+    border: 0.4vw solid var(--accent-yellow);
+    border-radius: 2vw;
+    margin: 0 1.5vw 1.5vw 1.5vw;
 }
 
 .info-row {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0.5vw;
 }
 
 .info-row-flex {
     display: flex;
-    gap: 40px;
+    gap: 3vw;
 }
 
 .info-col {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0.5vw;
     flex: 1;
 }
 
 .info-label-main {
-    font-size: 35px;
+    font-size: 3vw;
     color: var(--accent-yellow);
     font-weight: bold;
     opacity: 0.8;
 }
 
 .info-val-main {
-    font-size: 45px;
+    font-size: 4vw;
     color: var(--accent-yellow);
     font-weight: 900;
-    padding-left: 10px;
-    border-bottom: 2px solid var(--accent-yellow);
-    padding-bottom: 10px;
+    padding-left: 1vw;
+    border-bottom: 0.2vw solid var(--accent-yellow);
+    padding-bottom: 1vw;
 }
 
 /* =========================================
    6. 약관 동의 (Terms) 섹션
    ========================================= */
 .terms-section {
-    padding: 40px;
-    gap: 30px;
+    padding: 3vw;
+    gap: 2vw;
     align-items: flex-start;
 }
 
 .term-row {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 2vw;
     cursor: pointer;
     width: 100%;
 }
 
 .check-circle {
-    width: 60px;
-    height: 60px;
-    border: 8px solid var(--accent-yellow);
+    width: 5vw;
+    height: 5vw;
+    border: 0.5vw solid var(--accent-yellow);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 45px;
+    font-size: 3.5vw;
     font-weight: 900;
     color: var(--bg-dark);
     background-color: transparent;
     transition: background-color 0.2s;
-    -webkit-text-stroke: 3px var(--bg-dark);
+    -webkit-text-stroke: 0.1vw var(--bg-dark);
 }
 
 .check-circle.checked {
@@ -294,7 +306,7 @@ body {
 }
 
 .term-text {
-    font-size: 50px;
+    font-size: 4vw;
     font-weight: bold;
 }
 
@@ -304,10 +316,10 @@ body {
 
 /* 회원가입 제출 버튼 */
 .signup-submit-btn {
-    font-size: 90px;
-    padding: 40px;
-    border-radius: 30px;
-    margin-top: 20px;
+    font-size: 6vw;
+    padding: 3vw;
+    border-radius: 2vw;
+    margin-top: 2vw;
     width: 100%;
 }
 
@@ -325,40 +337,42 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 2vw;
     backdrop-filter: blur(5px);
 }
 
 .modal-content {
     width: 100%;
-    max-width: 1400px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 1vw;
 }
 
 .hearbe-text {
-    font-size: 60px;
+    font-size: 4vw;
     font-weight: 900;
     color: var(--accent-yellow);
     font-style: italic;
-    margin-bottom: 20px;
+    margin-bottom: 1vw;
     align-self: flex-start;
-    margin-left: 20px;
-    letter-spacing: 2px;
+    margin-left: 1vw;
+    letter-spacing: 0.1vw;
 }
 
 /* 팝업 박스 본체 */
 .modal-box {
-    width: 1600px;
-    border: 6px solid var(--accent-yellow);
-    border-radius: 30px;
-    padding: 60px;
+    width: 90vw;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 0.5vw solid var(--accent-yellow);
+    border-radius: 2vw;
+    padding: 4vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
+    gap: 2vw;
     box-sizing: border-box;
     background-color: var(--bg-dark);
     position: relative;
@@ -368,46 +382,50 @@ body {
 .modal-close-x,
 .modal-close-btn {
     position: absolute;
-    top: 30px;
-    right: 30px;
-    font-size: 100px;
-    /* 크기 조정 */
+    top: 2vw;
+    right: 2vw;
+    font-size: 8vw;
     font-weight: 1000;
     color: var(--accent-yellow);
     cursor: pointer;
     line-height: 1;
+    z-index: 30;
+    transition: transform 0.2s;
+}
+
+.modal-close-btn:hover {
+    transform: scale(1.1);
 }
 
 .modal-title {
-    font-size: 100px;
+    font-size: 7vw;
     font-weight: 900;
     color: var(--accent-yellow);
-    letter-spacing: 3px;
+    letter-spacing: 0.2vw;
     text-align: center;
 }
 
 .modal-desc {
-    font-size: 50px;
+    font-size: 4vw;
     font-weight: 900;
     color: var(--accent-yellow);
-    margin-bottom: 30px;
+    margin-bottom: 2vw;
     text-align: center;
-    letter-spacing: 3px;
+    letter-spacing: 0.2vw;
 }
 
 /* 모달 내 카메라 영역 */
 .modal-camera-area {
     width: 100%;
-    max-width: 1200px;
-    border: 4px solid var(--accent-yellow);
-    border-radius: 20px;
+    border: 0.4vw solid var(--accent-yellow);
+    border-radius: 2vw;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #000;
-    height: 800px;
+    height: 60vh;
     position: relative;
     overflow: hidden;
 }
@@ -419,26 +437,26 @@ body {
 }
 
 .modal-camera-text {
-    font-size: 50px;
+    font-size: 4vw;
     font-weight: bold;
     color: var(--accent-yellow);
-    margin-bottom: 20px;
+    margin-bottom: 2vw;
 }
 
 .modal-camera-icon {
-    width: 200px;
+    width: 15vw;
     height: auto;
 }
 
 /* 셔터 버튼 */
 .shutter-button {
-    width: 100px;
-    height: 100px;
+    width: 8vw;
+    height: 8vw;
     border-radius: 50%;
     background-color: transparent;
-    border: 6px solid var(--accent-yellow);
+    border: 0.5vw solid var(--accent-yellow);
     position: absolute;
-    bottom: 40px;
+    bottom: 3vw;
     left: 50%;
     transform: translateX(-50%);
     cursor: pointer;
@@ -449,8 +467,8 @@ body {
 }
 
 .shutter-inner {
-    width: 80px;
-    height: 80px;
+    width: 6vw;
+    height: 6vw;
     border-radius: 50%;
     background-color: var(--accent-yellow);
     transition: transform 0.1s;
@@ -465,56 +483,57 @@ body {
    ========================================= */
 .card-form-box {
     width: 100%;
-    max-width: 800px;
-    border: 10px solid var(--accent-yellow);
-    border-radius: 30px;
-    padding: 60px;
+    border: 0.6vw solid var(--accent-yellow);
+    border-radius: 2vw;
+    padding: 3vw;
     background-color: transparent;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 2vw;
+    box-sizing: border-box;
 }
 
 .card-form-header {
     display: flex;
     align-items: center;
-    gap: 20px;
-    font-size: 50px;
+    gap: 1.5vw;
+    font-size: 4vw;
     font-weight: 900;
     color: var(--accent-yellow);
-    margin-bottom: 20px;
+    margin-bottom: 1vw;
+    justify-content: center;
 }
 
 .small-card-icon {
-    width: 60px;
+    width: 5vw;
     height: auto;
 }
 
 .form-field-group {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 1vw;
     width: 100%;
 }
 
 .form-field-group label {
-    font-size: 40px;
+    font-size: 3vw;
     font-weight: bold;
     color: var(--accent-yellow);
-    margin-left: 10px;
+    margin-left: 0.5vw;
 }
 
 .modal-input {
-    border: 4px solid var(--accent-yellow);
-    border-radius: 15px;
-    padding: 20px;
-    font-size: 40px;
+    border: 0.4vw solid var(--accent-yellow);
+    border-radius: 1.5vw;
+    padding: 1.5vw;
+    font-size: 3.5vw;
     box-sizing: border-box;
 }
 
 .form-row-group {
     display: flex;
-    gap: 40px;
+    gap: 2vw;
     width: 100%;
 }
 
@@ -523,60 +542,32 @@ body {
 }
 
 .card-register-btn {
-    font-size: 50px;
-    padding: 30px;
-    border-radius: 20px;
-    margin-top: 30px;
-}
-
-/* 닫기 버튼 (X) 스타일 */
-.modal-close-btn {
-    position: absolute;
-    top: 40px;
-    /* 위에서 얼마나 띄울지 */
-    right: 40px;
-    /* 오른쪽에서 얼마나 띄울지 */
-
-    font-size: 150px;
-    /* 여기서 X 크기 조절! */
-    font-weight: 1000;
-    /* 아주 굵게 */
-    color: var(--accent-yellow);
-
-    cursor: pointer;
-    line-height: 1;
-    /* 줄 간격 때문에 위치 틀어짐 방지 */
-    z-index: 30;
-    /* 다른 요소보다 위에 오도록 */
-    transition: transform 0.2s;
-    /* 누를 때 살짝 움직이는 효과 */
-}
-
-/* 마우스 올렸을 때 살짝 커지게 (선택사항) */
-.modal-close-btn:hover {
-    transform: scale(1.3);
+    font-size: 4.5vw;
+    padding: 2vw;
+    border-radius: 1.5vw;
+    margin-top: 2vw;
 }
 
 /* =========================================
    9. 에러/성공 모달
    ========================================= */
 .error-modal-box {
-    width: 100%;
-    max-width: 1000px;
+    width: 80vw;
     background-color: var(--bg-dark);
-    border: 6px solid var(--accent-yellow);
-    border-radius: 30px;
-    padding: 80px;
+    border: 0.5vw solid var(--accent-yellow);
+    border-radius: 2vw;
+    padding: 5vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 60px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    gap: 4vw;
+    box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.5);
     text-align: center;
+    position: relative;
 }
 
 .error-message {
-    font-size: 70px;
+    font-size: 5vw;
     font-weight: bold;
     color: var(--accent-yellow);
     line-height: 1.4;
@@ -584,11 +575,11 @@ body {
 }
 
 .error-confirm-btn {
-    padding: 30px 100px;
-    border-radius: 20px;
-    font-size: 70px;
+    padding: 2vw 6vw;
+    border-radius: 1.5vw;
+    font-size: 5vw;
 }
 
 .success-icon {
-    font-size: 100px;
+    font-size: 8vw;
 }

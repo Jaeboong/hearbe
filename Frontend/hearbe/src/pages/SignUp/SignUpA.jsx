@@ -200,7 +200,8 @@ const SignUp = () => {
 
     return (
         <div className="signup-container">
-            <BackButton onClick={() => navigate(-1)} />
+            {/* 뒤로가기 버튼 */}
+            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
             <div className="signup-box">
                 {/* Logo Section */}
                 <div className="signup-logo-area">

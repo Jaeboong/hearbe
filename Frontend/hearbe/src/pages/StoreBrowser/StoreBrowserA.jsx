@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StoreBrowserA.css';
 import iconUser from '../../assets/icon-user.png';
-import iconCard from '../../assets/icon-card.png';
-import iconPhone from '../../assets/icon-phone.png';
+import iconCart from '../../assets/icon-cart.png'; // Updated
+import iconShare from '../../assets/icon-share.png'; // New Share Icon
+import iconCard from '../../assets/icon-cart.png';
 import hLogoOrigin from '../../assets/h-logo-origin.jpg'; // Using the origin logo
 
 import BackButton from '../common/BackButtonA';
@@ -16,6 +17,7 @@ const StoreBrowser = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
+    const [inviteCode, setInviteCode] = useState('0000');
 
     // Naver Add Simulation
     const isNaver = url.includes('naver');
@@ -44,6 +46,9 @@ const StoreBrowser = () => {
 
     const handleShareClick = () => {
         setIsMenuOpen(false); // Close menu
+        // Generate random 4-digit code
+        const code = Math.floor(1000 + Math.random() * 9000).toString();
+        setInviteCode(code);
         setShowShareModal(true);
     };
 
@@ -77,7 +82,7 @@ const StoreBrowser = () => {
                 <>
                     {/* Top Sharing Banner */}
                     <div className="sharing-header">
-                        <div className="sharing-pill">화면 공유 중 (코드: 4572)</div>
+                        <div className="sharing-pill">화면 공유 중 (코드: {inviteCode})</div>
                         <div className="participant-pill">
                             <img src={hLogoOrigin} alt="User" className="p-icon" />
                             <span>참가자 (1명)</span>
@@ -87,7 +92,7 @@ const StoreBrowser = () => {
                     {/* Bottom Control Bar */}
                     <div className="sharing-bottom-bar">
                         <button className="sharing-btn" onClick={handleCart}>
-                            <img src={iconCard} alt="Cart" className="s-icon" />
+                            <img src={iconCart} alt="Cart" className="s-icon" />
                             <span>장바구니</span>
                         </button>
                         <button className="sharing-btn primary">
@@ -95,7 +100,8 @@ const StoreBrowser = () => {
                             <span>바로구매</span>
                         </button>
                         <button className="sharing-btn highlight" onClick={handleEndShare}>
-                            <span>X 공유 종료</span>
+                            <img src={iconShare} alt="Share" className="s-icon" />
+                            <span>공유 종료</span>
                         </button>
                     </div>
                 </>
@@ -113,11 +119,11 @@ const StoreBrowser = () => {
                                 <span className="menu-text">마이페이지</span>
                             </div>
                             <div className="menu-item" onClick={handleCart}>
-                                <img src={iconCard} alt="Cart" className="menu-icon" />
+                                <img src={iconCart} alt="Cart" className="menu-icon" />
                                 <span className="menu-text">장바구니</span>
                             </div>
                             <div className="menu-item" onClick={handleShareClick}>
-                                <img src={iconPhone} alt="Share" className="menu-icon" />
+                                <img src={iconShare} alt="Share" className="menu-icon" />
                                 <span className="menu-text">공유</span>
                             </div>
                         </div>
@@ -138,16 +144,16 @@ const StoreBrowser = () => {
                 </>
             )}
 
-            {/* --- Share Code Modal --- */}
+            {/* Share Modal (Popup) */}
             {showShareModal && (
-                <div className="modal-overlay-dark">
-                    <div className="share-modal-box">
-                        <div className="share-title">회의 코드</div>
-                        <div className="share-code-box">4 5 7 2</div>
-                        <div className="share-desc">이 코드를 상대방에게 알려주세요</div>
-                        <div className="share-btn-row">
-                            <button className="share-btn-cancel" onClick={() => setShowShareModal(false)}>취소</button>
-                            <button className="share-btn-enter" onClick={handleEnterShare}>입장</button>
+                <div className="share-modal-overlay">
+                    <div className="share-modal-content">
+                        <div className="share-modal-title">초대 코드</div>
+                        <div className="share-code-box">{inviteCode.split('').join(' ')}</div>
+                        <div className="share-modal-desc">이 코드를 상대방에게 알려주세요</div>
+                        <div className="share-modal-btns">
+                            <button className="sm-btn cancel" onClick={() => setShowShareModal(false)}>취소</button>
+                            <button className="sm-btn confirm" onClick={handleEnterShare}>입장</button>
                         </div>
                     </div>
                 </div>
