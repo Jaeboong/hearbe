@@ -55,35 +55,49 @@ def _load_ocr_texts(path: str, preprocess: bool = True) -> Tuple[List[str], Dict
 
 def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]:
     numbered = "\n".join(f"{i + 1}. {t}" for i, t in enumerate(texts))
-    keywords = get_keywords_for_type(product_type)
-    type_desc = get_type_description(product_type)
-    
-    # 프롬프트 간소화: 첫 키워드만 전체 예시, 나머지는 생략
-    first_keyword = keywords[0] if keywords else "예시"
-    keyword_schema = f'    "{first_keyword}": {{ "answer": "...", "status": "found|not_found" }},\n    // 나머지 {len(keywords)-1}개 키워드도 동일 형식'
     
     system = (
-        "당신은 시각장애인을 위해 한국어 OCR 텍스트를 요약하고 분석하는 어시스턴트입니다. "
+        "당신은 시각장애인을 위한 **최고의 쇼핑 동반자(Shopping Companion)**입니다. "
+        "당신의 목표는 사용자가 앞을 보지 않고도 **'이 제품이 무엇인지', '내 필요에 맞는지', '안전하게 쓸 수 있는지'**를 명확히 알 수 있도록 돕는 것입니다. "
+        "OCR 텍스트에 오타나 누락이 있어도 전체 문맥을 통해 지능적으로 교정하여 해석하세요. "
         "반드시 유효한 JSON 형식으로만 응답하세요."
     )
     
     instructions = (
-        f"당신은 지금 '{type_desc} ({product_type.value})' 제품을 분석하고 있습니다.\n"
-        f"다음 키워드들에 대한 정보를 추출하세요: {', '.join(keywords)}\n\n"
-        "반드시 제공된 OCR 텍스트 내용에 기반해서만 답해야 합니다. "
-        "만약 해당 키워드에 대한 정보가 텍스트에 없다면, status를 \"not_found\"로 하고 "
-        "answer를 \"OCR 텍스트에 없음\"이라고 적으세요.\n\n"
-        "출력할 JSON 형식:\n"
+        "다음 OCR 텍스트를 철저히 분석하여 JSON 형식으로 응답하세요.\n\n"
+        "**💡 1단계: 동적 제품 분석 (Dynamic Analysis)**\n"
+        "먼저 이 제품의 본질을 파악하세요.\n"
+        "- **제품 정의**: 이것이 무엇입니까? (예: 과자, 런닝머신, 유아용 물티슈)\n"
+        "- **핵심 구매 요인 추론**: 이 제품군을 구매하는 소비자가 가장 중요하게 여기는 3~5가지 요소는 무엇입니까? (예: 모니터는 '해상도', 만두는 '속재료')\n"
+        "- **안전 이슈 파악**: 시각장애인이 사용할 때의 위험 요소(알레르기, 고온 주의, 오작동 등)가 있습니까?\n\n"
+        "**🔍 2단계: 정보 추출 및 재구성**\n"
+        "추론한 정보를 바탕으로 텍스트에서 답을 찾으세요.\n"
+        "- **필수 포함**: 제품명(풀네임), 브랜드/제조사\n"
+        "- **유동적 포함**: 위에서 추론한 '핵심 구매 요인' 정보 (텍스트에 있다면 반드시 포함)\n"
+        "- **안전 정보 (최우선)**: 유통기한, 주의사항, 알레르기 성분 등 안전 관련 정보는 **무조건** 포함하세요.\n\n"
+        "**✍️ 3단계: 사용자 친화적 요약 (서술형)**\n"
+        "다음 흐름에 따라 3~6문장으로 작성하세요:\n"
+        "1. **정체 소개**: \"이 제품은 [브랜드]의 [제품명]으로, [특징]을 가진 [제품종류]입니다.\"\n"
+        "2. **핵심 스펙**: 추론한 구매 요인에 맞춰 제품의 장점이나 스펙 설명\n"
+        "3. **사용/섭취 가이드**: 조리법이나 사용법 안내\n"
+        "4. **안전 경고**: 중요한 주의사항 덧붙이기\n\n"
+        "**출력 JSON 형식:**\n"
         "{\n"
-        f'  "product_type": "{product_type.value}",\n'
-        '  "product_name": "제품명",\n'
-        '  "confidence": 0.0-1.0,\n'
-        '  "summary": ["핵심 요약 문장 1", "핵심 요약 문장 2", "핵심 요약 문장 3"],\n'
-        '  "keywords": {\n'
-        f"{keyword_schema}\n"
+        "  \"product_type\": \"자동 감지한 제품군 (예: 즉석조리식품)\",\n"
+        "  \"product_name\": \"제품명\",\n"
+        "  \"confidence\": 1.0,\n"
+        "  \"summary\": [\n"
+        "    \"요약 문장 1\",\n"
+        "    \"요약 문장 2\",\n"
+        "    \"요약 문장 3\"\n"
+        "  ],\n"
+        "  \"keywords\": {\n"
+        "    \"키워드1(예: 소재)\": { \"answer\": \"내용\", \"status\": \"found|not_found\" },\n"
+        "    \"키워드2(예: 하중)\": { \"answer\": \"내용\", \"status\": \"found|not_found\" },\n"
+        "    \"키워드3(자동생성)\": { \"answer\": \"내용\", \"status\": \"found|not_found\" }\n"
         "  }\n"
         "}\n"
-        "요약(summary)은 3-5문장으로 작성하세요. 시각장애인을 위한 정보를 제공해야 합니다."
+        "키워드(keywords)는 고정된 것이 아니라, 당신이 분석한 '핵심 구매 요인'을 키(key)로 하여 3~5개를 스스로 생성해서 넣으세요."
     )
     
     user = "분석할 OCR 텍스트:\n" + numbered
@@ -96,7 +110,7 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
     if not api_key:
         raise RuntimeError("GMS_KEY 환경변수가 설정되지 않았습니다.")
 
-    model = os.environ.get("OPENAI_MODEL", "gpt-5-mini")
+    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"
 
     messages = [

@@ -337,6 +337,11 @@ def process_multiple_images(
         print(f"✅ 완료! (소요 시간: {elapsed_time:.1f}초)")
         print(f"{'='*60}\n")
     
+    if use_cache and pipeline_hash:
+        save_pipeline_cache(pipeline_hash, summary)
+        if verbose:
+            print("    cache saved: multi-image pipeline result")
+
     return summary
 
 
