@@ -77,6 +77,8 @@ class ServerConfig:
     ws_path: str = "/ws"
     cors_origins: str = "*"
     debug: bool = False
+    public_base_url: Optional[str] = None
+    public_ws_url: Optional[str] = None
 
 
 @dataclass
@@ -221,7 +223,9 @@ class ConfigManager:
             port=self._get_env_int("SERVER_PORT", 8000),
             ws_path=self._get_env("WS_PATH", "/ws"),
             cors_origins=self._get_env("CORS_ORIGINS", "*"),
-            debug=self._get_env_bool("DEBUG", False)
+            debug=self._get_env_bool("DEBUG", False),
+            public_base_url=self._get_env("PUBLIC_BASE_URL") or None,
+            public_ws_url=self._get_env("PUBLIC_WS_URL") or None
         )
 
         # Log 설정
