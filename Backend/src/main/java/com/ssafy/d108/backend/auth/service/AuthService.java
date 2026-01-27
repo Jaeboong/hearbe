@@ -11,15 +11,23 @@ import com.ssafy.d108.backend.auth.repository.WelfareCardRepository;
 import com.ssafy.d108.backend.entity.User;
 import com.ssafy.d108.backend.entity.UserType;
 import com.ssafy.d108.backend.entity.WelfareCard;
+import com.ssafy.d108.backend.global.auth.JwtTokenProvider;
 import com.ssafy.d108.backend.global.exception.DuplicateUserException;
 import com.ssafy.d108.backend.global.exception.InvalidPasswordException;
 import com.ssafy.d108.backend.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+
 /**
- * 인증 서비스 (B/C형 - 단순 버전)
+ * 인증 서비스 (B/C형 - 보안 적용 버전)
  */
 @Service
 @RequiredArgsConstructor
@@ -28,6 +36,18 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final WelfareCardRepository welfareCardRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final com.ssafy.d108.backend.global.util.AESUtil aesUtil;
+
+    // AuthenticationManagerBuilder creates AuthenticationManager which checks
+    // credentials
+    // But here we are doing manual password check first?
+    // Usually Spring Security uses loadUserByUsername.
+    // Let's stick to the manual check we had, but use passwordEncoder.matches,
+    // then generate token manually without AuthenticationManager for simplicity if
+    // UserDetailService is not yet fully implemented.
+    // However, JwtTokenProvider expects 'Authentication' object.
 
     /**
      * 회원가입
@@ -42,7 +62,7 @@ public class AuthService {
         // BLIND 타입 복지카드 필수 검증
         if (request.getUserType() == UserType.BLIND) {
             if (request.getWelfareCard() == null) {
-                throw new IllegalArgumentException("전맹 사용자는 복지카드 등록이 필수입니다.");
+                throw new IllegalArgumentException("A형 사용자는 복지카드 등록이 필수입니다.");
             }
 
             // 복지카드 유효기간 검증
@@ -60,10 +80,10 @@ public class AuthService {
             throw new DuplicateUserException("이미 등록된 휴대폰 번호입니다.");
         }
 
-        // User 생성 (비밀번호 평문 저장 - 추후 암호화 적용 예정)
+        // User 생성 (비밀번호 암호화 저장)
         User user = new User();
         user.setLoginId(request.getLoginId());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword())); // BCrypt Encoding
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
@@ -87,11 +107,12 @@ public class AuthService {
         WelfareCard welfareCard = new WelfareCard();
         welfareCard.setUser(user);
         welfareCard.setCardCompany(welfareCardRequest.getCardCompany());
-        // 숫자만 저장 (하이픈 등 제거)
-        welfareCard.setCardNumber(welfareCardRequest.getCardNumber().replaceAll("[^0-9]", ""));
+        // 숫자만 저장 (하이픈 등 제거) -> 암호화
+        String rawCardNumber = welfareCardRequest.getCardNumber().replaceAll("[^0-9]", "");
+        welfareCard.setCardNumber(aesUtil.encrypt(rawCardNumber));
         welfareCard.setIssueDate(welfareCardRequest.getIssueDate());
         welfareCard.setExpirationDate(welfareCardRequest.getExpirationDate());
-        welfareCard.setCvc(welfareCardRequest.getCvc()); // TODO: 암호화 필요
+        welfareCard.setCvc(aesUtil.encrypt(welfareCardRequest.getCvc())); // 암호화 저장
 
         welfareCardRepository.save(welfareCard);
     }
@@ -100,19 +121,31 @@ public class AuthService {
      * 로그인
      */
     public LoginResponse login(LoginRequest request) {
-        // 사용자 조회
+        // 1. 사용자 조회
         User user = userRepository.findByLoginId(request.getLoginId())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
 
-        // 비밀번호 검증 (평문 비교)
-        if (!user.getPassword().equals(request.getPassword())) {
+        // 2. 비밀번호 검증 (BCrypt Matches)
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidPasswordException();
         }
+
+        // 3. Authentication 객체 생성 (Custom)
+        //
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getLoginId(),
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) // 임시 Role
+        );
+
+        // 4. JWT 토큰 생성
+        String accessToken = jwtTokenProvider.createToken(authentication, user.getId());
 
         return new LoginResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getUserType(),
+                accessToken,
                 "로그인 성공");
     }
 
@@ -121,13 +154,18 @@ public class AuthService {
      */
     public FindIdResponse findId(FindIdRequest request) {
         // 복지카드 정보로 조회 (카드번호 포함 - 숫자만 비교)
+        // 암호화된 값으로 검색 (AES Fixed IV 사용)
+        String rawCardNumber = request.getCardNumber().replaceAll("[^0-9]", "");
+        String encryptedCardNumber = aesUtil.encrypt(rawCardNumber);
+        String encryptedCvc = aesUtil.encrypt(request.getCvc());
+
         WelfareCard welfareCard = welfareCardRepository
                 .findByCardNumberAndCardCompanyAndIssueDateAndExpirationDateAndCvc(
-                        request.getCardNumber().replaceAll("[^0-9]", ""),
+                        encryptedCardNumber,
                         request.getCardCompany(),
                         request.getIssueDate(),
                         request.getExpirationDate(),
-                        request.getCvc())
+                        encryptedCvc)
                 .orElseThrow(() -> new UserNotFoundException("일치하는 복지카드 정보가 없습니다."));
 
         // 연결된 사용자 정보 반환
@@ -138,10 +176,8 @@ public class AuthService {
 
     /**
      * 로그아웃
-     * 현재는 상태 비저장(Stateless)이라 별도 로직은 없지만, 추후 토큰 블랙리스팅/세션 무효화 등을 위해 API 마련
      */
     public void logout(Integer userId) {
-        // TODO: 추후 JWT 토큰 무효화 로직 추가 예정
-        // 현재는 클라이언트 측에서 토큰/세션 정보 삭제하면 됨
+        // TODO: 추후 JWT 토큰 무효화(Redis Blacklist) 등 구현
     }
 }
