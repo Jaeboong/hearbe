@@ -1,4 +1,22 @@
 package com.ssafy.d108.backend.wishlist.repository;
 
-public interface WishlistRepository {
+import com.ssafy.d108.backend.entity.User;
+import com.ssafy.d108.backend.entity.WishlistItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface WishlistRepository extends JpaRepository<WishlistItem, Integer> {
+
+    /**
+     * 특정 사용자의 모든 찜 아이템 조회
+     */
+    List<WishlistItem> findAllByUser(User user);
+
+    /**
+     * 특정 사용자의 찜 목록 전체 삭제 (필요 시)
+     */
+    void deleteAllByUser(User user);
 }

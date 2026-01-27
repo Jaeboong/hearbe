@@ -30,24 +30,11 @@ public class CartItemService {
      */
     @Transactional
     public CartItemCreateResponseDto addCartItem(Integer userId, CartItemRequestDto requestDto) {
-        // 1. 파라미터로 받은 userId로 유저 조회
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        // 2. 플랫폼 조회
+        User user = findUserById(userId);
         Platform platform = platformRepository.findById(requestDto.getPlatformId().intValue())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 플랫폼입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLATFORM_NOT_FOUND)); // 공통 에러코드 사용 권장
 
-        // 3. 엔티티 생성 및 저장
-        CartItem cartItem = new CartItem();
-        cartItem.setUser(user);
-        cartItem.setPlatform(platform);
-        cartItem.setName(requestDto.getName());
-        cartItem.setPrice((long) requestDto.getPrice());
-        cartItem.setImgUrl(requestDto.getImgUrl());
-        cartItem.setUrl(requestDto.getUrl());
-        cartItem.setQuantity(1);
-
+        CartItem cartItem = createCartItemEntity(user, platform, requestDto);
         CartItem savedItem = cartItemRepository.save(cartItem);
 
         return new CartItemCreateResponseDto(savedItem.getId(), "장바구니 추가 완료");
@@ -57,30 +44,18 @@ public class CartItemService {
      * 내 장바구니 목록 조회
      */
     public CartItemListResponseDto getCartItems(Integer userId) {
-        // 1. 유저 조회
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        // 2. 해당 유저의 아이템 리스트 조회
+        User user = findUserById(userId);
         List<CartItem> items = cartItemRepository.findAllByUser(user);
 
-        // 3. Detail DTO 변환
         List<CartItemListResponseDto.CartItemDetail> itemDetails = items.stream()
                 .map(this::convertToDetailDto)
                 .collect(Collectors.toList());
 
-        // 4. 합계 계산
         int totalPrice = (int) items.stream()
                 .mapToLong(item -> item.getPrice() * item.getQuantity())
                 .sum();
 
-        // 5. 응답 DTO 조립
-        CartItemListResponseDto response = new CartItemListResponseDto();
-        response.setCartItems(itemDetails);
-        response.setTotalCount(items.size());
-        response.setTotalPrice(totalPrice);
-
-        return response;
+        return buildListResponse(itemDetails, totalPrice);
     }
 
     /**
@@ -88,9 +63,7 @@ public class CartItemService {
      */
     @Transactional
     public CartItemUpdateResponseDto updateQuantity(Integer cartItemId, CartItemUpdateRequestDto requestDto) {
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 장바구니 아이템을 찾을 수 없습니다."));
-
+        CartItem cartItem = findCartItemById(cartItemId);
         cartItem.setQuantity(requestDto.getQuantity());
 
         return new CartItemUpdateResponseDto(Long.valueOf(cartItem.getId()), "수량이 변경되었습니다.");
@@ -102,7 +75,7 @@ public class CartItemService {
     @Transactional
     public void deleteCartItem(Integer cartItemId) {
         if (!cartItemRepository.existsById(cartItemId)) {
-            throw new IllegalArgumentException("삭제하려는 아이템이 존재하지 않습니다.");
+            throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND);
         }
         cartItemRepository.deleteById(cartItemId);
     }
@@ -112,14 +85,42 @@ public class CartItemService {
      */
     @Transactional
     public void clearCart(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = findUserById(userId);
         cartItemRepository.deleteAllByUser(user);
     }
 
-    /**
-     * 내부 매핑 로직 (Entity -> Detail DTO)
-     */
+    // --- Private Helper Methods ---
+
+    private User findUserById(Integer userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private CartItem findCartItemById(Integer cartItemId) {
+        return cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+    }
+
+    private CartItem createCartItemEntity(User user, Platform platform, CartItemRequestDto dto) {
+        CartItem cartItem = new CartItem();
+        cartItem.setUser(user);
+        cartItem.setPlatform(platform);
+        cartItem.setName(dto.getName());
+        cartItem.setPrice((long) dto.getPrice());
+        cartItem.setImgUrl(dto.getImgUrl());
+        cartItem.setUrl(dto.getUrl());
+        cartItem.setQuantity(1);
+        return cartItem;
+    }
+
+    private CartItemListResponseDto buildListResponse(List<CartItemListResponseDto.CartItemDetail> details, int totalPrice) {
+        CartItemListResponseDto response = new CartItemListResponseDto();
+        response.setCartItems(details);
+        response.setTotalCount(details.size());
+        response.setTotalPrice(totalPrice);
+        return response;
+    }
+
     private CartItemListResponseDto.CartItemDetail convertToDetailDto(CartItem item) {
         CartItemListResponseDto.CartItemDetail detail = new CartItemListResponseDto.CartItemDetail();
         detail.setCartItemId(Long.valueOf(item.getId()));
