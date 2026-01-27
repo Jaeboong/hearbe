@@ -16,6 +16,7 @@ try:
         get_type_description,
     )
     from .ocr_llm_summarizer import summarize_texts
+    from .extract_rec_texts import extract_rec_texts_from_data
     from .image_fetcher import (
         filter_product_images,
         download_images,
@@ -33,6 +34,7 @@ except ImportError:
         get_type_description,
     )
     from ocr_llm_summarizer import summarize_texts
+    from extract_rec_texts import extract_rec_texts_from_data
     from image_fetcher import (
         filter_product_images,
         download_images,
@@ -63,6 +65,10 @@ def _save_json(data: Dict, output_path: str) -> None:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def _summary_only(summary: Dict) -> Dict:
+    return {"summary": summary.get("summary", [])}
+
+
 def process_product_image(
     image_path: str,
     output_dir: str = "output",
@@ -78,37 +84,47 @@ def process_product_image(
     
     if verbose:
         print("\n📝 [1/5] OCR 처리 중...")
+    step_start = time.time()
     ocr_result = process_image(image_path, output_dir=output_dir)
+    step_time = time.time() - step_start
     ocr_count = ocr_result.get("total_count", len(ocr_result.get("rec_texts", [])))
     if verbose:
         mode = ocr_result.get("processing_mode", "direct")
         print(f"    → 처리 모드: {'분할 처리' if mode == 'split' else '직접 처리'}")
-        print(f"    → OCR 결과: {ocr_count}개 텍스트")
+        print(f"    → OCR 결과: {ocr_count}개 텍스트 ({step_time:.2f}초)")
     
     if verbose:
         print("\n🔧 [2/5] 전처리 중...")
-    texts = ocr_result.get("rec_texts", [])
+    step_start = time.time()
+    texts = extract_rec_texts_from_data(ocr_result)
     scores = ocr_result.get("rec_scores", [1.0] * len(texts))
     
     filtered = filter_texts(texts, scores, min_score=0.7, min_length=2)
     filtered_texts = [text for text, score in filtered]
+    step_time = time.time() - step_start
     
     if verbose:
-        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트 (원본: {len(texts)}개)")
+        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트 (원본: {len(texts)}개, {step_time:.2f}초)")
     
     if verbose:
         print("\n✂️  [3/5] 텍스트 추출 완료 (LLM 토큰 절약)")
     
     if verbose:
         print("\n🏷️  [4/5] 제품 타입 감지 중...")
+    step_start = time.time()
     product_type = detect_product_type(filtered_texts)
     type_desc = get_type_description(product_type)
+    step_time = time.time() - step_start
     if verbose:
-        print(f"    → 감지된 타입: {type_desc} ({product_type.value})")
+        print(f"    → 감지된 타입: {type_desc} ({product_type.value}) ({step_time:.2f}초)")
     
     if verbose:
         print("\n🤖 [5/5] LLM 요약 중...")
+    step_start = time.time()
     summary = summarize_texts(filtered_texts, product_type, verbose=verbose)
+    step_time = time.time() - step_start
+    if verbose:
+        print(f"    → LLM 처리 완료 ({step_time:.2f}초)")
     
     elapsed_time = time.time() - start_time
     summary["source_image"] = str(image_path)
@@ -119,7 +135,7 @@ def process_product_image(
     if save_result:
         base_name = Path(image_path).stem
         output_path = os.path.join(output_dir, f"{base_name}_summary.json")
-        _save_json(summary, output_path)
+        _save_json(_summary_only(summary), output_path)
         if verbose:
             print(f"\n💾 결과 저장: {output_path}")
     
@@ -147,45 +163,57 @@ def process_multiple_images(
     
     if verbose:
         print("\n📝 [1/6] 병렬 OCR 처리 중...")
+    step_start = time.time()
     ocr_results = process_images_parallel(
         image_paths,
         max_workers=max_workers,
         output_dir=output_dir
     )
+    step_time = time.time() - step_start
     total_ocr = sum(r.get("total_count", 0) for r in ocr_results)
     if verbose:
-        print(f"    → 총 OCR 결과: {total_ocr}개 텍스트")
+        print(f"    → 총 OCR 결과: {total_ocr}개 텍스트 ({step_time:.2f}초)")
     
     if verbose:
         print("\n🔗 [2/6] 텍스트 병합 중...")
+    step_start = time.time()
     merged = merge_ocr_results(ocr_results)
+    step_time = time.time() - step_start
     if verbose:
-        print(f"    → 병합 후: {merged['count']}개 텍스트 (중복 제거됨)")
+        print(f"    → 병합 후: {merged['count']}개 텍스트 (중복 제거됨, {step_time:.2f}초)")
     
     if verbose:
         print("\n🔧 [3/6] 전처리 중...")
-    texts = merged.get("rec_texts", [])
+    step_start = time.time()
+    texts = extract_rec_texts_from_data(merged)
     scores = merged.get("rec_scores", [1.0] * len(texts))
     
     filtered = filter_texts(texts, scores, min_score=0.7, min_length=2)
     filtered_texts = [text for text, score in filtered]
+    step_time = time.time() - step_start
     
     if verbose:
-        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트")
+        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트 ({step_time:.2f}초)")
     
     if verbose:
         print("\n✂️  [4/6] 텍스트 추출 완료 (LLM 토큰 절약)")
     
     if verbose:
         print("\n🏷️  [5/6] 제품 타입 감지 중...")
+    step_start = time.time()
     product_type = detect_product_type(filtered_texts)
     type_desc = get_type_description(product_type)
+    step_time = time.time() - step_start
     if verbose:
-        print(f"    → 감지된 타입: {type_desc} ({product_type.value})")
+        print(f"    → 감지된 타입: {type_desc} ({product_type.value}) ({step_time:.2f}초)")
     
     if verbose:
         print("\n🤖 [6/6] LLM 요약 중...")
+    step_start = time.time()
     summary = summarize_texts(filtered_texts, product_type, verbose=verbose)
+    step_time = time.time() - step_start
+    if verbose:
+        print(f"    → LLM 처리 완료 ({step_time:.2f}초)")
     
     elapsed_time = time.time() - start_time
     summary["source_images"] = [str(p) for p in image_paths]
@@ -198,7 +226,7 @@ def process_multiple_images(
     if save_result:
         first_name = Path(image_paths[0]).stem
         output_path = os.path.join(output_dir, f"{first_name}_merged_summary.json")
-        _save_json(summary, output_path)
+        _save_json(_summary_only(summary), output_path)
         if verbose:
             print(f"\n💾 결과 저장: {output_path}")
     
@@ -227,11 +255,13 @@ def process_product_from_urls(
     
     if verbose:
         print(f"\n🔍 [1/4] 이미지 URL 필터링 (사이트: {site})...")
+    step_start = time.time()
     
     filtered_urls = filter_product_images(image_urls, site=site)
+    step_time = time.time() - step_start
     
     if verbose:
-        print(f"    → {len(image_urls)}개 → {len(filtered_urls)}개 (광고/배너 제외)")
+        print(f"    → {len(image_urls)}개 → {len(filtered_urls)}개 (광고/배너 제외, {step_time:.2f}초)")
     
     if not filtered_urls:
         print("⚠️  필터링 후 이미지가 없습니다.")
@@ -245,6 +275,7 @@ def process_product_from_urls(
     
     if verbose:
         print(f"\n📥 [2/4] 이미지 다운로드 중...")
+    step_start = time.time()
     
     download_dir = os.path.join(output_dir, "downloaded")
     local_paths = download_images(
@@ -252,9 +283,10 @@ def process_product_from_urls(
         save_dir=download_dir,
         max_workers=max_workers
     )
+    step_time = time.time() - step_start
     
     if verbose:
-        print(f"    → {len(local_paths)}개 다운로드 완료")
+        print(f"    → {len(local_paths)}개 다운로드 완료 ({step_time:.2f}초)")
     
     if not local_paths:
         print("⚠️  다운로드된 이미지가 없습니다.")
@@ -336,7 +368,7 @@ def main() -> int:
             )
         
         if args.output:
-            _save_json(result, args.output)
+            _save_json(_summary_only(result), args.output)
             if not args.quiet:
                 print(f"📄 추가 저장: {args.output}")
         
