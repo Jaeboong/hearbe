@@ -1,13 +1,14 @@
 package com.ssafy.d108.backend.cartItem.service;
 
-import com.ssafy.d108.backend.cartItem.dto.CartItemRequestDto;
-import com.ssafy.d108.backend.cartItem.dto.CartItemResponseDto;
+import com.ssafy.d108.backend.auth.repository.UserRepository;
+import com.ssafy.d108.backend.cartItem.dto.*;
 import com.ssafy.d108.backend.cartItem.repository.CartItemRepository;
+import com.ssafy.d108.backend.global.exception.BusinessException;
+import com.ssafy.d108.backend.global.response.ErrorCode;
+import com.ssafy.d108.backend.platform.repository.PlatformRepository;
 import com.ssafy.d108.backend.entity.CartItem;
 import com.ssafy.d108.backend.entity.Platform;
 import com.ssafy.d108.backend.entity.User;
-import com.ssafy.d108.backend.platform.repository.PlatformRepository;
-import com.ssafy.d108.backend.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,106 +18,119 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class CartItemService {
 
     private final CartItemRepository cartItemRepository;
-    private final UserRepository userRepository;
     private final PlatformRepository platformRepository;
+    private final UserRepository userRepository;
 
     /**
      * 장바구니 아이템 추가
      */
-    public CartItemResponseDto addCartItem(Integer userId, CartItemRequestDto requestDto) {
+    @Transactional
+    public CartItemCreateResponseDto addCartItem(Integer userId, CartItemRequestDto requestDto) {
+        User user = findUserById(userId);
+        Platform platform = platformRepository.findById(requestDto.getPlatformId().intValue())
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLATFORM_NOT_FOUND)); // 공통 에러코드 사용 권장
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        Platform platform = platformRepository.findById(requestDto.getPlatformId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 플랫폼입니다."));
-
-        CartItem cartItem = new CartItem();
-        cartItem.setUser(user);
-        cartItem.setPlatform(platform);
-        cartItem.setName(requestDto.getName());
-        cartItem.setUrl(requestDto.getUrl());
-        cartItem.setImgUrl(requestDto.getImgUrl());
-        cartItem.setPrice(requestDto.getPrice());
-        cartItem.setQuantity(1);
-
+        CartItem cartItem = createCartItemEntity(user, platform, requestDto);
         CartItem savedItem = cartItemRepository.save(cartItem);
 
-        return toResponseDto(savedItem);
+        return new CartItemCreateResponseDto(savedItem.getId(), "장바구니 추가 완료");
     }
 
     /**
-     * 장바구니 목록 조회
+     * 내 장바구니 목록 조회
      */
-    @Transactional(readOnly = true)
-    public List<CartItemResponseDto> getCartItems(Integer userId) {
+    public CartItemListResponseDto getCartItems(Integer userId) {
+        User user = findUserById(userId);
+        List<CartItem> items = cartItemRepository.findAllByUser(user);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        return cartItemRepository.findAllByUser(user)
-                .stream()
-                .map(this::toResponseDto)
+        List<CartItemListResponseDto.CartItemDetail> itemDetails = items.stream()
+                .map(this::convertToDetailDto)
                 .collect(Collectors.toList());
+
+        int totalPrice = (int) items.stream()
+                .mapToLong(item -> item.getPrice() * item.getQuantity())
+                .sum();
+
+        return buildListResponse(itemDetails, totalPrice);
     }
 
     /**
-     * 장바구니 아이템 수량 변경
+     * 장바구니 아이템 수량 수정
      */
-    public CartItemResponseDto updateQuantity(Integer cartItemId, Integer quantity) {
+    @Transactional
+    public CartItemUpdateResponseDto updateQuantity(Integer cartItemId, CartItemUpdateRequestDto requestDto) {
+        CartItem cartItem = findCartItemById(cartItemId);
+        cartItem.setQuantity(requestDto.getQuantity());
 
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("수량은 1 이상이어야 합니다.");
-        }
-
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 아이템을 찾을 수 없습니다."));
-
-        cartItem.setQuantity(quantity);
-
-        return toResponseDto(cartItem);
+        return new CartItemUpdateResponseDto(Long.valueOf(cartItem.getId()), "수량이 변경되었습니다.");
     }
 
     /**
-     * 장바구니 아이템 삭제
+     * 장바구니 아이템 개별 삭제
      */
+    @Transactional
     public void deleteCartItem(Integer cartItemId) {
-
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 아이템을 찾을 수 없습니다."));
-
-        cartItemRepository.delete(cartItem);
+        if (!cartItemRepository.existsById(cartItemId)) {
+            throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND);
+        }
+        cartItemRepository.deleteById(cartItemId);
     }
 
     /**
-     * 장바구니 비우기
+     * 장바구니 전체 비우기
      */
+    @Transactional
     public void clearCart(Integer userId) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
+        User user = findUserById(userId);
         cartItemRepository.deleteAllByUser(user);
     }
 
-    /**
-     * Entity → ResponseDto 변환
-     */
-    private CartItemResponseDto toResponseDto(CartItem cartItem) {
+    // --- Private Helper Methods ---
 
-        return CartItemResponseDto.builder()
-                .cartItemId(cartItem.getId())
-                .userId(cartItem.getUser().getId())
-                .platformId(cartItem.getPlatform().getId())
-                .name(cartItem.getName())
-                .quantity(cartItem.getQuantity())
-                .url(cartItem.getUrl())
-                .price(cartItem.getPrice())
-                .createdAt(cartItem.getCreatedAt())
-                .build();
+    private User findUserById(Integer userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private CartItem findCartItemById(Integer cartItemId) {
+        return cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+    }
+
+    private CartItem createCartItemEntity(User user, Platform platform, CartItemRequestDto dto) {
+        CartItem cartItem = new CartItem();
+        cartItem.setUser(user);
+        cartItem.setPlatform(platform);
+        cartItem.setName(dto.getName());
+        cartItem.setPrice((long) dto.getPrice());
+        cartItem.setImgUrl(dto.getImgUrl());
+        cartItem.setUrl(dto.getUrl());
+        cartItem.setQuantity(1);
+        return cartItem;
+    }
+
+    private CartItemListResponseDto buildListResponse(List<CartItemListResponseDto.CartItemDetail> details, int totalPrice) {
+        CartItemListResponseDto response = new CartItemListResponseDto();
+        response.setCartItems(details);
+        response.setTotalCount(details.size());
+        response.setTotalPrice(totalPrice);
+        return response;
+    }
+
+    private CartItemListResponseDto.CartItemDetail convertToDetailDto(CartItem item) {
+        CartItemListResponseDto.CartItemDetail detail = new CartItemListResponseDto.CartItemDetail();
+        detail.setCartItemId(Long.valueOf(item.getId()));
+        detail.setPlatformId(Long.valueOf(item.getPlatform().getId()));
+        detail.setName(item.getName());
+        detail.setPrice(item.getPrice().intValue());
+        detail.setImgUrl(item.getImgUrl());
+        detail.setUrl(item.getUrl());
+        detail.setQuantity(item.getQuantity());
+        detail.setCreatedAt(item.getCreatedAt().toString());
+        return detail;
     }
 }
