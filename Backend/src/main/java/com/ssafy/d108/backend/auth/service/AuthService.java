@@ -167,23 +167,20 @@ public class AuthService {
     public FindIdResponse findId(FindIdRequest request) {
         // 복지카드 정보로 조회 (카드번호 포함 - 숫자만 비교)
         // 암호화된 값으로 검색 (AES Fixed IV 사용)
-        String rawCardNumber = request.getCardNumber().replaceAll("[^0-9]", "");
+        String rawCardNumber = request.getWelfareCard().getCardNumber().replaceAll("[^0-9]", "");
         String encryptedCardNumber = aesUtil.encrypt(rawCardNumber);
-        String encryptedCvc = aesUtil.encrypt(request.getCvc());
+        String encryptedCvc = aesUtil.encrypt(request.getWelfareCard().getCvc());
 
         WelfareCard welfareCard = welfareCardRepository
                 .findByCardNumberAndCardCompanyAndIssueDateAndExpirationDateAndCvc(
                         encryptedCardNumber,
-                        request.getCardCompany(),
-                        request.getIssueDate(),
-                        request.getExpirationDate(),
+                        request.getWelfareCard().getCardCompany(),
+                        request.getWelfareCard().getIssueDate(),
+                        request.getWelfareCard().getExpirationDate(),
                         encryptedCvc)
                 .orElseThrow(() -> new UserNotFoundException("일치하는 복지카드 정보가 없습니다."));
 
-        // 연결된 사용자 정보 반환
-        return new FindIdResponse(
-                welfareCard.getUser().getLoginId(),
-                "아이디 찾기 성공");
+        return new FindIdResponse(welfareCard.getUser().getLoginId(), "Found ID");
     }
 
     /**

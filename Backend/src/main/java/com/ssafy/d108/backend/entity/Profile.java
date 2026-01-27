@@ -1,7 +1,16 @@
 package com.ssafy.d108.backend.entity;
 
+import com.ssafy.d108.backend.entity.enums.Allergy;
+import com.ssafy.d108.backend.entity.enums.BottomSize;
 import com.ssafy.d108.backend.entity.enums.Gender;
+import com.ssafy.d108.backend.entity.enums.ShoeSize;
+import com.ssafy.d108.backend.entity.enums.TopSize;
+
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,6 +53,27 @@ public class Profile {
 
     @Column(name = "weight")
     private Float weight;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "top_size")
+    private TopSize topSize;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bottom_size")
+    private BottomSize bottomSize;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shoe_size")
+    private ShoeSize shoeSize;
+
+    @ElementCollection(targetClass = Allergy.class, fetch = FetchType.LAZY)
+    @CollectionTable(name = "profile_allergies", joinColumns = @JoinColumn(name = "profile_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "allergy")
+    private Set<Allergy> allergies = new HashSet<>();
+
+    @Column(name = "etc_allergy")
+    private String etcAllergy;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
