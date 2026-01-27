@@ -120,18 +120,18 @@ def _filter_texts_with_keyword_override(
 _TYPE_RULES = {
     "electronics": {
         "strong": ("HDMI", "IPS", "FHD"),
-        "weak": ("Hz", "??", "???", "?????"),
+        "weak": ("Hz", "\uc778\uce58", "\ubaa8\ub2c8\ud130", "\ub514\uc2a4\ud50c\ub808\uc774"),
     },
     "fresh_food": {
-        "strong": ("????", "??", "??", "??"),
-        "weak": ("??", "??"),
+        "strong": ("\uc720\ud1b5\uae30\ud55c", "\ubcf4\uad00", "\ub0c9\uc7a5", "\ub0c9\ub3d9"),
+        "weak": ("\uc0b0\uc9c0", "\uc81c\ucca0"),
     },
 }
 
 
-def _find_product_type_by_value_fragment(fragment: str) -> Optional[ProductType]:
+def _find_product_type_by_desc_fragment(fragment: str) -> Optional[ProductType]:
     for pt in ProductType:
-        if fragment in pt.value:
+        if fragment in get_type_description(pt):
             return pt
     return None
 
@@ -152,20 +152,20 @@ def _override_product_type(
         scores[key] = s_hits * 3 + w_hits
 
     if strong_hits["electronics"] >= 2:
-        pt = _find_product_type_by_value_fragment("??")
+        pt = _find_product_type_by_desc_fragment("\uc804\uc790")
         if pt:
             return pt
     if strong_hits["fresh_food"] >= 2:
-        pt = _find_product_type_by_value_fragment("??")
+        pt = _find_product_type_by_desc_fragment("\uc2e0\uc120")
         if pt:
             return pt
 
     if scores["electronics"] - scores["fresh_food"] >= 2 and scores["electronics"] >= 4:
-        pt = _find_product_type_by_value_fragment("??")
+        pt = _find_product_type_by_desc_fragment("\uc804\uc790")
         if pt:
             return pt
     if scores["fresh_food"] - scores["electronics"] >= 2 and scores["fresh_food"] >= 4:
-        pt = _find_product_type_by_value_fragment("??")
+        pt = _find_product_type_by_desc_fragment("\uc2e0\uc120")
         if pt:
             return pt
 
