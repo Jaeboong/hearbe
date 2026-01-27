@@ -12,10 +12,12 @@ from ..context.context_rules import (
     build_wait_command,
 )
 from ..sites.site_manager import get_page_type
+from core.korean_numbers import extract_ordinal_index
 
 
 SELECTION_TRIGGERS = ["선택", "골라", "고르", "열어", "눌러", "클릭", "열어줘", "열어봐"]
-FILLER_WORDS = ["해줘", "해주세요", "해", "좀", "줘", "봐", "봐줘", "상품", "결과"]
+FILLER_WORDS = ["그거", "이거", "저거", "해줘", "해주세요", "해", "좀", "줘", "봐", "봐줘", "상품", "결과"]
+DEICTIC_WORDS = {"그거", "이거", "저거", "그것", "이것", "저것"}
 
 
 def _extract_selection_target(text: str) -> str:
@@ -25,6 +27,12 @@ def _extract_selection_target(text: str) -> str:
     for kw in FILLER_WORDS:
         target = target.replace(kw, "").strip()
     return target
+
+
+def _is_ordinal_target(target: str) -> bool:
+    if not target:
+        return False
+    return extract_ordinal_index(target) is not None
 
 
 class SearchSelectRule(BaseRule):
@@ -43,6 +51,8 @@ class SearchSelectRule(BaseRule):
         target = _extract_selection_target(text)
 
         if target:
+            if target in DEICTIC_WORDS or _is_ordinal_target(target):
+                return None
             commands = [
                 build_click_text_command(target, f"검색 결과에서 '{target}' 선택"),
                 build_wait_command(1500, "상품 페이지 로딩 대기"),
