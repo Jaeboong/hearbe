@@ -24,6 +24,9 @@ class ProductInfo:
     original_price: str = ""
     discount_rate: str = ""
     delivery_info: str = ""
+    arrival_info: str = ""
+    free_shipping: bool = False
+    free_return: bool = False
     rating: str = ""
     review_count: str = ""
     seller: str = ""
@@ -38,6 +41,9 @@ class ProductInfo:
             "original_price": self.original_price,
             "discount_rate": self.discount_rate,
             "delivery_info": self.delivery_info,
+            "arrival_info": self.arrival_info,
+            "free_shipping": self.free_shipping,
+            "free_return": self.free_return,
             "rating": self.rating,
             "review_count": self.review_count,
             "seller": self.seller,
@@ -108,15 +114,18 @@ class CoupangHTMLParser(BaseHTMLParser):
             ".product-title__name",
             "h1.prod-buy-header__title",
             ".prod-buy-header__title",
+            ".ProductUnit_productNameV2__cV9cw",
         ],
         "price": [
             ".total-price strong",
             ".final-price",
             ".prod-sale-price .total-price",
+            ".PriceArea_priceArea__NntJz .fw-text-red-700",
         ],
         "original_price": [
             ".origin-price",
             ".base-price",
+            ".PriceArea_priceArea__NntJz del",
         ],
         "discount_rate": [
             ".discount-rate",
@@ -179,9 +188,14 @@ class CoupangHTMLParser(BaseHTMLParser):
 
         # 할인율
         info.discount_rate = self._find_first(soup, self.SELECTORS["discount_rate"])
+        if not info.discount_rate:
+            info.discount_rate = self._find_percent_in_area(soup, ".PriceArea_priceArea__NntJz")
 
         # 배송 정보
         info.delivery_info = self._find_first(soup, self.SELECTORS["delivery_info"])
+        info.arrival_info = self._find_arrival_info(soup)
+        info.free_shipping = self._has_text(soup, "무료배송")
+        info.free_return = self._has_text(soup, "무료반품")
 
         # 리뷰 수
         review_text = self._find_first(soup, self.SELECTORS["review_count"])
@@ -247,6 +261,35 @@ class CoupangHTMLParser(BaseHTMLParser):
 
         return images
 
+    def _has_text(self, soup: BeautifulSoup, keyword: str) -> bool:
+        """텍스트 포함 여부"""
+        if not keyword:
+            return False
+        return bool(soup.find(string=re.compile(re.escape(keyword))))
+
+    def _find_percent_in_area(self, soup: BeautifulSoup, area_selector: str) -> str:
+        """특정 영역에서 퍼센트 텍스트 추출"""
+        try:
+            area = soup.select_one(area_selector)
+        except Exception:
+            area = None
+        target = area if area else soup
+        if not target:
+            return ""
+        text = self._clean_text(target.get_text())
+        match = re.search(r"\d+\s*%", text)
+        return match.group(0) if match else ""
+
+    def _find_arrival_info(self, soup: BeautifulSoup) -> str:
+        """도착 보장 정보 추출"""
+        for div in soup.find_all("div"):
+            text = self._clean_text(div.get_text(" "))
+            if "도착" in text and ("보장" in text or "도착" in text):
+                # 너무 긴 텍스트는 컷
+                if len(text) > 60:
+                    continue
+                return text
+        return ""
     def _is_valid_product_image(self, url: str) -> bool:
         """상품 상세 이미지인지 확인 (광고/아이콘 제외)"""
         exclude_patterns = [
@@ -479,35 +522,24 @@ def format_for_tts(info: ProductInfo, include_details: bool = False) -> str:
 
     # 상품명
     if info.product_name:
-        parts.append(f"상품명: {info.product_name}")
+        parts.append(f"{info.product_name}")
 
-    # 가격 정보
+    # 가격/할인
     if info.price:
-        if info.discount_rate and info.original_price:
-            parts.append(f"가격: {info.price} ({info.discount_rate} 할인, 원래 {info.original_price})")
+        if info.discount_rate:
+            parts.append(f"{info.discount_rate} 할인 중이며 {info.price}입니다")
         else:
-            parts.append(f"가격: {info.price}")
+            parts.append(f"{info.price}입니다")
 
-    # 배송 정보
-    if info.delivery_info:
-        parts.append(f"배송: {info.delivery_info}")
-
-    # 평점/리뷰
-    if info.review_count:
-        if info.rating:
-            parts.append(f"평점 {info.rating}, 리뷰 {info.review_count}개")
-        else:
-            parts.append(f"리뷰 {info.review_count}개")
-
-    if include_details:
-        # 판매자
-        if info.seller:
-            parts.append(f"판매자: {info.seller}")
-
-        # 옵션
-        if info.options:
-            options_text = ", ".join(info.options[:5])  # 최대 5개
-            parts.append(f"옵션: {options_text}")
+    # 배송/반품/도착
+    if info.free_shipping:
+        parts.append("무료배송")
+    if info.free_return:
+        parts.append("무료반품")
+    if info.arrival_info:
+        parts.append(info.arrival_info)
+    elif info.delivery_info:
+        parts.append(info.delivery_info)
 
     return ". ".join(parts) + "."
 
@@ -522,18 +554,21 @@ def format_summary_for_tts(info: ProductInfo) -> List[str]:
     summaries = []
 
     if info.product_name:
-        summaries.append(f"이 상품은 {info.product_name}입니다.")
+        summaries.append(f"{info.product_name}입니다.")
 
     if info.price:
         if info.discount_rate:
-            summaries.append(f"가격은 {info.price}이며, {info.discount_rate} 할인 중입니다.")
+            summaries.append(f"{info.discount_rate} 할인 중이며 {info.price}입니다.")
         else:
-            summaries.append(f"가격은 {info.price}입니다.")
+            summaries.append(f"{info.price}입니다.")
 
-    if info.delivery_info:
-        summaries.append(f"배송은 {info.delivery_info}입니다.")
-
-    if info.review_count:
-        summaries.append(f"리뷰가 {info.review_count}개 있습니다.")
+    if info.free_shipping:
+        summaries.append("무료배송입니다.")
+    if info.free_return:
+        summaries.append("무료반품입니다.")
+    if info.arrival_info:
+        summaries.append(f"{info.arrival_info}입니다.")
+    elif info.delivery_info:
+        summaries.append(f"{info.delivery_info}입니다.")
 
     return summaries if summaries else ["상품 정보를 찾을 수 없습니다."]

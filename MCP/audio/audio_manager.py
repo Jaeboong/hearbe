@@ -222,6 +222,11 @@ class AudioManager:
         def on_hotkey_press(e):
             if not self._hotkey_pressed:
                 self._hotkey_pressed = True
+                publish_sync(
+                    EventType.HOTKEY_PRESSED,
+                    data={"hotkey": self.hotkey},
+                    source="audio"
+                )
                 self._start_recording()
         
         def on_hotkey_release(e):

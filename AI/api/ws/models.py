@@ -19,6 +19,7 @@ class MessageType(str, Enum):
     USER_INPUT = "user_input"
     USER_CONFIRM = "user_confirm"
     CANCEL = "cancel"
+    INTERRUPT = "interrupt"
     MCP_RESULT = "mcp_result"
 
     # Server -> Client

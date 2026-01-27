@@ -21,6 +21,11 @@ class WSSender:
     def __init__(self, connection_manager, tts_service=None):
         self._connections = connection_manager
         self._tts = tts_service
+        self._tts_epoch = {}
+
+    async def cancel_tts(self, session_id: str):
+        """Cancel ongoing TTS streaming for a session."""
+        self._tts_epoch[session_id] = self._tts_epoch.get(session_id, 0) + 1
 
     async def send_status(self, session_id: str, status: str, message: str):
         msg = WSMessage(
@@ -93,8 +98,12 @@ class WSSender:
 
         try:
             text = normalize_tts_text(text)
+            epoch = self._tts_epoch.get(session_id, 0)
             chunk_count = 0
             async for chunk in self._tts.synthesize_stream(text):
+                if self._tts_epoch.get(session_id, 0) != epoch:
+                    logger.info(f"TTS cancelled: session={session_id}")
+                    break
                 msg = WSMessage(
                     type=MessageType.TTS_CHUNK,
                     data={

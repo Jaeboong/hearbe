@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Search results reader utilities
+Search results reader utilities.
+Always read only name + price for consistency.
 """
 
+import re
 from typing import List, Dict, Tuple
 
 
@@ -16,7 +18,28 @@ def _get_name(item: Dict) -> str:
 
 
 def _get_price(item: Dict) -> str:
-    return item.get("price") or ""
+    raw = item.get("price") or ""
+    if not raw:
+        return ""
+
+    text = str(raw).strip()
+
+    # Prefer explicit prices with "원"
+    match = re.search(r"\d{1,3}(?:,\d{3})+\s*원|\d+\s*원", text)
+    if match:
+        return match.group(0).replace(" ", "")
+
+    # Fallback: comma numbers only
+    match = re.search(r"\d{1,3}(?:,\d{3})+", text)
+    if match:
+        return match.group(0) + "원"
+
+    # Last resort: any number
+    match = re.search(r"\d+", text)
+    if match:
+        return match.group(0) + "원"
+
+    return ""
 
 
 def build_search_read_tts(
@@ -33,7 +56,7 @@ def build_search_read_tts(
     """
     total = len(products)
     if total == 0 or start_index >= total:
-        return "더 읽을 상품이 없습니다.", start_index, False
+        return "읽을 상품이 없습니다.", start_index, False
 
     end_index = min(start_index + count, total)
     lines = []

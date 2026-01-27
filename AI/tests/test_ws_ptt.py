@@ -270,11 +270,14 @@ class PTTStreamer:
 
         # Keyboard event handlers
         space_pressed = False
+        interrupt_requested = False
 
         def on_space_press(e):
             nonlocal space_pressed
+            nonlocal interrupt_requested
             if not space_pressed:
                 space_pressed = True
+                interrupt_requested = True
                 self.start_recording()
 
         def on_space_release(e):
@@ -296,6 +299,15 @@ class PTTStreamer:
                     if result and result[0] == "chunk":
                         # 3 seconds reached, send partial
                         await self.send_audio(result[1], is_final=False)
+
+                # Interrupt current TTS/logic on space press (barge-in)
+                if interrupt_requested:
+                    interrupt_requested = False
+                    message = {
+                        "type": "interrupt",
+                        "data": {}
+                    }
+                    await self.ws.send(json.dumps(message))
 
                 # Check if space was released
                 if not space_pressed and not self.recording:

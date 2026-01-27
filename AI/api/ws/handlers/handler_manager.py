@@ -10,6 +10,7 @@ from .audio_handler import AudioHandler
 from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
 from ..action_feedback import ActionFeedbackManager
+from ..tool_failure_notifier import ToolFailureNotifier
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class HandlerManager:
         self._session = session_manager
 
         self._action_feedback = ActionFeedbackManager(sender)
+        self._failure_notifier = ToolFailureNotifier(sender)
 
         self._text_handler = TextHandler(
             nlu_service=nlu_service,
@@ -48,7 +50,8 @@ class HandlerManager:
         self._mcp_handler = MCPHandler(
             sender=sender,
             session_manager=session_manager,
-            action_feedback=self._action_feedback
+            action_feedback=self._action_feedback,
+            failure_notifier=self._failure_notifier
         )
 
     async def create_session(self, session_id: str):
@@ -59,6 +62,7 @@ class HandlerManager:
         await self._audio_handler.cleanup_session(session_id)
         await self._text_handler.cleanup_session(session_id)
         self._action_feedback.clear_pending(session_id)
+        self._mcp_handler.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
         audio_data = base64.b64decode(data.get("audio", ""))
@@ -79,6 +83,13 @@ class HandlerManager:
         await self._audio_handler.clear_audio(session_id)
         await self._text_handler.handle_cancel(session_id)
         self._action_feedback.clear_pending(session_id)
+
+    async def handle_interrupt(self, session_id: str):
+        await self._audio_handler.clear_audio(session_id)
+        await self._text_handler.interrupt(session_id)
+        self._action_feedback.clear_pending(session_id)
+        if self._sender:
+            await self._sender.cancel_tts(session_id)
 
     async def handle_mcp_result(self, session_id: str, data: dict):
         await self._mcp_handler.handle_mcp_result(session_id, data)

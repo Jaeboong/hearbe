@@ -79,11 +79,11 @@ class ActionFeedbackManager:
         arguments: Optional[dict],
         success: bool,
         result: Optional[Dict[str, Any]] = None
-    ):
+    ) -> bool:
         """Handle MCP tool result to emit confirmation-safe feedback."""
         pending = self._pending.get(session_id)
         if not pending:
-            return
+            return False
 
         # Verification phase: check cart contents after navigation/extract
         if pending.action_type == "add_to_cart_verify":
@@ -100,14 +100,15 @@ class ActionFeedbackManager:
                         "장바구니에서 상품을 확인하지 못했습니다."
                     )
                 self._pending.pop(session_id, None)
-            return
+                return True
+            return False
 
         if tool_name not in ("click", "click_element", "click_text"):
-            return
+            return False
 
         if pending.selector:
             if not arguments or arguments.get("selector") != pending.selector:
-                return
+                return False
 
         if not success:
             await self._sender.send_tts_response(
@@ -115,7 +116,7 @@ class ActionFeedbackManager:
                 "장바구니 담기 버튼 클릭에 실패했습니다. 다시 시도해주세요."
             )
             self._pending.pop(session_id, None)
-            return
+            return True
 
         verify_commands = self._build_verify_add_to_cart_commands(pending.current_url or "")
         if verify_commands:
@@ -130,12 +131,14 @@ class ActionFeedbackManager:
                 tool_name="extract",
                 current_url=pending.current_url
             )
+            return True
         else:
             await self._sender.send_tts_response(
                 session_id,
                 "버튼 클릭은 완료되었습니다. 장바구니 반영은 수동 확인이 필요합니다."
             )
             self._pending.pop(session_id, None)
+            return True
 
     def _build_verify_add_to_cart_commands(self, current_url: str) -> List[MCPCommand]:
         site = get_site_manager().get_site_by_url(current_url)

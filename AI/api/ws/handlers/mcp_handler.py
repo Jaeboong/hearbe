@@ -10,6 +10,7 @@ from typing import Dict, Any, Optional, List
 
 from core.event_bus import EventType, publish
 from ..search_reader import build_search_read_tts
+from ..temp_file_manager import TempFileManager
 
 # Summarizer imports (HTML parser + OCR integrator)
 try:
@@ -29,10 +30,12 @@ logger = logging.getLogger(__name__)
 class MCPHandler:
     """Handles MCP execution results and summary pipeline."""
 
-    def __init__(self, sender, session_manager, action_feedback):
+    def __init__(self, sender, session_manager, action_feedback, failure_notifier=None):
         self._sender = sender
         self._session = session_manager
         self._action_feedback = action_feedback
+        self._failure_notifier = failure_notifier
+        self._file_manager = TempFileManager()  # Manages temporary JSON files
 
     async def handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
         """
@@ -76,13 +79,21 @@ class MCPHandler:
             session_id=session_id
         )
 
-        await self._action_feedback.handle_mcp_result(
+        handled = await self._action_feedback.handle_mcp_result(
             session_id=session_id,
             tool_name=tool_name,
             arguments=arguments,
             success=success,
             result=result
         )
+        if self._failure_notifier:
+            await self._failure_notifier.handle_mcp_result(
+                session_id=session_id,
+                tool_name=tool_name,
+                arguments=arguments,
+                success=success,
+                handled=handled
+            )
 
         session = self._session.get_session(session_id) if self._session else None
         if session and self._session:
@@ -91,6 +102,8 @@ class MCPHandler:
                 session.current_url = page_url
             if products:
                 self._session.set_context(session_id, "search_results", products)
+                self._session.set_context(session_id, "search_active_results", products)
+                self._session.set_context(session_id, "search_active_label", "all")
                 try:
                     payload = json.dumps(products, ensure_ascii=True)
                     self._session.add_to_history(
@@ -100,6 +113,9 @@ class MCPHandler:
                     )
                 except Exception:
                     logger.warning("Failed to serialize search_results for history")
+
+                # Save search results to JSON file
+                self._save_search_results_to_file(products, session_id)
 
                 product_count = len(products)
                 signature = self._build_search_signature(products)
@@ -116,6 +132,11 @@ class MCPHandler:
                     include_total=True
                 )
                 self._session.set_context(session_id, "search_read_index", next_index)
+                if next_index > 0:
+                    last_item = products[next_index - 1]
+                    name = last_item.get("name") or last_item.get("title") or last_item.get("product_name")
+                    if name:
+                        self._session.set_context(session_id, "last_mentioned_product", name)
                 if has_more:
                     tts_text += " 더 읽어드릴까요? 'n개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
                 await self._sender.send_tts_response(session_id, tts_text)
@@ -204,3 +225,14 @@ class MCPHandler:
                 len(image_urls),
                 error=str(e)
             )
+
+    def _save_search_results_to_file(self, products: List[Dict[str, Any]], session_id: str):
+        self._file_manager.save_json(
+            data=products,
+            session_id=session_id,
+            category="search_results",
+            filename_prefix="search_results"
+        )
+
+    def cleanup_session(self, session_id: str):
+        self._file_manager.cleanup_session(session_id)

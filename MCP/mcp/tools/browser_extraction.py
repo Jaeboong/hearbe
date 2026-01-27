@@ -8,6 +8,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
+from browser.dynamic_extract import extract_search_results_dynamic
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
@@ -75,11 +76,13 @@ class BrowserExtractionMixin:
         selector: str,
         fields: Optional[list] = None,
         field_selectors: Optional[Dict[str, str]] = None,
+        field_attributes: Optional[Dict[str, str]] = None,
         limit: int = 20,
         frame_selector: Optional[str] = None,
         frame_name: Optional[str] = None,
         frame_url: Optional[str] = None,
         frame_index: Optional[int] = None,
+        fallback_dynamic: bool = False,
     ) -> Dict[str, Any]:
         """
         Extract structured items from a list.
@@ -108,11 +111,23 @@ class BrowserExtractionMixin:
             locator = context.locator(selector)
             count = await locator.count()
             if count == 0:
+                if fallback_dynamic:
+                    products = await extract_search_results_dynamic(page)
+                    if products:
+                        sliced = products if limit <= 0 else products[:limit]
+                        return {
+                            "success": True,
+                            "products": sliced,
+                            "count": len(sliced),
+                            "page_url": page.url,
+                            "fallback": "dynamic",
+                        }
                 return {"success": False, "error": "Element not found", "products": []}
 
-            max_items = min(limit, count)
+            max_items = count if limit <= 0 else min(limit, count)
             fields = fields or ["name"]
             field_selectors = field_selectors or {}
+            field_attributes = field_attributes or {}
             products: list[Dict[str, Any]] = []
 
             for i in range(max_items):
@@ -125,8 +140,13 @@ class BrowserExtractionMixin:
                     if field_selector:
                         target = item.locator(field_selector)
                         if await target.count() > 0:
-                            value = await target.first.text_content()
-                            text = value.strip() if value else ""
+                            attr = field_attributes.get(field)
+                            if attr:
+                                value = await target.first.get_attribute(attr)
+                                text = value.strip() if value else ""
+                            else:
+                                value = await target.first.text_content()
+                                text = value.strip() if value else ""
                     elif field in ("name", "title"):
                         value = await item.text_content()
                         text = value.strip() if value else ""
@@ -135,10 +155,26 @@ class BrowserExtractionMixin:
 
                 products.append(item_data)
 
+            # Fallback if price/name missing
+            if fallback_dynamic and fields and "price" in fields:
+                missing_price = all(not p.get("price") for p in products)
+                if missing_price:
+                    dynamic_products = await extract_search_results_dynamic(page)
+                    if dynamic_products:
+                        sliced = dynamic_products if limit <= 0 else dynamic_products[:limit]
+                        return {
+                            "success": True,
+                            "products": sliced,
+                            "count": len(sliced),
+                            "page_url": page.url,
+                            "fallback": "dynamic",
+                        }
+
             return {
                 "success": True,
                 "products": products,
                 "count": len(products),
+                "total_count": count,
                 "page_url": page.url,
             }
 
