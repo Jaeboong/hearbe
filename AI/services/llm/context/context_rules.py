@@ -100,7 +100,7 @@ def build_click_text_command(text: str, description: str = "") -> GeneratedComma
 def build_extract_products_command(
     site: Optional[SiteConfig],
     current_url: str = "",
-    limit: int = 20,
+    limit: int = 0,
 ) -> Optional[GeneratedCommand]:
     """
     Build an extract command for search results.
@@ -125,15 +125,27 @@ def build_extract_products_command(
         return None
 
     field_selectors: Dict[str, str] = {}
+    field_attributes: Dict[str, str] = {}
     title_selector = selectors.get("product_title") or selectors.get("product_name")
     if title_selector:
         field_selectors["name"] = title_selector
     if selectors.get("product_price"):
         field_selectors["price"] = selectors["product_price"]
-    if selectors.get("product_rating"):
-        field_selectors["rating"] = selectors["product_rating"]
-    if selectors.get("product_review"):
-        field_selectors["review_count"] = selectors["product_review"]
+    rating_selector = selectors.get("product_rating")
+    if rating_selector:
+        field_selectors["rating"] = rating_selector
+        field_attributes["rating"] = "aria-label"
+    review_selector = selectors.get("product_review") or selectors.get("product_reviews")
+    if review_selector:
+        field_selectors["review_count"] = review_selector
+    if selectors.get("product_discount"):
+        field_selectors["discount"] = selectors["product_discount"]
+    if selectors.get("product_delivery"):
+        field_selectors["delivery"] = selectors["product_delivery"]
+    if selectors.get("product_free_shipping"):
+        field_selectors["free_shipping"] = selectors["product_free_shipping"]
+    if selectors.get("product_free_return"):
+        field_selectors["free_return"] = selectors["product_free_return"]
 
     fields = list(field_selectors.keys()) or ["name"]
 
@@ -143,7 +155,9 @@ def build_extract_products_command(
             "selector": item_selector,
             "fields": fields,
             "field_selectors": field_selectors,
+            "field_attributes": field_attributes,
             "limit": limit,
+            "fallback_dynamic": True,
         },
         description="Extract search results"
     )
