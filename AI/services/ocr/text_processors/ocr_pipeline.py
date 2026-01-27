@@ -133,7 +133,7 @@ def process_product_image(
     if verbose:
         print("\n📝 [1/5] OCR 처리 중...")
     step_start = time.time()
-    ocr_result = process_image(image_path, output_dir=output_dir)
+    ocr_result = process_image(image_path, output_dir=output_dir, save_vis=False)
     step_time = time.time() - step_start
     ocr_count = ocr_result.get("total_count", len(ocr_result.get("rec_texts", [])))
     if verbose:
@@ -216,7 +216,8 @@ def process_multiple_images(
     ocr_results = process_images_parallel(
         image_paths,
         max_workers=max_workers,
-        output_dir=output_dir
+        output_dir=output_dir,
+        save_vis=False
     )
     step_time = time.time() - step_start
     total_ocr = sum(r.get("total_count", 0) for r in ocr_results)

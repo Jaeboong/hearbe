@@ -13,8 +13,9 @@ try:
 except ImportError:
     import korean_ocr
 
-DEFAULT_MAX_HEIGHT = 2000
-DEFAULT_OVERLAP = 200
+DEFAULT_MAX_HEIGHT = 2500
+DEFAULT_OVERLAP = 150
+DEFAULT_RESIZE_MAX_HEIGHT = 12000
 MIN_CHUNK_HEIGHT = 500
 OUTPUT_DIR = "output"
 
@@ -33,11 +34,19 @@ def split_image_to_chunks(
     image_path: str,
     max_height: int = DEFAULT_MAX_HEIGHT,
     overlap: int = DEFAULT_OVERLAP,
+    resize_max_height: int = DEFAULT_RESIZE_MAX_HEIGHT,
     save_chunks: bool = False,
     output_dir: str = None
 ) -> List[Tuple[Image.Image, int]]:
     img = Image.open(image_path)
     width, height = img.size
+    
+    if resize_max_height and height > resize_max_height:
+        scale = resize_max_height / height
+        new_size = (max(1, int(width * scale)), resize_max_height)
+        img = img.resize(new_size, Image.LANCZOS)
+        width, height = img.size
+        print(f"큰 이미지 리사이즈: {new_size[0]}x{new_size[1]}px (scale={scale:.3f})")
     
     if save_chunks:
         base_name = Path(image_path).stem
