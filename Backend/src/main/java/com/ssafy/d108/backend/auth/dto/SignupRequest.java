@@ -1,7 +1,7 @@
 package com.ssafy.d108.backend.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ssafy.d108.backend.entity.UserType;
+import com.ssafy.d108.backend.entity.enums.UserType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

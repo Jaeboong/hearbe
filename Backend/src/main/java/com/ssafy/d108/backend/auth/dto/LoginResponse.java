@@ -1,6 +1,6 @@
 package com.ssafy.d108.backend.auth.dto;
 
-import com.ssafy.d108.backend.entity.UserType;
+import com.ssafy.d108.backend.entity.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

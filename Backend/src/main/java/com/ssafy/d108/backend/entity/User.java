@@ -1,6 +1,7 @@
 package com.ssafy.d108.backend.entity;
 
 import java.time.LocalDateTime;
+import com.ssafy.d108.backend.entity.enums.UserType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

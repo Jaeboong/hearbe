@@ -9,7 +9,7 @@ import com.ssafy.d108.backend.auth.dto.WelfareCardRequest;
 import com.ssafy.d108.backend.auth.repository.UserRepository;
 import com.ssafy.d108.backend.auth.repository.WelfareCardRepository;
 import com.ssafy.d108.backend.entity.User;
-import com.ssafy.d108.backend.entity.UserType;
+import com.ssafy.d108.backend.entity.enums.UserType;
 import com.ssafy.d108.backend.entity.WelfareCard;
 import com.ssafy.d108.backend.global.auth.JwtTokenProvider;
 import com.ssafy.d108.backend.global.exception.DuplicateUserException;
@@ -17,7 +17,7 @@ import com.ssafy.d108.backend.global.exception.InvalidPasswordException;
 import com.ssafy.d108.backend.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
