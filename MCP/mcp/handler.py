@@ -111,7 +111,9 @@ class MCPHandler:
             success=result.get("success", False),
             result=result,
             error=result.get("error"),
-            page_data=page_data
+            page_data=page_data,
+            tool_name=tool_name,
+            arguments=arguments
         )
 
     async def _publish_result(
@@ -120,7 +122,9 @@ class MCPHandler:
         success: bool,
         result: dict = None,
         error: str = None,
-        page_data: dict = None
+        page_data: dict = None,
+        tool_name: str = None,
+        arguments: dict = None
     ):
         """도구 실행 결과 발행"""
         await publish(
@@ -130,7 +134,9 @@ class MCPHandler:
                 "success": success,
                 "result": result,
                 "error": error,
-                "page_data": page_data
+                "page_data": page_data,
+                "tool_name": tool_name,
+                "arguments": arguments
             },
             source="mcp.handler"
         )
