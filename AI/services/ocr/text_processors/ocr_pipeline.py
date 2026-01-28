@@ -17,6 +17,7 @@ try:
         override_product_type,
     )
     from .ocr_llm_summarizer import summarize_texts
+    from .extract_rec_texts import extract_rec_texts_from_data
     from .image_fetcher import (
         filter_product_images,
         download_images,
@@ -47,6 +48,7 @@ except ImportError:
         override_product_type,
     )
     from ocr_llm_summarizer import summarize_texts
+    from extract_rec_texts import extract_rec_texts_from_data
     from image_fetcher import (
         filter_product_images,
         download_images,
@@ -112,6 +114,113 @@ def _select_texts_by_importance(
     # 중요 텍스트 우선 선택
     selected = important + normal
     return [text for text, score in selected[:max_items]]
+
+
+def _summary_only(summary: Dict) -> Dict:
+    return {"summary": summary.get("summary", [])}
+
+
+def _cap_texts(texts: List[str], max_items: int = 200) -> List[str]:
+    if max_items <= 0:
+        return []
+    if len(texts) <= max_items:
+        return texts
+    return texts[:max_items]
+
+
+_IMPORTANT_TOKENS = (
+    "특가", "할인", "세일", "반값", "쿠폰", "무료배송",
+    "원산지", "제조", "브랜드", "유통기한", "보관",
+    "용량", "중량", "구성", "증정", "1+1", "2+1",
+    "원", "%", "kg", "g", "ml", "l", "개", "입", "팩", "박스"
+)
+
+
+def _is_important_text(text: str) -> bool:
+    for token in _IMPORTANT_TOKENS:
+        if token in text:
+            return True
+    # 숫자 + 단위/통화 패턴
+    import re
+    return bool(re.search(r"\d+\s*(원|%|kg|g|ml|l|개|입|팩|박스)", text.lower()))
+
+
+def _filter_texts_with_keyword_override(
+    texts: List[str],
+    scores: List[float],
+    min_score: float = 0.7,
+    min_length: int = 2,
+) -> List[tuple[str, float]]:
+    filtered: List[tuple[str, float]] = []
+    for text, score in zip(texts, scores):
+        if not isinstance(text, str):
+            continue
+        text = text.strip()
+        if not text:
+            continue
+        if len(text) < min_length:
+            continue
+        if not is_meaningful_text(text):
+            continue
+        if score < min_score and not _is_important_text(text):
+            continue
+        filtered.append((text, score))
+    return filtered
+
+
+_TYPE_RULES = {
+    "electronics": {
+        "strong": ("HDMI", "IPS", "FHD"),
+        "weak": ("Hz", "\uc778\uce58", "\ubaa8\ub2c8\ud130", "\ub514\uc2a4\ud50c\ub808\uc774"),
+    },
+    "fresh_food": {
+        "strong": ("\uc720\ud1b5\uae30\ud55c", "\ubcf4\uad00", "\ub0c9\uc7a5", "\ub0c9\ub3d9"),
+        "weak": ("\uc0b0\uc9c0", "\uc81c\ucca0"),
+    },
+}
+
+
+def _find_product_type_by_desc_fragment(fragment: str) -> Optional[ProductType]:
+    for pt in ProductType:
+        if fragment in get_type_description(pt):
+            return pt
+    return None
+
+
+def _override_product_type(
+    texts: List[str],
+    current_type: ProductType
+) -> ProductType:
+    joined = " ".join(texts)
+    scores = {}
+    strong_hits = {}
+    for key, rules in _TYPE_RULES.items():
+        strong = rules["strong"]
+        weak = rules["weak"]
+        s_hits = sum(1 for token in strong if token in joined)
+        w_hits = sum(1 for token in weak if token in joined)
+        strong_hits[key] = s_hits
+        scores[key] = s_hits * 3 + w_hits
+
+    if strong_hits["electronics"] >= 2:
+        pt = _find_product_type_by_desc_fragment("\uc804\uc790")
+        if pt:
+            return pt
+    if strong_hits["fresh_food"] >= 2:
+        pt = _find_product_type_by_desc_fragment("\uc2e0\uc120")
+        if pt:
+            return pt
+
+    if scores["electronics"] - scores["fresh_food"] >= 2 and scores["electronics"] >= 4:
+        pt = _find_product_type_by_desc_fragment("\uc804\uc790")
+        if pt:
+            return pt
+    if scores["fresh_food"] - scores["electronics"] >= 2 and scores["fresh_food"] >= 4:
+        pt = _find_product_type_by_desc_fragment("\uc2e0\uc120")
+        if pt:
+            return pt
+
+    return current_type
 
 
 def process_product_image(
