@@ -76,6 +76,14 @@ public class AuthService {
                 throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
             }
             rawPassword = request.getPassword();
+
+            // B/C형은 이메일 필수
+            if (request.getEmail() == null || request.getEmail().isBlank()) {
+                throw new IllegalArgumentException("이메일은 필수입니다.");
+            }
+            if (!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                throw new IllegalArgumentException("올바른 이메일 형식이 아닙니다.");
+            }
         }
 
         // BLIND 타입 복지카드 필수 검증
