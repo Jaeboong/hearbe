@@ -111,7 +111,7 @@ def process_image(
         result["processing_mode"] = "split"
     else:
         print(f"일반 이미지 (높이 {height}px <= {max_height}px) → 직접 처리")
-        
+
         ocr_raw_result = ocr_instance.predict(image_path)
 
         if save_vis:
