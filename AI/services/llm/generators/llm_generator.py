@@ -122,18 +122,29 @@ class LLMGenerator:
         )
         
         try:
-            # OpenAI API 호출 (blocking -> thread)
-            response = await asyncio.to_thread(
-                self.client.chat.completions.create,
-                model=self.model,
-                messages=messages,
-                response_format={"type": "json_object"},
-                max_completion_tokens=1000
-            )
-            
+            # OpenAI API 호출 (blocking -> thread), empty 응답 시 최대 2회 재시도
+            content = None
+            last_error = None
+            for attempt in range(3):
+                response = await asyncio.to_thread(
+                    self.client.chat.completions.create,
+                    model=self.model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                    max_completion_tokens=1000
+                )
+                content = response.choices[0].message.content
+                logger.info("LLM response received: chars=%d", len(content or ""))
+                if content:
+                    break
+                last_error = "empty_response"
+                if attempt < 2:
+                    logger.warning("Empty LLM response received, retrying (%d/2)", attempt + 1)
+
+            if not content:
+                raise ValueError(last_error or "empty_response")
+
             # 응답 파싱
-            content = response.choices[0].message.content
-            logger.info("LLM response received: chars=%d", len(content or ""))
             result = self._parse_response(content)
             logger.info(
                 "LLM parsed: success=%s, commands=%d, response_text_len=%d",
