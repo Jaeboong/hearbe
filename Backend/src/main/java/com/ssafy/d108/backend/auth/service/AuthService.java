@@ -100,7 +100,7 @@ public class AuthService {
         }
 
         // 중복 체크
-        if (userRepository.existsByLoginId(request.getLoginId())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateUserException("이미 사용 중인 아이디입니다.");
         }
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
@@ -109,9 +109,9 @@ public class AuthService {
 
         // User 생성 (비밀번호 암호화 저장)
         User user = new User();
-        user.setLoginId(request.getLoginId());
-        user.setPassword(passwordEncoder.encode(rawPassword)); // 선택된 패스워드 암호화
         user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(rawPassword)); // 선택된 패스워드 암호화
+        user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setUserType(request.getUserType());
@@ -153,7 +153,7 @@ public class AuthService {
      */
     public LoginResponse login(LoginRequest request) {
         // 1. 사용자 조회
-        User user = userRepository.findByLoginId(request.getLoginId())
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
 
         // 2. 비밀번호 검증 (BCrypt Matches)
@@ -164,7 +164,7 @@ public class AuthService {
         // 3. Authentication 객체 생성 (Custom)
         //
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user.getLoginId(),
+                user.getUsername(),
                 null,
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) // 임시 Role
         );
@@ -174,7 +174,7 @@ public class AuthService {
 
         return new LoginResponse(
                 user.getId(),
-                user.getUsername(),
+                user.getName(),
                 user.getUserType(),
                 accessToken,
                 "로그인 성공");
@@ -199,7 +199,7 @@ public class AuthService {
                         encryptedCvc)
                 .orElseThrow(() -> new UserNotFoundException("일치하는 복지카드 정보가 없습니다."));
 
-        return new FindIdResponse(welfareCard.getUser().getLoginId(), "Found ID");
+        return new FindIdResponse(welfareCard.getUser().getUsername(), "Found ID");
     }
 
     /**

@@ -58,7 +58,7 @@ public class OrderService {
         orderItem.setPlatform(platform);
         orderItem.setName(request.getName());
         orderItem.setPrice(request.getPrice());
-        orderItem.setQuantity(1); // 기본 1개
+        orderItem.setQuantity(request.getQuantity()); // 요청에서 받은 수량 사용
         orderItem.setUrl(request.getUrl());
         orderItem.setImgUrl(request.getImgUrl());
 

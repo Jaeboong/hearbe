@@ -25,6 +25,10 @@ public class OrderCreateRequest {
     @NotNull(message = "가격은 필수입니다.")
     private Long price;
 
+    @JsonProperty("quantity")
+    @NotNull(message = "수량은 필수입니다.")
+    private Integer quantity;
+
     @JsonProperty("img_url")
     private String imgUrl;
 }

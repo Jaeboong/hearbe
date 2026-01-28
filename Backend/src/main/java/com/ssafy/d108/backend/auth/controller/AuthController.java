@@ -33,7 +33,7 @@ public class AuthController {
      * 회원가입
      */
     @Operation(summary = "회원가입", description = "B/C형 사용자 회원가입 (복지카드 불필요)")
-    @PostMapping("/signup")
+    @PostMapping("/regist")
     public ResponseEntity<ApiResponse<Integer>> signup(@Valid @RequestBody SignupRequest request) {
         Integer userId = authService.signup(request);
         return ResponseEntity
