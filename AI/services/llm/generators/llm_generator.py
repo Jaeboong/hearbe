@@ -29,6 +29,28 @@ from ..sites.site_manager import get_site_manager
 logger = logging.getLogger(__name__)
 
 
+def resolve_llm_api_key(explicit_key: Optional[str] = None) -> Optional[str]:
+    """
+    Resolve LLM API key based on environment configuration.
+
+    Order:
+    1) explicit_key (if provided)
+    2) LLM_API_KEY_NAME -> env value
+    3) GMS_API_KEY, GMS_KEY, OPENAI_API_KEY
+    """
+    if explicit_key:
+        return explicit_key
+    key_name = os.environ.get("LLM_API_KEY_NAME")
+    if key_name:
+        key_value = os.environ.get(key_name)
+        if key_value:
+            return key_value
+    return (
+        os.environ.get("GMS_API_KEY")
+        or os.environ.get("OPENAI_API_KEY")
+    )
+
+
 @dataclass
 class LLMResult:
     """LLM 생성 결과"""
@@ -46,8 +68,8 @@ class LLMGenerator:
     """
     
     def __init__(self, api_key: str = None, model: str = "gpt-5-mini"):
-        # GMS_API_KEY 우선, 없으면 OPENAI_API_KEY 사용
-        self.api_key = api_key or os.environ.get("GMS_API_KEY") or os.environ.get("OPENAI_API_KEY")
+        # Allow env-based key selection
+        self.api_key = resolve_llm_api_key(api_key)
         self.model = model
         self.base_url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1"
         self.context_builder = ContextBuilder()
