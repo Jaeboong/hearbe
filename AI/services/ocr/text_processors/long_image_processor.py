@@ -1,32 +1,29 @@
-# -*- coding: utf-8 -*-
+# 긴 이미지 분할 및 OCR 처리
 import argparse
 import json
 import os
-import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+import numpy as np
 from PIL import Image
 
 try:
     from . import korean_ocr
+    from .utils import get_image_size, save_json
 except ImportError:
     import korean_ocr
+    from utils import get_image_size, save_json
 
 DEFAULT_MAX_HEIGHT = 2500
-DEFAULT_OVERLAP = 150
+DEFAULT_OVERLAP = 100
 DEFAULT_RESIZE_MAX_HEIGHT = 12000
 MIN_CHUNK_HEIGHT = 500
 OUTPUT_DIR = "output"
 
 
-def get_image_info(image_path: str) -> Tuple[int, int]:
-    with Image.open(image_path) as img:
-        return img.size
-
-
 def should_split_image(image_path: str, max_height: int = DEFAULT_MAX_HEIGHT) -> bool:
-    width, height = get_image_info(image_path)
+    width, height = get_image_size(image_path)
     return height > max_height
 
 
@@ -85,15 +82,12 @@ def split_image_to_chunks(
 
 
 def process_chunk_ocr(chunk: Image.Image, ocr_instance) -> List[Dict]:
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-        chunk.save(tmp.name, "PNG")
-        tmp_path = tmp.name
-    
-    try:
-        result = ocr_instance.predict(tmp_path)
-        return result
-    finally:
-        os.unlink(tmp_path)
+    """청크 이미지에 OCR 수행 (numpy 배열 직접 전달로 임시파일 생략)"""
+    # PIL Image -> numpy array (RGB -> BGR for OpenCV compatibility)
+    img_array = np.array(chunk)
+    if len(img_array.shape) == 3 and img_array.shape[2] == 3:
+        img_array = img_array[:, :, ::-1]  # RGB to BGR
+    return ocr_instance.predict(img_array)
 
 
 def adjust_coordinates(ocr_result: List[Dict], y_offset: int) -> List[Dict]:
@@ -126,11 +120,21 @@ def remove_duplicate_texts(all_results: List[Dict], overlap: int) -> Dict:
             for res in result:
                 texts = res.get('rec_texts', [])
                 scores = res.get('rec_scores', [])
+                polys = res.get('dt_polys', [])
                 
-                for text, score in zip(texts, scores):
+                for idx, (text, score) in enumerate(zip(texts, scores)):
                     normalized = text.strip().lower()
-                    if normalized and normalized not in seen_texts:
-                        seen_texts.add(normalized)
+                    if not normalized:
+                        continue
+                    key = normalized
+                    if polys and idx < len(polys):
+                        poly = polys[idx]
+                        if poly:
+                            min_y = min(p[1] for p in poly)
+                            bucket = int(min_y / max(overlap, 1))
+                            key = f"{normalized}|{bucket}"
+                    if key not in seen_texts:
+                        seen_texts.add(key)
                         unique_texts.append(text)
                         unique_scores.append(score)
     
@@ -148,7 +152,7 @@ def process_long_image(
     ocr_instance = None,
     save_chunks: bool = False
 ) -> Dict:
-    width, height = get_image_info(image_path)
+    width, height = get_image_size(image_path)
     print(f"이미지 크기: {width}x{height}px")
     
     if not should_split_image(image_path, max_height):
@@ -213,13 +217,6 @@ def process_long_image(
     return merged
 
 
-def save_result(result: Dict, output_path: str) -> None:
-    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
-    print(f"결과 저장: {output_path}")
-
-
 def main():
     parser = argparse.ArgumentParser(description="긴 이미지 OCR 처리")
     parser.add_argument("--input", required=True)
@@ -245,8 +242,9 @@ def main():
     else:
         output_path = args.output
     
-    save_result(result, output_path)
-    
+    save_json(result, output_path)
+    print(f"결과 저장: {output_path}")
+
     return 0
 
 

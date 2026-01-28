@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# 여러 OCR 결과 병합/중복 제거
 import argparse
 import json
 import os
@@ -8,8 +8,10 @@ from typing import Dict, Iterable, List, Tuple, Any
 
 try:
     from .ocr_text_preprocessor import normalize_text, filter_texts
+    from .utils import save_json
 except ImportError:
     from ocr_text_preprocessor import normalize_text, filter_texts
+    from utils import save_json
 
 
 def _merge_entries(
@@ -118,12 +120,6 @@ def merge_ocr_texts(
     )
 
 
-def _write_json(path: str, data: Dict) -> None:
-    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description="OCR 텍스트 병합")
     parser.add_argument("--inputs", nargs="+", required=True)
@@ -139,7 +135,7 @@ def main() -> int:
         min_length=args.min_length,
         similarity_threshold=args.similarity_threshold,
     )
-    _write_json(args.output, result)
+    save_json(args.output, result)
     print(f"병합 완료: {result['count']}개 텍스트 -> {args.output}")
     return 0
 

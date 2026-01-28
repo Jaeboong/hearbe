@@ -1,3 +1,4 @@
+# OCR 텍스트를 LLM으로 요약
 import argparse
 import json
 import os
@@ -15,6 +16,11 @@ from product_type_detector import (
     get_type_description,
     is_keyword_valid_for_type
 )
+
+try:
+    from .utils import compute_summary_hash, load_summary_cache, save_summary_cache
+except ImportError:
+    from utils import compute_summary_hash, load_summary_cache, save_summary_cache
 
 try:
     from dotenv import load_dotenv
@@ -49,39 +55,46 @@ def _load_ocr_texts(path: str, preprocess: bool = True) -> Tuple[List[str], Dict
 
 def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]:
     numbered = "\n".join(f"{i + 1}. {t}" for i, t in enumerate(texts))
-    keywords = get_keywords_for_type(product_type)
-    type_desc = get_type_description(product_type)
-    
-    keyword_lines = []
-    for i, kw in enumerate(keywords):
-        if i == 0:
-            keyword_lines.append(f'    "{kw}": {{ "answer": "...", "evidence": ["..."], "status": "found|not_found" }}')
-        else:
-            keyword_lines.append(f'    "{kw}": {{...}}')
-    keyword_schema = ",\n".join(keyword_lines)
     
     system = (
-        "당신은 시각장애인을 위해 한국어 OCR 텍스트를 요약하고 분석하는 어시스턴트입니다. "
-        "반드시 유효한 JSON 형식으로만 응답하세요."
+        "당신은 시각장애인 사용자에게 제품을 대신 읽어주는 **따뜻하고 친절한 쇼핑 친구**이자, "
+        "안전을 책임지는 **꼼꼼한 확인자**입니다. "
+        "기계적인 요약 대신 **사용자가 바로 옆에 있는 것처럼** 제품의 매력(맛, 식감, 특징)을 생생하게 설명하세요. "
+        "단, 안전과 직결된 **숫자, 유통기한, 알레르기 성분은 절대로 추측하지 말고** OCR 텍스트에 적힌 그대로 정확하게 전달해야 합니다."
     )
     
     instructions = (
-        f"당신은 지금 '{type_desc} ({product_type.value})' 제품을 분석하고 있습니다.\n"
-        f"다음 키워드들에 대한 정보를 추출하세요: {', '.join(keywords)}\n\n"
-        "반드시 제공된 OCR 텍스트 내용에 기반해서만 답해야 합니다. "
-        "만약 해당 키워드에 대한 정보가 텍스트에 없다면, status를 \"not_found\"로 하고 "
-        "answer를 \"OCR 텍스트에 없음\"이라고 적으세요.\n\n"
-        "출력할 JSON 형식:\n"
+        "다음 OCR 텍스트를 분석하여 친구에게 말해주듯이 JSON 형식으로 응답하세요.\n\n"
+        "**💡 1단계: 냉철한 팩트 체크 (Strict Check)**\n"
+        "- **추측 금지**: 텍스트에 없는 내용을 상상해서 채워 넣지 마세요.\n"
+        "- **숫자/단위**: 용량(g, ml), 칼로리(kcal), 개수 등은 텍스트 그대로 정확히 찾으세요.\n"
+        "- **안전 정보**: 유통기한, 보관방법, 알레르기 주의사항은 **원문 그대로** 추출하세요. '밀가루'가 '말가루'로 오인식 된 것처럼 **명백한 오타만** 문맥에 맞게 수정하세요.\n\n"
+        "**� 2단계: 매력 포인트 발견 (Rich Description)**\n"
+        "- 딱딱한 스펙 외에, 포장지에 적힌 **설명 문구**를 적극적으로 찾으세요.\n"
+        "- 예: \"진한 풍미\", \"부드러운 식감\", \"깊은 맛\", \"국산 원료 사용\" 등.\n"
+        "- 단순히 \"스프입니다\"라고 하지 말고, **\"진한 버섯 풍미가 가득한 포르치니 스프\"**라고 설명해 주세요.\n\n"
+        "**✍️ 3단계: 친절한 말하기 (요약 작성)**\n"
+        "다음 흐름으로 **3~6문장**의 이야기를 들려주세요. (딱딱한 \"~다\"체 금지, **\"~해요/네요\"체 사용**)\n"
+        "1. **첫인상**: \"이건 [브랜드]의 **[제품명]**이에요. 포장지에 [매력 포인트/수식어]라고 적혀 있네요.\"\n"
+        "2. **상세 설명**: \"용량은 [용량]이고, 칼로리는 [열량]이라서 [용도추천]으로 좋을 것 같아요. [맛/식감 묘사]가 특징이라고 해요.\"\n"
+        "3. **사용법**: \"조리법도 간단해요. [조리법 내용]하면 된답니다.\"\n"
+        "4. **안전 챙김**: \"아, 그리고 [알레르기/주의사항]이 있으니 꼼꼼히 확인해 주세요!\" (없으면 생략)\n\n"
+        "**출력 JSON 형식:**\n"
         "{\n"
-        f'  "product_type": "{product_type.value}",\n'
-        '  "product_name": "제품명",\n'
-        '  "confidence": 0.0-1.0,\n'
-        '  "summary": ["핵심 요약 문장 1", "핵심 요약 문장 2", "핵심 요약 문장 3"],\n'
-        '  "keywords": {\n'
-        f"{keyword_schema}\n"
+        "  \"product_type\": \"자동 감지한 제품군\",\n"
+        "  \"product_name\": \"제품명\",\n"
+        "  \"confidence\": 1.0,\n"
+        "  \"summary\": [\n"
+        "    \"이야기하듯 작성한 첫 번째 문장\",\n"
+        "    \"두 번째 문장\",\n"
+        "    \"세 번째 문장...\"\n"
+        "  ],\n"
+        "  \"keywords\": {\n"
+        "    \"키워드1(예: 조리법)\": { \"answer\": \"내용\", \"status\": \"found|not_found\" },\n"
+        "    \"키워드2(예: 칼로리)\": { \"answer\": \"내용\", \"status\": \"found|not_found\" },\n"
+        "    \"키워드3(자동생성)\": { \"answer\": \"내용\", \"status\": \"found|not_found\" }\n"
         "  }\n"
         "}\n"
-        "요약(summary)은 3-5문장으로 작성하세요. 시각장애인을 위한 정보를 제공해야 합니다."
     )
     
     user = "분석할 OCR 텍스트:\n" + numbered
@@ -94,7 +107,7 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
     if not api_key:
         raise RuntimeError("GMS_KEY 환경변수가 설정되지 않았습니다.")
 
-    model = os.environ.get("OPENAI_MODEL", "gpt-5-mini")
+    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"
 
     messages = [
@@ -111,6 +124,7 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
     payload = {
         "model": model,
         "messages": messages,
+        "temperature": 0.1,
     }
 
     headers = {
@@ -164,7 +178,9 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
 def summarize_texts(
     texts: List[str],
     product_type: ProductType = None,
-    verbose: bool = True
+    verbose: bool = True,
+    use_cache: bool = True,
+    prompt_version: str = "v1",
 ) -> Dict:
     if not texts:
         return {
@@ -182,11 +198,27 @@ def summarize_texts(
             type_desc = get_type_description(product_type)
             print(f"    제품 타입 자동 감지: {type_desc} ({product_type.value})")
     
+    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    if use_cache:
+        summary_hash = compute_summary_hash(
+            texts=texts,
+            product_type=product_type.value,
+            model=model,
+            prompt_version=prompt_version,
+        )
+        cached = load_summary_cache(summary_hash)
+        if cached:
+            if verbose:
+                print("    LLM summary cache hit")
+            return cached
+
     prompt = _build_prompt(texts, product_type)
     
     if verbose:
         print("    LLM API 호출 중...", end="", flush=True)
     summary = _call_openai(prompt)
+    if use_cache:
+        save_summary_cache(summary_hash, summary)
     if verbose:
         print(" 완료!")
     

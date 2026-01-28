@@ -1,5 +1,6 @@
+# OCR 텍스트 정제·필터링
 import re
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 
 def normalize_text(text: str) -> str:
@@ -19,6 +20,7 @@ def filter_texts(
     scores: List[float],
     min_score: float = 0.7,
     min_length: int = 2,
+    important_text_predicate: Optional[Callable[[str], bool]] = None,
 ) -> List[Tuple[str, float]]:
     filtered: List[Tuple[str, float]] = []
     
@@ -29,7 +31,8 @@ def filter_texts(
         if not text:
             continue
         if score < min_score:
-            continue
+            if not (important_text_predicate and important_text_predicate(text)):
+                continue
         if len(text) < min_length:
             continue
         if not is_meaningful_text(text):
@@ -66,7 +69,6 @@ def preprocess_ocr_texts(
     }
     
     for text, score in zip(texts, scores):
-        original_text = text
         text = text.strip()
         
         if score < min_score:
@@ -135,6 +137,22 @@ def load_and_preprocess_ocr_json(
         scores = [1.0] * len(texts)
     
     return preprocess_ocr_texts(texts, scores, min_score, min_length, verbose)
+
+
+def extract_rec_texts_from_data(data: Dict) -> List[str]:
+    """OCR 결과 딕셔너리에서 유효한 텍스트만 추출"""
+    rec_texts = data.get("rec_texts", [])
+    cleaned = []
+    for text in rec_texts:
+        if not isinstance(text, str):
+            continue
+        text = text.strip()
+        if not text:
+            continue
+        if not normalize_text(text):
+            continue
+        cleaned.append(text)
+    return cleaned
 
 
 if __name__ == "__main__":

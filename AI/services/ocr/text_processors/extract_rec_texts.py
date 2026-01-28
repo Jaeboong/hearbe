@@ -1,12 +1,13 @@
+# OCR JSON에서 rec_texts만 추출 
 import argparse
 import json
 import os
 from pathlib import Path
 
 try:
-    from .ocr_text_preprocessor import normalize_text
+    from .ocr_text_preprocessor import extract_rec_texts_from_data
 except ImportError:
-    from ocr_text_preprocessor import normalize_text
+    from ocr_text_preprocessor import extract_rec_texts_from_data
 
 DEFAULT_INPUT = os.path.join("output", "초코파이_detail_res.json")
 DEFAULT_OUTPUT = os.path.join("output", "초코파이_detail_res_texts.json")
