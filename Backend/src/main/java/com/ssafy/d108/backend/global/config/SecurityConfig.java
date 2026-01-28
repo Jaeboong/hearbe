@@ -53,7 +53,9 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/health",
                                 "/ping",
-                                "/")
+                                "/",
+                                "/cart/**",
+                                "/wishlist/**")
                         .permitAll()
 
                         // All other requests require authentication
