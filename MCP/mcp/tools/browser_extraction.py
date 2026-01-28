@@ -9,6 +9,7 @@ from typing import Any, Dict, Optional
 
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
 from browser.extractors import extract_search_results_dynamic
+from browser.extractors.coupang_product import extract_coupang_product_options
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
@@ -194,6 +195,7 @@ class BrowserExtractionMixin:
         frame_name: Optional[str] = None,
         frame_url: Optional[str] = None,
         frame_index: Optional[int] = None,
+        fallback_dynamic: bool = False,
     ) -> Dict[str, Any]:
         """
         Extract detail fields from a product page.
@@ -261,6 +263,20 @@ class BrowserExtractionMixin:
                     if src.startswith("//"):
                         src = f"https:{src}"
                     images.append(src)
+
+            # 동적 fallback: 옵션 필드가 없거나 실패한 경우
+            if fallback_dynamic:
+                option_fields = {'option', 'size', 'color', 'capacity'}
+                has_option_data = any(detail.get(f) for f in option_fields if f in detail)
+
+                if not has_option_data:
+                    try:
+                        dynamic_options = await extract_coupang_product_options(page)
+                        if dynamic_options:
+                            detail['options'] = dynamic_options
+                            logger.info(f"Dynamic option extraction succeeded: {dynamic_options}")
+                    except Exception as e:
+                        logger.warning(f"Dynamic option extraction failed: {e}")
 
             return {
                 "success": True,

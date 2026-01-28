@@ -26,7 +26,6 @@ from ..search.search_insights import (
     filter_tomorrow_items,
     filter_free_shipping_items,
 )
-from ..search.search_matcher import SearchMatcher
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +48,6 @@ class SearchQueryHandler:
         """
         self._session = session_manager
         self._sender = sender
-        self._matcher = SearchMatcher()
 
     async def handle_query(self, session_id: str, text: str, session) -> bool:
         """
@@ -63,17 +61,25 @@ class SearchQueryHandler:
         Returns:
             True if query was handled, False otherwise
         """
-        # Try insight queries first (filtering, analysis)
-        handled = await self._handle_insight_query(session_id, text, session)
-        if handled:
-            return True
+        normalized = text.strip().lower()
+        if not normalized:
+            return False
 
-        # Then try read/detail queries
-        handled = await self._handle_read_query(session_id, text, session)
-        if handled:
-            return True
+        # 정보성 질문은 LLM에게 위임
+        if self._is_attribute_query(normalized):
+            return False
+        if (
+            self._is_highest_discount_request(normalized)
+            or self._is_lowest_price_request(normalized)
+            or self._is_tomorrow_delivery_request(normalized)
+            or self._is_free_shipping_list_request(normalized)
+        ):
+            return False
 
-        return False
+        if not self._is_read_request(normalized):
+            return False
+
+        return await self._handle_read_query(session_id, normalized, session)
 
     async def _handle_insight_query(
         self,
@@ -181,13 +187,11 @@ class SearchQueryHandler:
         session
     ) -> bool:
         """
-        Handle read queries: item details, list reading.
+        Handle read queries: list reading only.
 
         Examples:
         - "전체 읽어줘"
         - "n개 더 읽어줘"
-        - "1번 상품 가격은?"
-        - "2번 할인율은?"
         """
         results = self._get_active_results(session)
         if not results:
@@ -197,187 +201,17 @@ class SearchQueryHandler:
         if not normalized:
             return False
 
-        # Item-specific attribute queries (e.g., "1번 가격은?")
-        ordinal_index = extract_ordinal_index(normalized)
-        is_attribute_query = self._is_attribute_query(normalized)
-        if ordinal_index is not None and is_attribute_query:
-            if 0 <= ordinal_index < len(results):
-                item = results[ordinal_index]
-                self._set_last_mentioned_product(session_id, item)
-
-                # Discount query
-                if self._is_discount_query(normalized):
-                    discount_text = get_discount_text(item)
-                    if discount_text:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{ordinal_index + 1}번 상품 할인율은 {discount_text}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "할인율 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Price query
-                if self._is_price_query(normalized):
-                    price = get_price_text(item)
-                    if price:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{ordinal_index + 1}번 상품 가격은 {price}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "가격 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Delivery query
-                if self._is_delivery_query(normalized):
-                    delivery = get_delivery_text(item)
-                    if delivery:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{ordinal_index + 1}번 상품 배송 정보는 {delivery}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "배송 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Rating query
-                if self._is_rating_query(normalized):
-                    rating = get_rating_text(item)
-                    if rating:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{ordinal_index + 1}번 상품 평점은 {rating}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "평점 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Free shipping query
-                if self._is_free_shipping_query(normalized):
-                    if is_free_shipping(item):
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{ordinal_index + 1}번 상품은 무료배송입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{ordinal_index + 1}번 상품은 무료배송이 아닙니다."
-                        )
-                    return True
-
-            return True
-
-        # If ordinal is present but it's not an attribute/read query, let other handlers handle it.
-        if ordinal_index is not None and not is_attribute_query:
-            if not self._is_read_request(normalized):
-                return False
-
-        # Name-based attribute queries (e.g., "탐사 샘물 2L 12개 평점 알려줘")
-        if self._is_attribute_query(normalized):
-            match = await self._matcher.match(text, results)
-            if match:
-                item = match.item
-                self._set_last_mentioned_product(session_id, item)
-                # Discount query
-                if self._is_discount_query(normalized):
-                    discount_text = get_discount_text(item)
-                    if discount_text:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{get_name(item)} 할인율은 {discount_text}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "할인율 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Price query
-                if self._is_price_query(normalized):
-                    price = get_price_text(item)
-                    if price:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{get_name(item)} 가격은 {price}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "가격 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Delivery query
-                if self._is_delivery_query(normalized):
-                    delivery = get_delivery_text(item)
-                    if delivery:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{get_name(item)} 배송 정보는 {delivery}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "배송 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Rating query
-                if self._is_rating_query(normalized):
-                    rating = get_rating_text(item)
-                    if rating:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{get_name(item)} 평점은 {rating}입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            "평점 정보를 찾지 못했습니다."
-                        )
-                    return True
-
-                # Free shipping query
-                if self._is_free_shipping_query(normalized):
-                    if is_free_shipping(item):
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{get_name(item)}은 무료배송입니다."
-                        )
-                    else:
-                        await self._sender.send_tts_response(
-                            session_id,
-                            f"{get_name(item)}은 무료배송이 아닙니다."
-                        )
-                    return True
-
-            return False
-
-        # List reading (e.g., "전체 읽어줘", "더 읽어줘")
         if not self._is_read_request(normalized):
             return False
 
         mode, count = self._parse_read_request(normalized)
+        if mode is None:
+            return False
+
         total = len(results)
-        start_index = session.context.get("search_read_index", 0)
+        start_index = self._session.get_context(session_id, "search_read_index", 0)
 
         if mode == "all":
-            start_index = 0
             count = total
         elif mode == "restart":
             start_index = 0

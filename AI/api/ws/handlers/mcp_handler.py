@@ -102,9 +102,12 @@ class MCPHandler:
                 detail = result.get("detail") or result.get("product_detail")
                 if detail:
                     self._session.set_context(session_id, "product_detail", detail)
+                    self._save_product_detail_to_file(detail, session_id)
                 if detail_images:
                     self._session.set_context(session_id, "detail_images", detail_images)
             if page_url:
+                if session.current_url and session.current_url != page_url:
+                    self._session.set_context(session_id, "previous_url", session.current_url)
                 session.current_url = page_url
             if products:
                 self._session.set_context(session_id, "search_results", products)
@@ -238,6 +241,14 @@ class MCPHandler:
             session_id=session_id,
             category="search_results",
             filename_prefix="search_results"
+        )
+
+    def _save_product_detail_to_file(self, detail: Dict[str, Any], session_id: str):
+        self._file_manager.save_json(
+            data=detail,
+            session_id=session_id,
+            category="product_detail",
+            filename_prefix="product_detail"
         )
 
     def cleanup_session(self, session_id: str):

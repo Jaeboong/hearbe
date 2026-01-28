@@ -78,6 +78,7 @@ class LLMPlanner(ILLMPlanner):
 
         current_url = session.current_url if session else ""
         conversation_history = session.conversation_history if session else None
+        session_context = session.context if session else None
 
         # 1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
@@ -98,7 +99,8 @@ class LLMPlanner(ILLMPlanner):
                 llm_result = await self._llm_generator.generate(
                     user_text=user_text,
                     current_url=current_url,
-                    conversation_history=conversation_history
+                    conversation_history=conversation_history,
+                    session_context=session_context
                 )
                 
                 if llm_result.success and llm_result.commands:
