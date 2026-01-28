@@ -1,8 +1,9 @@
-# MCP 데스크탑 앱 설정 가이드
+# MCP Client Setup Guide
 
 ## 📋 사전 요구사항
 
-- **Python 3.9 이상**
+- **Windows 10/11**
+- **Python 3.11 권장** (패키지 호환성 안정)
 - **pip** (Python 패키지 관리자)
 - **Git**
 
@@ -171,9 +172,9 @@ pipwin install pyaudio
 playwright install --force chromium
 ```
 
-## 📦 배포
+## 📦 배포 (Windows onedir 권장)
 
-### PyInstaller로 .exe 생성 (권장: onedir)
+### PyInstaller로 .exe 생성 (최신 검증됨)
 
 **권장 워크플로우 (onedir)**
 
@@ -182,10 +183,10 @@ playwright install --force chromium
 1. Windows에서 가상환경 생성 및 의존성 설치
 2. Playwright 브라우저 설치
 3. PyInstaller onedir 빌드
-4. `dist/앱폴더/`에서 실행 테스트
-5. 필요 시 `.env`를 `dist/앱폴더/`에 복사해 설정 적용
+4. `dist/MCPDesktop/`에서 실행 테스트
+5. `.env` 포함 여부 확인 (아래 참고)
 
-예시:
+**빌드 명령어 (검증 완료)**
 
 ```bash
 # Windows
@@ -195,11 +196,20 @@ pip install -r requirements.txt
 playwright install chromium
 
 # onedir 빌드
-pyinstaller -y --clean --name MCPDesktop --onedir --noconsole ^
-  --collect-all playwright ^
-  --add-data ".env;." ^
-  main.py
+pyinstaller -y --clean --name MCPDesktop --onedir --noconsole --collect-all playwright --add-data ".env;." main.py
 ```
+
+**실행 위치**
+
+- `dist\MCPDesktop\MCPDesktop.exe`에서 실행
+- `.env`는 다음 위치 중 하나에 있어야 함:
+  - exe 옆 (`dist\MCPDesktop\.env`) 우선
+  - 내부 폴더 (`dist\MCPDesktop\_internal\.env`) 대체
+
+**검증 로그 예시**
+
+- `core.config - INFO - Loaded .env file from ...`
+- `audio.audio_manager - INFO - AudioManager initialized with hotkey: space`
 
 > onedir은 배포 폴더 전체를 전달해야 하며, 실행 안정성이 높습니다.
 
@@ -215,6 +225,13 @@ pyinstaller --onefile --windowed main.py
 
 # dist/ 폴더에 생성됨
 ```
+
+## ✅ 배포 체크리스트 (Client)
+
+- [ ] `dist\MCPDesktop\` 폴더 그대로 zip 배포
+- [ ] `.env` 포함 확인
+- [ ] `MCPDesktop.exe` 실행 후 로그에서 `.env` 로드 확인
+- [ ] Hotkey가 기대값으로 동작 확인
 
 ### 배포 전 체크리스트
 
