@@ -1,0 +1,25 @@
+{
+  "rec_texts": [
+    "WTOLIH",
+    "4",
+    "NITOLIH",
+    "WIIOLIH",
+    "N",
+    "WITOLIH"
+  ],
+  "rec_scores": [
+    0.40436264872550964,
+    0.40553146600723267,
+    0.5904556512832642,
+    0.5199047923088074,
+    0.4659087061882019,
+    0.5316750407218933
+  ],
+  "total_count": 6,
+  "split_count": 2,
+  "image_size": {
+    "width": 780,
+    "height": 5000
+  },
+  "processing_mode": "split"
+}

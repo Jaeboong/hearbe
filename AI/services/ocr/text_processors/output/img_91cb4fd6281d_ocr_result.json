@@ -1,0 +1,23 @@
+{
+  "rec_texts": [
+    "WIIOLIH",
+    "FITOJIM",
+    "WIIOLIA",
+    "WIOLI",
+    "K"
+  ],
+  "rec_scores": [
+    0.6983557343482971,
+    0.9694299101829529,
+    0.4671092927455902,
+    0.5402724146842957,
+    0.6019814014434814
+  ],
+  "total_count": 5,
+  "split_count": 2,
+  "image_size": {
+    "width": 780,
+    "height": 5000
+  },
+  "processing_mode": "split"
+}

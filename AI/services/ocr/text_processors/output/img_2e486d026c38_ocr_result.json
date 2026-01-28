@@ -1,0 +1,29 @@
+{
+  "rec_texts": [
+    "NTOLA",
+    "FITOJIM",
+    "NOLIH",
+    "FITOJIM",
+    "ORIGINAL",
+    "W19EBHADE",
+    "LOS ANGELES WUINTY",
+    "72nem Ir"
+  ],
+  "rec_scores": [
+    0.5534349679946899,
+    0.9560605883598328,
+    0.6562763452529907,
+    0.9366024732589722,
+    0.8376034498214722,
+    0.6561941504478455,
+    0.8910961151123047,
+    0.3224881887435913
+  ],
+  "total_count": 8,
+  "split_count": 2,
+  "image_size": {
+    "width": 780,
+    "height": 5000
+  },
+  "processing_mode": "split"
+}
