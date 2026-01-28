@@ -35,6 +35,7 @@ class EventType(Enum):
     # Browser 모듈 이벤트
     BROWSER_READY = auto()
     BROWSER_ERROR = auto()
+    PAGE_URL_UPDATED = auto()
 
     # MCP 모듈 이벤트
     MCP_SERVER_READY = auto()

@@ -41,7 +41,7 @@ class LLMQueryCorrector:
                 os.getenv("GMS_API_KEY")
                 or os.getenv("OPENAI_API_KEY")
             )
-        self._base_url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1"
+        self._base_url = os.getenv("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 
     def _get_client(self):
         if not self._api_key:

@@ -293,6 +293,7 @@ class ContextBuilder:
 5. If the request is informational and can be answered from context, return an answer with an empty "commands" list.
 6. If the request requires an action (click, input, navigation), include appropriate commands and a brief response.
 7. If you lack necessary info, ask a clarification with empty commands.
+8. Do not include URLs in the response text.
 
 ## Output format
 {output_example}
@@ -412,6 +413,7 @@ If the request cannot be understood:
             "quantity": product_detail.get("quantity"),
             "option": product_detail.get("option"),
             "options": product_detail.get("options"),
+            "options_list": product_detail.get("options_list"),
         }
         lines = ["## Product Detail (current)"]
         lines.append(json.dumps(detail, ensure_ascii=True))

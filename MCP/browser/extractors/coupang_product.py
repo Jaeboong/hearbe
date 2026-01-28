@@ -10,9 +10,26 @@ from typing import Dict, Any
 def _build_option_script() -> str:
     return r"""
     () => {
-      const options = {};
+      const selectedOptions = {};
+      const optionsList = {};
       const getText = (el) => (el && (el.innerText || el.textContent) || '').trim();
       const hasAny = (text, keywords) => keywords.some((kw) => text.includes(kw));
+      const normalizeKey = (label) => {
+        const text = (label || '').toLowerCase();
+        if (!text) return 'option';
+        if (text.includes('수량')) return 'quantity';
+        if (text.includes('용량') || text.includes('중량')) return 'capacity';
+        if (text.includes('사이즈') || text.includes('크기')) return 'size';
+        if (text.includes('색상') || text.includes('컬러')) return 'color';
+        return 'option';
+      };
+      const addOption = (key, option) => {
+        const safeKey = key || 'option';
+        if (!optionsList[safeKey]) optionsList[safeKey] = [];
+        if (option && option.name) {
+          optionsList[safeKey].push(option);
+        }
+      };
       const isSelected = (el) => {
         if (!el) return false;
         const cls = (el.className || '').toString();
@@ -30,6 +47,19 @@ def _build_option_script() -> str:
         if (!select || select.selectedIndex < 0) return '';
         return getText(select.options[select.selectedIndex]);
       };
+      const addSelectOptions = (root, key) => {
+        const select = root.querySelector('select');
+        if (!select) return;
+        for (const opt of Array.from(select.options || [])) {
+          const name = getText(opt);
+          if (!name) continue;
+          const selected = !!opt.selected;
+          addOption(key, { name, selected });
+          if (selected) {
+            selectedOptions[key] = name;
+          }
+        }
+      };
       const pickFromCustomSelect = (root) => {
         const custom = root.querySelector('.option-picker-select, .fashion-option-select, [class*="option-select"]');
         if (!custom) return '';
@@ -37,7 +67,9 @@ def _build_option_script() -> str:
         return getText(label);
       };
       const pickFromSelectedItems = (root) => {
-        const items = root.querySelectorAll('li, button, div[class*="item"], span[class*="item"]');
+        const items = root.querySelectorAll(
+          'li, button, div[class*="item"], span[class*="item"], div[class*="option"], div[class*="Option"]'
+        );
         for (const item of items) {
           if (!isSelected(item)) continue;
           const label = getText(item);
@@ -47,40 +79,94 @@ def _build_option_script() -> str:
         }
         return '';
       };
+
+      const pickFromOptionTable = (root) => {
+        const selected = root.querySelector('.option-table-list__option--selected');
+        if (!selected) return '';
+        const name = selected.querySelector('.option-table-list__option-name');
+        const text = getText(name) || getText(selected);
+        return text;
+      };
+      const parsePrice = (priceEl) => {
+        if (!priceEl) return '';
+        const firstNode = priceEl.childNodes && priceEl.childNodes.length ? priceEl.childNodes[0] : null;
+        let text = '';
+        if (firstNode && firstNode.textContent) {
+          text = firstNode.textContent;
+        } else {
+          text = priceEl.textContent || '';
+        }
+        text = text.trim();
+        if (!text) return '';
+        if (text.includes('원')) {
+          const idx = text.indexOf('원');
+          return text.slice(0, idx + 1).trim();
+        }
+        return text;
+      };
+      const parseOptionTable = (table) => {
+        const label = getText(table.querySelector('.toggle-header span, .tab-selector__header-title'));
+        const key = normalizeKey(label);
+        const items = table.querySelectorAll('.option-table-list__option');
+        for (const item of items) {
+          const nameEl = item.querySelector('.option-table-list__option-name');
+          const name = getText(nameEl) || getText(item);
+          const priceEl = item.querySelector('.option-table-list__option-price');
+          const price = parsePrice(priceEl);
+          const unitPrice = getText(item.querySelector('.option-table-list__option-unit-price'));
+          const selected = item.classList.contains('option-table-list__option--selected');
+          addOption(key, { name, price, unit_price: unitPrice, selected });
+          if (selected && name) {
+            selectedOptions[key] = name;
+          }
+        }
+      };
       const keywords = {
         size: ['사이즈', 'size', '크기'],
         color: ['색상', 'color', '컬러'],
         capacity: ['용량', 'capacity'],
         quantity: ['수량', 'quantity', '개수']
       };
+      const tables = document.querySelectorAll('.option-table-v2');
+      for (const table of tables) {
+        parseOptionTable(table);
+      }
       const sections = document.querySelectorAll('section, div[class*="option"], div[class*="Option"]');
       for (const section of sections) {
         const sectionText = getText(section).toLowerCase();
         if (hasAny(sectionText, keywords.size)) {
-          options.size = options.size || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
+          const key = 'size';
+          addSelectOptions(section, key);
+          selectedOptions.size = selectedOptions.size || pickFromOptionTable(section) || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
         }
         if (hasAny(sectionText, keywords.color)) {
+          const key = 'color';
+          addSelectOptions(section, key);
           const label = section.querySelector('[class*="label-item-text"], [class*="label"] span');
-          options.color = options.color || getText(label) || pickFromSelectedItems(section);
+          selectedOptions.color = selectedOptions.color || getText(label) || pickFromSelectedItems(section);
         }
         if (hasAny(sectionText, keywords.capacity)) {
-          options.capacity = options.capacity || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
+          const key = 'capacity';
+          addSelectOptions(section, key);
+          selectedOptions.capacity = selectedOptions.capacity || pickFromOptionTable(section) || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
         }
         if (hasAny(sectionText, keywords.quantity)) {
           const input = section.querySelector('input[type="number"], input[type="text"]');
           if (input && input.value) {
-            options.quantity = input.value.trim();
+            selectedOptions.quantity = input.value.trim();
+          } else {
+            selectedOptions.quantity = selectedOptions.quantity || pickFromOptionTable(section) || pickFromSelectedItems(section);
           }
         }
       }
-      if (!options.size && !options.color && !options.capacity && !options.option) {
+      if (!selectedOptions.size && !selectedOptions.color && !selectedOptions.capacity && !selectedOptions.option) {
         const fallback = document.querySelector('select[class*="option"], .option-picker-select');
         if (fallback) {
           const label = pickFromSelect(fallback) || getText(fallback);
-          if (label) options.option = label;
+          if (label) selectedOptions.option = label;
         }
       }
-      return options;
+      return { selected: selectedOptions, options_list: optionsList };
     }
     """
 

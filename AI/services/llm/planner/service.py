@@ -16,7 +16,7 @@ from core.interfaces import (
 from ..generators.command_generator import CommandGenerator, CommandResult
 from ..generators.llm_generator import LLMGenerator, LLMResult, resolve_llm_api_key
 from .routing import LLMRoutingPolicy
-from .selection import select_from_results
+from .selection import select_from_results, select_option_from_detail
 from .fallback import build_llm_fallback_response
 
 logger = logging.getLogger(__name__)
@@ -87,6 +87,9 @@ class LLMPlanner(ILLMPlanner):
             selection = select_from_results(user_text, session)
             if selection:
                 return selection
+            option_selection = select_option_from_detail(user_text, session)
+            if option_selection:
+                return option_selection
         decision = self._routing_policy.decide(user_text, intent, rule_result)
 
         # 2. LLM fallback by policy

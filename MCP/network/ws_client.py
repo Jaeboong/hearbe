@@ -30,6 +30,7 @@ class MessageType(str, Enum):
     USER_INPUT = "user_input"
     MCP_RESULT = "mcp_result"
     INTERRUPT = "interrupt"
+    PAGE_UPDATE = "page_update"
     
     # Server → Client
     ASR_RESULT = "asr_result"
@@ -82,6 +83,7 @@ class WSClient:
         event_bus.subscribe(EventType.MCP_RESULT, self._on_mcp_result)
         event_bus.subscribe(EventType.AUDIO_READY, self._on_audio_ready)  # PTT 오디오
         event_bus.subscribe(EventType.HOTKEY_PRESSED, self._on_hotkey_pressed)
+        event_bus.subscribe(EventType.PAGE_URL_UPDATED, self._on_page_url_updated)
         event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
         logger.info("WSClient event handlers registered")
     
@@ -407,6 +409,19 @@ class WSClient:
         await self.send_message(
             MessageType.INTERRUPT,
             {"reason": "hotkey"}
+        )
+
+    async def _on_page_url_updated(self, event):
+        """Send page URL updates to server."""
+        if not self.is_connected:
+            return
+        data = event.data or {}
+        url = data.get("url")
+        if not url:
+            return
+        await self.send_message(
+            MessageType.PAGE_UPDATE,
+            {"url": url}
         )
     
     async def _on_shutdown(self, _event):

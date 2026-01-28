@@ -6,6 +6,8 @@ Handler manager: orchestrates WS handlers and session lifecycle.
 import base64
 import logging
 
+from services.llm.sites.site_manager import get_current_site
+
 from .audio_handler import AudioHandler
 from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
@@ -93,6 +95,20 @@ class HandlerManager:
 
     async def handle_mcp_result(self, session_id: str, data: dict):
         await self._mcp_handler.handle_mcp_result(session_id, data)
+
+    async def handle_page_update(self, session_id: str, data: dict):
+        url = data.get("url") or data.get("page_url") or data.get("current_url")
+        if not url:
+            return
+        session = self._session.get_session(session_id) if self._session else None
+        if not session:
+            return
+        if session.current_url and session.current_url != url:
+            self._session.set_context(session_id, "previous_url", session.current_url)
+        session.current_url = url
+        site = get_current_site(url)
+        if site:
+            session.current_site = site.name
 
     async def handle_invalid_message(self, session_id: str, error: str):
         await self._sender.send_error(session_id, error)

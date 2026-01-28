@@ -8,6 +8,7 @@ import logging
 from typing import Optional
 
 from playwright.async_api import async_playwright, Browser, Page, Playwright
+from core.event_bus import publish_sync, EventType
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,8 @@ class BrowserConnectionMixin:
         self._browser: Optional[Browser] = None
         self._page: Optional[Page] = None
         self._cdp_url: Optional[str] = None
+        self._tracked_pages: set[int] = set()
+        self._last_published_url: Optional[str] = None
 
     @property
     def is_connected(self) -> bool:
@@ -60,6 +63,7 @@ class BrowserConnectionMixin:
                 context = contexts[0] if contexts else await self._browser.new_context()
                 self._page = await context.new_page()
 
+            self._attach_browser_listeners()
             logger.info(f"Connected to browser via CDP: {cdp_url}")
             return True
 
@@ -67,6 +71,58 @@ class BrowserConnectionMixin:
             logger.error(f"Failed to connect to browser: {e}")
             await self.disconnect()
             return False
+
+    def _attach_browser_listeners(self):
+        if not self._browser:
+            return
+        for context in self._browser.contexts:
+            try:
+                context.on("page", self._on_new_page)
+                for page in context.pages:
+                    if not page.is_closed():
+                        self._attach_page_listeners(page)
+            except Exception as e:
+                logger.debug(f"Failed to attach context listeners: {e}")
+
+    def _on_new_page(self, page: Page):
+        self._attach_page_listeners(page)
+        self._publish_page_url(page)
+
+    def _attach_page_listeners(self, page: Page):
+        page_id = id(page)
+        if page_id in self._tracked_pages:
+            return
+        self._tracked_pages.add(page_id)
+
+        def on_frame_navigated(frame):
+            try:
+                if frame == page.main_frame:
+                    self._publish_page_url(page)
+            except Exception:
+                pass
+
+        def on_load():
+            self._publish_page_url(page)
+
+        try:
+            page.on("framenavigated", on_frame_navigated)
+            page.on("load", on_load)
+        except Exception as e:
+            logger.debug(f"Failed to attach page listeners: {e}")
+
+    def _publish_page_url(self, page: Page):
+        try:
+            url = page.url or ""
+            if not url or url == self._last_published_url:
+                return
+            self._last_published_url = url
+            publish_sync(
+                EventType.PAGE_URL_UPDATED,
+                data={"url": url},
+                source="browser"
+            )
+        except Exception:
+            pass
 
     async def _get_active_page(self) -> Optional[Page]:
         """
@@ -124,4 +180,5 @@ class BrowserConnectionMixin:
             self._playwright = None
 
         self._cdp_url = None
+        self._tracked_pages.clear()
         logger.info("Disconnected from browser")

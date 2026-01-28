@@ -3,12 +3,12 @@ Selection helpers for applying recent search results to user requests.
 """
 
 from typing import Optional
-import re
 
 from core.interfaces import LLMResponse, MCPCommand, SessionState
 from core.korean_numbers import extract_ordinal_index
 from .selection_extract import build_product_extract_command
-from ...sites.site_manager import get_site_manager, get_current_site, get_selector
+from .selection_intent import is_selection_request, is_ranking_query
+from ...sites.site_manager import get_site_manager, get_current_site, get_selector, get_page_type
 
 
 def select_from_results(
@@ -20,42 +20,46 @@ def select_from_results(
     results = session.context.get("search_results")
     if not isinstance(results, list) or not results:
         return None
+    current_url = session.current_url or ""
+    if current_url and get_page_type(current_url) != "search":
+        return None
 
     target = user_text.strip().lower()
     if not target:
         return None
 
-    if _is_ranking_query(target):
+    if is_ranking_query(target):
         return None
-
+    if not is_selection_request(target):
+        return None
     ordinal_index = extract_ordinal_index(target)
     if ordinal_index is not None:
         if 0 <= ordinal_index < len(results):
-            commands = _build_click_nth_result_commands(session, ordinal_index)
-            if not commands:
-                item = results[ordinal_index] if isinstance(results[ordinal_index], dict) else {}
-                name = item.get("name") or item.get("title") or item.get("product_name")
-                if name:
-                    commands = [
-                        MCPCommand(
-                            tool_name="click_text",
-                            arguments={"text": name},
-                            description=f"search result click '{name}'"
-                        ),
-                        MCPCommand(
-                            tool_name="wait_for_new_page",
-                            arguments={"timeout_ms": 1500, "focus": True},
-                            description="detect new tab and focus"
-                        ),
-                        MCPCommand(
-                            tool_name="wait",
-                            arguments={"ms": 1500},
-                            description="wait for product page"
-                        )
-                    ]
-                    extract_command = build_product_extract_command(session)
-                    if extract_command:
-                        commands.append(extract_command)
+            item = results[ordinal_index] if isinstance(results[ordinal_index], dict) else {}
+            name = item.get("name") or item.get("title") or item.get("product_name")
+            if name:
+                commands = [
+                    MCPCommand(
+                        tool_name="click_text",
+                        arguments={"text": name},
+                        description=f"search result click '{name}'"
+                    ),
+                    MCPCommand(
+                        tool_name="wait_for_new_page",
+                        arguments={"timeout_ms": 1500, "focus": True},
+                        description="detect new tab and focus"
+                    ),
+                    MCPCommand(
+                        tool_name="wait",
+                        arguments={"ms": 1500},
+                        description="wait for product page"
+                    )
+                ]
+                extract_command = build_product_extract_command(session)
+                if extract_command:
+                    commands.append(extract_command)
+            else:
+                commands = _build_click_nth_result_commands(session, ordinal_index)
             if commands:
                 return LLMResponse(
                     text=f"{ordinal_index + 1}번째 상품을 선택합니다.",
@@ -106,19 +110,6 @@ def select_from_results(
         requires_flow=False,
         flow_type=None
     )
-
-
-def _is_ranking_query(text: str) -> bool:
-    if not text:
-        return False
-    # Ranking/superlative queries should be handled by LLM, not ordinal selection.
-    if re.search(r"\d+\s*(?:번째|번)", text):
-        return False
-    keywords = [
-        "가장", "제일", "최고", "최대", "최저",
-        "높은", "낮은", "많은", "적은", "싼", "저렴", "비싼",
-    ]
-    return any(k in text for k in keywords)
 
 
 def _build_click_nth_result_commands(
