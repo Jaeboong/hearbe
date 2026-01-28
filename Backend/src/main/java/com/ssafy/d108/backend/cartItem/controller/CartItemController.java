@@ -28,10 +28,13 @@ public class CartItemController {
     /**
      * 장바구니 목록 조회
      */
-    @GetMapping
-    public ResponseEntity<CartItemListResponseDto> getCartItems() {
+    @GetMapping("/{userId}")
+    public ResponseEntity<CartItemListResponseDto> getCartItems(@PathVariable("userId") Integer userId) {
 
-        return ResponseEntity.ok(cartItemService.getCartItems(SecurityUtil.getCurrentUserId()));
+        // 경로 변수로 받은 userId를 서비스로 전달
+        CartItemListResponseDto response = cartItemService.getCartItems(userId);
+
+        return ResponseEntity.ok(response);
     }
 
     /**

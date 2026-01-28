@@ -41,18 +41,29 @@ public class WishlistService {
     }
 
     /**
-     * 찜 목록 조회 (GET /wishlist)
+     * 찜 목록 조회 (GET /wishlist/user)
      */
     public WishlistResponseDto getWishlistItems(Integer userId) {
         User user = findUserById(userId);
         List<WishlistItem> items = wishlistRepository.findAllByUser(user);
 
+        // 1. 개별 아이템 상세 정보 리스트 변환
         List<WishlistResponseDto.WishlistItemDetail> itemDetails = items.stream()
                 .map(this::convertToDetailDto)
                 .collect(Collectors.toList());
 
+        // 2. 비즈니스 로직: 총 개수 및 총 가격 계산
+        int totalCount = items.size();
+        long totalPrice = items.stream()
+                .mapToLong(WishlistItem::getPrice) // Entity에 getPrice()가 있다고 가정
+                .sum();
+
+        // 3. 최종 Response 조립
         WishlistResponseDto response = new WishlistResponseDto();
         response.setItems(itemDetails);
+        response.setTotalCount(totalCount);
+        response.setTotalPrice(totalPrice);
+
         return response;
     }
 
@@ -85,6 +96,7 @@ public class WishlistService {
         return item;
     }
 
+    // helper method 수정
     private WishlistResponseDto.WishlistItemDetail convertToDetailDto(WishlistItem item) {
         WishlistResponseDto.WishlistItemDetail detail = new WishlistResponseDto.WishlistItemDetail();
         detail.setWishlistItemId(item.getId());
@@ -93,7 +105,8 @@ public class WishlistService {
         detail.setPlatformName(item.getPlatform().getPlatformName());
         detail.setCreatedAt(item.getCreatedAt().toString());
         detail.setImgUrl(item.getImgUrl());
-        detail.setLiked(true); // 찜 목록에 있는 상품이므로 기본 true
+        detail.setPrice(item.getPrice()); // 가격 필드 추가
+        detail.setLiked(true);
         return detail;
     }
 }
