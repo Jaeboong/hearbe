@@ -24,7 +24,7 @@ public class SignupRequest {
     @JsonProperty("user_id")
     @NotBlank(message = "아이디는 필수입니다.")
     @Size(min = 4, max = 30, message = "아이디는 4~30자 사이여야 합니다.")
-    private String loginId;
+    private String username;
 
     private String password;
 
@@ -33,7 +33,7 @@ public class SignupRequest {
 
     @NotBlank(message = "이름은 필수입니다.")
     @Size(max = 15, message = "이름은 15자 이하여야 합니다.")
-    private String username;
+    private String name;
 
     private String email;
 

@@ -27,13 +27,13 @@ public class User {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "login_id", length = 30, nullable = false, unique = true)
-    private String loginId;
+    @Column(name = "username", length = 30, nullable = false, unique = true)
+    private String username;
 
-    @Column(name = "email", length = 100)
+    @Column(name = "email", length = 50)
     private String email;
 
-    @Column(name = "password", length = 255, nullable = false)
+    @Column(name = "password", length = 30)
     private String password;
 
     @Column(name = "phone_number", length = 20, nullable = false, unique = true)
@@ -42,8 +42,8 @@ public class User {
     @Column(name = "simple_password", length = 6)
     private String simplePassword;
 
-    @Column(name = "username", length = 15)
-    private String username;
+    @Column(name = "name", length = 15)
+    private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
