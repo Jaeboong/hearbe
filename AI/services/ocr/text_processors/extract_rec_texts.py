@@ -13,21 +13,6 @@ DEFAULT_INPUT = os.path.join("output", "초코파이_detail_res.json")
 DEFAULT_OUTPUT = os.path.join("output", "초코파이_detail_res_texts.json")
 
 
-def extract_rec_texts_from_data(data: dict) -> list:
-    rec_texts = data.get("rec_texts", [])
-    cleaned = []
-    for text in rec_texts:
-        if not isinstance(text, str):
-            continue
-        text = text.strip()
-        if not text:
-            continue
-        if not normalize_text(text):
-            continue
-        cleaned.append(text)
-    return cleaned
-
-
 def extract_rec_texts(input_path: str, output_path: str = None) -> list:
     with open(input_path, "r", encoding="utf-8") as f:
         data = json.load(f)
