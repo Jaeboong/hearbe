@@ -173,11 +173,24 @@ class AIServer:
         # 루트 엔드포인트
         @self.app.get("/")
         async def root():
+            ws_url = self.config.server.public_ws_url
+            if not ws_url:
+                base_url = self.config.server.public_base_url
+                if base_url:
+                    if base_url.startswith("https://"):
+                        ws_url = "wss://" + base_url[len("https://"):]
+                    elif base_url.startswith("http://"):
+                        ws_url = "ws://" + base_url[len("http://"):]
+                    else:
+                        ws_url = base_url
+                    ws_url = ws_url.rstrip("/") + self.config.server.ws_path
+                else:
+                    ws_url = f"ws://localhost:{self.config.server.port}{self.config.server.ws_path}"
             return {
                 "name": "AI Shopping Assistant Server",
                 "version": "1.0.0",
                 "status": "running",
-                "websocket": f"ws://localhost:{self.config.server.port}/ws"
+                "websocket": ws_url
             }
 
         return self.app
