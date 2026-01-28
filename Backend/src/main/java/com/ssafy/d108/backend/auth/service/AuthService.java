@@ -55,20 +55,27 @@ public class AuthService {
     @Transactional
     public Integer signup(SignupRequest request) {
         // 비밀번호 정책 검증
+        String rawPassword;
+
         if (request.getUserType() == UserType.BLIND) {
-            // A형: 비밀번호(간편비밀번호)가 6자리 숫자인지 확인
-            if (!request.getPassword().matches("^[0-9]{6}$")) {
-                throw new IllegalArgumentException("A형 사용자의 비밀번호는 6자리 숫자여야 합니다.");
+            // A형: 간편비밀번호(simplePassword)가 6자리 숫자인지 확인
+            if (request.getSimplePassword() == null || !request.getSimplePassword().matches("^[0-9]{6}$")) {
+                throw new IllegalArgumentException("A형 사용자의 간편 비밀번호는 6자리 숫자여야 합니다.");
             }
-            // A형은 password_check 확인 안 함 (또는 동일하다고 가정)
+            // A형은 simplePassword를 메인 비밀번호로 사용
+            rawPassword = request.getSimplePassword();
         } else {
-            // B/C형: 비밀번호 8~20자 확인 및 password_check 일치 확인
+            // B/C형: 비밀번호(password) 필수 및 유효성 검사
+            if (request.getPassword() == null || request.getPassword().isBlank()) {
+                throw new IllegalArgumentException("비밀번호는 필수입니다.");
+            }
             if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
                 throw new IllegalArgumentException("비밀번호는 8~20자 사이여야 합니다.");
             }
             if (request.getPasswordCheck() == null || !request.getPassword().equals(request.getPasswordCheck())) {
                 throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
             }
+            rawPassword = request.getPassword();
         }
 
         // BLIND 타입 복지카드 필수 검증
@@ -95,12 +102,16 @@ public class AuthService {
         // User 생성 (비밀번호 암호화 저장)
         User user = new User();
         user.setLoginId(request.getLoginId());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // BCrypt Encoding
+        user.setPassword(passwordEncoder.encode(rawPassword)); // 선택된 패스워드 암호화
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setUserType(request.getUserType());
-        user.setSimplePassword(request.getSimplePassword());
+        if (request.getUserType() == UserType.BLIND) {
+            user.setSimplePassword(request.getSimplePassword());
+        } else {
+            user.setSimplePassword(null);
+        }
 
         User saved = userRepository.save(user);
 

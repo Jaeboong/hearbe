@@ -14,7 +14,7 @@ import java.util.Map;
  * 서버 상태 확인 및 모니터링을 위한 엔드포인트 제공
  */
 @RestController
-@RequestMapping("/api")
+// @RequestMapping("/api") // Removed class level mapping to allow root mapping
 public class HealthCheckController {
 
     /**
@@ -40,5 +40,15 @@ public class HealthCheckController {
     @GetMapping("/ping")
     public String ping() {
         return "OK";
+    }
+
+    /**
+     * 루트 경로 확인 (사용자 편의성)
+     * 
+     * @return 환영 메시지
+     */
+    @GetMapping("/")
+    public String root() {
+        return "HearBe Server is running on port 8080!";
     }
 }

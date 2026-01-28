@@ -8,12 +8,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/members/profile")
+@RequestMapping("/members/profile")
 @RequiredArgsConstructor
 @Tag(name = "Member Profile", description = "회원 상세 정보(마이페이지) 관련 API")
 public class ProfileController {
