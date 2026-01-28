@@ -10,7 +10,7 @@ from typing import Optional
 
 from core.interfaces import ASRResult
 from .models import MessageType, WSMessage
-from .tts_normalizer import normalize_tts_text
+from .tts.tts_normalizer import normalize_tts_text
 
 logger = logging.getLogger(__name__)
 

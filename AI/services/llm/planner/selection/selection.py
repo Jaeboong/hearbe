@@ -7,7 +7,7 @@ from typing import Optional
 from core.interfaces import LLMResponse, MCPCommand, SessionState
 from core.korean_numbers import extract_ordinal_index
 from .selection_extract import build_product_extract_command
-from ..sites.site_manager import get_site_manager, get_current_site, get_selector
+from ...sites.site_manager import get_site_manager, get_current_site, get_selector
 
 
 def select_from_results(

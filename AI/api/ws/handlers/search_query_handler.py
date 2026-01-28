@@ -12,8 +12,8 @@ import logging
 import re
 from typing import Optional, Tuple
 
-from ..search_reader import build_search_read_tts
-from ..search_insights import (
+from ..search.search_reader import build_search_read_tts
+from ..search.search_insights import (
     get_name,
     get_price_text,
     get_discount_text,
@@ -26,7 +26,7 @@ from ..search_insights import (
     filter_tomorrow_items,
     filter_free_shipping_items,
 )
-from ..search_matcher import SearchMatcher
+from ..search.search_matcher import SearchMatcher
 
 logger = logging.getLogger(__name__)
 

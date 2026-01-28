@@ -9,8 +9,8 @@ import logging
 from typing import Dict, Any, Optional, List
 
 from core.event_bus import EventType, publish
-from ..search_reader import build_search_read_tts
-from ..temp_file_manager import TempFileManager
+from ..search.search_reader import build_search_read_tts
+from ..utils.temp_file_manager import TempFileManager
 
 # Summarizer imports (HTML parser + OCR integrator)
 try:
@@ -98,6 +98,12 @@ class MCPHandler:
         session = self._session.get_session(session_id) if self._session else None
         if session and self._session:
             self._session.set_context(session_id, "mcp_result", result)
+            if isinstance(result, dict):
+                detail = result.get("detail") or result.get("product_detail")
+                if detail:
+                    self._session.set_context(session_id, "product_detail", detail)
+                if detail_images:
+                    self._session.set_context(session_id, "detail_images", detail_images)
             if page_url:
                 session.current_url = page_url
             if products:

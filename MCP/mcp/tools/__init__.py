@@ -54,6 +54,7 @@ class BrowserTools(
             "fill_input": self.fill_input,
             "get_text": self.get_text,
             "extract": self.extract,
+            "extract_detail": self.extract_detail,
             "take_screenshot": self.take_screenshot,
             "scroll": self.scroll,
             "press_key": self.press_key,

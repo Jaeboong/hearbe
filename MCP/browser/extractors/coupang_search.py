@@ -1,16 +1,13 @@
 """
-Dynamic extraction utilities for search results.
-
-Fallback extraction when selectors are unstable.
+Coupang search results dynamic extraction.
 """
 
 from typing import List, Dict, Any
 
 
-async def extract_search_results_dynamic(page) -> List[Dict[str, Any]]:
+async def extract_coupang_search_results(page) -> List[Dict[str, Any]]:
     """
-    Extract search results with comprehensive product information.
-    Extracts: name, price, original_price, discount, reviews, free_shipping, free_return, delivery_date
+    Extract search results with comprehensive product information on Coupang.
     """
     script = """
     () => {
@@ -40,7 +37,7 @@ async def extract_search_results_dynamic(page) -> List[Dict[str, Any]]:
         // Review count (리뷰 개수)
         const reviewEl = item.querySelector('.ProductRating_productRating__jjf7W span[class*="fw-text-[#212B36]"]');
         const reviewText = (reviewEl?.innerText || '').trim();
-        const reviewMatch = reviewText.match(/\(([0-9,]+)\)/);
+        const reviewMatch = reviewText.match(/\\(([0-9,]+)\\)/);
         const reviews = reviewMatch ? reviewMatch[1] : '';
 
         // Free shipping (무료배송)
