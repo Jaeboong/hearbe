@@ -50,7 +50,9 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-resources/**")
+                                "/swagger-resources/**",
+                                "/cart/**",
+                                "/wishlist/**")
                         .permitAll()
 
                         // All other requests require authentication
