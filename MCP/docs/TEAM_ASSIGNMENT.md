@@ -416,7 +416,7 @@ Description:
 - [이벤트 명세서](EVENT_SPECIFICATION.md)
 - [모듈 통합 가이드](INTEGRATION_GUIDE.md)
 - [환경 변수 명세서](ENV_SPECIFICATION.md)
-- [설정 가이드](SETUP_GUIDE.md)
+- [클라이언트 설정 가이드](MCP_CLIENT_SETUP_GUIDE.md)
 - [프로젝트 README](../README.md)
 
 ---
