@@ -37,3 +37,7 @@ bin/
 # OS
 .DS_Store
 Thumbs.db
+
+# Secrets
+application.properties
+src/main/resources/application.properties
