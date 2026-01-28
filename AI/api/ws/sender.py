@@ -162,7 +162,9 @@ def _strip_urls(text: str) -> str:
     if not text:
         return text
     cleaned = _URL_PATTERN.sub("", text)
-    return re.sub(r"\s+", " ", cleaned).strip()
+    cleaned = re.sub(r"[ \t]+", " ", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
 
 
 def _normalize_line_breaks(text: str) -> str:

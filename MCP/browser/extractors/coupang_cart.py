@@ -37,18 +37,33 @@ async def extract_coupang_cart(page) -> Dict[str, Any]:
         if (promise) parts.push(getText(promise));
         return parts.join(' ').trim();
       };
-      const bundles = document.querySelectorAll('[data-component-id="non-fresh-bundle"] [id^="item_"]');
+      let bundles = document.querySelectorAll('#mainContent [id^="item_"]');
+      if (!bundles || bundles.length === 0) {
+        bundles = document.querySelectorAll('[id^="item_"]');
+      }
       for (const item of bundles) {
-        const nameEl = item.querySelector('a span.twc-text-custom-black');
-        const name = getText(nameEl);
-        const optionEl = item.querySelector('span.twc-text-custom-637381');
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) continue;
+
+        const nameEl = item.querySelector('a span.twc-text-custom-black')
+          || item.querySelector('#name span.twc-text-custom-black')
+          || item.querySelector('#name span');
+        let name = getText(nameEl);
+        if (!name) {
+          name = (checkbox.getAttribute('title') || '').trim();
+        }
+
+        const optionEl = item.querySelector('span.twc-text-custom-637381')
+          || item.querySelector('#name span.twc-text-custom-637381');
         let option = getText(optionEl);
-        option = option.replace('옵션', '').replace(':', '').trim();
+        if (option) {
+          option = option.replace('옵션', '').replace(':', '').trim();
+        }
+
         const price = pickPriceFrom(item);
         const arrival = pickArrival(item);
         const qtyInput = item.querySelector('input.cart-quantity-input');
         const quantity = qtyInput ? qtyInput.value : '';
-        const checkbox = item.querySelector('input[type="checkbox"]');
         const selectedAttr = item.getAttribute('data-selected');
         const selected = (selectedAttr === 'true') || (checkbox ? checkbox.checked === true : false);
 

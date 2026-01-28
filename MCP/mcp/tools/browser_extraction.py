@@ -303,6 +303,13 @@ class BrowserExtractionMixin:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
+            try:
+                await page.wait_for_selector(
+                    "#mainContent [id^='item_'] input[type='checkbox']",
+                    timeout=3000
+                )
+            except Exception:
+                pass
             data = await extract_cart_dynamic(page)
             items = data.get("items") if isinstance(data, dict) else []
             summary = data.get("summary") if isinstance(data, dict) else {}
