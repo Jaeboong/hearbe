@@ -114,19 +114,39 @@ def remove_duplicate_texts(all_results: List[Dict], overlap: int) -> Dict:
     seen_texts = set()
     unique_texts = []
     unique_scores = []
-    
+    unique_boxes = []
+
     for result in all_results:
         if isinstance(result, list):
             for res in result:
-                texts = res.get('rec_texts', [])
-                scores = res.get('rec_scores', [])
-                polys = res.get('dt_polys', [])
-                
+                # 딕셔너리와 객체 모두 처리
+                if hasattr(res, 'get'):
+                    texts = res.get('rec_texts', [])
+                    scores = res.get('rec_scores', [])
+                    polys = res.get('dt_polys', [])
+                elif hasattr(res, 'rec_texts'):
+                    texts = res.rec_texts if hasattr(res, 'rec_texts') else []
+                    scores = res.rec_scores if hasattr(res, 'rec_scores') else []
+                    polys = res.dt_polys if hasattr(res, 'dt_polys') else []
+                else:
+                    continue
+
                 for idx, (text, score) in enumerate(zip(texts, scores)):
                     normalized = text.strip().lower()
                     if not normalized:
                         continue
                     key = normalized
+                    box = polys[idx] if polys and idx < len(polys) else []
+
+                    # NumPy 배열을 Python list로 변환 (좌표값도 float로 변환)
+                    if hasattr(box, 'tolist'):
+                        box = [[float(p[0]), float(p[1])] for p in box]
+                    elif box and len(box) > 0:
+                        if hasattr(box[0], 'tolist'):
+                            box = [[float(p[0]), float(p[1])] for p in box]
+                        elif isinstance(box[0], (list, tuple)) and len(box[0]) >= 2:
+                            box = [[float(p[0]), float(p[1])] for p in box]
+
                     if polys and idx < len(polys):
                         poly = polys[idx]
                         if poly:
@@ -136,11 +156,13 @@ def remove_duplicate_texts(all_results: List[Dict], overlap: int) -> Dict:
                     if key not in seen_texts:
                         seen_texts.add(key)
                         unique_texts.append(text)
-                        unique_scores.append(score)
-    
+                        unique_scores.append(float(score))  # float로 변환
+                        unique_boxes.append(box)
+
     return {
         "rec_texts": unique_texts,
         "rec_scores": unique_scores,
+        "boxes": unique_boxes,
         "total_count": len(unique_texts)
     }
 
@@ -161,14 +183,24 @@ def process_long_image(
             result = ocr_instance.predict(image_path)
             all_texts = []
             all_scores = []
+            all_boxes = []
             for res in result:
                 all_texts.extend(res.get('rec_texts', []))
                 all_scores.extend(res.get('rec_scores', []))
+                dt_polys = res.get('dt_polys', [])
+                # NumPy 배열을 Python list로 변환 (좌표값도 float로 변환)
+                for poly in dt_polys:
+                    if poly is not None and len(poly) > 0:
+                        all_boxes.append([[float(p[0]), float(p[1])] for p in poly])
+                    else:
+                        all_boxes.append([])
             return {
                 "rec_texts": all_texts,
-                "rec_scores": all_scores,
+                "rec_scores": [float(s) for s in all_scores],
+                "boxes": all_boxes,
                 "total_count": len(all_texts),
-                "split_count": 1
+                "split_count": 1,
+                "image_size": {"width": int(width), "height": int(height)}
             }
         return {"error": "OCR 인스턴스가 필요합니다."}
     
@@ -210,10 +242,11 @@ def process_long_image(
     print("결과 병합 및 중복 제거 중...")
     merged = remove_duplicate_texts(all_results, overlap)
     merged["split_count"] = len(chunks)
-    merged["image_size"] = {"width": width, "height": height}
-    
+    merged["image_size"] = {"width": int(width), "height": int(height)}
+    merged["processing_mode"] = "split"
+
     print(f"완료! 총 {merged['total_count']}개 텍스트 추출됨")
-    
+
     return merged
 
 

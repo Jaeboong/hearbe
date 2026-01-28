@@ -23,6 +23,7 @@ def _merge_entries(
         text = entry.get("text", "")
         score = float(entry.get("score", 1.0))
         source = entry.get("source")
+        box = entry.get("box", [])
         norm = normalize_text(text)
         if not norm:
             continue
@@ -43,6 +44,7 @@ def _merge_entries(
                 {
                     "text": text,
                     "score": score,
+                    "box": box,
                     "sources": [source] if source else [],
                     "norm": norm,
                 }
@@ -52,6 +54,7 @@ def _merge_entries(
             if score > existing["score"]:
                 existing["text"] = text
                 existing["score"] = score
+                existing["box"] = box  # 더 높은 스코어의 box로 업데이트
             if source and source not in existing["sources"]:
                 existing["sources"].append(source)
 
@@ -67,21 +70,35 @@ def merge_ocr_results(
     similarity_threshold: float = 0.9,
 ) -> Dict:
     entries: List[Dict] = []
-    
+
     for result in ocr_results:
         texts = result.get("rec_texts", []) or []
         scores = result.get("rec_scores", []) or [1.0] * len(texts)
+        boxes = result.get("boxes", []) or []
         source = result.get("source", None)
-        
+
+        # boxes가 texts보다 짧으면 빈 리스트로 채움
+        if len(boxes) < len(texts):
+            boxes = boxes + [[]] * (len(texts) - len(boxes))
+
         filtered = filter_texts(texts, scores, min_score, min_length)
+
+        # 필터링된 인덱스를 추적하여 해당하는 box도 함께 가져옴
+        text_to_box = {}
+        for i, (text, score) in enumerate(zip(texts, scores)):
+            if i < len(boxes):
+                text_to_box[text] = boxes[i]
+
         for text, score in filtered:
-            entries.append({"text": text, "score": score, "source": source})
-    
+            box = text_to_box.get(text, [])
+            entries.append({"text": text, "score": score, "box": box, "source": source})
+
     merged = _merge_entries(entries, similarity_threshold)
-    
+
     return {
         "rec_texts": [item["text"] for item in merged],
         "rec_scores": [item["score"] for item in merged],
+        "boxes": [item.get("box", []) for item in merged],
         "items": merged,
         "count": len(merged),
     }

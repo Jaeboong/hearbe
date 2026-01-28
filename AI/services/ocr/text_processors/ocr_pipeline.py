@@ -24,6 +24,7 @@ try:
         get_selector,
         list_supported_sites,
     )
+    from .table_reconstructor import reconstruct_size_table
     from .utils import (
         save_json,
         compute_image_hash,
@@ -54,6 +55,7 @@ except ImportError:
         get_selector,
         list_supported_sites,
     )
+    from table_reconstructor import reconstruct_size_table
     from utils import (
         save_json,
         compute_image_hash,
@@ -76,7 +78,11 @@ _IMPORTANT_TOKENS = (
     "특가", "할인", "세일", "반값", "쿠폰", "무료배송",
     "원산지", "제조", "브랜드", "유통기한", "보관",
     "용량", "중량", "구성", "증정", "1+1", "2+1",
-    "원", "%", "kg", "g", "ml", "l", "개", "입", "팩", "박스"
+    "원", "%", "kg", "g", "ml", "l", "개", "입", "팩", "박스",
+    # 의류 사이즈 관련
+    "SIZE", "사이즈", "허리", "총장", "영덩이", "왓밀위", "뜻밀위",
+    "가슴", "어깨", "소매", "밑단", "허벅지", "암홀", "기장",
+    "M", "L", "XL", "2XL", "FREE", "프리"
 )
 
 
@@ -192,11 +198,37 @@ def process_product_image(
     step_time = time.time() - step_start
     if verbose:
         print(f"    → 감지된 타입: {type_desc} ({product_type.value}) ({step_time:.2f}초)")
-    
+
+    # 의류일 때 SIZE 표 재구성 시도
+    size_table_text = None
+    if product_type in [ProductType.의류, ProductType.신발, ProductType.패션잡화]:
+        if verbose:
+            print("\n📏 [4.5/5] SIZE 표 재구성 시도 중...")
+        step_start = time.time()
+        boxes = ocr_result.get("boxes", [])
+        if boxes:
+            size_table_text = reconstruct_size_table(texts, boxes, scores)
+            if size_table_text:
+                step_time = time.time() - step_start
+                if verbose:
+                    print(f"    → SIZE 표 재구성 성공 ({step_time:.2f}초)")
+                    print(f"    → 재구성된 표 미리보기:")
+                    for line in size_table_text.split("\n")[:3]:  # 처음 3줄만
+                        print(f"       {line}")
+            else:
+                if verbose:
+                    print(f"    → SIZE 표를 찾지 못했습니다")
+
     if verbose:
         print("\n🤖 [5/5] LLM 요약 중...")
     step_start = time.time()
-    summary = summarize_texts(filtered_texts, product_type, verbose=verbose, use_cache=use_cache)
+    summary = summarize_texts(
+        filtered_texts,
+        product_type,
+        verbose=verbose,
+        use_cache=use_cache,
+        size_table=size_table_text  # SIZE 표 전달
+    )
     step_time = time.time() - step_start
     if verbose:
         print(f"    → LLM 처리 완료 ({step_time:.2f}초)")
@@ -308,11 +340,57 @@ def process_multiple_images(
     step_time = time.time() - step_start
     if verbose:
         print(f"    → 감지된 타입: {type_desc} ({product_type.value}) ({step_time:.2f}초)")
-    
+
+    # 의류일 때 SIZE 표 재구성 시도
+    size_table_text = None
+    if product_type in [ProductType.의류, ProductType.신발, ProductType.패션잡화]:
+        if verbose:
+            print("\n📏 [5.5/6] SIZE 표 재구성 시도 중...")
+        step_start = time.time()
+
+        # SIZE 키워드가 있는 원본 이미지 찾기 (병합 전 결과에서)
+        size_image_result = None
+        for ocr_result in ocr_results:
+            result_texts = ocr_result.get("rec_texts", [])
+            if any("SIZE" in str(t).upper() for t in result_texts):
+                size_image_result = ocr_result
+                break
+
+        if size_image_result:
+            # 원본 이미지의 OCR 결과로 SIZE 표 재구성
+            size_texts = size_image_result.get("rec_texts", [])
+            size_scores = size_image_result.get("rec_scores", [1.0] * len(size_texts))
+            size_boxes = size_image_result.get("boxes", [])
+
+            if size_boxes:
+                size_table_text = reconstruct_size_table(size_texts, size_boxes, size_scores)
+                if size_table_text:
+                    step_time = time.time() - step_start
+                    if verbose:
+                        print(f"    → SIZE 표 재구성 성공 ({step_time:.2f}초)")
+                        print(f"    → 재구성된 표 미리보기:")
+                        for line in size_table_text.split("\n")[:3]:  # 처음 3줄만
+                            print(f"       {line}")
+                else:
+                    if verbose:
+                        print(f"    → SIZE 표를 찾지 못했습니다")
+            else:
+                if verbose:
+                    print(f"    → boxes 정보가 없습니다")
+        else:
+            if verbose:
+                print(f"    → SIZE 키워드가 있는 이미지를 찾지 못했습니다")
+
     if verbose:
         print("\n🤖 [6/6] LLM 요약 중...")
     step_start = time.time()
-    summary = summarize_texts(filtered_texts, product_type, verbose=verbose, use_cache=use_cache)
+    summary = summarize_texts(
+        filtered_texts,
+        product_type,
+        verbose=verbose,
+        use_cache=use_cache,
+        size_table=size_table_text  # SIZE 표 전달
+    )
     step_time = time.time() - step_start
     if verbose:
         print(f"    → LLM 처리 완료 ({step_time:.2f}초)")

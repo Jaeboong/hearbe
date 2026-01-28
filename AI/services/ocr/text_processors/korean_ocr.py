@@ -50,13 +50,26 @@ def extract_texts_with_scores(ocr_result: List[Any]) -> List[Dict[str, Any]]:
         if hasattr(res, 'get'):
             texts = res.get('rec_texts', [])
             scores = res.get('rec_scores', [])
+            boxes = res.get('dt_polys', [])
         elif hasattr(res, 'rec_texts'):
             texts = res.rec_texts
             scores = res.rec_scores if hasattr(res, 'rec_scores') else [1.0] * len(texts)
+            boxes = res.dt_polys if hasattr(res, 'dt_polys') else []
         else:
             continue
-        for text, score in zip(texts, scores):
-            results.append({"text": text, "score": score})
+
+        # boxes가 없으면 빈 리스트로 채움
+        if len(boxes) < len(texts):
+            boxes = boxes + [[]] * (len(texts) - len(boxes))
+
+        for text, score, box in zip(texts, scores, boxes):
+            # NumPy 배열을 Python list로 변환
+            if hasattr(box, 'tolist'):
+                box = box.tolist()
+            elif box and hasattr(box[0], 'tolist'):
+                box = [pt.tolist() if hasattr(pt, 'tolist') else pt for pt in box]
+
+            results.append({"text": text, "score": float(score), "box": box})
     return results
 
 
@@ -98,7 +111,7 @@ def process_image(
         result["processing_mode"] = "split"
     else:
         print(f"일반 이미지 (높이 {height}px <= {max_height}px) → 직접 처리")
-        
+
         ocr_raw_result = ocr_instance.predict(image_path)
 
         if save_vis:
@@ -109,24 +122,35 @@ def process_image(
 
         texts_with_scores = extract_texts_with_scores(ocr_raw_result)
 
-        
+
         result = {
             "rec_texts": [item["text"] for item in texts_with_scores],
             "rec_scores": [item["score"] for item in texts_with_scores],
+            "boxes": [item["box"] for item in texts_with_scores],
             "total_count": len(texts_with_scores),
             "processing_mode": "direct",
-            "image_size": {"width": width, "height": height}
+            "image_size": {"width": int(width), "height": int(height)}
         }
     
     os.makedirs(output_dir, exist_ok=True)
     base_name = Path(image_path).stem
     output_path = os.path.join(output_dir, f"{base_name}_ocr_result.json")
-    
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
-    
-    print(f"완료! 총 {result['total_count']}개 텍스트 추출됨")
-    print(f"결과 저장: {output_path}")
+
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+        print(f"완료! 총 {result['total_count']}개 텍스트 추출됨")
+        print(f"결과 저장: {output_path}")
+    except Exception as e:
+        print(f"❌ JSON 저장 실패: {type(e).__name__}: {e}")
+        print(f"  result 타입: {type(result)}")
+        print(f"  result keys: {result.keys() if isinstance(result, dict) else 'N/A'}")
+        if isinstance(result, dict):
+            for key, value in result.items():
+                print(f"    {key}: {type(value).__name__}")
+                if isinstance(value, list) and value:
+                    print(f"      첫 번째 요소 타입: {type(value[0]).__name__}")
+        raise
     
     return result
 
@@ -165,6 +189,7 @@ def process_images_parallel(
             return {
                 "rec_texts": [],
                 "rec_scores": [],
+                "boxes": [],
                 "total_count": 0,
                 "processing_mode": "error",
                 "source": Path(image_path).name,
@@ -194,6 +219,7 @@ def process_images_parallel(
                 results.append({
                     "rec_texts": [],
                     "rec_scores": [],
+                    "boxes": [],
                     "total_count": 0,
                     "processing_mode": "error",
                     "source": Path(path).name,
