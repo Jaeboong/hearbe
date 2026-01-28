@@ -37,7 +37,9 @@ def _build_option_script() -> str:
         return getText(label);
       };
       const pickFromSelectedItems = (root) => {
-        const items = root.querySelectorAll('li, button, div[class*="item"], span[class*="item"]');
+        const items = root.querySelectorAll(
+          'li, button, div[class*="item"], span[class*="item"], div[class*="option"], div[class*="Option"]'
+        );
         for (const item of items) {
           if (!isSelected(item)) continue;
           const label = getText(item);
@@ -46,6 +48,14 @@ def _build_option_script() -> str:
           if (img && img.alt) return img.alt.trim();
         }
         return '';
+      };
+
+      const pickFromOptionTable = (root) => {
+        const selected = root.querySelector('.option-table-list__option--selected');
+        if (!selected) return '';
+        const name = selected.querySelector('.option-table-list__option-name');
+        const text = getText(name) || getText(selected);
+        return text;
       };
       const keywords = {
         size: ['사이즈', 'size', '크기'],
@@ -57,19 +67,21 @@ def _build_option_script() -> str:
       for (const section of sections) {
         const sectionText = getText(section).toLowerCase();
         if (hasAny(sectionText, keywords.size)) {
-          options.size = options.size || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
+          options.size = options.size || pickFromOptionTable(section) || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
         }
         if (hasAny(sectionText, keywords.color)) {
           const label = section.querySelector('[class*="label-item-text"], [class*="label"] span');
           options.color = options.color || getText(label) || pickFromSelectedItems(section);
         }
         if (hasAny(sectionText, keywords.capacity)) {
-          options.capacity = options.capacity || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
+          options.capacity = options.capacity || pickFromOptionTable(section) || pickFromSelect(section) || pickFromCustomSelect(section) || pickFromSelectedItems(section);
         }
         if (hasAny(sectionText, keywords.quantity)) {
           const input = section.querySelector('input[type="number"], input[type="text"]');
           if (input && input.value) {
             options.quantity = input.value.trim();
+          } else {
+            options.quantity = options.quantity || pickFromOptionTable(section) || pickFromSelectedItems(section);
           }
         }
       }
