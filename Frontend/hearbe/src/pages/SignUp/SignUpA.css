@@ -1,0 +1,422 @@
+/* =========================================
+   1. 기본 설정 및 변수 (색상, 폰트)
+   ========================================= */
+:root {
+    --bg-dark-a: #141C29;
+    --bg-depp-dark-a: #0A0E14;
+    --accent-yellow-a: #FFF064;
+    --font-main-a: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* =========================================
+   2. 유틸리티 & 공통 스타일
+   ========================================= */
+.signup-container-a .check-btn-a,
+.signup-container-a .signup-submit-btn-a,
+.signup-container-a .error-confirm-btn-a,
+.signup-container-a .card-register-btn-a {
+    background-color: var(--accent-yellow-a);
+    color: var(--bg-dark-a);
+    border: none;
+    font-family: var(--font-main-a);
+    font-weight: 900;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.signup-container-a .check-btn-a:hover,
+.signup-container-a .signup-submit-btn-a:hover,
+.signup-container-a .error-confirm-btn-a:hover,
+.signup-container-a .card-register-btn-a:hover {
+    opacity: 0.9;
+}
+
+/* 공통 Input 스타일 */
+.signup-input-a,
+.modal-input-a {
+    background: transparent;
+    color: var(--accent-yellow-a);
+    font-family: var(--font-main-a);
+    font-weight: bold;
+    outline: none;
+    width: 100%;
+}
+
+/* =========================================
+   3. 회원가입 메인 레이아웃
+   ========================================= */
+.signup-container-a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    letter-spacing: 0.2vw;
+    width: 100%;
+    background-color: #141C29;
+    padding-bottom: 5vw;
+}
+
+/* Back Button Component Override */
+.signup-container-a .global-back-button.arrow-only {
+    left: 4vw;
+    top: 4vw;
+    transform: none;
+}
+
+.signup-container-a .global-back-button.arrow-only .back-arrow-svg {
+    width: 8vw;
+    height: 8vw;
+}
+
+.signup-box-a {
+    width: 100%;
+    max-width: 1200px;
+    /* 대폭 확대 */
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    box-sizing: border-box;
+    margin-top: 60px;
+}
+
+.signup-logo-area-a {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.signup-logo-image-a {
+    width: 450px;
+    /* 로고 대폭 확대 */
+    height: auto;
+    object-fit: contain;
+}
+
+/* =========================================
+   4. 입력 폼 (Input) 스타일
+   ========================================= */
+.form-group-outline-a {
+    border: 0.5vw solid var(--accent-yellow-a);
+    border-radius: 2vw;
+    background-color: var(--bg-dark-a);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-row-a {
+    display: flex;
+    align-items: center;
+    padding: 30px;
+    font-weight: bold;
+    font-size: 32px;
+}
+
+.border-bottom-a {
+    border-bottom: 0.5vw solid var(--accent-yellow-a);
+}
+
+.input-icon-a {
+    width: 8vw;
+    height: 8vw;
+    object-fit: contain;
+}
+
+.signup-input-a {
+    flex: 1;
+    border: none;
+    padding: 16px;
+    font-size: 36px;
+    letter-spacing: 1px;
+    height: auto;
+    min-width: 0;
+}
+
+.signup-input-a::placeholder {
+    color: var(--accent-yellow-a);
+    font-weight: bold;
+}
+
+/* 중복확인 버튼 */
+.check-btn-a {
+    padding: 1.5vw 3vw;
+    border-radius: 1.5vw;
+    font-size: 4vw;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.1vw;
+    margin-left: 2vw;
+}
+
+/* 라벨 텍스트 */
+.label-a {
+    flex-grow: 1;
+    font-size: 6vw;
+    letter-spacing: 0.2vw;
+}
+
+/* =========================================
+   5. 카드 섹션 (메인 화면)
+   ========================================= */
+.camera-area-a {
+    border: 0.6vw solid var(--accent-yellow-a);
+    border-radius: 2vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vw;
+    margin: 0 1.5vw 1.5vw 1.5vw;
+    background-color: transparent;
+    padding: 4vw;
+    min-height: 25vw;
+}
+
+.camera-text-a {
+    font-weight: bold;
+    font-size: 5vw;
+    letter-spacing: 0.2vw;
+    color: var(--accent-yellow-a);
+}
+
+.camera-icon-img-a {
+    width: 20vw;
+    height: auto;
+}
+
+/* 등록 완료 후 카드 정보 표시 박스 */
+.card-info-display-a {
+    padding: 3vw;
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+    border: 0.4vw solid var(--accent-yellow-a);
+    border-radius: 2vw;
+    margin: 0 1.5vw 1.5vw 1.5vw;
+}
+
+.info-row-a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+}
+
+.info-row-flex-a {
+    display: flex;
+    gap: 3vw;
+}
+
+.info-col-a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+    flex: 1;
+}
+
+.info-label-main-a {
+    font-size: 3vw;
+    color: var(--accent-yellow-a);
+    font-weight: bold;
+    opacity: 0.8;
+}
+
+.info-val-main-a {
+    font-size: 4vw;
+    color: var(--accent-yellow-a);
+    font-weight: 900;
+    padding-left: 1vw;
+    border-bottom: 0.2vw solid var(--accent-yellow-a);
+    padding-bottom: 1vw;
+}
+
+/* =========================================
+   6. 약관 동의 (Terms) 섹션
+   ========================================= */
+.terms-section-a {
+    padding: 3vw;
+    gap: 2vw;
+    align-items: flex-start;
+}
+
+.term-row-a {
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+    cursor: pointer;
+    width: 100%;
+}
+
+.check-circle-a {
+    width: 5vw;
+    height: 5vw;
+    border: 0.5vw solid var(--accent-yellow-a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5vw;
+    font-weight: 900;
+    color: var(--bg-dark-a);
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.check-circle-a.checked {
+    background-color: var(--accent-yellow-a);
+}
+
+.term-text-a {
+    font-size: 4vw;
+    font-weight: bold;
+    color: var(--accent-yellow-a);
+}
+
+.bold-a {
+    font-weight: 900;
+}
+
+/* 회원가입 제출 버튼 */
+.signup-submit-btn-a {
+    font-size: 40px;
+    padding: 40px;
+    border-radius: 24px;
+    margin-top: 30px;
+    width: 100%;
+}
+
+/* =========================================
+   7. 모달 (팝업) 스타일
+   ========================================= */
+.signup-container-a .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 28, 41, 0.95);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2vw;
+    backdrop-filter: blur(5px);
+}
+
+.signup-container-a .modal-box {
+    width: 90vw;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 0.5vw solid var(--accent-yellow-a);
+    border-radius: 2vw;
+    padding: 4vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vw;
+    box-sizing: border-box;
+    background-color: var(--bg-dark-a);
+    position: relative;
+}
+
+.signup-container-a .modal-close-btn {
+    position: absolute;
+    top: 2vw;
+    right: 2vw;
+    font-size: 8vw;
+    font-weight: 1000;
+    color: var(--accent-yellow-a);
+    cursor: pointer;
+    line-height: 1;
+    z-index: 30;
+}
+
+.signup-container-a .modal-title {
+    font-size: 7vw;
+    font-weight: 900;
+    color: var(--accent-yellow-a);
+    letter-spacing: 0.2vw;
+    text-align: center;
+}
+
+.signup-container-a .modal-desc {
+    font-size: 4vw;
+    font-weight: 900;
+    color: var(--accent-yellow-a);
+    margin-bottom: 2vw;
+    text-align: center;
+}
+
+.signup-container-a .modal-camera-area {
+    width: 100%;
+    border: 0.4vw solid var(--accent-yellow-a);
+    border-radius: 2vw;
+    background-color: #000;
+    height: 60vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.signup-container-a .modal-video-stream {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.signup-container-a .shutter-button {
+    width: 8vw;
+    height: 8vw;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 0.5vw solid var(--accent-yellow-a);
+    position: absolute;
+    bottom: 3vw;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signup-container-a .shutter-inner {
+    width: 6vw;
+    height: 6vw;
+    border-radius: 50%;
+    background-color: var(--accent-yellow-a);
+}
+
+.signup-container-a .card-register-btn-a {
+    font-size: 4.5vw;
+    padding: 2vw;
+    border-radius: 1.5vw;
+    margin-top: 2vw;
+}
+
+/* 에러/성공 모달 */
+.signup-container-a .error-modal-box {
+    width: 80vw;
+    background-color: var(--bg-dark-a);
+    border: 0.5vw solid var(--accent-yellow-a);
+    border-radius: 2vw;
+    padding: 5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4vw;
+    text-align: center;
+}
+
+.signup-container-a .error-message {
+    font-size: 5vw;
+    font-weight: bold;
+    color: var(--accent-yellow-a);
+}
+
+.signup-container-a .error-confirm-btn-a {
+    padding: 2vw 6vw;
+    border-radius: 1.5vw;
+    font-size: 5vw;
+}

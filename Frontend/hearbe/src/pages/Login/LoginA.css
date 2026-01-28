@@ -1,0 +1,224 @@
+/* 1. 색상 변수 설정 */
+:root {
+  --main-yellow: #FFF064;
+  --bg-dark: #141C29;
+  --input-radius: 12px;
+}
+
+/* 2. 전체 레이아웃 */
+.login-container-a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+  /* 화면 꽉 차게 */
+  background-color: var(--bg-dark);
+  color: var(--main-yellow);
+  font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+  letter-spacing: 1px;
+  padding: 20px;
+  box-sizing: border-box;
+  width: 100vw;
+  /* 전체 너비 사용 */
+  height: 100vh;
+}
+
+/* 3. 로그인 박스 */
+.login-box-a {
+  width: 100%;
+  max-width: 1000px;
+  /* 대폭 확대 */
+  padding: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 8px solid var(--main-yellow);
+  /* 테두리 두께 강화 */
+  border-radius: 30px;
+  background-color: transparent;
+  gap: 48px;
+  box-sizing: border-box;
+}
+
+/* 4. 로고 */
+.logo-area-a {
+  margin-bottom: 30px;
+}
+
+.logo-image-a {
+  width: 450px;
+  /* 로고 대폭 확대 */
+  height: auto;
+  object-fit: contain;
+}
+
+/* 5. 폼 영역 */
+.login-form-a {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ID/PW 입력 그룹 */
+.login-container-a .input-group-a {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 6px solid var(--main-yellow);
+  border-radius: var(--input-radius);
+  background-color: var(--bg-dark);
+  overflow: hidden;
+}
+
+.login-input-a {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 28px;
+  color: var(--main-yellow);
+  font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+  font-size: 32px;
+  /* 폰트 더 크게 */
+  font-weight: bold;
+  outline: none;
+  letter-spacing: 1px;
+  box-sizing: border-box;
+}
+
+.login-input-a::placeholder {
+  color: var(--main-yellow);
+  font-weight: bold;
+  opacity: 0.9;
+}
+
+/* 첫 번째 입력창(아이디) 밑줄 */
+.first-input-a {
+  border-bottom: 4px solid var(--main-yellow);
+}
+
+/* 6. 로그인 버튼 */
+.login-button-a {
+  width: 100%;
+  padding: 28px;
+  background-color: var(--main-yellow);
+  color: var(--bg-dark);
+  font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+  font-size: 42px;
+  /* 버튼 폰트 거대화 */
+  font-weight: 900;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 15px;
+}
+
+.login-button-a:hover {
+  opacity: 0.9;
+}
+
+/* 7. 옵션 (체크박스 등) */
+.login-options-a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 20px;
+  color: var(--main-yellow);
+  font-weight: bold;
+  font-size: 20px;
+  /* 폰트 축소 */
+}
+
+/* --- 커스텀 체크박스 시작 --- */
+.checkbox-container-a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* 기본 체크박스 숨김 */
+.checkbox-container-a input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* 가짜 체크박스 (네모) */
+.checkmark-a {
+  height: 32px;
+  width: 32px;
+  background-color: transparent;
+  border: 4px solid var(--main-yellow);
+  border-radius: 6px;
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+/* 체크되었을 때 배경 채우기 */
+.checkbox-container-a input:checked~.checkmark-a {
+  background-color: var(--main-yellow);
+}
+
+/* 체크 표시 (V 모양 만들기) */
+.checkmark-a:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 9px;
+  top: 2px;
+  width: 8px;
+  height: 16px;
+  border: solid var(--bg-dark);
+  border-width: 0 4px 4px 0;
+  transform: rotate(45deg);
+}
+
+/* 체크되면 V 표시 보이기 */
+.checkmark-a:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 9px;
+  top: 2px;
+  width: 8px;
+  height: 16px;
+  border: solid var(--bg-dark);
+  border-width: 0 4px 4px 0;
+  transform: rotate(45deg);
+}
+
+/* 체크되면 V 표시 보이기 */
+.checkbox-container-a input:checked~.checkmark-a:after {
+  display: block;
+}
+
+/* --- 커스텀 체크박스 끝 --- */
+
+/* 9. 하단 링크 (아이디 찾기/비밀번호 찾기/회원가입) */
+.login-footer-a {
+  margin-top: 30px;
+  display: flex;
+  gap: 20px;
+  color: var(--main-yellow);
+  font-weight: bold;
+  font-size: 18px;
+  /* 폰트 축소 */
+}
+
+.login-separator-a {
+  opacity: 0.5;
+}
