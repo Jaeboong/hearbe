@@ -216,6 +216,10 @@ class LLMGenerator:
             data = json.loads(content)
             
             response_text = data.get("response", "")
+            if isinstance(response_text, str):
+                response_text = response_text.strip()
+            else:
+                response_text = str(response_text)
             commands_data = data.get("commands")
             if commands_data is None:
                 commands_data = data.get("tool_calls")
@@ -228,7 +232,12 @@ class LLMGenerator:
                     truncate(content)
                 )
                 commands_data = []
-            
+
+            if not response_text or len(response_text) < 5:
+                details = data.get("details")
+                if isinstance(details, dict) and details:
+                    response_text = self._format_details(details)
+
             commands = []
             for cmd in commands_data:
                 action = (
@@ -272,6 +281,17 @@ class LLMGenerator:
                 error=f"JSON 파싱 실패: {e}"
             )
     
+    def _format_details(self, details: Dict[str, Any]) -> str:
+        lines = ["???? ?? ?????."]
+        for key, value in details.items():
+            if isinstance(value, dict):
+                lines.append(f"- {key}:")
+                for sub_key, sub_value in value.items():
+                    lines.append(f"  - {sub_key}: {sub_value}")
+            else:
+                lines.append(f"- {key}: {value}")
+        return "\n".join(lines)
+
     def _validate_command(self, action: str, args: Dict[str, Any]) -> bool:
         """명령 유효성 검증"""
         valid_actions = [
@@ -283,6 +303,7 @@ class LLMGenerator:
             "click_text",
             "scroll",
             "extract",
+            "extract_cart",
             "extract_detail",
             "get_visible_buttons",
             "get_text",

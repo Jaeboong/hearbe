@@ -27,13 +27,14 @@ class TextHandler:
     - Coordinating NLU/LLM pipeline
     """
 
-    def __init__(self, nlu_service, llm_planner, flow_engine, session_manager, sender, action_feedback):
+    def __init__(self, nlu_service, llm_planner, flow_engine, session_manager, sender, action_feedback, login_guard=None):
         self._nlu = nlu_service
         self._llm = llm_planner
         self._flow = flow_engine
         self._session = session_manager
         self._sender = sender
         self._action_feedback = action_feedback
+        self._login_guard = login_guard
 
         # Specialized handlers
         self._search_query_handler = SearchQueryHandler(session_manager, sender)
@@ -221,6 +222,17 @@ class TextHandler:
         else:
             if response.commands:
                 if self._is_interrupted(session_id, epoch):
+                    return
+                guard_commands = None
+                if self._login_guard:
+                    guard_commands = self._login_guard.prepare_guard(
+                        session_id,
+                        response.commands,
+                        response.text,
+                        session.current_url or ""
+                    )
+                if guard_commands:
+                    await self._sender.send_tool_calls(session_id, guard_commands)
                     return
                 await self._sender.send_tool_calls(session_id, response.commands)
             else:

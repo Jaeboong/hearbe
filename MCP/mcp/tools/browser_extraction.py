@@ -8,8 +8,9 @@ import logging
 from typing import Any, Dict, Optional
 
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
-from browser.extractors import extract_search_results_dynamic
-from browser.extractors.coupang_product import extract_coupang_product_options
+from browser.extractors import extract_cart_dynamic
+from browser.fallbacks.detail_fallback import apply_detail_option_fallback
+from browser.fallbacks.search_fallback import build_search_fallback_result
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
@@ -113,16 +114,9 @@ class BrowserExtractionMixin:
             count = await locator.count()
             if count == 0:
                 if fallback_dynamic:
-                    products = await extract_search_results_dynamic(page)
-                    if products:
-                        sliced = products if limit <= 0 else products[:limit]
-                        return {
-                            "success": True,
-                            "products": sliced,
-                            "count": len(sliced),
-                            "page_url": page.url,
-                            "fallback": "dynamic",
-                        }
+                    fallback = await build_search_fallback_result(page, limit)
+                    if fallback:
+                        return fallback
                 return {"success": False, "error": "Element not found", "products": []}
 
             max_items = count if limit <= 0 else min(limit, count)
@@ -160,16 +154,9 @@ class BrowserExtractionMixin:
             if fallback_dynamic and fields and "price" in fields:
                 missing_price = all(not p.get("price") for p in products)
                 if missing_price:
-                    dynamic_products = await extract_search_results_dynamic(page)
-                    if dynamic_products:
-                        sliced = dynamic_products if limit <= 0 else dynamic_products[:limit]
-                        return {
-                            "success": True,
-                            "products": sliced,
-                            "count": len(sliced),
-                            "page_url": page.url,
-                            "fallback": "dynamic",
-                        }
+                    fallback = await build_search_fallback_result(page, limit)
+                    if fallback:
+                        return fallback
 
             return {
                 "success": True,
@@ -269,16 +256,8 @@ class BrowserExtractionMixin:
                 page_url = page.url or ""
                 if "coupang.com" in page_url:
                     try:
-                        dynamic_options = await extract_coupang_product_options(page)
+                        dynamic_options = await apply_detail_option_fallback(page, detail)
                         if dynamic_options:
-                            selected = dynamic_options.get("selected") if isinstance(dynamic_options, dict) else None
-                            options_list = dynamic_options.get("options_list") if isinstance(dynamic_options, dict) else None
-                            if selected and not detail.get("options"):
-                                detail["options"] = selected
-                            elif isinstance(dynamic_options, dict) and not detail.get("options"):
-                                detail["options"] = dynamic_options
-                            if options_list and not detail.get("options_list"):
-                                detail["options_list"] = options_list
                             logger.info(f"Dynamic option extraction succeeded: {dynamic_options}")
                     except Exception as e:
                         logger.warning(f"Dynamic option extraction failed: {e}")
@@ -315,40 +294,24 @@ class BrowserExtractionMixin:
             logger.error(f"Get visible buttons failed: {e}")
             return {"success": False, "error": str(e), "buttons": []}
 
-    async def get_pages(self) -> Dict[str, Any]:
+    async def extract_cart(self) -> Dict[str, Any]:
         """
-        Return a list of open pages/tabs.
+        Extract cart items and summary from cart page.
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
 
-        Returns:
-            {"success": bool, "pages": list, "count": int}
-        """
-        if not self.is_connected:
-            return {"success": False, "error": "Not connected to browser", "pages": []}
-                                                                                                                                                                                                                                                                               
         try:
-            pages: list[Dict[str, Any]] = []
-            for context in self._browser.contexts:
-                for page in context.pages:
-                    if page.is_closed():
-                        continue
-                    url = page.url or ""
-                    title = ""
-                    if "/" in url:
-                        parts = url.split("/")
-                        if len(parts) > 2:
-                            title = parts[2]
-                    pages.append(
-                        {
-                            "index": len(pages),
-                            "url": url,
-                            "title": title or url,
-                            "is_current": False,
-                        }
-                    )
-
-            if pages:
-                pages[-1]["is_current"] = True
-            return {"success": True, "pages": pages, "count": len(pages)}
+            data = await extract_cart_dynamic(page)
+            items = data.get("items") if isinstance(data, dict) else []
+            summary = data.get("summary") if isinstance(data, dict) else {}
+            return {
+                "success": True,
+                "cart_items": items,
+                "cart_summary": summary,
+                "page_url": page.url,
+            }
         except Exception as e:
-            logger.error(f"Get pages failed: {e}")
-            return {"success": False, "error": str(e), "pages": []}
+            logger.error(f"Extract cart failed: {e}")
+            return {"success": False, "error": str(e), "cart_items": []}

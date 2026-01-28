@@ -127,10 +127,44 @@ def _build_option_script() -> str:
         capacity: ['용량', 'capacity'],
         quantity: ['수량', 'quantity', '개수']
       };
+      const inferKeyFromContainer = (list) => {
+        const container = list.parentElement || list;
+        if (!container) return 'option';
+        const labels = container.querySelectorAll('label, span, div, p');
+        for (const el of labels) {
+          const text = getText(el);
+          if (!text) continue;
+          if (hasAny(text, keywords.size)) return 'size';
+          if (hasAny(text, keywords.color)) return 'color';
+          if (hasAny(text, keywords.capacity)) return 'capacity';
+          if (hasAny(text, keywords.quantity)) return 'quantity';
+        }
+        return 'option';
+      };
+      const parseCustomScrollbars = () => {
+        const lists = document.querySelectorAll('.custom-scrollbar');
+        for (const list of lists) {
+          const key = inferKeyFromContainer(list);
+          const items = list.querySelectorAll('.select-item');
+          for (const item of items) {
+            const nameEl = item.querySelector('.twc-font-bold') || item.querySelector('div');
+            const name = getText(nameEl) || getText(item);
+            const priceEl = item.querySelector('.price-text');
+            const price = parsePrice(priceEl);
+            const delivery = getText(item.querySelector('.pdd-text'));
+            const selected = item.classList.contains('selected');
+            addOption(key, { name, price, delivery, selected });
+            if (selected && name) {
+              selectedOptions[key] = name;
+            }
+          }
+        }
+      };
       const tables = document.querySelectorAll('.option-table-v2');
       for (const table of tables) {
         parseOptionTable(table);
       }
+      parseCustomScrollbars();
       const sections = document.querySelectorAll('section, div[class*="option"], div[class*="Option"]');
       for (const section of sections) {
         const sectionText = getText(section).toLowerCase();

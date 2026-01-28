@@ -10,6 +10,7 @@ from typing import Dict, Any, Optional, List
 
 from core.event_bus import EventType, publish
 from ..search.search_reader import build_search_read_tts
+from ..cart.cart_reader import build_cart_read_tts
 from ..utils.temp_file_manager import TempFileManager
 
 # Summarizer imports (HTML parser + OCR integrator)
@@ -30,11 +31,12 @@ logger = logging.getLogger(__name__)
 class MCPHandler:
     """Handles MCP execution results and summary pipeline."""
 
-    def __init__(self, sender, session_manager, action_feedback, failure_notifier=None):
+    def __init__(self, sender, session_manager, action_feedback, failure_notifier=None, login_guard=None):
         self._sender = sender
         self._session = session_manager
         self._action_feedback = action_feedback
         self._failure_notifier = failure_notifier
+        self._login_guard = login_guard
         self._file_manager = TempFileManager()  # Manages temporary JSON files
 
     async def handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
@@ -52,6 +54,8 @@ class MCPHandler:
         tool_name = data.get("tool_name")
         arguments = data.get("arguments") or {}
         products = page_data.get("products") if isinstance(page_data, dict) else None
+        cart_items = None
+        cart_summary = None
 
         page_url = None
         if isinstance(page_data, dict):
@@ -105,10 +109,21 @@ class MCPHandler:
                     self._save_product_detail_to_file(detail, session_id)
                 if detail_images:
                     self._session.set_context(session_id, "detail_images", detail_images)
+                cart_items = result.get("cart_items")
+                cart_summary = result.get("cart_summary") or {}
+                if cart_items is not None:
+                    self._session.set_context(session_id, "cart_items", cart_items)
+                    self._session.set_context(session_id, "cart_summary", cart_summary)
+                    self._save_cart_to_file(cart_items, cart_summary, session_id)
             if page_url:
                 if session.current_url and session.current_url != page_url:
                     self._session.set_context(session_id, "previous_url", session.current_url)
                 session.current_url = page_url
+            if cart_items is not None:
+                tts_text = build_cart_read_tts(cart_items, cart_summary or {})
+                await self._sender.send_tts_response(session_id, tts_text)
+                return
+
             if products:
                 self._session.set_context(session_id, "search_results", products)
                 self._session.set_context(session_id, "search_active_results", products)
@@ -149,6 +164,15 @@ class MCPHandler:
                 if has_more:
                     tts_text += " 더 읽어드릴까요? 'n개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
                 await self._sender.send_tts_response(session_id, tts_text)
+
+        if tool_name == "check_login_status" and self._login_guard:
+            handled = await self._login_guard.handle_login_check_result(
+                session_id,
+                result if isinstance(result, dict) else {},
+                page_url or (session.current_url if session else "")
+            )
+            if handled:
+                return
 
         if SUMMARIZER_AVAILABLE and html_content:
             try:
@@ -249,6 +273,18 @@ class MCPHandler:
             session_id=session_id,
             category="product_detail",
             filename_prefix="product_detail"
+        )
+
+    def _save_cart_to_file(self, items: List[Dict[str, Any]], summary: Dict[str, Any], session_id: str):
+        payload = {
+            "items": items,
+            "summary": summary,
+        }
+        self._file_manager.save_json(
+            data=payload,
+            session_id=session_id,
+            category="cart",
+            filename_prefix="cart"
         )
 
     def cleanup_session(self, session_id: str):

@@ -66,7 +66,7 @@ def build_search_read_tts(
         price = _get_price(item)
         line = f"{idx + 1}번, {name}"
         if price:
-            line += f", 가격 {price}"
+            line += f". 가격  {price}"
         lines.append(line)
 
     prefix = f"총 {total}개 상품입니다. " if include_total else ""
