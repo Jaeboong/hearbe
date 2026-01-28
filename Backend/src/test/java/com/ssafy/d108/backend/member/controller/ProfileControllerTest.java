@@ -13,13 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +62,7 @@ class ProfileControllerTest {
         ProfileUpdateRequest request = new ProfileUpdateRequest();
         request.setHeight(180.5f);
         request.setTopSize(TopSize.L);
-        request.setAllergies(Set.of(Allergy.PEANUT));
+        request.setAllergies(Set.of(Allergy.NUTS));
         request.setEtcAllergy("Peach");
 
         // Mock Response

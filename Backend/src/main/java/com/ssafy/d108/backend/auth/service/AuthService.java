@@ -55,19 +55,34 @@ public class AuthService {
     @Transactional
     public Integer signup(SignupRequest request) {
         // 비밀번호 정책 검증
+        String rawPassword;
+
         if (request.getUserType() == UserType.BLIND) {
-            // A형: 비밀번호(간편비밀번호)가 6자리 숫자인지 확인
-            if (!request.getPassword().matches("^[0-9]{6}$")) {
-                throw new IllegalArgumentException("A형 사용자의 비밀번호는 6자리 숫자여야 합니다.");
+            // A형: 간편비밀번호(simplePassword)가 6자리 숫자인지 확인
+            if (request.getSimplePassword() == null || !request.getSimplePassword().matches("^[0-9]{6}$")) {
+                throw new IllegalArgumentException("A형 사용자의 간편 비밀번호는 6자리 숫자여야 합니다.");
             }
-            // A형은 password_check 확인 안 함 (또는 동일하다고 가정)
+            // A형은 simplePassword를 메인 비밀번호로 사용
+            rawPassword = request.getSimplePassword();
         } else {
-            // B/C형: 비밀번호 8~20자 확인 및 password_check 일치 확인
+            // B/C형: 비밀번호(password) 필수 및 유효성 검사
+            if (request.getPassword() == null || request.getPassword().isBlank()) {
+                throw new IllegalArgumentException("비밀번호는 필수입니다.");
+            }
             if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
                 throw new IllegalArgumentException("비밀번호는 8~20자 사이여야 합니다.");
             }
             if (request.getPasswordCheck() == null || !request.getPassword().equals(request.getPasswordCheck())) {
                 throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            }
+            rawPassword = request.getPassword();
+
+            // B/C형은 이메일 필수
+            if (request.getEmail() == null || request.getEmail().isBlank()) {
+                throw new IllegalArgumentException("이메일은 필수입니다.");
+            }
+            if (!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                throw new IllegalArgumentException("올바른 이메일 형식이 아닙니다.");
             }
         }
 
@@ -85,7 +100,7 @@ public class AuthService {
         }
 
         // 중복 체크
-        if (userRepository.existsByLoginId(request.getLoginId())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateUserException("이미 사용 중인 아이디입니다.");
         }
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
@@ -94,13 +109,17 @@ public class AuthService {
 
         // User 생성 (비밀번호 암호화 저장)
         User user = new User();
-        user.setLoginId(request.getLoginId());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // BCrypt Encoding
         user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(rawPassword)); // 선택된 패스워드 암호화
+        user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setUserType(request.getUserType());
-        user.setSimplePassword(request.getSimplePassword());
+        if (request.getUserType() == UserType.BLIND) {
+            user.setSimplePassword(request.getSimplePassword());
+        } else {
+            user.setSimplePassword(null);
+        }
 
         User saved = userRepository.save(user);
 
@@ -134,7 +153,7 @@ public class AuthService {
      */
     public LoginResponse login(LoginRequest request) {
         // 1. 사용자 조회
-        User user = userRepository.findByLoginId(request.getLoginId())
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
 
         // 2. 비밀번호 검증 (BCrypt Matches)
@@ -145,7 +164,7 @@ public class AuthService {
         // 3. Authentication 객체 생성 (Custom)
         //
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user.getLoginId(),
+                user.getUsername(),
                 null,
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) // 임시 Role
         );
@@ -155,7 +174,7 @@ public class AuthService {
 
         return new LoginResponse(
                 user.getId(),
-                user.getUsername(),
+                user.getName(),
                 user.getUserType(),
                 accessToken,
                 "로그인 성공");
@@ -180,7 +199,7 @@ public class AuthService {
                         encryptedCvc)
                 .orElseThrow(() -> new UserNotFoundException("일치하는 복지카드 정보가 없습니다."));
 
-        return new FindIdResponse(welfareCard.getUser().getLoginId(), "Found ID");
+        return new FindIdResponse(welfareCard.getUser().getUsername(), "Found ID");
     }
 
     /**

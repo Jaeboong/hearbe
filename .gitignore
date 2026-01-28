@@ -538,3 +538,4 @@ session.json
 sessions/
 
 nul
+Backend/src/main/resources/application.properties

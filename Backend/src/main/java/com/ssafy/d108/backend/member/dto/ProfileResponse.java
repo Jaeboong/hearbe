@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -18,7 +17,6 @@ public class ProfileResponse {
 
     private Long userId;
     private String username;
-    private String loginId;
     private UserType userType;
     private String phoneNumber;
 
@@ -40,8 +38,7 @@ public class ProfileResponse {
     public static ProfileResponse rom(User user, Profile profile) {
         ProfileResponse response = new ProfileResponse();
         response.setUserId(Long.valueOf(user.getId()));
-        response.setUsername(user.getUsername());
-        response.setLoginId(user.getLoginId());
+        response.setUsername(user.getName());
         response.setUserType(user.getUserType());
         response.setPhoneNumber(user.getPhoneNumber());
 

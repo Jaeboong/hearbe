@@ -3,7 +3,6 @@ package com.ssafy.d108.backend.auth.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssafy.d108.backend.entity.enums.UserType;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -22,12 +21,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SignupRequest {
 
-    @JsonProperty("user_id")
+    @JsonProperty("username")
     @NotBlank(message = "아이디는 필수입니다.")
     @Size(min = 4, max = 30, message = "아이디는 4~30자 사이여야 합니다.")
-    private String loginId;
+    private String username;
 
-    @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 
     @JsonProperty("password_check")
@@ -35,10 +33,8 @@ public class SignupRequest {
 
     @NotBlank(message = "이름은 필수입니다.")
     @Size(max = 15, message = "이름은 15자 이하여야 합니다.")
-    private String username;
+    private String name;
 
-    @NotBlank(message = "이메일은 필수입니다.")
-    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
     @JsonProperty("phone_number")

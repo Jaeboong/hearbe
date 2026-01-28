@@ -12,7 +12,7 @@ public class DuplicateUserException extends BusinessException {
         super(ErrorCode.DUPLICATE_USER);
     }
 
-    public DuplicateUserException(String loginId) {
-        super(ErrorCode.DUPLICATE_USER, "이미 사용 중인 아이디입니다: " + loginId);
+    public DuplicateUserException(String username) {
+        super(ErrorCode.DUPLICATE_USER, "이미 사용 중인 아이디입니다: " + username);
     }
 }
