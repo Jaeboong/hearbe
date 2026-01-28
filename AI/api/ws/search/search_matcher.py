@@ -33,12 +33,15 @@ class LLMQueryCorrector:
     def __init__(self, model: str = DEFAULT_LLM_MODEL):
         self._model = model
         self._client = None
-        self._api_key = (
-            os.getenv("GMS_API_KEY")
-            or os.getenv("GMS_KEY")
-            or os.getenv("OPENAI_API_KEY")
-        )
-        self._base_url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1"
+        try:
+            from services.llm.generators.llm_generator import resolve_llm_api_key
+            self._api_key = resolve_llm_api_key()
+        except Exception:
+            self._api_key = (
+                os.getenv("GMS_API_KEY")
+                or os.getenv("OPENAI_API_KEY")
+            )
+        self._base_url = os.getenv("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 
     def _get_client(self):
         if not self._api_key:

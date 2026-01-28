@@ -6,11 +6,12 @@ Centralizes outbound message formats for WS responses.
 """
 
 import logging
-from typing import Optional
+import re
+from typing import Optional, Iterable, List
 
 from core.interfaces import ASRResult
 from .models import MessageType, WSMessage
-from .tts_normalizer import normalize_tts_text
+from .tts.tts_normalizer import normalize_tts_text
 
 logger = logging.getLogger(__name__)
 
@@ -97,25 +98,35 @@ class WSSender:
             return
 
         try:
+            text = _strip_urls(text)
+            text = _normalize_line_breaks(text)
             text = normalize_tts_text(text)
+            segments = _split_tts_text(text)
             epoch = self._tts_epoch.get(session_id, 0)
             chunk_count = 0
-            async for chunk in self._tts.synthesize_stream(text):
+            for segment in segments:
                 if self._tts_epoch.get(session_id, 0) != epoch:
                     logger.info(f"TTS cancelled: session={session_id}")
                     break
-                msg = WSMessage(
-                    type=MessageType.TTS_CHUNK,
-                    data={
-                        "audio": chunk.audio_data.hex() if chunk.audio_data else "",
-                        "is_final": chunk.is_final,
-                        "sample_rate": chunk.sample_rate
-                    },
-                    session_id=session_id
-                )
-                await self._connections.send_message(session_id, msg)
-                chunk_count += 1
-            logger.info(f"TTS completed: {chunk_count} chunks sent for '{text[:50]}...'")
+                if not segment:
+                    continue
+                async for chunk in self._tts.synthesize_stream(segment):
+                    if self._tts_epoch.get(session_id, 0) != epoch:
+                        logger.info(f"TTS cancelled: session={session_id}")
+                        break
+                    msg = WSMessage(
+                        type=MessageType.TTS_CHUNK,
+                        data={
+                            "audio": chunk.audio_data.hex() if chunk.audio_data else "",
+                            "is_final": chunk.is_final,
+                            "sample_rate": chunk.sample_rate
+                        },
+                        session_id=session_id
+                    )
+                    await self._connections.send_message(session_id, msg)
+                    chunk_count += 1
+            preview = segments[0][:50] if segments else ""
+            logger.info(f"TTS completed: {chunk_count} chunks sent for '{preview}...'")
         except Exception as e:
             logger.error(f"TTS streaming failed: {e}")
 
@@ -142,3 +153,55 @@ class WSSender:
             session_id=session_id
         )
         await self._connections.send_message(session_id, msg)
+
+
+_URL_PATTERN = re.compile(r"https?://\S+")
+
+
+def _strip_urls(text: str) -> str:
+    if not text:
+        return text
+    cleaned = _URL_PATTERN.sub("", text)
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+
+def _normalize_line_breaks(text: str) -> str:
+    if not text:
+        return text
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines:
+        return ""
+    normalized: List[str] = []
+    for line in lines:
+        if re.search(r"[.!?。…]$", line):
+            normalized.append(line)
+        else:
+            normalized.append(f"{line}.")
+    return " ".join(normalized)
+
+
+def _split_tts_text(text: str, max_chars: int = 200) -> List[str]:
+    if not text:
+        return []
+    # Split by sentence endings or newlines.
+    parts = re.split(r"(?<=[.!?。…])\s+|\n+", text)
+    segments: List[str] = []
+    for part in parts:
+        part = part.strip()
+        if not part:
+            continue
+        if len(part) <= max_chars:
+            segments.append(part)
+            continue
+        # Further split long segments by commas or spaces.
+        while len(part) > max_chars:
+            cut = part.rfind(",", 0, max_chars)
+            if cut == -1:
+                cut = part.rfind(" ", 0, max_chars)
+            if cut == -1:
+                cut = max_chars
+            segments.append(part[:cut].strip())
+            part = part[cut:].strip()
+        if part:
+            segments.append(part)
+    return segments

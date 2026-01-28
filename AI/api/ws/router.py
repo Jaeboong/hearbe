@@ -39,6 +39,8 @@ class WebSocketRouter:
                 await self._handlers.handle_interrupt(session_id)
             elif msg_type == MessageType.MCP_RESULT:
                 await self._handlers.handle_mcp_result(session_id, data)
+            elif msg_type == MessageType.PAGE_UPDATE:
+                await self._handlers.handle_page_update(session_id, data)
             else:
                 logger.warning(f"Unknown message type: {msg_type}")
 

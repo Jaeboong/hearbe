@@ -25,8 +25,31 @@ except ImportError:
 from ..context.context_builder import ContextBuilder, get_page_context, PageContext
 from ..context.context_rules import GeneratedCommand
 from ..sites.site_manager import get_site_manager
+from .llm_logging import log_llm_request, log_llm_response, truncate
 
 logger = logging.getLogger(__name__)
+
+
+def resolve_llm_api_key(explicit_key: Optional[str] = None) -> Optional[str]:
+    """
+    Resolve LLM API key based on environment configuration.
+
+    Order:
+    1) explicit_key (if provided)
+    2) LLM_API_KEY_NAME -> env value
+    3) GMS_API_KEY, GMS_KEY, OPENAI_API_KEY
+    """
+    if explicit_key:
+        return explicit_key
+    key_name = os.environ.get("LLM_API_KEY_NAME")
+    if key_name:
+        key_value = os.environ.get(key_name)
+        if key_value:
+            return key_value
+    return (
+        os.environ.get("GMS_API_KEY")
+        or os.environ.get("OPENAI_API_KEY")
+    )
 
 
 @dataclass
@@ -46,10 +69,14 @@ class LLMGenerator:
     """
     
     def __init__(self, api_key: str = None, model: str = "gpt-5-mini"):
-        # GMS_API_KEY 우선, 없으면 OPENAI_API_KEY 사용
-        self.api_key = api_key or os.environ.get("GMS_API_KEY") or os.environ.get("OPENAI_API_KEY")
+        # Allow env-based key selection
+        self.api_key = resolve_llm_api_key(api_key)
         self.model = model
-        self.base_url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1"
+        self.base_url = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
+        try:
+            self.max_tokens = int(os.environ.get("LLM_MAX_TOKENS", "1000"))
+        except ValueError:
+            self.max_tokens = 1000
         self.context_builder = ContextBuilder()
         self._client = None
         
@@ -77,7 +104,8 @@ class LLMGenerator:
         current_url: str = "",
         page_type: Optional[str] = None,
         available_selectors: Optional[Dict[str, str]] = None,
-        conversation_history: List[Dict[str, str]] = None
+        conversation_history: List[Dict[str, str]] = None,
+        session_context: Optional[Dict[str, Any]] = None,
     ) -> LLMResult:
         """
         LLM을 사용하여 명령 생성
@@ -110,7 +138,8 @@ class LLMGenerator:
             user_text=user_text,
             current_url=current_url,
             conversation_history=history,
-            page_context=page_context
+            page_context=page_context,
+            session_context=session_context,
         )
         logger.info(
             "LLM request: model=%s, text_len=%d, url=%s",
@@ -118,20 +147,42 @@ class LLMGenerator:
             len(user_text),
             current_url or "(empty)"
         )
+        token_param = "max_completion_tokens"
+        log_llm_request(
+            logger,
+            model=self.model,
+            base_url=self.base_url,
+            messages=messages,
+            max_tokens=self.max_tokens,
+            response_format={"type": "json_object"},
+            token_param=token_param,
+        )
         
         try:
-            # OpenAI API 호출 (blocking -> thread)
-            response = await asyncio.to_thread(
-                self.client.chat.completions.create,
-                model=self.model,
-                messages=messages,
-                response_format={"type": "json_object"},
-                max_completion_tokens=1000
-            )
-            
+            # OpenAI API 호출 (blocking -> thread), empty 응답 시 최대 2회 재시도
+            content = None
+            last_error = None
+            for attempt in range(3):
+                response = await asyncio.to_thread(
+                    self.client.chat.completions.create,
+                    model=self.model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                    max_completion_tokens=self.max_tokens,
+                )
+                content = response.choices[0].message.content
+                logger.info("LLM response received: chars=%d", len(content or ""))
+                log_llm_response(logger, response, content)
+                if content:
+                    break
+                last_error = "empty_response"
+                if attempt < 2:
+                    logger.warning("Empty LLM response received, retrying (%d/2)", attempt + 1)
+
+            if not content:
+                raise ValueError(last_error or "empty_response")
+
             # 응답 파싱
-            content = response.choices[0].message.content
-            logger.info("LLM response received: chars=%d", len(content or ""))
             result = self._parse_response(content)
             logger.info(
                 "LLM parsed: success=%s, commands=%d, response_text_len=%d",
@@ -174,7 +225,7 @@ class LLMGenerator:
                 logger.warning(
                     "LLM response missing commands/tool_calls. keys=%s content=%s",
                     list(data.keys()),
-                    self._truncate(content)
+                    truncate(content)
                 )
                 commands_data = []
             
@@ -206,10 +257,10 @@ class LLMGenerator:
             )
             if not commands:
                 logger.warning(
-                    "LLM produced no commands. response_text=%s content=%s",
-                    self._truncate(response_text),
-                    self._truncate(content)
-                )
+                "LLM produced no commands. response_text=%s content=%s",
+                truncate(response_text),
+                truncate(content)
+            )
             return result
             
         except json.JSONDecodeError as e:
@@ -232,6 +283,7 @@ class LLMGenerator:
             "click_text",
             "scroll",
             "extract",
+            "extract_detail",
             "get_visible_buttons",
             "get_text",
             "get_pages",
@@ -240,6 +292,7 @@ class LLMGenerator:
             "fill_input",
             "press_key",
             "take_screenshot",
+            "wait_for_new_page",
         ]
         
         if action not in valid_actions:
@@ -256,6 +309,8 @@ class LLMGenerator:
             return False
         if action == "extract" and "selector" not in args:
             return False
+        if action == "extract_detail":
+            return True
         if action == "get_text" and "selector" not in args:
             return False
         if action == "click_element" and "selector" not in args:
@@ -267,13 +322,7 @@ class LLMGenerator:
 
         return True
 
-    @staticmethod
-    def _truncate(text: Optional[str], limit: int = 400) -> str:
-        if not text:
-            return ""
-        if len(text) <= limit:
-            return text
-        return f"{text[:limit]}...<truncated>"
+    # use helpers in llm_logging.py for truncation/logging
     
     def clear_history(self):
         """로컬 대화 기록 초기화"""

@@ -21,6 +21,7 @@ class MessageType(str, Enum):
     CANCEL = "cancel"
     INTERRUPT = "interrupt"
     MCP_RESULT = "mcp_result"
+    PAGE_UPDATE = "page_update"
 
     # Server -> Client
     ASR_RESULT = "asr_result"

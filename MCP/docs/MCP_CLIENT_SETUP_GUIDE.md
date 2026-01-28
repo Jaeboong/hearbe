@@ -1,8 +1,9 @@
-# MCP 데스크탑 앱 설정 가이드
+# MCP Client Setup Guide
 
 ## 📋 사전 요구사항
 
-- **Python 3.9 이상**
+- **Windows 10/11**
+- **Python 3.11 권장** (패키지 호환성 안정)
 - **pip** (Python 패키지 관리자)
 - **Git**
 
@@ -171,16 +172,66 @@ pipwin install pyaudio
 playwright install --force chromium
 ```
 
-## 📦 배포
+## 📦 배포 (Windows onedir 권장)
 
-### PyInstaller로 .exe 생성
+### PyInstaller로 .exe 생성 (최신 검증됨)
+
+**권장 워크플로우 (onedir)**
+
+이유: Playwright/네이티브 DLL/리소스 경로 문제를 줄이고, 디버깅과 초기 안정성을 확보하기 위함.
+
+1. Windows에서 가상환경 생성 및 의존성 설치
+2. Playwright 브라우저 설치
+3. PyInstaller onedir 빌드
+4. `dist/MCPDesktop/`에서 실행 테스트
+5. `.env` 포함 여부 확인 (아래 참고)
+
+**빌드 명령어 (검증 완료)**
 
 ```bash
-# 단일 exe 파일 생성
+# Windows
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+playwright install chromium
+
+# onedir 빌드
+pyinstaller -y --clean --name MCPDesktop --onedir --noconsole --collect-all playwright --add-data ".env;." main.py
+```
+
+**실행 위치**
+
+- `dist\MCPDesktop\MCPDesktop.exe`에서 실행
+- `.env`는 다음 위치 중 하나에 있어야 함:
+  - exe 옆 (`dist\MCPDesktop\.env`) 우선
+  - 내부 폴더 (`dist\MCPDesktop\_internal\.env`) 대체
+
+**검증 로그 예시**
+
+- `core.config - INFO - Loaded .env file from ...`
+- `audio.audio_manager - INFO - AudioManager initialized with hotkey: space`
+
+> onedir은 배포 폴더 전체를 전달해야 하며, 실행 안정성이 높습니다.
+
+### onefile은 언제?
+
+onefile은 단일 exe 배포에 유리하지만, 실행 시 임시 폴더로 풀리는 구조라
+리소스/브라우저/DLL 경로 이슈가 더 자주 발생합니다. 초기 배포 단계에서는
+onedir로 안정성을 확보한 뒤 onefile 전환을 권장합니다.
+
+```bash
+# (참고) onefile 예시
 pyinstaller --onefile --windowed main.py
 
 # dist/ 폴더에 생성됨
 ```
+
+## ✅ 배포 체크리스트 (Client)
+
+- [ ] `dist\MCPDesktop\` 폴더 그대로 zip 배포
+- [ ] `.env` 포함 확인
+- [ ] `MCPDesktop.exe` 실행 후 로그에서 `.env` 로드 확인
+- [ ] Hotkey가 기대값으로 동작 확인
 
 ### 배포 전 체크리스트
 

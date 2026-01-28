@@ -68,6 +68,7 @@ class AudioManager:
         
         self._hotkey_pressed = False
         self._audio_thread: Optional[threading.Thread] = None
+        self._has_partial_since_last_final = False
         
         logger.info(f"AudioManager initialized with hotkey: {hotkey}")
     
@@ -120,6 +121,7 @@ class AudioManager:
             self.recording = True
             self.audio_buffer = b""
             self.record_start_time = time.time()
+            self._has_partial_since_last_final = False
         
         try:
             stream_kwargs = {
@@ -194,10 +196,11 @@ class AudioManager:
         duration = len(audio_data) / (SAMPLE_RATE * 2) if audio_data else 0
         
         # 너무 짧은 녹음은 스킵 (Whisper 환각 방지)
-        if is_final and duration < MIN_RECORDING_SEC:
-            logger.info(f"Audio too short ({duration:.2f}s), sending final signal only")
-            # 빈 final 시그널은 보내지 않음
+        if is_final and duration < MIN_RECORDING_SEC and not self._has_partial_since_last_final:
+            logger.info(f"Audio too short ({duration:.2f}s), skipping final chunk (no partials)")
             return
+        if is_final and duration < MIN_RECORDING_SEC and self._has_partial_since_last_final:
+            logger.info(f"Short final chunk ({duration:.2f}s) after partials, sending final")
         
         self.seq += 1
         
@@ -214,6 +217,11 @@ class AudioManager:
         logger.info(f"Sending {status} chunk #{self.seq} ({duration:.2f}s, {len(audio_data)} bytes)")
         
         publish_sync(EventType.AUDIO_READY, data=data, source="audio")
+
+        if is_final:
+            self._has_partial_since_last_final = False
+        else:
+            self._has_partial_since_last_final = True
     
     def _audio_loop(self):
         """오디오 처리 메인 루프 (별도 스레드)"""

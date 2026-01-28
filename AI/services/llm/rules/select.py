@@ -7,11 +7,13 @@
 from typing import Optional
 from . import BaseRule, RuleResult
 from ..context.context_rules import (
+    GeneratedCommand,
     build_click_text_command,
     build_click_command,
     build_wait_command,
 )
-from ..sites.site_manager import get_page_type
+from ..sites.site_manager import get_page_type, get_current_site
+from ..planner.selection.site_extractors import build_product_extract_command_for_site
 from core.korean_numbers import extract_ordinal_index
 
 
@@ -55,8 +57,14 @@ class SearchSelectRule(BaseRule):
                 return None
             commands = [
                 build_click_text_command(target, f"검색 결과에서 '{target}' 선택"),
+                GeneratedCommand(
+                    tool_name="wait_for_new_page",
+                    arguments={"timeout_ms": 1500, "focus": True},
+                    description="detect new tab and focus",
+                ),
                 build_wait_command(1500, "상품 페이지 로딩 대기"),
             ]
+            _append_detail_extract(commands, current_site, current_url)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -71,8 +79,14 @@ class SearchSelectRule(BaseRule):
         if selector:
             commands = [
                 build_click_command(selector, "검색 결과 첫 상품 선택"),
+                GeneratedCommand(
+                    tool_name="wait_for_new_page",
+                    arguments={"timeout_ms": 1500, "focus": True},
+                    description="detect new tab and focus",
+                ),
                 build_wait_command(1500, "상품 페이지 로딩 대기"),
             ]
+            _append_detail_extract(commands, current_site, current_url)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -81,3 +95,27 @@ class SearchSelectRule(BaseRule):
             )
 
         return None
+
+
+def _append_detail_extract(
+    commands: list[GeneratedCommand],
+    current_site,
+    current_url: str,
+):
+    if current_site is None and current_url:
+        current_site = get_current_site(current_url)
+
+    if not current_site:
+        return
+
+    detail_cmd = build_product_extract_command_for_site(current_site, current_url=current_url)
+    if not detail_cmd:
+        return
+
+    commands.append(
+        GeneratedCommand(
+            tool_name=detail_cmd.tool_name,
+            arguments=detail_cmd.arguments,
+            description=detail_cmd.description or "extract product details",
+        )
+    )

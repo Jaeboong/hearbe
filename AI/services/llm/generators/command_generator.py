@@ -128,10 +128,10 @@ class CommandGenerator:
         Returns:
             CommandResult
         """
-        import os
-        
-        # GMS_API_KEY 확인
-        if not (os.getenv("GMS_API_KEY") or os.getenv("OPENAI_API_KEY")):
+        from .llm_generator import resolve_llm_api_key
+
+        # API key availability check (configurable)
+        if not resolve_llm_api_key():
             return CommandResult(
                 commands=[],
                 response_text=f"'{user_text}' 명령을 어떻게 처리할지 모르겠습니다.",

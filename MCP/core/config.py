@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass
 from dotenv import load_dotenv
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class AudioConfig:
     sample_rate: int = 16000
     channels: int = 1
     chunk_size: int = 1024
-    hotkey: str = "v"
+    hotkey: str = "space"
     input_device_index: Optional[int] = None
 
 
@@ -117,13 +118,25 @@ class ConfigManager:
         """환경 변수 로드"""
         # 현재 파일의 부모 디렉토리(MCP/)에서 .env 파일 찾기
         current_dir = Path(__file__).parent.parent
-        env_path = current_dir / ".env"
+        exe_dir = Path(sys.executable).parent
 
-        if env_path.exists():
-            load_dotenv(env_path)
-            logger.info(f"Loaded .env file from {env_path}")
-        else:
-            logger.warning(f".env file not found at {env_path}")
+        # 우선순위: exe 옆 -> _internal -> 프로젝트 루트
+        candidates = [
+            exe_dir / ".env",
+            exe_dir / "_internal" / ".env",
+            current_dir / ".env",
+        ]
+
+        for env_path in candidates:
+            if env_path.exists():
+                load_dotenv(env_path)
+                logger.info(f"Loaded .env file from {env_path}")
+                return
+
+        logger.warning(
+            ".env file not found. Checked: "
+            + ", ".join(str(p) for p in candidates)
+        )
 
     def _get_env(self, key: str, default: str = "") -> str:
         """환경 변수 가져오기"""
@@ -160,7 +173,7 @@ class ConfigManager:
             sample_rate=self._get_env_int("AUDIO_SAMPLE_RATE", 16000),
             channels=self._get_env_int("AUDIO_CHANNELS", 1),
             chunk_size=self._get_env_int("AUDIO_CHUNK_SIZE", 1024),
-            hotkey=self._get_env("HOTKEY", "v"),
+            hotkey=self._get_env("HOTKEY", "space"),
             input_device_index=self._get_env_int_optional("AUDIO_INPUT_DEVICE_INDEX")
         )
 
