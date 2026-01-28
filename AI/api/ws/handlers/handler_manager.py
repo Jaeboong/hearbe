@@ -9,8 +9,8 @@ import logging
 from .audio_handler import AudioHandler
 from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
-from ..action_feedback import ActionFeedbackManager
-from ..tool_failure_notifier import ToolFailureNotifier
+from ..feedback.action_feedback import ActionFeedbackManager
+from ..feedback.tool_failure_notifier import ToolFailureNotifier
 
 logger = logging.getLogger(__name__)
 

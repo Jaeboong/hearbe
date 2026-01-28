@@ -77,7 +77,8 @@ class LLMGenerator:
         current_url: str = "",
         page_type: Optional[str] = None,
         available_selectors: Optional[Dict[str, str]] = None,
-        conversation_history: List[Dict[str, str]] = None
+        conversation_history: List[Dict[str, str]] = None,
+        session_context: Optional[Dict[str, Any]] = None,
     ) -> LLMResult:
         """
         LLM을 사용하여 명령 생성
@@ -110,7 +111,8 @@ class LLMGenerator:
             user_text=user_text,
             current_url=current_url,
             conversation_history=history,
-            page_context=page_context
+            page_context=page_context,
+            session_context=session_context,
         )
         logger.info(
             "LLM request: model=%s, text_len=%d, url=%s",
@@ -120,18 +122,29 @@ class LLMGenerator:
         )
         
         try:
-            # OpenAI API 호출 (blocking -> thread)
-            response = await asyncio.to_thread(
-                self.client.chat.completions.create,
-                model=self.model,
-                messages=messages,
-                response_format={"type": "json_object"},
-                max_completion_tokens=1000
-            )
-            
+            # OpenAI API 호출 (blocking -> thread), empty 응답 시 최대 2회 재시도
+            content = None
+            last_error = None
+            for attempt in range(3):
+                response = await asyncio.to_thread(
+                    self.client.chat.completions.create,
+                    model=self.model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                    max_completion_tokens=1000
+                )
+                content = response.choices[0].message.content
+                logger.info("LLM response received: chars=%d", len(content or ""))
+                if content:
+                    break
+                last_error = "empty_response"
+                if attempt < 2:
+                    logger.warning("Empty LLM response received, retrying (%d/2)", attempt + 1)
+
+            if not content:
+                raise ValueError(last_error or "empty_response")
+
             # 응답 파싱
-            content = response.choices[0].message.content
-            logger.info("LLM response received: chars=%d", len(content or ""))
             result = self._parse_response(content)
             logger.info(
                 "LLM parsed: success=%s, commands=%d, response_text_len=%d",
@@ -232,6 +245,7 @@ class LLMGenerator:
             "click_text",
             "scroll",
             "extract",
+            "extract_detail",
             "get_visible_buttons",
             "get_text",
             "get_pages",
@@ -240,6 +254,7 @@ class LLMGenerator:
             "fill_input",
             "press_key",
             "take_screenshot",
+            "wait_for_new_page",
         ]
         
         if action not in valid_actions:
@@ -256,6 +271,8 @@ class LLMGenerator:
             return False
         if action == "extract" and "selector" not in args:
             return False
+        if action == "extract_detail":
+            return True
         if action == "get_text" and "selector" not in args:
             return False
         if action == "click_element" and "selector" not in args:

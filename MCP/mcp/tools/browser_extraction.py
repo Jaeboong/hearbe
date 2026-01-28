@@ -8,7 +8,9 @@ import logging
 from typing import Any, Dict, Optional
 
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
-from browser.dynamic_extract import extract_search_results_dynamic
+from browser.extractors import extract_search_results_dynamic
+from browser.extractors.coupang_product import extract_coupang_product_options
+from browser.extractors.coupang_product import extract_coupang_product_options
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
@@ -181,6 +183,124 @@ class BrowserExtractionMixin:
         except Exception as e:
             logger.error(f"Extract failed: {e}")
             return {"success": False, "error": str(e), "products": []}
+
+    async def extract_detail(
+        self,
+        fields: Optional[list] = None,
+        field_selectors: Optional[Dict[str, str]] = None,
+        field_attributes: Optional[Dict[str, str]] = None,
+        image_selector: Optional[str] = None,
+        image_attribute: str = "src",
+        image_limit: int = 60,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+        fallback_dynamic: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Extract detail fields from a product page.
+
+        Args:
+            fields: Field names to extract
+            field_selectors: field -> selector mapping
+            field_attributes: field -> attribute mapping (e.g., value)
+            image_selector: selector for detail images
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            context_type, context, error = resolve_frame_context(
+                page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error}
+
+            field_selectors = field_selectors or {}
+            field_attributes = field_attributes or {}
+            fields = fields or list(field_selectors.keys())
+            detail: Dict[str, Any] = {}
+
+            for field in fields:
+                field_selector = field_selectors.get(field)
+                if not field_selector:
+                    continue
+
+                target = context.locator(field_selector) if context_type == "frame_locator" else context.locator(field_selector)
+                if await target.count() == 0:
+                    continue
+
+                attr = field_attributes.get(field)
+                if attr:
+                    if attr == "value":
+                        try:
+                            value = await target.first.input_value()
+                        except Exception:
+                            value = await target.first.get_attribute(attr)
+                    else:
+                        value = await target.first.get_attribute(attr)
+                    detail[field] = (value or "").strip()
+                else:
+                    value = await target.first.text_content()
+                    detail[field] = (value or "").strip()
+
+            if fallback_dynamic:
+                has_option = bool(detail.get("option") or detail.get("options"))
+                page_url = page.url or ""
+                if not has_option and "coupang.com" in page_url:
+                    try:
+                        dynamic_options = await extract_coupang_product_options(page)
+                        if dynamic_options:
+                            detail["options"] = dynamic_options
+                    except Exception as e:
+                        logger.warning(f"Dynamic option extraction failed: {e}")
+
+            images: list[str] = []
+            if image_selector:
+                img_locator = context.locator(image_selector) if context_type == "frame_locator" else context.locator(image_selector)
+                count = await img_locator.count()
+                max_items = min(count, image_limit) if image_limit > 0 else count
+                for i in range(max_items):
+                    item = img_locator.nth(i)
+                    src = await item.get_attribute(image_attribute)
+                    if not src:
+                        continue
+                    src = src.strip()
+                    if src.startswith("//"):
+                        src = f"https:{src}"
+                    images.append(src)
+
+            # 동적 fallback: 옵션 필드가 없거나 실패한 경우
+            if fallback_dynamic:
+                option_fields = {'option', 'size', 'color', 'capacity'}
+                has_option_data = any(detail.get(f) for f in option_fields if f in detail)
+
+                if not has_option_data:
+                    try:
+                        dynamic_options = await extract_coupang_product_options(page)
+                        if dynamic_options:
+                            detail['options'] = dynamic_options
+                            logger.info(f"Dynamic option extraction succeeded: {dynamic_options}")
+                    except Exception as e:
+                        logger.warning(f"Dynamic option extraction failed: {e}")
+
+            return {
+                "success": True,
+                "detail": detail,
+                "detail_images": images,
+                "images": images,
+                "count": len(images),
+                "page_url": page.url,
+            }
+        except Exception as e:
+            logger.error(f"Extract detail failed: {e}")
+            return {"success": False, "error": str(e)}
 
     async def get_visible_buttons(self, max_items: int = 200) -> Dict[str, Any]:
         """

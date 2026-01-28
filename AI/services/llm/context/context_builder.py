@@ -85,6 +85,17 @@ AVAILABLE_COMMANDS = {
         },
         "example": """{"tool_name": "extract", "arguments": {"selector": ".search-product", "fields": ["name", "price"], "limit": 20}, "description": "Extract search results"}"""
     },
+    "extract_detail": {
+        "description": "Extract product detail fields on a product page",
+        "args": {
+            "fields": "Field names to extract",
+            "field_selectors": "Field -> selector mapping",
+            "field_attributes": "Field -> attribute mapping (optional)",
+            "image_selector": "Selector for detail images (optional)",
+            "image_attribute": "Image attribute (optional)",
+        },
+        "example": """{"tool_name": "extract_detail", "arguments": {"fields": ["name", "price"], "field_selectors": {"name": "h1.product-title span", "price": ".final-price-amount"}}, "description": "Extract product detail"}"""
+    },
     "get_text": {
         "description": "Get text content from an element",
         "args": {
@@ -110,6 +121,11 @@ AVAILABLE_COMMANDS = {
         "description": "Capture a screenshot",
         "args": {"full_page": "Capture full page if true (optional)"},
         "example": """{"tool_name": "take_screenshot", "arguments": {"full_page": true}, "description": "Capture full page screenshot"}"""
+    },
+    "wait_for_new_page": {
+        "description": "Wait for a new tab/page and optionally focus it",
+        "args": {"timeout_ms": "Timeout in ms (optional)", "focus": "Focus new page if true (optional)"},
+        "example": """{"tool_name": "wait_for_new_page", "arguments": {"timeout_ms": 1500, "focus": true}, "description": "Wait for new page and focus"}"""
     }
 }
 
@@ -182,13 +198,24 @@ class ContextBuilder:
         user_text: str,
         current_url: str,
         conversation_history: List[Dict[str, str]] = None,
-        page_context: PageContext = None
+        page_context: PageContext = None,
+        session_context: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, str]]:
         """
         Build OpenAI messages for the current request.
         """
-        search_results = self._extract_search_results(conversation_history)
-        system_prompt = self._build_system_prompt(current_url, page_context, search_results)
+        search_results = self._select_search_results(session_context, conversation_history)
+        product_detail = self._select_product_detail(session_context, conversation_history)
+        previous_url = None
+        if session_context:
+            previous_url = session_context.get("previous_url")
+        system_prompt = self._build_system_prompt(
+            current_url,
+            page_context,
+            search_results,
+            product_detail,
+            previous_url,
+        )
 
         messages = [{"role": "system", "content": system_prompt}]
 
@@ -207,7 +234,9 @@ class ContextBuilder:
         self,
         current_url: str,
         page_context: PageContext = None,
-        search_results: List[Any] = None
+        search_results: List[Any] = None,
+        product_detail: Optional[Dict[str, Any]] = None,
+        previous_url: Optional[str] = None,
     ) -> str:
         """Build the system prompt."""
         if page_context is None:
@@ -217,6 +246,8 @@ class ContextBuilder:
         commands_doc = self._format_commands()
         selectors_doc = self._format_selectors(page_context.selectors)
         search_results_section = self._format_search_results_section(search_results)
+        product_detail_section = self._format_product_detail_section(product_detail)
+        url_context_section = self._format_url_context(current_url, previous_url)
 
         output_example = json.dumps(
             {
@@ -244,6 +275,7 @@ class ContextBuilder:
 - Page type: {page_context.page_type}
 - URL: {current_url}
 - Available actions: {', '.join(page_context.available_actions)}
+{url_context_section}
 
 ## Available commands
 {commands_doc}
@@ -252,12 +284,15 @@ class ContextBuilder:
 {selectors_doc}
 
 {search_results_section}
+{product_detail_section}
 ## Rules
 1. Respond with JSON only.
 2. Commands are executed in order.
 3. If a selector is uncertain, use click_text.
 4. Add wait before or after navigation when needed.
-5. Always include a "commands" array. If no command is needed, return an empty list and ask a clarifying question in "response".
+5. If the request is informational and can be answered from context, return an answer with an empty "commands" list.
+6. If the request requires an action (click, input, navigation), include appropriate commands and a brief response.
+7. If you lack necessary info, ask a clarification with empty commands.
 
 ## Output format
 {output_example}
@@ -284,7 +319,18 @@ If the request cannot be understood:
             lines.append(f"- {name}: {selector}")
         return "\n".join(lines)
 
-    def _extract_search_results(self, conversation_history: List[Dict[str, Any]] = None) -> List[Any]:
+    def _select_search_results(
+        self,
+        session_context: Optional[Dict[str, Any]] = None,
+        conversation_history: List[Dict[str, Any]] = None,
+    ) -> List[Any]:
+        if session_context:
+            results = session_context.get("search_active_results") or session_context.get("search_results")
+            if isinstance(results, list) and results:
+                return results
+        return self._extract_search_results_from_history(conversation_history)
+
+    def _extract_search_results_from_history(self, conversation_history: List[Dict[str, Any]] = None) -> List[Any]:
         if not conversation_history:
             return []
 
@@ -309,32 +355,69 @@ If the request cannot be understood:
                 results = data
         return results
 
+    def _select_product_detail(
+        self,
+        session_context: Optional[Dict[str, Any]] = None,
+        conversation_history: List[Dict[str, Any]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        if session_context:
+            detail = session_context.get("product_detail")
+            if isinstance(detail, dict) and detail:
+                return detail
+        # Product detail is not stored in history currently.
+        return None
+
     def _format_search_results_section(self, search_results: List[Any] = None) -> str:
         if not search_results:
             return ""
 
-        names: List[str] = []
+        items: List[Dict[str, Any]] = []
         for item in search_results:
             if isinstance(item, dict):
-                name = item.get("name") or item.get("title") or item.get("product_name")
-            else:
-                name = str(item)
-            if name:
-                names.append(name.strip())
+                items.append(item)
 
-        if not names:
+        if not items:
             return ""
 
-        max_items = 15
+        max_items = len(items)
         lines = ["## Search Results (most recent)"]
-        for name in names[:max_items]:
-            lines.append(f"- {name}")
-        if len(names) > max_items:
-            lines.append(f"... and {len(names) - max_items} more")
-
+        for item in items[:max_items]:
+            entry = {
+                "index": item.get("index"),
+                "name": item.get("name") or item.get("title") or item.get("product_name"),
+                "price": item.get("price"),
+                "rating": item.get("rating"),
+                "review_count": item.get("review_count"),
+                "discount": item.get("discount"),
+                "delivery": item.get("delivery") or item.get("delivery_date"),
+                "free_shipping": item.get("free_shipping"),
+                "free_return": item.get("free_return"),
+            }
+            lines.append(json.dumps(entry, ensure_ascii=True))
         lines.append("")
         lines.append("## Selection Rule")
         lines.append("- If user text matches an item above, prefer click_text with that name.")
         lines.append("- Do not run a new search when a match exists.")
         lines.append("- If no match and the intent is search, run a new search.")
         return "\n".join(lines)
+
+    def _format_product_detail_section(self, product_detail: Optional[Dict[str, Any]] = None) -> str:
+        if not product_detail:
+            return ""
+
+        detail = {
+            "name": product_detail.get("name"),
+            "price": product_detail.get("price"),
+            "discount": product_detail.get("discount"),
+            "quantity": product_detail.get("quantity"),
+            "option": product_detail.get("option"),
+            "options": product_detail.get("options"),
+        }
+        lines = ["## Product Detail (current)"]
+        lines.append(json.dumps(detail, ensure_ascii=True))
+        return "\n".join(lines)
+
+    def _format_url_context(self, current_url: str, previous_url: Optional[str]) -> str:
+        if not previous_url:
+            return ""
+        return f"- Previous URL: {previous_url}"
