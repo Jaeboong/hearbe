@@ -1,0 +1,325 @@
+.store-container {
+    width: 50vw;
+    height: 50vh;
+    transform: scale(2);
+    transform-origin: 0 0;
+    position: relative;
+    background-color: #f2f2f2;
+}
+
+/* Back Button Component Override */
+.store-container .global-back-button {
+    transform: scale(0.5);
+    /* Counteract x2 scale */
+    transform-origin: top left;
+    left: 40px;
+    top: 40px;
+}
+
+
+
+.store-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* --- Hamburger & Menu --- */
+.hamburger-overlay {
+    position: fixed;
+    bottom: 50px;
+    left: 40px;
+    width: 100px;
+    height: 100px;
+    background-color: #141C29;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1200;
+}
+
+.hamburger-line {
+    width: 50px;
+    height: 6px;
+    background-color: #FFF064;
+    border-radius: 3px;
+}
+
+.close-x {
+    font-size: 70px;
+    color: #FFF064;
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* Menu Bubble */
+.menu-bubble {
+    position: fixed;
+    bottom: 180px;
+    left: 40px;
+    background-color: #141C29;
+    /* Navy Background */
+    border-radius: 30px;
+    /* Larger radius */
+    padding: 30px 50px;
+    /* Larger padding */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    z-index: 1205;
+    animation: fadeIn 0.3s ease-out;
+    border: 2px solid #FFF064;
+    /* Yellow border for contrast */
+}
+
+/* Bubble Arrow */
+.menu-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 40px;
+    /* Align with button */
+    border-width: 20px 20px 0;
+    border-style: solid;
+    border-color: #141C29 transparent transparent transparent;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    /* Increased gap */
+}
+
+.menu-item {
+    font-size: 50px;
+    /* Increased font size */
+    font-weight: bold;
+    color: #FFF064;
+    /* Yellow text */
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 15px 0;
+    cursor: pointer;
+    border-bottom: 2px solid rgba(255, 240, 100, 0.2);
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-icon {
+    width: 50px;
+    /* generic icon size */
+    height: 50px;
+    object-fit: contain;
+}
+
+.menu-text {
+    font-size: 50px;
+    font-weight: 900;
+    color: #FFF064;
+    white-space: nowrap;
+}
+
+/* Close Button in Bubble */
+.close-bubble {
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    background: #141C29;
+    color: #FFF064;
+    width: 100px;
+    /* Increased to match hamburger */
+    height: 100px;
+    /* Increased to match hamburger */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 50px;
+    /* Increased font size */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #FFF064;
+}
+
+/* --- Share Modal --- */
+.modal-overlay-dark,
+.share-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.share-modal-content,
+.share-modal-box {
+    width: 900px;
+    background-color: #141C29;
+    border-radius: 50px;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    border: 4px solid #FFF064;
+}
+
+.share-modal-title,
+.share-title {
+    font-size: 70px;
+    font-weight: 900;
+    color: #FFF064;
+}
+
+.share-code-box {
+    border: 6px solid #FFF064;
+    border-radius: 40px;
+    padding: 30px 100px;
+    font-size: 100px;
+    font-weight: 900;
+    color: #FFF064;
+    background-color: transparent;
+    letter-spacing: 20px;
+}
+
+.share-modal-desc,
+.share-desc {
+    font-size: 45px;
+    color: #FAFAFA;
+    font-weight: bold;
+}
+
+.share-modal-btns,
+.share-btn-row {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+    justify-content: center;
+}
+
+.sm-btn,
+.share-btn-cancel,
+.share-btn-enter {
+    padding: 20px 60px;
+    border-radius: 20px;
+    border: 4px solid #FFF064;
+    font-size: 50px;
+    font-weight: 900;
+    cursor: pointer;
+    min-width: 250px;
+    background-color: transparent;
+    color: #FAFAFA;
+}
+
+.sm-btn.confirm,
+.share-btn-enter {
+    background-color: #FFF064;
+    color: #141C29;
+}
+
+/* --- Sharing UI --- */
+.sharing-header {
+    position: fixed;
+    top: 30px;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    z-index: 1500;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+    pointer-events: none;
+}
+
+.sharing-pill,
+.participant-pill {
+    pointer-events: auto;
+    background-color: #141C29;
+    color: #FFF064;
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 35px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.p-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.sharing-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #141C29;
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    z-index: 1300;
+}
+
+.sharing-btn {
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #FFF064;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.sharing-btn.highlight {
+    background-color: #FFF064;
+    color: #141C29;
+    padding: 10px 40px;
+    border-radius: 20px;
+    flex-direction: row;
+    height: 100px;
+    align-self: center;
+}
+
+.s-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
