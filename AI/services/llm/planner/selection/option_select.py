@@ -201,4 +201,5 @@ def _build_option_selector(option_name: str) -> str:
     return (
         '.option-table-v2 '
         f'.option-table-list__option:has(.option-table-list__option-name:has-text("{safe_text}"))'
+        f', .custom-scrollbar .select-item:has-text("{safe_text}")'
     )

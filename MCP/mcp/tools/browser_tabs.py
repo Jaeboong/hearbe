@@ -53,3 +53,41 @@ class BrowserTabsMixin:
 
         logger.info("Detected new page and focused")
         return {"success": True, "new_page": True, "page_url": new_page.url}
+
+    async def get_pages(self) -> Dict[str, Any]:
+        """
+        Return a list of open pages/tabs.
+
+        Returns:
+            {"success": bool, "pages": list, "count": int}
+        """
+        if not self.is_connected:
+            return {"success": False, "error": "Not connected to browser", "pages": []}
+
+        try:
+            pages: list[Dict[str, Any]] = []
+            for context in self._browser.contexts:
+                for page in context.pages:
+                    if page.is_closed():
+                        continue
+                    url = page.url or ""
+                    title = ""
+                    if "/" in url:
+                        parts = url.split("/")
+                        if len(parts) > 2:
+                            title = parts[2]
+                    pages.append(
+                        {
+                            "index": len(pages),
+                            "url": url,
+                            "title": title or url,
+                            "is_current": False,
+                        }
+                    )
+
+            if pages:
+                pages[-1]["is_current"] = True
+            return {"success": True, "pages": pages, "count": len(pages)}
+        except Exception as e:
+            logger.error(f"Get pages failed: {e}")
+            return {"success": False, "error": str(e), "pages": []}

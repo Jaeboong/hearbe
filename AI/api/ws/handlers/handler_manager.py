@@ -12,6 +12,7 @@ from .audio_handler import AudioHandler
 from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
 from ..feedback.action_feedback import ActionFeedbackManager
+from ..feedback.login_guard import LoginGuard
 from ..feedback.tool_failure_notifier import ToolFailureNotifier
 
 logger = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ class HandlerManager:
 
         self._action_feedback = ActionFeedbackManager(sender)
         self._failure_notifier = ToolFailureNotifier(sender)
+        self._login_guard = LoginGuard(session_manager, sender, self._action_feedback)
 
         self._text_handler = TextHandler(
             nlu_service=nlu_service,
@@ -42,7 +44,8 @@ class HandlerManager:
             flow_engine=flow_engine,
             session_manager=session_manager,
             sender=sender,
-            action_feedback=self._action_feedback
+            action_feedback=self._action_feedback,
+            login_guard=self._login_guard
         )
         self._audio_handler = AudioHandler(
             asr_service=asr_service,
@@ -53,7 +56,8 @@ class HandlerManager:
             sender=sender,
             session_manager=session_manager,
             action_feedback=self._action_feedback,
-            failure_notifier=self._failure_notifier
+            failure_notifier=self._failure_notifier,
+            login_guard=self._login_guard
         )
 
     async def create_session(self, session_id: str):
@@ -64,6 +68,7 @@ class HandlerManager:
         await self._audio_handler.cleanup_session(session_id)
         await self._text_handler.cleanup_session(session_id)
         self._action_feedback.clear_pending(session_id)
+        self._login_guard.clear_pending(session_id)
         self._mcp_handler.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
@@ -85,6 +90,7 @@ class HandlerManager:
         await self._audio_handler.clear_audio(session_id)
         await self._text_handler.handle_cancel(session_id)
         self._action_feedback.clear_pending(session_id)
+        self._login_guard.clear_pending(session_id)
 
     async def handle_interrupt(self, session_id: str):
         await self._audio_handler.clear_audio(session_id)

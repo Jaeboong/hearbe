@@ -96,6 +96,11 @@ AVAILABLE_COMMANDS = {
         },
         "example": """{"tool_name": "extract_detail", "arguments": {"fields": ["name", "price"], "field_selectors": {"name": "h1.product-title span", "price": ".final-price-amount"}}, "description": "Extract product detail"}"""
     },
+    "extract_cart": {
+        "description": "Extract cart items and summary on cart page",
+        "args": {},
+        "example": """{"tool_name": "extract_cart", "arguments": {}, "description": "Extract cart items"}"""
+    },
     "get_text": {
         "description": "Get text content from an element",
         "args": {

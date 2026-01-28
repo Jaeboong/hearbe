@@ -13,6 +13,7 @@ from typing import Dict, Optional, List, Any
 from services.llm.sites.site_manager import get_selector
 from services.llm.sites.site_manager import get_site_manager
 from core.interfaces import MCPCommand
+from ..utils.temp_file_manager import TempFileManager
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ class ActionFeedbackManager:
     def __init__(self, sender):
         self._sender = sender
         self._pending: Dict[str, PendingAction] = {}
+        self._file_manager = TempFileManager()
 
     def register_commands(self, session_id: str, commands: List, current_url: str) -> Optional[str]:
         """
@@ -87,8 +89,18 @@ class ActionFeedbackManager:
 
         # Verification phase: check cart contents after navigation/extract
         if pending.action_type == "add_to_cart_verify":
-            if tool_name == "extract":
-                products = (result or {}).get("products") or []
+            if tool_name == "extract_cart":
+                products = (result or {}).get("cart_items") or []
+                self._file_manager.save_json(
+                    data={
+                        "success": success,
+                        "products": products,
+                        "page_url": (result or {}).get("page_url"),
+                    },
+                    session_id=session_id,
+                    category="cart_verify",
+                    filename_prefix="cart_verify"
+                )
                 if success and products:
                     await self._sender.send_tts_response(
                         session_id,
@@ -128,7 +140,7 @@ class ActionFeedbackManager:
             self._pending[session_id] = PendingAction(
                 action_type="add_to_cart_verify",
                 selector=None,
-                tool_name="extract",
+                tool_name="extract_cart",
                 current_url=pending.current_url
             )
             return True
@@ -140,45 +152,32 @@ class ActionFeedbackManager:
             self._pending.pop(session_id, None)
             return True
 
+    
+    
     def _build_verify_add_to_cart_commands(self, current_url: str) -> List[MCPCommand]:
         site = get_site_manager().get_site_by_url(current_url)
         if not site:
             return []
 
         cart_url = site.get_url("cart")
-        cart_item_selector = site.get_selector("cart", "cart_item")
-        item_title_selector = site.get_selector("cart", "item_title")
-        item_price_selector = site.get_selector("cart", "item_price")
-
-        if not cart_url or not cart_item_selector:
+        if not cart_url:
             return []
-
-        field_selectors: Dict[str, str] = {}
-        if item_title_selector:
-            field_selectors["name"] = item_title_selector
-        if item_price_selector:
-            field_selectors["price"] = item_price_selector
 
         commands = [
             MCPCommand(
                 tool_name="goto",
                 arguments={"url": cart_url},
-                description="장바구니 페이지 이동"
+                description="Go to cart page"
             ),
             MCPCommand(
                 tool_name="wait",
                 arguments={"ms": 1500},
-                description="장바구니 페이지 로딩 대기"
+                description="Wait for cart page load"
             ),
             MCPCommand(
-                tool_name="extract",
-                arguments={
-                    "selector": cart_item_selector,
-                    "fields": list(field_selectors.keys()) or ["name"],
-                    "field_selectors": field_selectors,
-                    "limit": 5
-                },
-                description="장바구니 아이템 확인"
+                tool_name="extract_cart",
+                arguments={},
+                description="Extract cart items"
             )
         ]
         return commands

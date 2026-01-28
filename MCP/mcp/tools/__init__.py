@@ -11,6 +11,7 @@ from mcp.tool_utils import normalize_tool_call
 from .browser_connection import BrowserConnectionMixin
 from .browser_actions import BrowserActionsMixin
 from .browser_extraction import BrowserExtractionMixin
+from .browser_state import BrowserStateMixin
 from .browser_utilities import BrowserUtilitiesMixin
 from .browser_tabs import BrowserTabsMixin
 
@@ -21,6 +22,7 @@ class BrowserTools(
     BrowserConnectionMixin,
     BrowserActionsMixin,
     BrowserExtractionMixin,
+    BrowserStateMixin,
     BrowserUtilitiesMixin,
     BrowserTabsMixin,
 ):
@@ -55,12 +57,14 @@ class BrowserTools(
             "get_text": self.get_text,
             "extract": self.extract,
             "extract_detail": self.extract_detail,
+            "extract_cart": self.extract_cart,
             "take_screenshot": self.take_screenshot,
             "scroll": self.scroll,
             "press_key": self.press_key,
             "wait": self.wait,
             "click_text": self.click_text,
             "get_visible_buttons": self.get_visible_buttons,
+            "check_login_status": self.check_login_status,
             "get_pages": self.get_pages,
             "wait_for_new_page": self.wait_for_new_page,
         }
