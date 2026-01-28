@@ -25,6 +25,7 @@ except ImportError:
 from ..context.context_builder import ContextBuilder, get_page_context, PageContext
 from ..context.context_rules import GeneratedCommand
 from ..sites.site_manager import get_site_manager
+from .llm_logging import log_llm_request, log_llm_response, truncate
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +72,11 @@ class LLMGenerator:
         # Allow env-based key selection
         self.api_key = resolve_llm_api_key(api_key)
         self.model = model
-        self.base_url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1"
+        self.base_url = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
+        try:
+            self.max_tokens = int(os.environ.get("LLM_MAX_TOKENS", "1000"))
+        except ValueError:
+            self.max_tokens = 1000
         self.context_builder = ContextBuilder()
         self._client = None
         
@@ -142,6 +147,16 @@ class LLMGenerator:
             len(user_text),
             current_url or "(empty)"
         )
+        token_param = "max_completion_tokens"
+        log_llm_request(
+            logger,
+            model=self.model,
+            base_url=self.base_url,
+            messages=messages,
+            max_tokens=self.max_tokens,
+            response_format={"type": "json_object"},
+            token_param=token_param,
+        )
         
         try:
             # OpenAI API 호출 (blocking -> thread), empty 응답 시 최대 2회 재시도
@@ -153,10 +168,11 @@ class LLMGenerator:
                     model=self.model,
                     messages=messages,
                     response_format={"type": "json_object"},
-                    max_completion_tokens=1000
+                    max_completion_tokens=self.max_tokens,
                 )
                 content = response.choices[0].message.content
                 logger.info("LLM response received: chars=%d", len(content or ""))
+                log_llm_response(logger, response, content)
                 if content:
                     break
                 last_error = "empty_response"
@@ -209,7 +225,7 @@ class LLMGenerator:
                 logger.warning(
                     "LLM response missing commands/tool_calls. keys=%s content=%s",
                     list(data.keys()),
-                    self._truncate(content)
+                    truncate(content)
                 )
                 commands_data = []
             
@@ -241,10 +257,10 @@ class LLMGenerator:
             )
             if not commands:
                 logger.warning(
-                    "LLM produced no commands. response_text=%s content=%s",
-                    self._truncate(response_text),
-                    self._truncate(content)
-                )
+                "LLM produced no commands. response_text=%s content=%s",
+                truncate(response_text),
+                truncate(content)
+            )
             return result
             
         except json.JSONDecodeError as e:
@@ -306,13 +322,7 @@ class LLMGenerator:
 
         return True
 
-    @staticmethod
-    def _truncate(text: Optional[str], limit: int = 400) -> str:
-        if not text:
-            return ""
-        if len(text) <= limit:
-            return text
-        return f"{text[:limit]}...<truncated>"
+    # use helpers in llm_logging.py for truncation/logging
     
     def clear_history(self):
         """로컬 대화 기록 초기화"""
