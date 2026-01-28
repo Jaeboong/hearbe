@@ -173,10 +173,44 @@ playwright install --force chromium
 
 ## 📦 배포
 
-### PyInstaller로 .exe 생성
+### PyInstaller로 .exe 생성 (권장: onedir)
+
+**권장 워크플로우 (onedir)**
+
+이유: Playwright/네이티브 DLL/리소스 경로 문제를 줄이고, 디버깅과 초기 안정성을 확보하기 위함.
+
+1. Windows에서 가상환경 생성 및 의존성 설치
+2. Playwright 브라우저 설치
+3. PyInstaller onedir 빌드
+4. `dist/앱폴더/`에서 실행 테스트
+5. 필요 시 `.env`를 `dist/앱폴더/`에 복사해 설정 적용
+
+예시:
 
 ```bash
-# 단일 exe 파일 생성
+# Windows
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+playwright install chromium
+
+# onedir 빌드
+pyinstaller -y --clean --name MCPDesktop --onedir --noconsole ^
+  --collect-all playwright ^
+  --add-data ".env;." ^
+  main.py
+```
+
+> onedir은 배포 폴더 전체를 전달해야 하며, 실행 안정성이 높습니다.
+
+### onefile은 언제?
+
+onefile은 단일 exe 배포에 유리하지만, 실행 시 임시 폴더로 풀리는 구조라
+리소스/브라우저/DLL 경로 이슈가 더 자주 발생합니다. 초기 배포 단계에서는
+onedir로 안정성을 확보한 뒤 onefile 전환을 권장합니다.
+
+```bash
+# (참고) onefile 예시
 pyinstaller --onefile --windowed main.py
 
 # dist/ 폴더에 생성됨
