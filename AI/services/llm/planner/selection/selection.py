@@ -3,6 +3,7 @@ Selection helpers for applying recent search results to user requests.
 """
 
 from typing import Optional
+import re
 
 from core.interfaces import LLMResponse, MCPCommand, SessionState
 from core.korean_numbers import extract_ordinal_index
@@ -22,6 +23,9 @@ def select_from_results(
 
     target = user_text.strip().lower()
     if not target:
+        return None
+
+    if _is_ranking_query(target):
         return None
 
     ordinal_index = extract_ordinal_index(target)
@@ -102,6 +106,19 @@ def select_from_results(
         requires_flow=False,
         flow_type=None
     )
+
+
+def _is_ranking_query(text: str) -> bool:
+    if not text:
+        return False
+    # Ranking/superlative queries should be handled by LLM, not ordinal selection.
+    if re.search(r"\d+\s*(?:번째|번)", text):
+        return False
+    keywords = [
+        "가장", "제일", "최고", "최대", "최저",
+        "높은", "낮은", "많은", "적은", "싼", "저렴", "비싼",
+    ]
+    return any(k in text for k in keywords)
 
 
 def _build_click_nth_result_commands(
