@@ -411,6 +411,7 @@ If the request cannot be understood:
             "discount": product_detail.get("discount"),
             "quantity": product_detail.get("quantity"),
             "option": product_detail.get("option"),
+            "options": product_detail.get("options"),
         }
         lines = ["## Product Detail (current)"]
         lines.append(json.dumps(detail, ensure_ascii=True))

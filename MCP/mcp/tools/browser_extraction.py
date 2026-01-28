@@ -10,6 +10,7 @@ from typing import Any, Dict, Optional
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
 from browser.extractors import extract_search_results_dynamic
 from browser.extractors.coupang_product import extract_coupang_product_options
+from browser.extractors.coupang_product import extract_coupang_product_options
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
@@ -248,6 +249,17 @@ class BrowserExtractionMixin:
                 else:
                     value = await target.first.text_content()
                     detail[field] = (value or "").strip()
+
+            if fallback_dynamic:
+                has_option = bool(detail.get("option") or detail.get("options"))
+                page_url = page.url or ""
+                if not has_option and "coupang.com" in page_url:
+                    try:
+                        dynamic_options = await extract_coupang_product_options(page)
+                        if dynamic_options:
+                            detail["options"] = dynamic_options
+                    except Exception as e:
+                        logger.warning(f"Dynamic option extraction failed: {e}")
 
             images: list[str] = []
             if image_selector:

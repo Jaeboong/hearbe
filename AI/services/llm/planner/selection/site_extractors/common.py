@@ -75,6 +75,7 @@ def _build_extract_command_from_selectors(
             "image_selector": image_selector,
             "image_attribute": "src",
             "image_limit": 80,
+            "fallback_dynamic": True,
         },
         description="extract product detail fields"
     )
