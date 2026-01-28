@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FindIdResponse {
 
-    @JsonProperty("user_id")
+    @JsonProperty("username")
     private String username;
 
     private String message;

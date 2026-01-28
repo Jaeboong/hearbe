@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @JsonProperty("user_id")
+    @JsonProperty("username")
     @NotBlank(message = "아이디는 필수입니다.")
     private String username;
 

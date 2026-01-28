@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SignupRequest {
 
-    @JsonProperty("user_id")
+    @JsonProperty("username")
     @NotBlank(message = "아이디는 필수입니다.")
     @Size(min = 4, max = 30, message = "아이디는 4~30자 사이여야 합니다.")
     private String username;
