@@ -224,7 +224,9 @@ TYPE_DETECTION_KEYWORDS: Dict[ProductType, List[str]] = {
     ],
     ProductType.의류: [
         "의류", "옷", "티셔츠", "셔츠", "바지", "치마", "원피스",
-        "자켓", "코트", "패딩", "니트", "후드"
+        "자켓", "코트", "패딩", "니트", "후드", "팬츠", "SIZE",
+        "사이즈", "허리", "총장", "면", "폴리", "소재", "세탁",
+        "와이드", "슬랙스", "청바지"
     ],
     ProductType.신발: [
         "신발", "운동화", "구두", "슬리퍼", "샌들", "부츠", "스니커즈"
@@ -315,6 +317,12 @@ TYPE_DESCRIPTIONS: Dict[ProductType, str] = {
 
 
 CORE_KEYWORD_WEIGHTS: Dict[ProductType, Dict[str, int]] = {
+    ProductType.의류: {
+        "SIZE": 10, "사이즈": 10, "허리": 5, "총장": 5, "팬츠": 5,
+        "바지": 5, "티셔츠": 5, "셔츠": 5, "원피스": 5, "치마": 5,
+        "와이드": 4, "슬랙스": 4, "면": 3, "폴리": 3, "소재": 3,
+        "M": 2, "L": 2, "XL": 2, "FREE": 3,
+    },
     ProductType.헤어케어: {
         "샴푸": 5, "린스": 5, "트리트먼트": 5, "두피": 4, "모발": 4,
         "탈모": 4, "스칼프": 4, "헤어케어": 5, "케어샴푸": 5, "컨디셔너": 5,
@@ -390,6 +398,18 @@ def override_product_type(
 ) -> ProductType:
     """OCR 텍스트 기반으로 제품 타입 오버라이드"""
     joined = " ".join(texts)
+
+    # SIZE 관련 키워드가 있으면 무조건 의류로 판단
+    size_keywords = ["SIZE", "사이즈", "허리", "총장", "영덩이", "왓밀위", "뜻밀위", "밀단"]
+    size_labels = ["M", "L", "XL", "2XL", "3XL", "FREE"]
+
+    # SIZE 키워드 + 사이즈 라벨이 함께 있으면 의류 확정
+    has_size_keyword = any(kw in joined.upper() for kw in size_keywords)
+    has_size_label = any(f" {label} " in f" {joined.upper()} " or f"|{label}|" in joined.upper() for label in size_labels)
+
+    if has_size_keyword and has_size_label:
+        return ProductType.의류
+
     scores = {}
     strong_hits = {}
 

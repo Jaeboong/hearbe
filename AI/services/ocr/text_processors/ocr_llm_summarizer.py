@@ -53,7 +53,7 @@ def _load_ocr_texts(path: str, preprocess: bool = True) -> Tuple[List[str], Dict
     return texts, data
 
 
-def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]:
+def _build_prompt(texts: List[str], product_type: ProductType, size_table: str = None) -> Dict[str, str]:
     numbered = "\n".join(f"{i + 1}. {t}" for i, t in enumerate(texts))
 
     system = (
@@ -61,6 +61,7 @@ def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]
         "안전을 책임지는 **꼼꼼한 확인자**입니다. "
         "기계적인 요약 대신 **사용자가 바로 옆에 있는 것처럼** 제품의 매력(소재, 기능, 맛, 특징)을 생생하게 설명하세요. "
         "단, 안전과 직결된 **숫자, 유통기한, 전압, 성분 등은 절대로 추측하지 말고** OCR 텍스트에 적힌 그대로 정확하게 전달해야 합니다."
+        "원산지 정보도 꼭 전달해주세요"
     )
     
     # 의류/신발/패션잡화일 때 사이즈 정보 필수 지시
@@ -122,7 +123,15 @@ def _build_prompt(texts: List[str], product_type: ProductType) -> Dict[str, str]
     )
     
     user = "분석할 OCR 텍스트:\n" + numbered
-    
+
+    # SIZE 표가 재구성되었으면 추가
+    if size_table:
+        user += "\n\n**📏 재구성된 SIZE 표 (좌표 기반 정렬)**:\n"
+        user += "```\n"
+        user += size_table
+        user += "\n```\n"
+        user += "위 표를 참고하여 모든 사이즈 정보를 정확히 요약에 포함하세요."
+
     return {"system": system, "instructions": instructions, "user": user}
 
 
@@ -205,6 +214,7 @@ def summarize_texts(
     verbose: bool = True,
     use_cache: bool = True,
     prompt_version: str = "v1",
+    size_table: str = None,
 ) -> Dict:
     if not texts:
         return {
@@ -236,8 +246,8 @@ def summarize_texts(
                 print("    LLM summary cache hit")
             return cached
 
-    prompt = _build_prompt(texts, product_type)
-    
+    prompt = _build_prompt(texts, product_type, size_table)
+
     if verbose:
         print("    LLM API 호출 중...", end="", flush=True)
     summary = _call_openai(prompt)
@@ -347,8 +357,8 @@ def main() -> int:
     print(f"감지된 제품 타입: {product_type.value} ({type_desc})")
     print(f"추출 목표 키워드: {', '.join(get_keywords_for_type(product_type))}")
 
-    prompt = _build_prompt(texts, product_type)
-    
+    prompt = _build_prompt(texts, product_type, None)
+
     print("LLM 분석 중...", end="", flush=True)
     summary = _call_openai(prompt)
     print(" 완료!")
