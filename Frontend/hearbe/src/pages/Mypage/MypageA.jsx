@@ -19,7 +19,7 @@ const Mypage = () => {
 
     return (
         <div className="mypage-container">
-            {/* 1. 상단 네비게이션 (홈/카트/마이) - 가장 위로 뺐어! */}
+            {/* 1. 상단 네비게이션 (홈/카트/마이)*/}
             <div className="top-nav-area">
                 <div className="header-nav">
                     <div className="nav-item" onClick={() => navigate('/mall')}>

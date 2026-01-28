@@ -6,7 +6,7 @@
 ## API Specification
 
 ### Endpoint
-- **URL**: `/auth/regist`
+- **URL**: `/api/auth/regist`
 - **Method**: POST
 - **Content-Type**: application/json
 

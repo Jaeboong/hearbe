@@ -91,7 +91,7 @@ body {
 }
 
 .signup-box {
-    width: clamp(300px, 95vw, 750px);
+    width: clamp(300px, 80vw, 700px);
     padding: clamp(8px, 2vw, 16px);
     display: flex;
     flex-direction: column;
@@ -162,7 +162,7 @@ body {
     flex: 1;
     border: none;
     padding: clamp(4px, 1vw, 8px);
-    font-size: clamp(16px, 5vw, 28px);
+    font-size: clamp(18px, 5vw, 36px);
     letter-spacing: clamp(1px, 0.2vw, 2px);
     height: auto;
     min-width: 0;
@@ -177,7 +177,7 @@ body {
 .check-btn {
     padding: clamp(6px, 1.5vw, 12px) clamp(12px, 3vw, 24px);
     border-radius: clamp(6px, 1.5vw, 12px);
-    font-size: clamp(14px, 4vw, 24px);
+    font-size: clamp(16px, 5vw, 28px);
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: clamp(0.5px, 0.1vw, 1px);
@@ -187,7 +187,7 @@ body {
 /* 라벨 텍스트 */
 .label {
     flex-grow: 1;
-    font-size: clamp(18px, 6vw, 36px);
+    font-size: clamp(22px, 7vw, 42px);
     letter-spacing: clamp(1px, 0.2vw, 2px);
 }
 
@@ -215,7 +215,7 @@ body {
 
 .camera-text {
     font-weight: bold;
-    font-size: clamp(16px, 5vw, 28px);
+    font-size: clamp(18px, 6vw, 36px);
     letter-spacing: clamp(1px, 0.2vw, 2px);
 }
 
@@ -602,7 +602,7 @@ body:has(.modal-overlay) .global-back-button {
    9. 에러/성공 모달
    ========================================= */
 .error-modal-box {
-    width: 80vw;
+    width: 60vw;
     background-color: var(--bg-dark);
     border: 0.5vw solid var(--accent-yellow);
     border-radius: 2vw;
@@ -617,15 +617,15 @@ body:has(.modal-overlay) .global-back-button {
 }
 
 .error-message {
-    font-size: 5vw;
+    font-size: 4vw !important;
     font-weight: bold;
     color: var(--accent-yellow);
-    line-height: 1.4;
+    line-height: 1.6;
     word-break: keep-all;
 }
 
 .error-confirm-btn {
-    padding: 2vw 6vw;
+    padding: 1.5vw 3vw 1.5vw;
     border-radius: 1.5vw;
     font-size: 5vw;
 }

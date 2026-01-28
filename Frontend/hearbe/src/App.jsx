@@ -3,12 +3,12 @@ import Login from './pages/Login/LoginA';
 import SignUp from './pages/SignUp/SignUpA';
 import SelectMall from './pages/SelectMall/SelectMallA';
 import StoreBrowser from './pages/StoreBrowser/StoreBrowserA';
-import Cart from './pages/Mypage/CartA';
+import Cart from './pages/Cart/CartA';
 import Mypage from './pages/Mypage/MypageA';
-import MemberInfo from './pages/Mypage/MemberInfoA';
-import CardManagement from './pages/Mypage/CardManagementA';
-import Wishlist from './pages/Mypage/WishlistA';
-import OrderHistory from './pages/Mypage/OrderHistoryA';
+import MemberInfo from './pages/MemberInfo/MemberInfoA';
+import CardManagement from './pages/CardManagement/CardManagementA';
+import Wishlist from './pages/Wishlist/WishlistA';
+import OrderHistory from './pages/OrderHistory/OrderHistoryA';
 
 import './App.css';
 

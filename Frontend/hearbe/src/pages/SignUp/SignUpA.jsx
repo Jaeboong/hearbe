@@ -194,10 +194,18 @@ const SignUp = () => {
 
     // 2. 최종 카드 등록 -> 데이터 저장 후 팝업 닫기
     const handleCardRegister = () => {
+        // 현재 날짜를 issue_date로, expiry를 백엔드 형식으로 변환
+        const today = new Date();
+        const issueDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
+
+        // expiry '01/21' -> '2021-01-31' 형식으로 변환 (임시로 월말 사용)
+        const expiryDate = '2030-12-31'; // 하드코딩된 만료일
+
         setCardData({
             company: '신한카드',
             number: '0000-0000-0000-0000',
-            expiry: '01/21',
+            issueDate: issueDate,
+            expiry: expiryDate,
             cvc: '123'
         });
         setShowCamera(false);
@@ -279,14 +287,21 @@ const SignUp = () => {
         try {
             const userData = {
                 user_id: formData.id,
-                password: formData.password,
-                password_check: formData.password, // PRD에서 제거되었지만 서버가 요구할 수 있음
                 username: formData.name,
-                email: null,
+                email: `${formData.id}@hearbe.com`, // 임시 이메일 생성
                 phone_number: formData.phone,
-                user_type: "BLIND", // 카드 등록 필수이므로 항상 BLIND
-                simple_password: null
+                user_type: "BLIND",
+                simple_password: formData.password, // 6자리 비밀번호
+                welfare_card: {
+                    card_company: cardData.company,
+                    card_number: cardData.number,
+                    issue_date: cardData.issueDate,
+                    expiration_date: cardData.expiry,
+                    cvc: cardData.cvc
+                }
             };
+
+            console.log('📤 전송할 데이터:', JSON.stringify(userData, null, 2));
 
             const response = await authAPI.register(userData);
 

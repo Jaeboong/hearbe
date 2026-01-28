@@ -14,7 +14,26 @@ export const authAPI = {
                 body: JSON.stringify(userData),
             });
 
-            const data = await response.json();
+            // 응답 상태 확인
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
+            // 응답이 비어있거나 204 No Content인 경우
+            if (response.status === 204) {
+                return { success: true, message: '회원가입이 완료되었습니다.' };
+            }
+
+            // JSON 파싱 전에 응답 텍스트 확인
+            const text = await response.text();
+            console.log('Response text:', text);
+
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
 
             if (!response.ok) {
                 throw new Error(data.message || '회원가입에 실패했습니다.');
