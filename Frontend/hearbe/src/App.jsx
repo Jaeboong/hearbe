@@ -5,10 +5,10 @@ import SelectMall from './pages/SelectMall/SelectMallA';
 import StoreBrowser from './pages/StoreBrowser/StoreBrowserA';
 import Cart from './pages/Cart/CartA';
 import Mypage from './pages/Mypage/MypageA';
-import MemberInfo from './pages/MemberInfo/MemberInfoA';
-import CardManagement from './pages/CardManagement/CardManagementA';
-import Wishlist from './pages/Wishlist/WishlistA';
-import OrderHistory from './pages/OrderHistory/OrderHistoryA';
+import MemberInfo from './pages/MemberInfo_A/MemberInfoA';
+import CardManagement from './pages/CardManagement_A/CardManagementA';
+import Wishlist from './pages/Wishlist_A/WishlistA';
+import OrderHistory from './pages/OrderHistory_A/OrderHistoryA';
 
 import './App.css';
 

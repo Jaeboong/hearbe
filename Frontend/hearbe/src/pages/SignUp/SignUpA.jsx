@@ -286,8 +286,8 @@ const SignUp = () => {
         // 7. API 호출
         try {
             const userData = {
-                user_id: formData.id,
-                username: formData.name,
+                username: formData.id,
+                name: formData.name,
                 email: `${formData.id}@hearbe.com`, // 임시 이메일 생성
                 phone_number: formData.phone,
                 user_type: "BLIND",

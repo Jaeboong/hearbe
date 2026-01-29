@@ -1,26 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoA.png';
-import { findUser } from '../../utils/userStorage';
+import { authAPI } from '../../services/authAPI';
 import './LoginA.css';
 
 const Login = () => {
     const navigate = useNavigate();
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!id || !password) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
         }
 
-        const user = findUser(id, password);
-        if (user) {
-            // Success
-            navigate('/mall');
-        } else {
-            alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+        setIsLoading(true);
+        try {
+            const response = await authAPI.login(id, password);
+
+            if (response.code === 200) {
+                // 로그인 성공
+                navigate('/mall');
+            } else {
+                alert(response.message || "로그인에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error('Login Error:', error);
+            alert(error.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
+        } finally {
+            setIsLoading(false);
         }
     };
 

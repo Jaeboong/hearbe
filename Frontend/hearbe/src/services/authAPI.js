@@ -54,7 +54,7 @@ export const authAPI = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_id: userId }),
+                body: JSON.stringify({ username: userId }),
             });
 
             const data = await response.json();
@@ -63,6 +63,45 @@ export const authAPI = {
             console.error('Check Duplicate API Error:', error);
             // API가 없으면 기본적으로 사용 가능으로 처리
             return { available: true };
+        }
+    },
+
+    // 로그인 API
+    login: async (id, password) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: id, password }),
+            });
+
+            const text = await response.text();
+            console.log('Login Response status:', response.status);
+            console.log('Login Response text:', text);
+
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '로그인에 실패했습니다.');
+            }
+
+            // 토큰 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
+            if (data.data && data.data.accessToken) {
+                localStorage.setItem('accessToken', data.data.accessToken);
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Login API Error:', error);
+            throw error;
         }
     },
 
