@@ -7,7 +7,7 @@
     --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
 }
 
-.mypage-container {
+.mypage-container-a {
     display: flex;
     flex-direction: column;
     width: 100%;

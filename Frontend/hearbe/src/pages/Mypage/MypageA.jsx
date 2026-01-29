@@ -12,25 +12,25 @@ const Mypage = () => {
     const requestedMenuItems = [
         { id: 1, label: '회원정보', action: () => { } },
         { id: 2, label: '주문내역', action: () => { } },
-        { id: 3, label: '장바구니', action: () => navigate('/cart') },
+        { id: 3, label: '장바구니', action: () => navigate('/A/cart') },
         { id: 4, label: '찜한 상품', action: () => { } },
         { id: 5, label: '장애인 복지카드 변경', action: () => { } },
     ];
 
     return (
-        <div className="mypage-container">
+        <div className="mypage-container-a">
             {/* 1. 상단 네비게이션 (홈/카트/마이)*/}
             <div className="top-nav-area">
                 <div className="header-nav">
-                    <div className="nav-item" onClick={() => navigate('/mall')}>
+                    <div className="nav-item" onClick={() => navigate('/A/mall')}>
                         <img src={iconHome} alt="Home" className="nav-icon" />
                         <span>홈</span>
                     </div>
-                    <div className="nav-item" onClick={() => navigate('/cart')}>
+                    <div className="nav-item" onClick={() => navigate('/A/cart')}>
                         <img src={iconCart} alt="Cart" className="nav-icon" />
                         <span>카트</span>
                     </div>
-                    <div className="nav-item" onClick={() => navigate('/mypage')}>
+                    <div className="nav-item" onClick={() => navigate('/A/mypage')}>
                         <img src={iconUser} alt="My" className="nav-icon" />
                         <span>마이</span>
                     </div>

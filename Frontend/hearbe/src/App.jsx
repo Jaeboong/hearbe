@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-
+import { motion } from 'framer-motion';
 
 // [공통 컴포넌트 및 설정 페이지]
 import InitialSetup from './pages/InitialSetup/InitialSetup';
@@ -12,6 +12,7 @@ import SignUpA from './pages/SignUp/SignUpA';
 import SelectMallA from './pages/SelectMall/SelectMallA';
 import StoreBrowserA from './pages/StoreBrowser/StoreBrowserA';
 import CartA from './pages/Cart/CartA';
+import MypageA from './pages/MyPage/MypageA';
 
 // [C형 페이지 임포트]
 import LoginC from './pages/Login/LoginC';
@@ -217,10 +218,10 @@ export default function App() {
   const [showInitialSetup, setShowInitialSetup] = useState(false);
   const modeSelectionRef = useRef(null);
 
-  useEffect(() => {
-    const setupCompleted = localStorage.getItem('hearbe_mcp_setup_completed');
-    if (!setupCompleted) setShowInitialSetup(true);
-  }, []);
+  // useEffect(() => {
+  //   const setupCompleted = localStorage.getItem('hearbe_mcp_setup_completed');
+  //   if (!setupCompleted) setShowInitialSetup(true);
+  // }, []);
 
   const handleSetupComplete = (micGranted) => {
     setMicPermissionGranted(micGranted);
@@ -248,7 +249,7 @@ export default function App() {
     window.location.reload();
   };
 
-  if (showInitialSetup) return <InitialSetup onComplete={handleSetupComplete} />;
+  // if (showInitialSetup) return <InitialSetup onComplete={handleSetupComplete} />;
 
 
   return (
@@ -355,6 +356,7 @@ export default function App() {
       <Route path="/A/mall" element={<SelectMallA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
       <Route path="/A/store" element={<StoreBrowserA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
       <Route path="/A/cart" element={<CartA mode={selectedMode} />} />
+      <Route path="/A/mypage" element={<MypageA mode={selectedMode} />} />
 
       {/* Flat Routes for compatibility */}
       <Route path="/login" element={<Navigate to="/A/login" replace />} />

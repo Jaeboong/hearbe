@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, UserPlus } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail } from '../../utils/validation';
 import logoImage from '../../assets/HearBe_logo_.png';
 import './SignUpC.css';
