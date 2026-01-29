@@ -311,7 +311,7 @@ def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[i
     # SIZE 키워드가 있는 행 찾기
     for i, row in enumerate(rows):
         for item in row:
-            if "SIZE" in item["text"].upper():
+            if "SIZE" in item["text"].upper() or "사이즈" in item["text"].upper():
                 size_row_index = i
                 break
         if size_row_index is not None:
