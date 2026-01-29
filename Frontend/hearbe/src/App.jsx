@@ -24,7 +24,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/mypage" element={<Mypage />} />
         <Route path="/mypage/profile" element={<MemberInfo />} />
-        <Route path="/mypage/orders" element={<OrderHistory />} />
+        <Route path="/orders" element={<OrderHistory />} />
         <Route path="/mypage/wishlist" element={<Wishlist />} />
         <Route path="/mypage/card" element={<CardManagement />} />
       </Routes>

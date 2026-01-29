@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StoreBrowserA.css';
 import iconUser from '../../assets/icon-user.png';
-import iconCart from '../../assets/icon-cart.png'; // Updated
-import iconShare from '../../assets/icon-share.png'; // New Share Icon
+import iconCart from '../../assets/icon-cart.png';
+import iconShare from '../../assets/icon-share.png';
 import iconCard from '../../assets/icon-cart.png';
 import logo from '../../assets/logoA.png';
+import { cartAPI } from '../../services/cartAPI';
 
 import BackButton from '../common/BackButtonA';
 
@@ -18,24 +19,54 @@ const StoreBrowser = () => {
     const [showShareModal, setShowShareModal] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
     const [inviteCode, setInviteCode] = useState('0000');
+    const [showAddCartModal, setShowAddCartModal] = useState(false);
+    const [productInfo, setProductInfo] = useState({
+        name: '',
+        price: '',
+        url: '',
+        img_url: ''
+    });
 
-    // Naver Add Simulation
+    // Platform Checks
     const isNaver = url.includes('naver');
+    const isCoupang = url.includes('coupang');
 
-    const handleSimulateAddCart = () => {
-        const newItem = {
-            id: Date.now(),
-            mall: '네이버',
-            name: `네이버 스토어 상품 ${Math.floor(Math.random() * 100)}`,
-            price: Math.floor(Math.random() * 50000) + 10000,
-            quantity: 1,
-            image: null,
-            date: new Date().toLocaleDateString()
-        };
+    // Platform cart URLs
+    const getPlatformCartUrl = () => {
+        if (url.includes('coupang')) {
+            return 'https://www.coupang.com';
+        } else if (url.includes('naver')) {
+            return 'https://shopping.naver.com/cart';
+        } else if (url.includes('11st')) {
+            return 'https://m.11st.co.kr/MW/MyOrder/MyCart';
+        } else if (url.includes('ssg')) {
+            return 'https://m.ssg.com/cart/dmsShppCartList.ssg';
+        }
+        return null;
+    };
 
-        const currentCart = JSON.parse(localStorage.getItem('naverCart') || '[]');
-        localStorage.setItem('naverCart', JSON.stringify([...currentCart, newItem]));
-        alert("장바구니에 상품을 담았습니다!");
+    const handleSimulateAddCart = async () => {
+        const dummyItems = [
+            { name: '네이버 인기 생수 2L x 6', price: 5900, img_url: 'https://via.placeholder.com/150?text=Water' },
+            { name: '프리미엄 원두 커피 500g', price: 18500, img_url: 'https://via.placeholder.com/150?text=Coffee' },
+            { name: '친환경 세탁 세제 3L', price: 12900, img_url: 'https://via.placeholder.com/150?text=Detergent' }
+        ];
+        const randomItem = dummyItems[Math.floor(Math.random() * dummyItems.length)];
+
+        try {
+            const itemData = {
+                platformId: 2, // Naver
+                name: randomItem.name,
+                url: url,
+                img_url: randomItem.img_url,
+                price: randomItem.price
+            };
+
+            await cartAPI.addToCart(itemData);
+            alert(`[시뮬레이션] 장바구니에 '${randomItem.name}'이(가) 추가되었습니다!`);
+        } catch (error) {
+            alert(`시뮬레이션 추가 실패: ${error.message}`);
+        }
     };
 
     const handleToggleMenu = () => {
@@ -66,16 +97,77 @@ const StoreBrowser = () => {
         navigate('/cart');
     };
 
+    const handlePlatformCart = () => {
+        const cartUrl = getPlatformCartUrl();
+        if (cartUrl) {
+            window.open(cartUrl, '_blank');
+        } else {
+            alert('현재 쇼핑몰의 장바구니 URL을 찾을 수 없습니다.');
+        }
+    };
+
+    const handleAddToMyCart = () => {
+        setIsMenuOpen(false);
+        setShowAddCartModal(true);
+    };
+
+    const handleProductInfoChange = (field, value) => {
+        setProductInfo(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSubmitProduct = async () => {
+        if (!productInfo.name || !productInfo.price) {
+            alert('상품명과 가격은 필수 항목입니다.');
+            return;
+        }
+
+        try {
+            // Determine platform ID based on current URL
+            let platformId = 1; // Default to Coupang
+            if (url.includes('naver')) platformId = 2;
+            else if (url.includes('11st')) platformId = 3;
+            else if (url.includes('ssg')) platformId = 4;
+
+            const itemData = {
+                platformId,
+                name: productInfo.name,
+                url: productInfo.url || url,
+                img_url: productInfo.img_url || 'https://via.placeholder.com/80',
+                price: parseInt(productInfo.price)
+            };
+
+            await cartAPI.addToCart(itemData);
+            alert('장바구니에 상품이 추가되었습니다!');
+            setShowAddCartModal(false);
+            setProductInfo({ name: '', price: '', url: '', img_url: '' });
+        } catch (error) {
+            alert(`장바구니 추가 실패: ${error.message}`);
+        }
+    };
+
     return (
         <div className="store-container">
             <BackButton onClick={() => navigate('/mall')} variant="navy" />
 
-            {/* Iframe */}
-            <iframe
-                src={url}
-                title="Store"
-                className="store-iframe"
-            />
+            {/* Iframe or Alternate View for Coupang */}
+            {isCoupang ? (
+                <div className="iframe-blocked-message">
+                    <div className="blocked-content">
+                        <img src={logo} alt="Logo" className="blocked-logo" />
+                        <h2>쿠팡은 보안상 앱 내에서<br />바로 보기가 제한됩니다.</h2>
+                        <p>새 창에서 상품을 확인하고<br /><strong>[내 장바구니에 담기]</strong> 기능을 이용해주세요!</p>
+                        <button className="open-new-window-btn" onClick={() => window.open(url, '_blank')}>
+                            새 창에서 쿠팡 열기
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <iframe
+                    src={url}
+                    title="Store"
+                    className="store-iframe"
+                />
+            )}
 
             {/* --- Sharing Mode UI --- */}
             {isSharing && (
@@ -91,14 +183,24 @@ const StoreBrowser = () => {
 
                     {/* Bottom Control Bar */}
                     <div className="sharing-bottom-bar">
-                        <button className="sharing-btn" onClick={handleCart}>
+                        <button className="sharing-btn" onClick={handlePlatformCart}>
                             <img src={iconCart} alt="Cart" className="s-icon" />
-                            <span>장바구니</span>
+                            <span>쇼핑몰 장바구니</span>
+                        </button>
+                        <button className="sharing-btn" onClick={handleCart}>
+                            <img src={iconCart} alt="My Cart" className="s-icon" />
+                            <span>내 장바구니</span>
                         </button>
                         <button className="sharing-btn primary">
                             <img src={iconCard} alt="Buy" className="s-icon" />
                             <span>바로구매</span>
                         </button>
+                        {isNaver && (
+                            <button className="sharing-btn" onClick={handleSimulateAddCart} style={{ backgroundColor: '#03C75A', color: 'white' }}>
+                                <img src={iconCart} alt="Simulate" className="s-icon" />
+                                <span>네이버 담기 (시뮬)</span>
+                            </button>
+                        )}
                         <button className="sharing-btn highlight" onClick={handleEndShare}>
                             <img src={iconShare} alt="Share" className="s-icon" />
                             <span>공유 종료</span>
@@ -118,14 +220,28 @@ const StoreBrowser = () => {
                                 <img src={iconUser} alt="My Page" className="menu-icon" />
                                 <span className="menu-text">마이페이지</span>
                             </div>
+                            <div className="menu-item" onClick={handleAddToMyCart}>
+                                <img src={iconCart} alt="Add to Cart" className="menu-icon" />
+                                <span className="menu-text">내 장바구니에 담기</span>
+                            </div>
+                            <div className="menu-item" onClick={handlePlatformCart}>
+                                <img src={iconCart} alt="Platform Cart" className="menu-icon" />
+                                <span className="menu-text">쇼핑몰 장바구니</span>
+                            </div>
                             <div className="menu-item" onClick={handleCart}>
-                                <img src={iconCart} alt="Cart" className="menu-icon" />
-                                <span className="menu-text">장바구니</span>
+                                <img src={iconCart} alt="My Cart" className="menu-icon" />
+                                <span className="menu-text">내 장바구니 보기</span>
                             </div>
                             <div className="menu-item" onClick={handleShareClick}>
                                 <img src={iconShare} alt="Share" className="menu-icon" />
                                 <span className="menu-text">공유</span>
                             </div>
+                            {isNaver && (
+                                <div className="menu-item" onClick={handleSimulateAddCart} style={{ color: '#03C75A' }}>
+                                    <img src={iconCart} alt="Simulate" className="menu-icon" />
+                                    <span className="menu-text">네이버 담기 시뮬레이션</span>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -154,6 +270,25 @@ const StoreBrowser = () => {
                         <div className="share-modal-btns">
                             <button className="sm-btn cancel" onClick={() => setShowShareModal(false)}>취소</button>
                             <button className="sm-btn confirm" onClick={handleEnterShare}>입장</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add to Cart Modal */}
+            {showAddCartModal && (
+                <div className="share-modal-overlay">
+                    <div className="share-modal-content add-cart-modal">
+                        <div className="share-modal-title">내 장바구니에 담기</div>
+                        <div className="product-input-group">
+                            <input type="text" placeholder="상품명 *" value={productInfo.name} onChange={(e) => handleProductInfoChange('name', e.target.value)} className="product-input" />
+                            <input type="number" placeholder="가격 *" value={productInfo.price} onChange={(e) => handleProductInfoChange('price', e.target.value)} className="product-input" />
+                            <input type="text" placeholder="상품 URL (선택)" value={productInfo.url} onChange={(e) => handleProductInfoChange('url', e.target.value)} className="product-input" />
+                            <input type="text" placeholder="이미지 URL (선택)" value={productInfo.img_url} onChange={(e) => handleProductInfoChange('img_url', e.target.value)} className="product-input" />
+                        </div>
+                        <div className="share-modal-btns">
+                            <button className="sm-btn cancel" onClick={() => { setShowAddCartModal(false); setProductInfo({ name: '', price: '', url: '', img_url: '' }); }}>취소</button>
+                            <button className="sm-btn confirm" onClick={handleSubmitProduct}>추가</button>
                         </div>
                     </div>
                 </div>

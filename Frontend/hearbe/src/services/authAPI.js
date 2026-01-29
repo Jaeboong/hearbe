@@ -93,9 +93,15 @@ export const authAPI = {
                 throw new Error(data.message || '로그인에 실패했습니다.');
             }
 
-            // 토큰 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
+            // 토큰 및 사용자 정보 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
             if (data.data && data.data.accessToken) {
                 localStorage.setItem('accessToken', data.data.accessToken);
+            }
+            // user_id 저장
+            if (data.data && data.data.id) {
+                localStorage.setItem('user_id', data.data.id);
+                // 가입 시 아이디인 username도 저장 (장바구니 API 등에서 사용)
+                localStorage.setItem('username', id);
             }
 
             return data;

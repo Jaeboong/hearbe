@@ -84,17 +84,20 @@
 }
 
 .cart-mall-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
-    background-color: #1E2A3A;
-    border: clamp(2px, 0.4vw, 4px) solid #4A6FA5;
+    background-color: #FFF064;
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
     border-radius: clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px) 0 0;
     border-bottom: none;
 }
 
 .cart-mall-name {
-    font-size: clamp(20px, 3.5vw, 32px);
+    font-size: clamp(24px, 4vw, 36px);
     font-weight: 900;
-    color: #4A6FA5;
+    color: #1E2A3A;
     margin: 0;
     font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
 }
@@ -115,7 +118,37 @@
 }
 
 .cart-item:first-child {
-    border-top: clamp(2px, 0.4vw, 4px) solid #4A6FA5;
+    border-top: clamp(2px, 0.4vw, 4px) solid #FFF064;
+}
+
+.cart-item:last-child {
+    border-bottom: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border-radius: 0 0 clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px);
+}
+
+/* Checkbox Styling */
+.cart-item-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: clamp(30px, 6vw, 40px);
+    height: clamp(30px, 6vw, 40px);
+    border: clamp(2px, 0.4vw, 3px) solid #1E2A3A;
+    background-color: #1E2A3A;
+    border-radius: clamp(4px, 1vw, 6px);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.cart-item-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #FFF064;
+    font-size: clamp(20px, 4.5vw, 30px);
+    font-weight: bold;
 }
 
 .cart-item-image {
@@ -193,16 +226,25 @@
 }
 
 .cart-delete-btn {
-    padding: clamp(6px, 1.5vw, 10px) clamp(12px, 2.5vw, 16px);
+    width: clamp(32px, 6.5vw, 44px);
+    height: clamp(32px, 6.5vw, 44px);
     background-color: #9C2121;
     color: #F5F5F5;
     border: none;
-    border-radius: clamp(4px, 1vw, 6px);
-    font-size: clamp(14px, 2.5vw, 18px);
+    border-radius: 50%;
+    font-size: clamp(18px, 3.5vw, 24px);
     font-weight: 900;
     cursor: pointer;
     font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cart-delete-btn::before {
+    content: 'X';
 }
 
 .cart-delete-btn:hover {
@@ -219,11 +261,11 @@
 
 .checkout-btn {
     padding: clamp(12px, 2.5vw, 18px) clamp(24px, 4vw, 36px);
-    background-color: #FFF064;
-    color: #1E2A3A;
+    background-color: #1E2A3A;
+    color: #FFF064;
     border: none;
     border-radius: clamp(6px, 1.5vw, 10px);
-    font-size: clamp(16px, 3vw, 24px);
+    font-size: clamp(18px, 3.5vw, 28px);
     font-weight: 900;
     cursor: pointer;
     font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;

@@ -16,7 +16,7 @@ const SelectMall = () => {
         if (mall === 'naver') {
             navigate('/store', { state: { url: 'https://m.shopping.naver.com/' } });
         } else if (mall === 'coupang') {
-            navigate('/store', { state: { url: 'https://m.coupang.com/' } });
+            navigate('/store', { state: { url: 'https://www.coupang.com' } });
         } else if (mall === '11st') {
             navigate('/store', { state: { url: 'https://m.11st.co.kr/' } });
         } else if (mall === 'emart') {

@@ -1,0 +1,32 @@
+/* Product Input Modal Styles */
+.add-cart-modal {
+    max-width: 700px;
+}
+
+.product-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.product-input {
+    padding: 20px 30px;
+    border-radius: 15px;
+    border: 3px solid #FFF064;
+    background-color: transparent;
+    color: #FAFAFA;
+    font-size: 35px;
+    font-weight: bold;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.product-input::placeholder {
+    color: rgba(250, 250, 250, 0.5);
+}
+
+.product-input:focus {
+    outline: none;
+    border-color: #FFF064;
+    background-color: rgba(255, 240, 100, 0.1);
+}
