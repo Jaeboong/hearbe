@@ -18,7 +18,7 @@ public interface WelfareCardRepository extends JpaRepository<WelfareCard, Intege
     boolean existsByUserId(Integer userId);
 
     Optional<WelfareCard> findByCardNumberAndCardCompanyAndIssueDateAndExpirationDateAndCvc(
-            String cardNumber, String cardCompany, LocalDate issueDate, LocalDate expirationDate, String cvc);
+            String cardNumber, String cardCompany, LocalDate issueDate, String expirationDate, String cvc);
 
     void deleteByUserId(Integer userId);
 }

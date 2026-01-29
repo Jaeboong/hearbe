@@ -45,8 +45,8 @@ public class WelfareCard {
     @Column(name = "issue_date", nullable = false)
     private LocalDate issueDate;
 
-    @Column(name = "expiration_date", nullable = false)
-    private LocalDate expirationDate;
+    @Column(name = "expiration_date", length = 5, nullable = false)
+    private String expirationDate; // MM/YY 형식
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

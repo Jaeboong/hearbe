@@ -29,9 +29,9 @@ public class WelfareCardRequest {
     private LocalDate issueDate;
 
     @JsonProperty("expiration_date")
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "만료일은 필수입니다.")
-    private LocalDate expirationDate;
+    @Pattern(regexp = "^(0[1-9]|1[0-2])/[0-9]{2}$", message = "유효기간은 MM/YY 형식이어야 합니다. (예: 12/26)")
+    private String expirationDate; // MM/YY 형식
 
     @JsonProperty("cvc")
     @NotNull(message = "CVC는 필수입니다.")
@@ -42,7 +42,7 @@ public class WelfareCardRequest {
     public WelfareCardRequest() {
     }
 
-    public WelfareCardRequest(String cardCompany, String cardNumber, LocalDate issueDate, LocalDate expirationDate,
+    public WelfareCardRequest(String cardCompany, String cardNumber, LocalDate issueDate, String expirationDate,
             String cvc) {
         this.cardCompany = cardCompany;
         this.cardNumber = cardNumber;
@@ -76,11 +76,11 @@ public class WelfareCardRequest {
         this.issueDate = issueDate;
     }
 
-    public LocalDate getExpirationDate() {
+    public String getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(LocalDate expirationDate) {
+    public void setExpirationDate(String expirationDate) {
         this.expirationDate = expirationDate;
     }
 

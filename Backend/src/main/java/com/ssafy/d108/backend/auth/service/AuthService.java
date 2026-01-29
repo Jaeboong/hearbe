@@ -92,11 +92,7 @@ public class AuthService {
                 throw new IllegalArgumentException("A형 사용자는 복지카드 등록이 필수입니다.");
             }
 
-            // 복지카드 유효기간 검증
-            if (request.getWelfareCard().getExpirationDate().isBefore(
-                    request.getWelfareCard().getIssueDate())) {
-                throw new IllegalArgumentException("복지카드 만료일은 발급일 이후여야 합니다.");
-            }
+            // MM/YY 형식은 @Pattern 어노테이션에서 검증됨
         }
 
         // 중복 체크

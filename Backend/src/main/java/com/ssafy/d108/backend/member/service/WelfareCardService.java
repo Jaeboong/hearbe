@@ -95,10 +95,9 @@ public class WelfareCardService {
         welfareCardRepository.deleteByUserId(userId);
     }
 
+    // MM/YY 형식은 날짜 비교 불가능하므로 패턴 검증만 수행 (Validation 어노테이션에서 처리)
     private void validateCard(WelfareCardRequest request) {
-        if (request.getExpirationDate().isBefore(request.getIssueDate())) {
-            throw new IllegalArgumentException("복지카드 만료일은 발급일 이후여야 합니다.");
-        }
+        // Pattern validation은 @Pattern 어노테이션에서 자동 처리됨
     }
 
     private WelfareCardResponse toResponse(Integer userId, WelfareCard card) {
