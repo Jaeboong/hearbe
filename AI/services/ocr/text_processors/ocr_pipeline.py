@@ -170,12 +170,13 @@ def process_product_image(
     if verbose:
         print("\n🔧 [2/5] 전처리 중...")
     step_start = time.time()
-    texts = extract_rec_texts_from_data(ocr_result)
-    scores = ocr_result.get("rec_scores", [1.0] * len(texts))
-    
+    # 원본 텍스트/점수를 직접 사용 (인덱스 정합성 유지)
+    raw_texts = ocr_result.get("rec_texts", [])
+    raw_scores = ocr_result.get("rec_scores", [1.0] * len(raw_texts))
+
     filtered = filter_texts(
-        texts,
-        scores,
+        raw_texts,
+        raw_scores,
         min_score=0.7,
         min_length=2,
         important_text_predicate=_is_important_text,
@@ -184,7 +185,7 @@ def process_product_image(
     step_time = time.time() - step_start
 
     if verbose:
-        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트 (원본: {len(texts)}개, 중요도 기반 선별, {step_time:.2f}초)")
+        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트 (원본: {len(raw_texts)}개, 중요도 기반 선별, {step_time:.2f}초)")
     
     if verbose:
         print("\n✂️  [3/5] 텍스트 추출 완료 (LLM 토큰 절약)")
@@ -205,9 +206,12 @@ def process_product_image(
         if verbose:
             print("\n📏 [4.5/5] SIZE 표 재구성 시도 중...")
         step_start = time.time()
-        boxes = ocr_result.get("boxes", [])
-        if boxes:
-            size_table_text = reconstruct_size_table(texts, boxes, scores)
+        # SIZE 표 재구성은 원본 OCR 데이터 사용 (인덱스 정합성 유지)
+        original_texts = ocr_result.get("rec_texts", [])
+        original_boxes = ocr_result.get("boxes", [])
+        original_scores = ocr_result.get("rec_scores", [1.0] * len(original_texts))
+        if original_boxes:
+            size_table_text = reconstruct_size_table(original_texts, original_boxes, original_scores)
             if size_table_text:
                 step_time = time.time() - step_start
                 if verbose:
@@ -312,12 +316,13 @@ def process_multiple_images(
     if verbose:
         print("\n🔧 [3/6] 전처리 중...")
     step_start = time.time()
-    texts = extract_rec_texts_from_data(merged)
-    scores = merged.get("rec_scores", [1.0] * len(texts))
-    
+    # 원본 텍스트/점수를 직접 사용 (인덱스 정합성 유지)
+    raw_texts = merged.get("rec_texts", [])
+    raw_scores = merged.get("rec_scores", [1.0] * len(raw_texts))
+
     filtered = filter_texts(
-        texts,
-        scores,
+        raw_texts,
+        raw_scores,
         min_score=0.7,
         min_length=2,
         important_text_predicate=_is_important_text,
@@ -326,7 +331,7 @@ def process_multiple_images(
     step_time = time.time() - step_start
 
     if verbose:
-        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트 (중요도 기반 선별, {step_time:.2f}초)")
+        print(f"    → 전처리 후: {len(filtered_texts)}개 텍스트 (원본: {len(raw_texts)}개, 중요도 기반 선별, {step_time:.2f}초)")
     
     if verbose:
         print("\n✂️  [4/6] 텍스트 추출 완료 (LLM 토큰 절약)")
@@ -348,11 +353,16 @@ def process_multiple_images(
             print("\n📏 [5.5/6] SIZE 표 재구성 시도 중...")
         step_start = time.time()
 
-        # SIZE 키워드가 있는 원본 이미지 찾기 (병합 전 결과에서)
+        # SIZE 키워드 또는 헤더 패턴이 있는 원본 이미지 찾기 (병합 전 결과에서)
+        size_header_patterns = ["허리", "엉덩이", "총장", "어깨", "가슴", "소매", "기장"]
         size_image_result = None
         for ocr_result in ocr_results:
             result_texts = ocr_result.get("rec_texts", [])
-            if any("SIZE" in str(t).upper() for t in result_texts):
+            combined = " ".join(str(t) for t in result_texts)
+            # SIZE/사이즈 키워드 또는 헤더 패턴으로 찾기
+            has_size_keyword = "SIZE" in combined.upper() or "사이즈" in combined
+            has_header_pattern = any(pattern in combined for pattern in size_header_patterns)
+            if has_size_keyword or has_header_pattern:
                 size_image_result = ocr_result
                 break
 

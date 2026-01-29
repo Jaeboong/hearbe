@@ -344,7 +344,7 @@ def detect_product_type(texts: List[str]) -> ProductType:
         weights = CORE_KEYWORD_WEIGHTS.get(ptype, {})
         
         for keyword in keywords:
-            if keyword in combined_text:
+            if keyword.lower() in combined_text:
                 weight = weights.get(keyword, 1)
                 score += weight
         
@@ -400,14 +400,28 @@ def override_product_type(
     joined = " ".join(texts)
 
     # SIZE 관련 키워드가 있으면 무조건 의류로 판단
-    size_keywords = ["SIZE", "사이즈", "허리", "총장", "영덩이", "왓밀위", "뜻밀위", "밀단"]
-    size_labels = ["M", "L", "XL", "2XL", "3XL", "FREE"]
+    # SIZE 관련 키워드가 있으면 무조건 의류로 판단
+    size_keywords = [
+        "SIZE", "사이즈", "허리", "총장", "영덩이", "왓밀위", "뜻밀위", "밀단",
+        "가슴둘레", "어깨너비", "소매길이", "기장", "밑단"
+    ]
+    size_labels = ["S", "M", "L", "XL", "2XL", "3XL", "FREE"]
 
-    # SIZE 키워드 + 사이즈 라벨이 함께 있으면 의류 확정
+    # 1. SIZE 키워드 감지
     has_size_keyword = any(kw in joined.upper() for kw in size_keywords)
-    has_size_label = any(f" {label} " in f" {joined.upper()} " or f"|{label}|" in joined.upper() for label in size_labels)
+    
+    # 2. 사이즈 라벨 개수 카운트 (M, L, XL 등이 여러 개 나오면 의류일 확률 높음)
+    # 단, 단순 알파벳과의 혼동을 막기 위해 독립된 토큰으로 확인
+    label_count = 0
+    upper_joined = f" {joined.upper()} "  # 앞뒤 공백 추가
+    for label in size_labels:
+        if f" {label} " in upper_joined or f"|{label}|" in upper_joined:
+            label_count += 1
 
-    if has_size_keyword and has_size_label:
+    # 조건 완화:
+    # 1) 키워드와 라벨이 모두 있는 경우 (확실)
+    # 2) 사이즈 라벨이 3개 이상 발견된 경우 (키워드 없어도 표로 추정)
+    if (has_size_keyword and label_count >= 1) or (label_count >= 3):
         return ProductType.의류
 
     scores = {}

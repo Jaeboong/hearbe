@@ -98,8 +98,13 @@ def is_noise_token(text: str) -> bool:
 
 def is_header_row(row: List[Dict[str, Any]]) -> bool:
     """헤더 행인지 판단"""
-    header_keywords = ["허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
-                       "I라우", "라우", "왓밀위", "뜻밀위", "밀단"]
+    header_keywords = [
+        # 하의 헤더
+        "허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
+        "I라우", "라우", "왓밀위", "뜻밀위", "밀단",
+        # 상의 헤더
+        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
+    ]
     row_text = " ".join(item["text"] for item in row)
     return any(kw in row_text for kw in header_keywords)
 
@@ -304,17 +309,32 @@ def assign_cells_to_columns(
 def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[int, int]]:
     """
     SIZE 표 영역 찾기
-    SIZE 키워드가 있는 행부터 시작해서, 연속된 표 영역을 감지
+    SIZE 키워드 또는 헤더 패턴이 있는 행부터 시작해서, 연속된 표 영역을 감지
     """
     size_row_index = None
 
-    # SIZE 키워드가 있는 행 찾기
+    # 헤더 키워드 (SIZE 없이도 표 감지용)
+    header_patterns = [
+        # 하의 헤더
+        "허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
+        "I라우", "라우", "왓밀위", "뜻밀위", "밀단",
+        # 상의 헤더
+        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
+    ]
+
+    # SIZE 키워드 또는 헤더 패턴이 있는 행 찾기
     for i, row in enumerate(rows):
-        for item in row:
-            if "SIZE" in item["text"].upper() or "사이즈" in item["text"].upper():
-                size_row_index = i
-                break
-        if size_row_index is not None:
+        row_text = " ".join(item["text"] for item in row)
+        row_text_upper = row_text.upper()
+
+        # 1순위: SIZE/size/사이즈 키워드
+        if "SIZE" in row_text_upper or "size" in row_text.lower() or "사이즈" in row_text:
+            size_row_index = i
+            break
+
+        # 2순위: 헤더 패턴 (허리, 엉덩이, 어깨 등)
+        if any(pattern in row_text for pattern in header_patterns):
+            size_row_index = i
             break
 
     if size_row_index is None:
@@ -322,7 +342,12 @@ def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[i
 
     # SIZE 다음 행부터 헤더와 데이터 행 찾기
     # 헤더는 보통 "허리", "엉덩이" 같은 키워드
-    header_keywords = ["허리", "엉덩이", "왓밀위", "뜻밀위", "허벅지", "밀단", "총장", "I라우"]
+    header_keywords = [
+        # 하의 헤더
+        "허리", "엉덩이", "왓밀위", "뜻밀위", "허벅지", "밀단", "총장", "I라우",
+        # 상의 헤더
+        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
+    ]
     size_labels = ["M", "L", "XL", "2XL", "3XL", "FREE", "F", "7", "7X"]  # 7X는 XL 오타
 
     start_index = size_row_index
@@ -440,9 +465,12 @@ def parse_size_table_to_dict(table_text: str) -> Dict[str, Any]:
 
     # 헤더 찾기 (교정된 헤더 포함)
     header_keywords = [
+        # 하의 헤더
         "허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
         # 오인식 버전도 포함 (교정 전 데이터 호환)
-        "왓밀위", "뜻밀위", "밀단", "I라우", "라우"
+        "왓밀위", "뜻밀위", "밀단", "I라우", "라우",
+        # 상의 헤더
+        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
     ]
     header_line = None
     header_index = 0
