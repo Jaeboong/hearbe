@@ -1,0 +1,111 @@
+.login-s-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #F8F9FA;
+    padding: 0 1rem;
+}
+
+.login-s-card {
+    background: white;
+    width: 100%;
+    max-width: 440px;
+    padding: 4rem 3rem;
+    border-radius: 40px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+    text-align: center;
+}
+
+.logo-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.s-logo {
+    height: 40px;
+    object-fit: contain;
+}
+
+.login-s-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1E293B;
+    margin-bottom: 0.5rem;
+}
+
+.login-s-desc {
+    font-size: 14px;
+    color: #94A3B8;
+    font-weight: 500;
+    margin-bottom: 3rem;
+}
+
+.login-s-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.invite-input {
+    width: 100%;
+    padding: 1.25rem;
+    border: 2px solid #F1F5F9;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 10px;
+    color: #8B5CF6;
+    /* S형 포인트 컬러 (보라색) */
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.invite-input::placeholder {
+    letter-spacing: normal;
+    font-size: 16px;
+    font-weight: 500;
+    color: #CBD5E1;
+}
+
+.invite-input:focus {
+    border-color: #8B5CF6;
+    background-color: #F5F3FF;
+}
+
+.login-s-btns {
+    display: flex;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 1.1rem;
+    background-color: #F1F5F9;
+    color: #64748B;
+    border: none;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-submit {
+    flex: 1;
+    padding: 1.1rem;
+    background-color: #8B5CF6;
+    /* S형 포인트 컬러 */
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.btn-submit:hover {
+    background-color: #7C3AED;
+}

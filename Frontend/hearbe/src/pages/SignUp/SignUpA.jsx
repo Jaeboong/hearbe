@@ -25,8 +25,8 @@ const formatPhoneNumber = (value) => {
 };
 
 const validateUserId = (userId) => {
-    // 영문자와 숫자 포함 필수, 3글자 이상
-    if (userId.length < 3) return false;
+    // 영문자와 숫자 포함 필수, 4글자 이상 (서버 요구사항)
+    if (userId.length < 4) return false;
     const hasLetter = /[a-zA-Z]/.test(userId);
     const hasNumber = /[0-9]/.test(userId);
     return hasLetter && hasNumber;
@@ -140,9 +140,9 @@ const SignUp = () => {
             return;
         }
 
-        // 아이디 형식 검증 (영문+숫자 포함, 3글자 이상)
+        // 아이디 형식 검증 (영문+숫자 포함, 4글자 이상)
         if (!validateUserId(formData.id)) {
-            setErrorMessage("아이디는 영문자와 숫자를 포함하여 3글자 이상이어야 합니다.");
+            setErrorMessage("아이디는 영문자와 숫자를 포함하여 4글자 이상이어야 합니다.");
             setShowError(true);
             return;
         }
@@ -198,8 +198,8 @@ const SignUp = () => {
         const today = new Date();
         const issueDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-        // expiry '01/21' -> '2021-01-31' 형식으로 변환 (임시로 월말 사용)
-        const expiryDate = '2030-12-31'; // 하드코딩된 만료일
+        // expiry '01/21' -> 서버 요구형식 'MM/YY'로 전송 (예: 12/30)
+        const expiryDate = '12/30'; // 하드코딩된 만료일 (MM/YY 형식)
 
         setCardData({
             company: '신한카드',
@@ -227,7 +227,7 @@ const SignUp = () => {
             return;
         }
         if (!validateUserId(formData.id)) {
-            setErrorMessage("아이디는 영문자와 숫자를 포함하여 3글자 이상이어야 합니다.");
+            setErrorMessage("아이디는 영문자와 숫자를 포함하여 4글자 이상이어야 합니다.");
             setShowError(true);
             return;
         }
