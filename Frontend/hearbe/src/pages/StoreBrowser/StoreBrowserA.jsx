@@ -5,12 +5,8 @@ import iconUser from '../../assets/icon-user.png';
 import iconCart from '../../assets/icon-cart.png';
 import iconShare from '../../assets/icon-share.png';
 import iconCard from '../../assets/icon-cart.png';
-<<<<<<< HEAD
-import hLogoOrigin from '../../assets/h-logo-origin.jpg';
-=======
 import logo from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
->>>>>>> feat/front/login
 
 import BackButton from '../common/BackButtonA';
 
@@ -23,26 +19,6 @@ const StoreBrowser = () => {
     const [showShareModal, setShowShareModal] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
     const [inviteCode, setInviteCode] = useState('0000');
-<<<<<<< HEAD
-
-    // Naver Add Simulation
-    const isNaver = url.includes('naver');
-
-    const handleSimulateAddCart = () => {
-        const newItem = {
-            id: Date.now(),
-            mall: '네이버',
-            name: `네이버 스토어 상품 ${Math.floor(Math.random() * 100)}`,
-            price: Math.floor(Math.random() * 50000) + 10000,
-            quantity: 1,
-            image: null,
-            date: new Date().toLocaleDateString()
-        };
-
-        const currentCart = JSON.parse(localStorage.getItem('naverCart') || '[]');
-        localStorage.setItem('naverCart', JSON.stringify([...currentCart, newItem]));
-        alert("장바구니에 상품을 담았습니다!");
-=======
     const [showAddCartModal, setShowAddCartModal] = useState(false);
     const [productInfo, setProductInfo] = useState({
         name: '',
@@ -91,7 +67,6 @@ const StoreBrowser = () => {
         } catch (error) {
             alert(`시뮬레이션 추가 실패: ${error.message}`);
         }
->>>>>>> feat/front/login
     };
 
     const handleToggleMenu = () => {
@@ -119,9 +94,6 @@ const StoreBrowser = () => {
 
     const handleCart = () => {
         setIsMenuOpen(false);
-<<<<<<< HEAD
-        navigate('/A/cart');
-=======
         navigate('/cart');
     };
 
@@ -171,21 +143,10 @@ const StoreBrowser = () => {
         } catch (error) {
             alert(`장바구니 추가 실패: ${error.message}`);
         }
->>>>>>> feat/front/login
     };
 
     return (
         <div className="store-container">
-<<<<<<< HEAD
-            <BackButton onClick={() => navigate('/A/mall')} variant="navy" />
-
-            {/* Iframe */}
-            <iframe
-                src={url}
-                title="Store"
-                className="store-iframe"
-            />
-=======
             <BackButton onClick={() => navigate('/mall')} variant="navy" />
 
             {/* Iframe or Alternate View for Coupang */}
@@ -207,7 +168,6 @@ const StoreBrowser = () => {
                     className="store-iframe"
                 />
             )}
->>>>>>> feat/front/login
 
             {/* --- Sharing Mode UI --- */}
             {isSharing && (
@@ -216,22 +176,13 @@ const StoreBrowser = () => {
                     <div className="sharing-header">
                         <div className="sharing-pill">화면 공유 중 (코드: {inviteCode})</div>
                         <div className="participant-pill">
-<<<<<<< HEAD
-                            <img src={hLogoOrigin} alt="User" className="p-icon" />
-=======
                             <img src={logo} alt="User" className="p-icon" />
->>>>>>> feat/front/login
                             <span>참가자 (1명)</span>
                         </div>
                     </div>
 
                     {/* Bottom Control Bar */}
                     <div className="sharing-bottom-bar">
-<<<<<<< HEAD
-                        <button className="sharing-btn" onClick={handleCart}>
-                            <img src={iconCart} alt="Cart" className="s-icon" />
-                            <span>장바구니</span>
-=======
                         <button className="sharing-btn" onClick={handlePlatformCart}>
                             <img src={iconCart} alt="Cart" className="s-icon" />
                             <span>쇼핑몰 장바구니</span>
@@ -239,21 +190,17 @@ const StoreBrowser = () => {
                         <button className="sharing-btn" onClick={handleCart}>
                             <img src={iconCart} alt="My Cart" className="s-icon" />
                             <span>내 장바구니</span>
->>>>>>> feat/front/login
                         </button>
                         <button className="sharing-btn primary">
                             <img src={iconCard} alt="Buy" className="s-icon" />
                             <span>바로구매</span>
                         </button>
-<<<<<<< HEAD
-=======
                         {isNaver && (
                             <button className="sharing-btn" onClick={handleSimulateAddCart} style={{ backgroundColor: '#03C75A', color: 'white' }}>
                                 <img src={iconCart} alt="Simulate" className="s-icon" />
                                 <span>네이버 담기 (시뮬)</span>
                             </button>
                         )}
->>>>>>> feat/front/login
                         <button className="sharing-btn highlight" onClick={handleEndShare}>
                             <img src={iconShare} alt="Share" className="s-icon" />
                             <span>공유 종료</span>
@@ -269,15 +216,6 @@ const StoreBrowser = () => {
                     {/* Menu Bubble */}
                     {isMenuOpen && (
                         <div className="menu-bubble">
-<<<<<<< HEAD
-                            <div className="menu-item">
-                                <img src={iconUser} alt="My Page" className="menu-icon" />
-                                <span className="menu-text">마이페이지</span>
-                            </div>
-                            <div className="menu-item" onClick={handleCart}>
-                                <img src={iconCart} alt="Cart" className="menu-icon" />
-                                <span className="menu-text">장바구니</span>
-=======
                             <div className="menu-item" onClick={() => navigate('/mypage')}>
                                 <img src={iconUser} alt="My Page" className="menu-icon" />
                                 <span className="menu-text">마이페이지</span>
@@ -293,21 +231,17 @@ const StoreBrowser = () => {
                             <div className="menu-item" onClick={handleCart}>
                                 <img src={iconCart} alt="My Cart" className="menu-icon" />
                                 <span className="menu-text">내 장바구니 보기</span>
->>>>>>> feat/front/login
                             </div>
                             <div className="menu-item" onClick={handleShareClick}>
                                 <img src={iconShare} alt="Share" className="menu-icon" />
                                 <span className="menu-text">공유</span>
                             </div>
-<<<<<<< HEAD
-=======
                             {isNaver && (
                                 <div className="menu-item" onClick={handleSimulateAddCart} style={{ color: '#03C75A' }}>
                                     <img src={iconCart} alt="Simulate" className="menu-icon" />
                                     <span className="menu-text">네이버 담기 시뮬레이션</span>
                                 </div>
                             )}
->>>>>>> feat/front/login
                         </div>
                     )}
 
@@ -340,8 +274,6 @@ const StoreBrowser = () => {
                     </div>
                 </div>
             )}
-<<<<<<< HEAD
-=======
 
             {/* Add to Cart Modal */}
             {showAddCartModal && (
@@ -361,7 +293,6 @@ const StoreBrowser = () => {
                     </div>
                 </div>
             )}
->>>>>>> feat/front/login
         </div>
     );
 };

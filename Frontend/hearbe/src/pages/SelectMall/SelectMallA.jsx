@@ -14,13 +14,6 @@ const SelectMall = () => {
 
     const handleSelectMall = (mall) => {
         if (mall === 'naver') {
-<<<<<<< HEAD
-            navigate('/A/store', { state: { url: 'https://m.shopping.naver.com/' } });
-        } else if (mall === 'coupang') {
-            navigate('/A/store', { state: { url: 'https://m.coupang.com/' } });
-        } else if (mall === 'cart') {
-            navigate('/A/cart');
-=======
             navigate('/store', { state: { url: 'https://m.shopping.naver.com/' } });
         } else if (mall === 'coupang') {
             navigate('/store', { state: { url: 'https://www.coupang.com' } });
@@ -30,17 +23,12 @@ const SelectMall = () => {
             navigate('/store', { state: { url: 'https://m.ssg.com/' } });
         } else if (mall === 'cart') {
             navigate('/cart');
->>>>>>> feat/front/login
         }
     };
 
     return (
         <div className="mall-container">
-<<<<<<< HEAD
-            <BackButton onClick={() => navigate('/A/login')} variant="arrow-only" />
-=======
             <BackButton onClick={() => navigate('/login')} variant="arrow-only" />
->>>>>>> feat/front/login
             {/* Header */}
             <div className="mall-header">
                 <div className="header-title">쇼핑몰 선택</div>
@@ -53,11 +41,7 @@ const SelectMall = () => {
                         <img src={iconCart} alt="Cart" className="nav-icon" />
                         <span>카트</span>
                     </div>
-<<<<<<< HEAD
-                    <div className="nav-item">
-=======
                     <div className="nav-item" onClick={() => navigate('/mypage')}>
->>>>>>> feat/front/login
                         <img src={iconUser} alt="My" className="nav-icon" />
                         <span>마이</span>
                     </div>
@@ -66,27 +50,6 @@ const SelectMall = () => {
 
             {/* Content */}
             <div className="mall-content">
-<<<<<<< HEAD
-                {/* Naver */}
-                <div className="mall-card naver-card" onClick={() => handleSelectMall('naver')}>
-                    <div className="mall-icon-box naver-box">
-                        <img src={iconNaver} alt="Naver" className="mall-logo-img" />
-                    </div>
-                    <div className="mall-text">1 네이버</div>
-                </div>
-
-                {/* Mic Center */}
-                <div className="mic-center">
-                    <img src={iconMic} alt="Mic" className="mic-icon" />
-                </div>
-
-                {/* Coupang */}
-                <div className="mall-card coupang-card" onClick={() => handleSelectMall('coupang')}>
-                    <div className="mall-icon-box coupang-box">
-                        <img src={iconCoupang} alt="Coupang" className="mall-logo-img" />
-                    </div>
-                    <div className="mall-text">2 쿠팡</div>
-=======
                 <div className="mall-scroll-container">
                     {/* Coupang (1) */}
                     <div className="mall-card-wrapper" onClick={() => handleSelectMall('coupang')}>
@@ -119,7 +82,6 @@ const SelectMall = () => {
                             <div className="mall-logo-placeholder">SSG</div>
                         </div>
                     </div>
->>>>>>> feat/front/login
                 </div>
             </div>
         </div>

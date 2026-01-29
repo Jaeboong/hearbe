@@ -4,13 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-<<<<<<< HEAD
   plugins: [react(), tailwindcss()],
-=======
-  plugins: [react()],
   server: {
-    // host: '0.0.0.0', // 외부 접속 허용 (같은 WiFi 네트워크)
     port: 5173,
   }
->>>>>>> feat/front/login
 })

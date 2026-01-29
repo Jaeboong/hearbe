@@ -1,4 +1,9 @@
-<<<<<<< HEAD
+.theme-a {
+  background-color: #141C29 !important;
+  color: #FCD34D !important;
+  min-height: 100vh;
+}
+
 .landing-container {
   min-height: 100vh;
   background-color: #f8f9fb;
@@ -382,309 +387,34 @@
   box-sizing: border-box;
 }
 
-.how-to-use-container:hover {
-  transform: translateY(-8px) scale(1.01);
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
 }
 
-.how-to-label h3 {
-  font-size: 1.75rem;
-  font-weight: 950;
-  color: #1a1a1a;
-  margin: 0 0 0.4rem 0;
-  white-space: nowrap;
-  letter-spacing: -0.02em;
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-.how-to-label p {
-  font-size: 0.95rem;
-  color: #7c3aed;
-  margin: 0;
-  font-weight: 800;
-  white-space: nowrap;
-  opacity: 0.8;
-}
-
-.steps-wrapper {
-  display: flex;
-  gap: 4.5rem;
-}
-
-.step-item {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.step-num {
-  width: 3.2rem;
-  height: 3.2rem;
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  color: white;
-  font-weight: 950;
-  border-radius: 1.25rem;
-  /* Rounded square for modern look */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  box-shadow: 0 6px 15px rgba(124, 58, 237, 0.15);
-  transform: rotate(-5deg);
-}
-
-.step-text {
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: #1f2937;
-  white-space: nowrap;
-}
-
-/* Speciality Section */
-.speciality-section {
-  margin-bottom: 8rem;
-}
-
-.section-header.center {
-  text-align: center;
-  margin-bottom: 4rem;
-}
-
-.section-subtitle.primary-color {
-  color: #7c3aed;
-  font-weight: 700;
-}
-
-.speciality-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  max-width: 70rem;
-  margin: 0 auto;
-}
-
-.spec-card {
-  border-radius: 2.5rem;
-  padding: 3rem;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  min-height: 320px;
-  transition: transform 0.3s ease;
-}
-
-.spec-card:hover {
-  transform: translateY(-5px);
-}
-
-.spec-card h3 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-}
-
-.spec-card p {
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.6;
-}
-
-/* 1. Purple Card (Voice Control) */
-.spec-card.purple {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  color: white;
-  grid-row: span 2;
-  /* Make it talk (Bento) */
-}
-
-.spec-card.purple p {
-  opacity: 0.9;
-}
-
-/* 2/3. White Card */
-.spec-card.white {
-  background: white;
-  color: #1a1a1a;
-  border: 1px solid #f3f4f6;
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
-}
-
-.spec-card.white h3 {
-  color: #1a1a1a;
-}
-
-.spec-card.white p {
-  color: #6b7280;
-}
-
-/* 4. Dark Card (Voice Bridge) */
-.spec-card.dark {
-  background: #1a1a1a;
-  color: white;
-  overflow: hidden;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  grid-column: span 2;
-  /* Make it wide (Bento) */
-}
-
-.spec-card.dark .spec-content {
-  flex: 1;
-  z-index: 10;
-}
-
-.spec-card.dark p {
-  opacity: 0.8;
-}
-
-/* Icon Boxes */
-.spec-icon-box {
-  background: rgba(255, 255, 255, 0.2);
-  width: 4rem;
-  height: 4rem;
-  border-radius: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  backdrop-filter: blur(10px);
-}
-
-.spec-icon-box.white-icon {
-  color: white;
-  background: white;
-  color: #7c3aed;
-}
-
-.spec-icon-box.text-purple {
-  background: #f5f3ff;
-  color: #7c3aed;
-}
-
-.spec-icon-box.text-purple-light {
-  background: rgba(124, 58, 237, 0.2);
-  color: #a78bfa;
-}
-
-/* Tags & Badges */
-.spec-tags {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: auto;
-}
-
-.spec-tags span {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.5rem 1rem;
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  backdrop-filter: blur(5px);
-}
-
-.spec-tag-badge {
-  display: inline-block;
-  background: #7c3aed;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  font-weight: 800;
-  margin-top: auto;
-  align-self: flex-start;
-}
-
-/* Dark Card Visuals */
-.bridge-visual {
-  width: 200px;
-  height: 120px;
-  background: #262626;
-  border-radius: 1.5rem;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #404040;
-}
-
-.mic-listening {
-  width: 1.5rem;
-  height: 2.5rem;
-  background: #7c3aed;
-  border-radius: 1rem;
-  box-shadow: 0 0 20px #7c3aed;
-}
-
-@media (max-width: 1024px) {
-  .speciality-grid {
-    grid-template-columns: 1fr;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
   }
 
-  .spec-card.dark {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .bridge-visual {
-    margin-top: 2rem;
-    width: 100%;
-  }
-
-  .how-to-use-container {
-    flex-direction: column;
-    gap: 2rem;
-    padding: 2rem;
-    align-items: flex-start;
-  }
-
-  .steps-wrapper {
-    flex-direction: column;
-    gap: 1.5rem;
+  to {
+    transform: rotate(360deg);
   }
 }
 
-.theme-c {
-  min-height: 100vh;
-  background-color: #fcfcfc !important;
-  color: #111827 !important;
-  display: flex;
-  flex-direction: column;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
-.theme-c>main {
-  flex: 1;
+.card {
+  padding: 2em;
 }
 
-.theme-a {
-  min-height: 100vh;
-  background-color: #141c29 !important;
-  color: #f8fafc !important;
-  display: flex;
-  flex-direction: column;
-}
-
-.theme-a>main {
-  flex: 1;
-}
-
-.theme-a .section-title {
-  color: #fcd34d !important;
-=======
-/* A형 */
-.theme-a {
-  background-color: #141C29 !important;
-  color: #FCD34D !important;
-  min-height: 100vh;
-}
-
-.theme-a * {
-  border-color: #FCD34D !important;
-}
-
-/* C형 */
-.theme-c {
-  background-color: #F8F9FA !important;
-  color: #1E293B !important;
-  min-height: 100vh;
->>>>>>> feat/front/login
+.read-the-docs {
+  color: #888;
 }

@@ -14,9 +14,6 @@ export const authAPI = {
                 body: JSON.stringify(userData),
             });
 
-<<<<<<< HEAD
-            const data = await response.json();
-=======
             // 응답 상태 확인
             console.log('Response status:', response.status);
             console.log('Response ok:', response.ok);
@@ -37,7 +34,6 @@ export const authAPI = {
                 console.error('JSON parse error:', e);
                 throw new Error('서버 응답 형식이 올바르지 않습니다.');
             }
->>>>>>> feat/front/login
 
             if (!response.ok) {
                 throw new Error(data.message || '회원가입에 실패했습니다.');
@@ -58,11 +54,7 @@ export const authAPI = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-<<<<<<< HEAD
-                body: JSON.stringify({ user_id: userId }),
-=======
                 body: JSON.stringify({ username: userId }),
->>>>>>> feat/front/login
             });
 
             const data = await response.json();
@@ -73,8 +65,6 @@ export const authAPI = {
             return { available: true };
         }
     },
-<<<<<<< HEAD
-=======
 
     // 로그인 API
     login: async (id, password) => {
@@ -146,5 +136,4 @@ export const authAPI = {
 
         return await response.json();
     }
->>>>>>> feat/front/login
 };

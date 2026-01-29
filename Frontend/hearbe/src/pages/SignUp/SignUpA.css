@@ -2,12 +2,6 @@
    1. 기본 설정 및 변수 (색상, 폰트)
    ========================================= */
 :root {
-<<<<<<< HEAD
-    --bg-dark-a: #141C29;
-    --bg-depp-dark-a: #0A0E14;
-    --accent-yellow-a: #FFF064;
-    --font-main-a: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-=======
     --bg-dark: #141C29;
     --bg-depp-dark: #0A0E14;
     --accent-yellow: #FFF064;
@@ -19,22 +13,11 @@ body {
     font-family: var(--font-main);
     background-color: var(--bg-dark);
     color: var(--accent-yellow);
->>>>>>> feat/front/login
 }
 
 /* =========================================
    2. 유틸리티 & 공통 스타일
    ========================================= */
-<<<<<<< HEAD
-.signup-container-a .check-btn-a,
-.signup-container-a .signup-submit-btn-a,
-.signup-container-a .error-confirm-btn-a,
-.signup-container-a .card-register-btn-a {
-    background-color: var(--accent-yellow-a);
-    color: var(--bg-dark-a);
-    border: none;
-    font-family: var(--font-main-a);
-=======
 .flex-col-center {
     display: flex;
     flex-direction: column;
@@ -56,40 +39,24 @@ body {
     color: var(--bg-dark);
     border: none;
     font-family: var(--font-main);
->>>>>>> feat/front/login
     font-weight: 900;
     cursor: pointer;
     transition: opacity 0.2s;
 }
 
-<<<<<<< HEAD
-.signup-container-a .check-btn-a:hover,
-.signup-container-a .signup-submit-btn-a:hover,
-.signup-container-a .error-confirm-btn-a:hover,
-.signup-container-a .card-register-btn-a:hover {
-=======
 .check-btn:hover,
 .signup-submit-btn:hover,
 .error-confirm-btn:hover,
 .card-register-btn:hover {
->>>>>>> feat/front/login
     opacity: 0.9;
 }
 
 /* 공통 Input 스타일 */
-<<<<<<< HEAD
-.signup-input-a,
-.modal-input-a {
-    background: transparent;
-    color: var(--accent-yellow-a);
-    font-family: var(--font-main-a);
-=======
 .signup-input,
 .modal-input {
     background: transparent;
     color: var(--accent-yellow);
     font-family: var(--font-main);
->>>>>>> feat/front/login
     font-weight: bold;
     outline: none;
     width: 100%;
@@ -98,57 +65,12 @@ body {
 /* =========================================
    3. 회원가입 메인 레이아웃
    ========================================= */
-<<<<<<< HEAD
-.signup-container-a {
-=======
 .signup-container {
->>>>>>> feat/front/login
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-<<<<<<< HEAD
-    letter-spacing: 0.2vw;
-    width: 100%;
-    background-color: #141C29;
-    padding-bottom: 5vw;
-}
-
-/* Back Button Component Override */
-.signup-container-a .global-back-button.arrow-only {
-    left: 4vw;
-    top: 4vw;
-    transform: none;
-}
-
-.signup-container-a .global-back-button.arrow-only .back-arrow-svg {
-    width: 8vw;
-    height: 8vw;
-}
-
-.signup-box-a {
-    width: 100%;
-    max-width: 1200px;
-    /* 대폭 확대 */
-    padding: 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-    box-sizing: border-box;
-    margin-top: 60px;
-}
-
-.signup-logo-area-a {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-}
-
-.signup-logo-image-a {
-    width: 450px;
-    /* 로고 대폭 확대 */
-=======
     letter-spacing: clamp(1px, 0.2vw, 2px);
     width: 100%;
     background-color: #141C29;
@@ -186,20 +108,10 @@ body {
 
 .signup-logo-image {
     width: clamp(210px, 52.5vw, 420px);
->>>>>>> feat/front/login
     height: auto;
     object-fit: contain;
 }
 
-<<<<<<< HEAD
-/* =========================================
-   4. 입력 폼 (Input) 스타일
-   ========================================= */
-.form-group-outline-a {
-    border: 0.5vw solid var(--accent-yellow-a);
-    border-radius: 2vw;
-    background-color: var(--bg-dark-a);
-=======
 /* 뒤로가기 화살표 (fallback if not using component) */
 .back-arrow {
     position: absolute;
@@ -218,38 +130,11 @@ body {
     border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
     border-radius: clamp(8px, 2vw, 16px);
     background-color: var(--bg-dark);
->>>>>>> feat/front/login
     overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
-<<<<<<< HEAD
-.input-row-a {
-    display: flex;
-    align-items: center;
-    padding: 30px;
-    font-weight: bold;
-    font-size: 32px;
-}
-
-.border-bottom-a {
-    border-bottom: 0.5vw solid var(--accent-yellow-a);
-}
-
-.input-icon-a {
-    width: 8vw;
-    height: 8vw;
-    object-fit: contain;
-}
-
-.signup-input-a {
-    flex: 1;
-    border: none;
-    padding: 16px;
-    font-size: 36px;
-    letter-spacing: 1px;
-=======
 .input-row {
     display: flex;
     align-items: center;
@@ -279,39 +164,16 @@ body {
     padding: clamp(4px, 1vw, 8px);
     font-size: clamp(18px, 5vw, 36px);
     letter-spacing: clamp(1px, 0.2vw, 2px);
->>>>>>> feat/front/login
     height: auto;
     min-width: 0;
 }
 
-<<<<<<< HEAD
-.signup-input-a::placeholder {
-    color: var(--accent-yellow-a);
-=======
 .signup-input::placeholder {
     color: var(--accent-yellow);
->>>>>>> feat/front/login
     font-weight: bold;
 }
 
 /* 중복확인 버튼 */
-<<<<<<< HEAD
-.check-btn-a {
-    padding: 1.5vw 3vw;
-    border-radius: 1.5vw;
-    font-size: 4vw;
-    white-space: nowrap;
-    flex-shrink: 0;
-    letter-spacing: 0.1vw;
-    margin-left: 2vw;
-}
-
-/* 라벨 텍스트 */
-.label-a {
-    flex-grow: 1;
-    font-size: 6vw;
-    letter-spacing: 0.2vw;
-=======
 .check-btn {
     padding: clamp(6px, 1.5vw, 12px) clamp(12px, 3vw, 24px);
     border-radius: clamp(6px, 1.5vw, 12px);
@@ -327,17 +189,11 @@ body {
     flex-grow: 1;
     font-size: clamp(22px, 7vw, 42px);
     letter-spacing: clamp(1px, 0.2vw, 2px);
->>>>>>> feat/front/login
 }
 
 /* =========================================
    5. 카드 섹션 (메인 화면)
    ========================================= */
-<<<<<<< HEAD
-.camera-area-a {
-    border: 0.6vw solid var(--accent-yellow-a);
-    border-radius: 2vw;
-=======
 .card-section {
     padding: 0.5vw;
 }
@@ -346,29 +202,10 @@ body {
 .camera-area {
     border: clamp(2px, 0.6vw, 5px) solid var(--accent-yellow);
     border-radius: clamp(8px, 2vw, 16px);
->>>>>>> feat/front/login
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-<<<<<<< HEAD
-    gap: 2vw;
-    margin: 0 1.5vw 1.5vw 1.5vw;
-    background-color: transparent;
-    padding: 4vw;
-    min-height: 25vw;
-}
-
-.camera-text-a {
-    font-weight: bold;
-    font-size: 5vw;
-    letter-spacing: 0.2vw;
-    color: var(--accent-yellow-a);
-}
-
-.camera-icon-img-a {
-    width: 20vw;
-=======
     gap: clamp(8px, 2vw, 16px);
     margin: 0 clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px);
     background-color: transparent;
@@ -384,44 +221,10 @@ body {
 
 .camera-icon-img {
     width: clamp(60px, 20vw, 140px);
->>>>>>> feat/front/login
     height: auto;
 }
 
 /* 등록 완료 후 카드 정보 표시 박스 */
-<<<<<<< HEAD
-.card-info-display-a {
-    padding: 3vw;
-    display: flex;
-    flex-direction: column;
-    gap: 2vw;
-    border: 0.4vw solid var(--accent-yellow-a);
-    border-radius: 2vw;
-    margin: 0 1.5vw 1.5vw 1.5vw;
-}
-
-.info-row-a {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5vw;
-}
-
-.info-row-flex-a {
-    display: flex;
-    gap: 3vw;
-}
-
-.info-col-a {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5vw;
-    flex: 1;
-}
-
-.info-label-main-a {
-    font-size: 3vw;
-    color: var(--accent-yellow-a);
-=======
 .card-info-display {
     padding: clamp(16px, 3vw, 30px);
     display: flex;
@@ -453,20 +256,10 @@ body {
 .info-label-main {
     font-size: clamp(14px, 3vw, 24px);
     color: var(--accent-yellow);
->>>>>>> feat/front/login
     font-weight: bold;
     opacity: 0.8;
 }
 
-<<<<<<< HEAD
-.info-val-main-a {
-    font-size: 4vw;
-    color: var(--accent-yellow-a);
-    font-weight: 900;
-    padding-left: 1vw;
-    border-bottom: 0.2vw solid var(--accent-yellow-a);
-    padding-bottom: 1vw;
-=======
 .info-val-main {
     font-size: clamp(20px, 4vw, 36px);
     color: var(--accent-yellow);
@@ -474,24 +267,11 @@ body {
     padding-left: clamp(4px, 1vw, 8px);
     border-bottom: clamp(1px, 0.2vw, 2px) solid var(--accent-yellow);
     padding-bottom: clamp(4px, 1vw, 8px);
->>>>>>> feat/front/login
 }
 
 /* =========================================
    6. 약관 동의 (Terms) 섹션
    ========================================= */
-<<<<<<< HEAD
-.terms-section-a {
-    padding: 3vw;
-    gap: 2vw;
-    align-items: flex-start;
-}
-
-.term-row-a {
-    display: flex;
-    align-items: center;
-    gap: 2vw;
-=======
 .terms-section {
     padding: clamp(8px, 2vw, 16px);
     display: flex;
@@ -503,17 +283,10 @@ body {
     display: flex;
     align-items: flex-start;
     gap: clamp(8px, 2vw, 16px);
->>>>>>> feat/front/login
     cursor: pointer;
     width: 100%;
 }
 
-<<<<<<< HEAD
-.check-circle-a {
-    width: 5vw;
-    height: 5vw;
-    border: 0.5vw solid var(--accent-yellow-a);
-=======
 .term-row:first-child {
     align-items: center;
 }
@@ -524,41 +297,10 @@ body {
     min-width: clamp(18px, 6vw, 36px);
     min-height: clamp(18px, 6vw, 36px);
     border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
->>>>>>> feat/front/login
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-<<<<<<< HEAD
-    font-size: 3.5vw;
-    font-weight: 900;
-    color: var(--bg-dark-a);
-    background-color: transparent;
-    transition: background-color 0.2s;
-}
-
-.check-circle-a.checked {
-    background-color: var(--accent-yellow-a);
-}
-
-.term-text-a {
-    font-size: 4vw;
-    font-weight: bold;
-    color: var(--accent-yellow-a);
-}
-
-.bold-a {
-    font-weight: 900;
-}
-
-/* 회원가입 제출 버튼 */
-.signup-submit-btn-a {
-    font-size: 40px;
-    padding: 40px;
-    border-radius: 24px;
-    margin-top: 30px;
-    width: 100%;
-=======
     font-size: clamp(12px, 4vw, 24px);
     font-weight: 900;
     color: var(--bg-dark);
@@ -590,88 +332,22 @@ body {
     margin-top: clamp(8px, 2vw, 16px);
     width: 100%;
     min-height: 44px;
->>>>>>> feat/front/login
 }
 
 /* =========================================
    7. 모달 (팝업) 스타일
    ========================================= */
-<<<<<<< HEAD
-.signup-container-a .modal-overlay {
-=======
 .modal-overlay {
->>>>>>> feat/front/login
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-<<<<<<< HEAD
-    background-color: rgba(20, 28, 41, 0.95);
-=======
     background-color: #1E2A3A;
->>>>>>> feat/front/login
     z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
-<<<<<<< HEAD
-    padding: 2vw;
-    backdrop-filter: blur(5px);
-}
-
-.signup-container-a .modal-box {
-    width: 90vw;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow-y: auto;
-    border: 0.5vw solid var(--accent-yellow-a);
-    border-radius: 2vw;
-    padding: 4vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2vw;
-    box-sizing: border-box;
-    background-color: var(--bg-dark-a);
-    position: relative;
-}
-
-.signup-container-a .modal-close-btn {
-    position: absolute;
-    top: 2vw;
-    right: 2vw;
-    font-size: 8vw;
-    font-weight: 1000;
-    color: var(--accent-yellow-a);
-    cursor: pointer;
-    line-height: 1;
-    z-index: 30;
-}
-
-.signup-container-a .modal-title {
-    font-size: 7vw;
-    font-weight: 900;
-    color: var(--accent-yellow-a);
-    letter-spacing: 0.2vw;
-    text-align: center;
-}
-
-.signup-container-a .modal-desc {
-    font-size: 4vw;
-    font-weight: 900;
-    color: var(--accent-yellow-a);
-    margin-bottom: 2vw;
-    text-align: center;
-}
-
-.signup-container-a .modal-camera-area {
-    width: 100%;
-    border: 0.4vw solid var(--accent-yellow-a);
-    border-radius: 2vw;
-    background-color: #000;
-    height: 60vh;
-=======
     padding: clamp(8px, 2vw, 16px);
     backdrop-filter: blur(5px);
 }
@@ -768,33 +444,16 @@ body:has(.modal-overlay) .global-back-button {
     justify-content: center;
     background-color: #000;
     height: 40vh;
->>>>>>> feat/front/login
     position: relative;
     overflow: hidden;
 }
 
-<<<<<<< HEAD
-.signup-container-a .modal-video-stream {
-=======
 .modal-video-stream {
->>>>>>> feat/front/login
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-<<<<<<< HEAD
-.signup-container-a .shutter-button {
-    width: 8vw;
-    height: 8vw;
-    border-radius: 50%;
-    background-color: transparent;
-    border: 0.5vw solid var(--accent-yellow-a);
-    position: absolute;
-    bottom: 3vw;
-    left: 50%;
-    transform: translateX(-50%);
-=======
 .modal-camera-text {
     font-size: 4vw;
     font-weight: bold;
@@ -815,34 +474,10 @@ body:has(.modal-overlay) .global-back-button {
     background-color: transparent;
     border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
     position: relative;
->>>>>>> feat/front/login
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-<<<<<<< HEAD
-}
-
-.signup-container-a .shutter-inner {
-    width: 6vw;
-    height: 6vw;
-    border-radius: 50%;
-    background-color: var(--accent-yellow-a);
-}
-
-.signup-container-a .card-register-btn-a {
-    font-size: 4.5vw;
-    padding: 2vw;
-    border-radius: 1.5vw;
-    margin-top: 2vw;
-}
-
-/* 에러/성공 모달 */
-.signup-container-a .error-modal-box {
-    width: 80vw;
-    background-color: var(--bg-dark-a);
-    border: 0.5vw solid var(--accent-yellow-a);
-=======
     margin-top: clamp(12px, 3vw, 24px);
 }
 
@@ -970,28 +605,12 @@ body:has(.modal-overlay) .global-back-button {
     width: 60vw;
     background-color: var(--bg-dark);
     border: 0.5vw solid var(--accent-yellow);
->>>>>>> feat/front/login
     border-radius: 2vw;
     padding: 5vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4vw;
-<<<<<<< HEAD
-    text-align: center;
-}
-
-.signup-container-a .error-message {
-    font-size: 5vw;
-    font-weight: bold;
-    color: var(--accent-yellow-a);
-}
-
-.signup-container-a .error-confirm-btn-a {
-    padding: 2vw 6vw;
-    border-radius: 1.5vw;
-    font-size: 5vw;
-=======
     box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.5);
     text-align: center;
     position: relative;
@@ -1013,5 +632,4 @@ body:has(.modal-overlay) .global-back-button {
 
 .success-icon {
     font-size: 8vw;
->>>>>>> feat/front/login
 }
