@@ -1,0 +1,433 @@
+/* StoreBrowserS.css */
+.store-browser-container-overlay-s {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+
+.store-browser-container-s {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    background-color: #f7f6ff;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.iframe-wrapper-s {
+    width: 100%;
+    height: 100vh;
+    border: none;
+}
+
+.store-iframe-s {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ---------------------------------------------------------
+   [SharingJoinS - Entry Modal Overlay]
+   --------------------------------------------------------- */
+.sharing-join-container-overlay-s {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    /* Extremely high z-index to stay on top of everything */
+    background-color: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.join-modal-s {
+    background: white;
+    padding: 4.5rem 3.5rem;
+    border-radius: 64px;
+    width: 100%;
+    max-width: 440px;
+    /* Matched to latest screenshot proportions */
+    text-align: center;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.12);
+}
+
+.modal-icon-square-s {
+    width: 84px;
+    height: 84px;
+    background-color: #fdf2f8;
+    /* Light pink background */
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2.5rem;
+    color: #D65E9E;
+    /* Pink icon color */
+    box-shadow: 0 10px 25px rgba(214, 94, 158, 0.1);
+}
+
+.modal-title-s {
+    font-size: 26px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 0.75rem;
+}
+
+.modal-subtitle-s {
+    font-size: 14px;
+    color: #999;
+    line-height: 1.5;
+    margin-bottom: 3rem;
+    word-break: keep-all;
+}
+
+.code-input-field-s {
+    background-color: #f8f9fb;
+    padding: 3rem 1rem;
+    border-radius: 35px;
+    margin-bottom: 3.5rem;
+    position: relative;
+    cursor: text;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.code-input-field-s:hover {
+    background-color: #f1f3f5;
+}
+
+.code-display-s {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    pointer-events: none;
+}
+
+.digit-s {
+    font-size: 56px;
+    font-weight: 800;
+    width: 42px;
+    text-align: center;
+    transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.digit-s.placeholder {
+    color: #e5e7eb;
+    /* Subtle '0' background numbers */
+}
+
+.digit-s.entered {
+    color: #D65E9E;
+    /* Pink entered digit */
+    transform: scale(1.1);
+    /* Subtle pop effect */
+}
+
+.hidden-native-input-s {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: default;
+}
+
+.modal-actions-s {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-cancel-s {
+    flex: 1;
+    padding: 1.3rem;
+    background-color: #f1f3f5;
+    border: none;
+    border-radius: 25px;
+    font-weight: 700;
+    color: #4b5563;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-join-s {
+    flex: 1.3;
+    padding: 1.3rem;
+    background-color: #e5e7eb;
+    border: none;
+    border-radius: 25px;
+    font-weight: 800;
+    font-size: 16px;
+    color: #adb5bd;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+}
+
+.btn-join-s.ready {
+    background-color: #D65E9E;
+    /* Pink join button */
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(214, 94, 158, 0.3);
+}
+
+.btn-join-s.ready:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(214, 94, 158, 0.4);
+}
+
+/* ---------------------------------------------------------
+   [SharingViewerS - Main Viewer]
+   --------------------------------------------------------- */
+.store-browser-container-s {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    /* Harmonized background */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.iframe-wrapper-s {
+    flex: 1;
+    width: 100%;
+    height: 100vh;
+    background-color: #000;
+    /* Black background for video contrast */
+    overflow: hidden;
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sharing-screen-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Show the whole captured screen */
+    background-color: #000;
+}
+
+.waiting-screen-s {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 2rem;
+}
+
+.waiting-text-s {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #8B5CF6;
+    animation: pulse-waiting 2s infinite;
+}
+
+@keyframes pulse-waiting {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+.store-iframe-s {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* 상단 정보 바 (Top Center) */
+.top-sharing-info-s {
+    position: fixed;
+    top: 1.5rem;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: fit-content;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 2rem;
+    background-color: white;
+    border-radius: 3rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    /* Harmonized shadow */
+}
+
+.status-dot-s {
+    width: 10px;
+    height: 10px;
+    background-color: #8B5CF6;
+    border-radius: 50%;
+    animation: pulse-purple 1.5s infinite;
+}
+
+.info-text-s {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #8B5CF6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.divider-s {
+    color: #e2e8f0;
+    font-weight: 300;
+    margin: 0 5px;
+}
+
+/* 하단 액션 바 (Bottom Center) */
+.bottom-sharing-actions-s {
+    position: fixed;
+    bottom: 3.5rem;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: fit-content;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: white;
+    border-radius: 4rem;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+    /* Harmonized shadow */
+}
+
+.share-action-btn-s {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    border-radius: 2.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.share-action-btn-s.purple-btn {
+    background-color: #8B5CF6;
+    color: white;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+}
+
+.share-action-btn-s.purple-btn:hover {
+    background-color: #7C3AED;
+    transform: translateY(-2px);
+}
+
+/* 우측 참가자 패널 (Top Right) */
+.participants-panel-s {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 400;
+    width: 180px;
+    background-color: white;
+    border-radius: 2.5rem;
+    padding: 2rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    /* Harmonized shadow */
+}
+
+.panel-header-s {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+    padding-left: 0.5rem;
+}
+
+.participant-list-s {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.participant-item-s {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar-s {
+    width: 36px;
+    height: 36px;
+    background-color: #f8f7ff;
+    color: #8B5CF6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f1f0ff;
+}
+
+.user-name-s {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+/* 고정 뒤로가기 버튼 */
+.back-button-circle-s {
+    position: fixed;
+    top: 40px;
+    left: 40px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8B5CF6;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-button-circle-s:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
+    background: #fdfbff;
+}
+
+@keyframes pulse-purple {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.3);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
