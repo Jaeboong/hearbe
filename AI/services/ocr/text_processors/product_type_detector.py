@@ -1,4 +1,5 @@
 # 상품 유형 분류 및 키워드 정의
+import re
 from enum import Enum
 from typing import List, Dict, Optional
 
@@ -225,8 +226,9 @@ TYPE_DETECTION_KEYWORDS: Dict[ProductType, List[str]] = {
     ProductType.의류: [
         "의류", "옷", "티셔츠", "셔츠", "바지", "치마", "원피스",
         "자켓", "코트", "패딩", "니트", "후드", "팬츠", "SIZE",
-        "사이즈", "허리", "총장", "면", "폴리", "소재", "세탁",
-        "와이드", "슬랙스", "청바지"
+        "사이즈", "허리둘레", "총장", "와이드", "슬랙스", "청바지",
+        # 소재 키워드는 더 구체적으로 (단독 "면"은 "측면" 등과 혼동)
+        "면100", "순면", "폴리에스터", "폴리100", "드라이클리닝"
     ],
     ProductType.신발: [
         "신발", "운동화", "구두", "슬리퍼", "샌들", "부츠", "스니커즈"
@@ -316,11 +318,104 @@ TYPE_DESCRIPTIONS: Dict[ProductType, str] = {
 }
 
 
+# "식품유형" 라벨 → ProductType 매핑 (OCR에서 직접 추출된 정보 우선)
+FOOD_TYPE_LABEL_MAP: Dict[str, ProductType] = {
+    # 빵류
+    "빵류": ProductType.베이커리,
+    "빵": ProductType.베이커리,
+    "베이커리": ProductType.베이커리,
+    "케이크류": ProductType.베이커리,
+    # 과자류
+    "과자": ProductType.과자_스낵,
+    "과자류": ProductType.과자_스낵,
+    "스낵": ProductType.과자_스낵,
+    "스낵류": ProductType.과자_스낵,
+    "비스킷": ProductType.과자_스낵,
+    "비스킷류": ProductType.과자_스낵,
+    "캔디류": ProductType.과자_스낵,
+    "초콜릿류": ProductType.과자_스낵,
+    # 음료류
+    "음료": ProductType.음료,
+    "음료류": ProductType.음료,
+    "탄산음료": ProductType.음료,
+    "과채음료": ProductType.음료,
+    "과채주스": ProductType.음료,
+    "커피": ProductType.음료,
+    "다류": ProductType.음료,
+    # 면류/즉석식품
+    "면류": ProductType.즉석식품,
+    "라면": ProductType.즉석식품,
+    "즉석식품": ProductType.즉석식품,
+    "즉석조리식품": ProductType.즉석식품,
+    "레토르트식품": ProductType.즉석식품,
+    "냉동식품": ProductType.즉석식품,
+    # 유제품
+    "유가공품": ProductType.유제품,
+    "유제품": ProductType.유제품,
+    "우유류": ProductType.유제품,
+    "발효유": ProductType.유제품,
+    "발효유류": ProductType.유제품,
+    "치즈류": ProductType.유제품,
+    "아이스크림": ProductType.유제품,
+    "아이스크림류": ProductType.유제품,
+    # 조미료/소스
+    "조미식품": ProductType.조미료_소스,
+    "소스": ProductType.조미료_소스,
+    "소스류": ProductType.조미료_소스,
+    "장류": ProductType.조미료_소스,
+    "식용유지": ProductType.조미료_소스,
+    "드레싱": ProductType.조미료_소스,
+    # 건강기능식품
+    "건강기능식품": ProductType.건강기능식품,
+    # 신선식품/농산물
+    "농산물": ProductType.신선식품,
+    "수산물": ProductType.신선식품,
+    "축산물": ProductType.신선식품,
+    "식육": ProductType.신선식품,
+    "식육가공품": ProductType.신선식품,
+}
+
+
+def extract_food_type_label(texts: List[str]) -> Optional[ProductType]:
+    """
+    OCR 텍스트에서 "식품유형" 라벨을 추출하여 ProductType 반환
+    예: "식품유형빵류원재료명..." → ProductType.베이커리
+    """
+    combined = "".join(texts)  # 공백 없이 합침 (OCR 결과가 붙어있을 수 있음)
+
+    # "식품유형" 다음에 오는 텍스트 추출
+    # 패턴: 식품유형 + 타입명 + (원재료명|제조원|판매원|유통|내용량 등)
+    pattern = r"식품유형\s*[:：]?\s*([가-힣]+?)(?:원재료|제조|판매|유통|내용|성분|영양|보관|주의|알레르기|원산지|$)"
+    match = re.search(pattern, combined)
+
+    if match:
+        food_type = match.group(1).strip()
+        # 매핑 테이블에서 찾기
+        if food_type in FOOD_TYPE_LABEL_MAP:
+            return FOOD_TYPE_LABEL_MAP[food_type]
+        # 부분 매칭 시도 (예: "빵류원재료명" → "빵류")
+        for label, ptype in FOOD_TYPE_LABEL_MAP.items():
+            if label in food_type or food_type in label:
+                return ptype
+
+    return None
+
+
 CORE_KEYWORD_WEIGHTS: Dict[ProductType, Dict[str, int]] = {
+    ProductType.과자_스낵: {
+        "과자": 5, "스낵": 5, "쿠키": 5, "비스킷": 5, "초콜릿": 5,
+        "사탕": 4, "젤리": 4, "껌": 4, "칩": 4, "크래커": 4,
+    },
+    ProductType.음료: {
+        "음료": 5, "주스": 5, "커피": 4, "탄산": 4, "드링크": 4,
+    },
+    ProductType.즉석식품: {
+        "라면": 5, "즉석": 4, "컵라면": 5, "레토르트": 5, "HMR": 5,
+    },
     ProductType.의류: {
-        "SIZE": 10, "사이즈": 10, "허리": 5, "총장": 5, "팬츠": 5,
+        "SIZE": 10, "사이즈": 10, "허리둘레": 5, "총장": 5, "팬츠": 5,
         "바지": 5, "티셔츠": 5, "셔츠": 5, "원피스": 5, "치마": 5,
-        "와이드": 4, "슬랙스": 4, "면": 3, "폴리": 3, "소재": 3,
+        "와이드": 4, "슬랙스": 4, "면100": 4, "순면": 4, "폴리에스터": 4,
         "M": 2, "L": 2, "XL": 2, "FREE": 3,
     },
     ProductType.헤어케어: {
@@ -336,25 +431,31 @@ CORE_KEYWORD_WEIGHTS: Dict[ProductType, Dict[str, int]] = {
 
 
 def detect_product_type(texts: List[str]) -> ProductType:
+    # 1순위: "식품유형" 라벨에서 직접 추출 (가장 신뢰도 높음)
+    food_type = extract_food_type_label(texts)
+    if food_type:
+        return food_type
+
+    # 2순위: 키워드 기반 감지
     combined_text = " ".join(texts).lower()
     scores: Dict[ProductType, float] = {}
-    
+
     for ptype, keywords in TYPE_DETECTION_KEYWORDS.items():
         score = 0.0
         weights = CORE_KEYWORD_WEIGHTS.get(ptype, {})
-        
+
         for keyword in keywords:
             if keyword.lower() in combined_text:
                 weight = weights.get(keyword, 1)
                 score += weight
-        
+
         if score > 0:
             scores[ptype] = score
-    
+
     if scores:
         detected_type = max(scores, key=scores.get)
         return detected_type
-    
+
     return ProductType.기타
 
 

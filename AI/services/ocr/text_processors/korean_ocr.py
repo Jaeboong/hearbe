@@ -112,7 +112,17 @@ def process_image(
     else:
         print(f"일반 이미지 (높이 {height}px <= {max_height}px) → 직접 처리")
 
-        ocr_raw_result = ocr_instance.predict(image_path)
+        # RGBA(PNG 투명도) 처리를 위해 이미지를 RGB로 변환 후 numpy 배열로 전달
+        from PIL import Image
+        import numpy as np
+        img = Image.open(image_path)
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+        img_array = np.array(img)
+        img_array = img_array[:, :, ::-1]  # RGB to BGR
+        ocr_raw_result = ocr_instance.predict(img_array)
 
         if save_vis:
             os.makedirs(output_dir, exist_ok=True)
