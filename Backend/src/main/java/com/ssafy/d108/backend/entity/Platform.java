@@ -22,7 +22,7 @@ public class Platform {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "platform_name", length = 50)
+    @Column(name = "platform_name", length = 50, unique = true)
     private String platformName;
 
     @Column(name = "base_url", length = 500, nullable = false)
