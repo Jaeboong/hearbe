@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* --- 1. 변수 설정 (유지보수 편하게!) --- */
 :root {
     --cart-bg: #141C29;
@@ -169,12 +170,254 @@
     height: 20vw;
     background-color: #fff;
     border-radius: 2vw;
+=======
+/* Cart Page Styles */
+
+.cart-container {
+    min-height: 100vh;
+    background-color: #1E2A3A;
+    padding: clamp(20px, 5vw, 40px);
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Back Button Override */
+.cart-container .global-back-button.arrow-only {
+    left: clamp(20px, 5vw, 40px);
+    top: clamp(20px, 5vw, 40px);
+}
+
+.cart-container .global-back-button.arrow-only .back-arrow-svg {
+    width: clamp(40px, 10vw, 80px);
+    height: clamp(40px, 10vw, 80px);
+}
+
+.cart-content {
+    display: flex;
+    gap: clamp(30px, 5vw, 60px);
+    max-width: 1400px;
+    margin: clamp(80px, 15vw, 120px) auto 0;
+    padding: 0 clamp(20px, 3vw, 40px);
+}
+
+/* Sidebar */
+.cart-sidebar {
+    flex: 0 0 clamp(200px, 25vw, 300px);
+}
+
+.sidebar-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    color: #FFF064;
+    margin-bottom: clamp(30px, 5vw, 50px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2vw, 16px);
+}
+
+.sidebar-item {
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: bold;
+    color: #FFF064;
+    padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
+    border-radius: clamp(8px, 2vw, 12px);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 240, 100, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: #141C29;
+}
+
+/* Main Content */
+.cart-main {
+    flex: 1;
+}
+
+.content-title {
+    font-size: clamp(28px, 4.5vw, 42px);
+    font-weight: 900;
+    color: #FFF064;
+    margin-bottom: clamp(30px, 5vw, 50px);
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Mall Section */
+.cart-mall-section {
+    margin-bottom: clamp(30px, 5vw, 50px);
+}
+
+.cart-mall-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
+    background-color: #FFF064;
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border-radius: clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px) 0 0;
+    border-bottom: none;
+}
+
+.cart-mall-name {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 900;
+    color: #1E2A3A;
+    margin: 0;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Items List */
+.cart-items-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 3vw, 24px);
+    padding: clamp(16px, 3vw, 24px);
+    background-color: #FFFFFF;
+    border-bottom: clamp(1px, 0.2vw, 2px) solid #E0E0E0;
+}
+
+.cart-item:first-child {
+    border-top: clamp(2px, 0.4vw, 4px) solid #FFF064;
+}
+
+.cart-item:last-child {
+    border-bottom: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border-radius: 0 0 clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px);
+}
+
+/* Checkbox Styling */
+.cart-item-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: clamp(30px, 6vw, 40px);
+    height: clamp(30px, 6vw, 40px);
+    border: clamp(2px, 0.4vw, 3px) solid #1E2A3A;
+    background-color: #1E2A3A;
+    border-radius: clamp(4px, 1vw, 6px);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.cart-item-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #FFF064;
+    font-size: clamp(20px, 4.5vw, 30px);
+    font-weight: bold;
+}
+
+.cart-item-image {
+    width: clamp(60px, 12vw, 80px);
+    height: clamp(60px, 12vw, 80px);
+    object-fit: cover;
+    border-radius: clamp(6px, 1.5vw, 10px);
+    flex-shrink: 0;
+}
+
+.cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.5vw, 10px);
+}
+
+.cart-item-name {
+    font-size: clamp(16px, 3vw, 22px);
+    color: #1E2A3A;
+    font-weight: bold;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.cart-item-price {
+    font-size: clamp(16px, 3vw, 22px);
+    color: #1E2A3A;
+    font-weight: 900;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Item Controls */
+.cart-item-controls {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2vw, 16px);
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1.5vw, 12px);
+}
+
+.quantity-btn {
+    width: clamp(28px, 6vw, 36px);
+    height: clamp(28px, 6vw, 36px);
+    border: clamp(1px, 0.2vw, 2px) solid #CCCCCC;
+    background-color: #F5F5F5;
+    color: #1E2A3A;
+    font-size: clamp(16px, 3.5vw, 24px);
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: clamp(4px, 1vw, 6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: background-color 0.2s;
+}
+
+.quantity-btn:hover {
+    background-color: #E0E0E0;
+}
+
+.quantity-value {
+    min-width: clamp(30px, 6vw, 40px);
+    text-align: center;
+    font-size: clamp(16px, 3vw, 22px);
+    font-weight: bold;
+    color: #1E2A3A;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+.cart-delete-btn {
+    width: clamp(32px, 6.5vw, 44px);
+    height: clamp(32px, 6.5vw, 44px);
+    background-color: #9C2121;
+    color: #F5F5F5;
+    border: none;
+    border-radius: 50%;
+    font-size: clamp(18px, 3.5vw, 24px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: opacity 0.2s;
+>>>>>>> feat/front/login
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
+<<<<<<< HEAD
 .item-img {
     width: 80%;
     height: 80%;
@@ -297,4 +540,78 @@
     border-radius: 2vw;
     cursor: pointer;
     box-shadow: 0 0.5vw 2vw rgba(255, 240, 100, 0.3);
+=======
+.cart-delete-btn::before {
+    content: 'X';
+}
+
+.cart-delete-btn:hover {
+    opacity: 0.9;
+}
+
+/* Mall Footer */
+.cart-mall-footer {
+    padding: clamp(16px, 3vw, 24px);
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.checkout-btn {
+    padding: clamp(12px, 2.5vw, 18px) clamp(24px, 4vw, 36px);
+    background-color: #1E2A3A;
+    color: #FFF064;
+    border: none;
+    border-radius: clamp(6px, 1.5vw, 10px);
+    font-size: clamp(18px, 3.5vw, 28px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.checkout-btn:hover {
+    opacity: 0.9;
+}
+
+/* Empty State */
+.empty-cart {
+    text-align: center;
+    padding: clamp(60px, 10vw, 100px);
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: bold;
+    color: #FFF064;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cart-content {
+        flex-direction: column;
+    }
+
+    .cart-sidebar {
+        flex: none;
+    }
+
+    .cart-item {
+        flex-wrap: wrap;
+    }
+
+    .cart-item-controls {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cart-mall-footer {
+        justify-content: stretch;
+    }
+
+    .checkout-btn {
+        width: 100%;
+    }
+>>>>>>> feat/front/login
 }

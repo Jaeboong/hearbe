@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* --- SelectMallA.css Optimized by Choco --- */
 
 :root {
@@ -10,6 +11,14 @@
     --color-coupang: #E11724;
 
     /* 🔠 폰트 변수 */
+=======
+:root {
+    --color-bg-main: #1E2A3A;
+    --color-bg-card: #141C29;
+    --color-accent: #FFF064;
+
+    /* 폰트 변수 */
+>>>>>>> feat/front/login
     --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
 }
 
@@ -25,9 +34,17 @@
     position: relative;
     overflow-x: hidden;
     box-sizing: border-box;
+<<<<<<< HEAD
 }
 
 /* --- 공통 유틸리티 --- */
+=======
+    padding: 0;
+    margin: 0;
+}
+
+/* --- 공통 유틸리티 (Flex 정렬 중복 제거) --- */
+>>>>>>> feat/front/login
 .mall-header,
 .mall-content,
 .mic-center,
@@ -39,6 +56,7 @@
 
 /* --- Header Section --- */
 .mall-header {
+<<<<<<< HEAD
     padding: 2vw;
     margin-top: 1vw;
     position: relative;
@@ -55,11 +73,30 @@
     color: var(--color-accent);
     z-index: 10;
     max-width: 50vw;
+=======
+    padding: clamp(8px, 1.5vw, 12px);
+    margin-top: clamp(8px, 2vw, 16px);
+    position: relative;
+    min-height: clamp(60px, 15vw, 120px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: clamp(150px, 20vw, 250px);
+}
+
+.header-title {
+    font-size: clamp(32px, 8vw, 80px);
+    font-weight: 900;
+    letter-spacing: clamp(0.5px, 0.1vw, 1px);
+    color: var(--color-accent);
+    z-index: 10;
+>>>>>>> feat/front/login
     white-space: nowrap;
 }
 
 .header-nav {
     position: absolute;
+<<<<<<< HEAD
     right: 3vw;
     top: 1.5vw;
     display: flex;
@@ -83,17 +120,44 @@
 .nav-icon {
     width: 9vw;
     height: 9vw;
+=======
+    right: clamp(12px, 3vw, 32px);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: clamp(12px, 3vw, 32px);
+    z-index: 20;
+}
+
+.nav-icon {
+    width: clamp(48px, 13vw, 110px);
+    height: clamp(48px, 13vw, 110px);
+>>>>>>> feat/front/login
     object-fit: contain;
 }
 
 .nav-item span {
+<<<<<<< HEAD
     font-size: 3vw;
     font-weight: bold;
     color: var(--color-accent);
+=======
+    font-size: clamp(16px, 4vw, 40px);
+    font-weight: bold;
+    color: var(--color-accent);
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .nav-item span {
+        display: inline;
+    }
+>>>>>>> feat/front/login
 }
 
 /* --- Content Section --- */
 .mall-content {
+<<<<<<< HEAD
     flex-grow: 1;
     gap: 4vw;
     padding-bottom: 5vw;
@@ -153,19 +217,123 @@
     color: var(--color-accent);
     text-shadow: 0.2vw 0.2vw 0.5vw rgba(0, 0, 0, 0.5);
     z-index: 10;
+=======
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    padding: clamp(10px, 2vw, 20px) 0;
+}
+
+.mall-scroll-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: clamp(20px, 4vw, 60px);
+    padding: clamp(30px, 8vh, 80px) clamp(16px, 4vw, 40px) clamp(20px, 5vw, 40px);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) transparent;
+}
+
+@media (min-width: 768px) {
+    .mall-scroll-container {
+        justify-content: flex-start;
+    }
+}
+
+@media (min-width: 1024px) {
+    .mall-scroll-container {
+        justify-content: center;
+        flex-wrap: wrap;
+        overflow-x: visible;
+    }
+}
+
+.mall-scroll-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+.mall-card-wrapper {
+    flex: 0 0 clamp(140px, 40vw, 280px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    scroll-snap-align: center;
+}
+
+@media (min-width: 768px) {
+    .mall-card-wrapper {
+        flex: 0 0 clamp(200px, 30vw, 320px);
+    }
+}
+
+@media (min-width: 1024px) {
+    .mall-card-wrapper {
+        flex: 0 0 280px;
+        scroll-snap-align: none;
+    }
+}
+
+.mall-square-box {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #141C29;
+    border: clamp(3px, 0.8vw, 8px) solid var(--color-accent);
+    border-radius: clamp(32px, 8vw, 80px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    padding: clamp(10px, 2vw, 20px) 0 clamp(20px, 5vw, 40px);
+    box-sizing: border-box;
+}
+
+.mall-card-wrapper:hover .mall-square-box {
+    transform: scale(1.05);
+    box-shadow: 0 0 2vw rgba(255, 240, 100, 0.2);
+}
+
+.mall-number {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    font-size: clamp(80px, 20vw, 160px);
+    font-weight: 900;
+    color: var(--color-accent);
+    text-shadow: none;
+    z-index: 10;
+    line-height: 1;
+    margin-bottom: clamp(10px, 2vw, 20px);
+>>>>>>> feat/front/login
 }
 
 /* Naver Specific */
 .naver-box {
     background-color: transparent;
+<<<<<<< HEAD
     display: flex;
     align-items: center;
     justify-content: center;
+=======
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-card);
+>>>>>>> feat/front/login
 }
 
 /* Coupang Specific */
 .coupang-box {
     background-color: transparent;
+<<<<<<< HEAD
     background-image: none;
     border: none;
     display: flex;
@@ -201,4 +369,39 @@
     color: var(--color-accent);
     cursor: pointer;
     font-weight: bold;
+=======
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-card);
+}
+
+.mall-11st-box {
+    border-color: var(--color-accent);
+}
+
+.mall-emart-box {
+    border-color: var(--color-accent);
+}
+
+.mall-logo-img {
+    width: clamp(90px, 22vw, 180px);
+    height: clamp(90px, 22vw, 180px);
+    object-fit: contain;
+}
+
+.mall-logo-placeholder {
+    font-size: clamp(30px, 7vw, 60px);
+    font-weight: 900;
+    color: var(--color-accent);
+    text-align: center;
+    word-break: keep-all;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: clamp(12px, 3vw, 24px);
+    border-radius: clamp(8px, 2vw, 16px);
+    min-width: clamp(90px, 22vw, 180px);
+}
+
+/* --- Mic Icon --- */
+.mic-icon {
+    display: none;
+>>>>>>> feat/front/login
 }

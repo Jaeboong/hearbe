@@ -6,7 +6,11 @@
 ## API Specification
 
 ### Endpoint
+<<<<<<< HEAD
 - **URL**: `/auth/regist`
+=======
+- **URL**: `/api/auth/regist`
+>>>>>>> feat/front/login
 - **Method**: POST
 - **Content-Type**: application/json
 

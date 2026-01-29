@@ -14,7 +14,30 @@ export const authAPI = {
                 body: JSON.stringify(userData),
             });
 
+<<<<<<< HEAD
             const data = await response.json();
+=======
+            // 응답 상태 확인
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
+            // 응답이 비어있거나 204 No Content인 경우
+            if (response.status === 204) {
+                return { success: true, message: '회원가입이 완료되었습니다.' };
+            }
+
+            // JSON 파싱 전에 응답 텍스트 확인
+            const text = await response.text();
+            console.log('Response text:', text);
+
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+>>>>>>> feat/front/login
 
             if (!response.ok) {
                 throw new Error(data.message || '회원가입에 실패했습니다.');
@@ -35,7 +58,11 @@ export const authAPI = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+<<<<<<< HEAD
                 body: JSON.stringify({ user_id: userId }),
+=======
+                body: JSON.stringify({ username: userId }),
+>>>>>>> feat/front/login
             });
 
             const data = await response.json();
@@ -46,4 +73,78 @@ export const authAPI = {
             return { available: true };
         }
     },
+<<<<<<< HEAD
+=======
+
+    // 로그인 API
+    login: async (id, password) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: id, password }),
+            });
+
+            const text = await response.text();
+            console.log('Login Response status:', response.status);
+            console.log('Login Response text:', text);
+
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '로그인에 실패했습니다.');
+            }
+
+            // 토큰 및 사용자 정보 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
+            if (data.data && data.data.accessToken) {
+                localStorage.setItem('accessToken', data.data.accessToken);
+            }
+            // user_id 저장
+            if (data.data && data.data.id) {
+                localStorage.setItem('user_id', data.data.id);
+                // 가입 시 아이디인 username도 저장 (장바구니 API 등에서 사용)
+                localStorage.setItem('username', id);
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Login API Error:', error);
+            throw error;
+        }
+    },
+
+    // 사용자 프로필 조회 API
+    getUserProfile: async () => {
+        const token = localStorage.getItem('accessToken');
+
+        if (!token) {
+            throw new Error('No access token found');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/auth/mypage`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('401');
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+>>>>>>> feat/front/login
 };

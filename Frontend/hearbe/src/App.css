@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .landing-container {
   min-height: 100vh;
   background-color: #f8f9fb;
@@ -668,4 +669,22 @@
 
 .theme-a .section-title {
   color: #fcd34d !important;
+=======
+/* A형 */
+.theme-a {
+  background-color: #141C29 !important;
+  color: #FCD34D !important;
+  min-height: 100vh;
+}
+
+.theme-a * {
+  border-color: #FCD34D !important;
+}
+
+/* C형 */
+.theme-c {
+  background-color: #F8F9FA !important;
+  color: #1E293B !important;
+  min-height: 100vh;
+>>>>>>> feat/front/login
 }
