@@ -23,6 +23,134 @@ def get_box_height(box: List[List[float]]) -> float:
     return abs(box[2][1] - box[0][1])
 
 
+def get_box_width(box: List[List[float]]) -> float:
+    """박스의 너비 계산"""
+    if not box or len(box) < 4:
+        return 0.0
+    return abs(box[2][0] - box[0][0])
+
+
+# ============================================
+# OCR 텍스트 교정 룰
+# ============================================
+
+# 헤더 오인식 교정 맵
+HEADER_CORRECTION_MAP = {
+    # 허리 오인식
+    "I라우": "허리",
+    "1라우": "허리",
+    "라우": "허리",
+    "허리단": "허리",
+    # 엉덩이 오인식
+    "10": "엉덩이",
+    "엉덩0": "엉덩이",
+    # 앞밑위 오인식
+    "|": "앞밑위",
+    "왓밀위": "앞밑위",
+    "앞밀위": "앞밑위",
+    # 뒷밑위 오인식
+    "뜻밀위": "뒷밑위",
+    "뒤밀위": "뒷밑위",
+    "딧밀위": "뒷밑위",
+    # 밑단 오인식
+    "밀단": "밑단",
+    "민단": "밑단",
+    # 허벅지 오인식
+    "허벅치": "허벅지",
+    "허벅": "허벅지",
+}
+
+# 사이즈 라벨 오인식 교정 맵
+SIZE_LABEL_CORRECTION_MAP = {
+    "7": "L",
+    "7X": "XL",
+    "X7": "XL",
+    "27L": "2XL",
+    "2X7": "2XL",
+    "3X7": "3XL",
+    "F": "FREE",
+}
+
+# 잡음 토큰 (헤더 행에서만 제거, 데이터 행에서는 유지)
+NOISE_TOKENS = {"|", "｜", "/", "\\", "-", "_", ".", ","}
+
+
+def correct_header_text(text: str) -> str:
+    """헤더 텍스트 오인식 교정"""
+    text = text.strip()
+    if text in HEADER_CORRECTION_MAP:
+        return HEADER_CORRECTION_MAP[text]
+    return text
+
+
+def correct_size_label(text: str) -> str:
+    """사이즈 라벨 오인식 교정"""
+    text = text.strip().upper()
+    if text in SIZE_LABEL_CORRECTION_MAP:
+        return SIZE_LABEL_CORRECTION_MAP[text]
+    return text
+
+
+def is_noise_token(text: str) -> bool:
+    """잡음 토큰인지 확인"""
+    return text.strip() in NOISE_TOKENS
+
+
+def is_header_row(row: List[Dict[str, Any]]) -> bool:
+    """헤더 행인지 판단"""
+    header_keywords = ["허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
+                       "I라우", "라우", "왓밀위", "뜻밀위", "밀단"]
+    row_text = " ".join(item["text"] for item in row)
+    return any(kw in row_text for kw in header_keywords)
+
+
+def is_size_data_row(row: List[Dict[str, Any]]) -> bool:
+    """사이즈 데이터 행인지 판단 (M, L, XL 등으로 시작)"""
+    if not row:
+        return False
+    first_text = row[0]["text"].strip().upper()
+    size_labels = ["M", "L", "XL", "2XL", "3XL", "FREE", "F", "7", "7X", "S"]
+    return first_text in size_labels
+
+
+def correct_row_texts(row: List[Dict[str, Any]], is_header: bool = False) -> List[Dict[str, Any]]:
+    """행 내 텍스트 교정"""
+    corrected_row = []
+
+    for cell in row:
+        new_cell = cell.copy()
+        text = cell["text"]
+
+        if is_header:
+            # 헤더 행: 헤더 교정 적용, 잡음 토큰 제거
+            corrected_text = correct_header_text(text)
+            if not is_noise_token(text) or corrected_text != text:
+                new_cell["text"] = corrected_text
+                new_cell["original_text"] = text  # 원본 보존
+                corrected_row.append(new_cell)
+        else:
+            # 데이터 행: 첫 번째 셀(사이즈 라벨)만 교정
+            if not corrected_row:  # 첫 번째 셀
+                corrected_text = correct_size_label(text)
+                new_cell["text"] = corrected_text
+                new_cell["original_text"] = text
+            corrected_row.append(new_cell)
+
+    return corrected_row
+
+
+def apply_ocr_corrections(rows: List[List[Dict[str, Any]]]) -> List[List[Dict[str, Any]]]:
+    """전체 행에 OCR 교정 적용"""
+    corrected_rows = []
+
+    for row in rows:
+        is_header = is_header_row(row)
+        corrected_row = correct_row_texts(row, is_header=is_header)
+        corrected_rows.append(corrected_row)
+
+    return corrected_rows
+
+
 def cluster_by_y_coordinate(
     texts: List[str],
     boxes: List[List[List[float]]],
@@ -87,6 +215,92 @@ def cluster_by_y_coordinate(
     return rows
 
 
+def cluster_column_centers(rows: List[List[Dict[str, Any]]]) -> List[float]:
+    """
+    모든 행의 셀에서 center_x를 수집하여 열 기준선(column centers) 생성
+    """
+    if not rows:
+        return []
+
+    # 모든 셀의 center_x와 width 수집
+    all_cells = []
+    for row in rows:
+        for cell in row:
+            all_cells.append({
+                "center_x": cell["center_x"],
+                "width": get_box_width(cell["box"]) if cell.get("box") else 0
+            })
+
+    if not all_cells:
+        return []
+
+    # 평균 너비 계산 (클러스터링 threshold로 사용)
+    avg_width = sum(c["width"] for c in all_cells) / len(all_cells)
+    x_threshold = avg_width * 0.5  # 너비의 절반을 threshold로
+
+    # center_x 기준 정렬
+    all_x = sorted([c["center_x"] for c in all_cells])
+
+    # X좌표 클러스터링
+    column_centers = []
+    current_cluster = [all_x[0]]
+
+    for x in all_x[1:]:
+        # 현재 클러스터의 평균과 비교
+        cluster_mean = sum(current_cluster) / len(current_cluster)
+
+        if abs(x - cluster_mean) <= x_threshold:
+            current_cluster.append(x)
+        else:
+            # 클러스터 완성 → 평균을 열 기준선으로
+            column_centers.append(sum(current_cluster) / len(current_cluster))
+            current_cluster = [x]
+
+    # 마지막 클러스터
+    if current_cluster:
+        column_centers.append(sum(current_cluster) / len(current_cluster))
+
+    return sorted(column_centers)
+
+
+def assign_cells_to_columns(
+    rows: List[List[Dict[str, Any]]],
+    column_centers: List[float]
+) -> List[List[Optional[Dict[str, Any]]]]:
+    """
+    각 셀을 가장 가까운 열 기준선에 배치
+    빈 열은 None으로 유지
+    """
+    if not column_centers:
+        return rows
+
+    num_columns = len(column_centers)
+    result_rows = []
+
+    for row in rows:
+        # 고정 열 개수의 빈 행 생성
+        new_row = [None] * num_columns
+
+        for cell in row:
+            # 가장 가까운 열 찾기
+            min_dist = float('inf')
+            best_col = 0
+
+            for col_idx, col_center in enumerate(column_centers):
+                dist = abs(cell["center_x"] - col_center)
+                if dist < min_dist:
+                    min_dist = dist
+                    best_col = col_idx
+
+            # 해당 열에 셀 배치 (이미 있으면 덮어쓰지 않음)
+            if new_row[best_col] is None:
+                new_row[best_col] = cell
+
+        result_rows.append(new_row)
+
+    return result_rows
+
+
 def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[int, int]]:
     """
     SIZE 표 영역 찾기
@@ -135,7 +349,7 @@ def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[i
 
 def format_table_as_text(rows: List[List[Dict[str, Any]]]) -> str:
     """
-    표 구조를 텍스트로 변환
+    표 구조를 텍스트로 변환 (기존 방식 - 열 클러스터링 없음)
     """
     lines = []
     for row in rows:
@@ -144,14 +358,40 @@ def format_table_as_text(rows: List[List[Dict[str, Any]]]) -> str:
     return "\n".join(lines)
 
 
+def format_table_with_fixed_columns(
+    rows: List[List[Optional[Dict[str, Any]]]]
+) -> str:
+    """
+    고정 열 개수의 표를 텍스트로 변환
+    빈 셀은 빈 문자열로 표시
+    """
+    lines = []
+    for row in rows:
+        row_texts = []
+        for cell in row:
+            if cell is None:
+                row_texts.append("")
+            else:
+                row_texts.append(cell["text"])
+        row_text = " | ".join(row_texts)
+        lines.append(row_text)
+    return "\n".join(lines)
+
+
 def reconstruct_size_table(
     texts: List[str],
     boxes: List[List[List[float]]],
-    scores: List[float]
+    scores: List[float],
+    use_column_clustering: bool = True,
+    use_ocr_correction: bool = True
 ) -> Optional[str]:
     """
     SIZE 표를 좌표 기반으로 재구성
     반환: 구조화된 표 텍스트 (행별로 | 구분)
+
+    Args:
+        use_column_clustering: True면 X좌표 기반 열 클러스터링 적용 (빈칸 보정)
+        use_ocr_correction: True면 OCR 오인식 텍스트 교정 적용
     """
     # 1. Y좌표 기반 행 클러스터링
     rows = cluster_by_y_coordinate(texts, boxes, scores)
@@ -168,8 +408,23 @@ def reconstruct_size_table(
     start_idx, end_idx = table_region
     table_rows = rows[start_idx:end_idx]
 
-    # 3. 표를 텍스트로 변환
-    table_text = format_table_as_text(table_rows)
+    # 3. OCR 오인식 교정 (선택적)
+    if use_ocr_correction and table_rows:
+        table_rows = apply_ocr_corrections(table_rows)
+
+    # 4. X좌표 기반 열 클러스터링 (선택적)
+    if use_column_clustering and table_rows:
+        # 열 기준선 생성
+        column_centers = cluster_column_centers(table_rows)
+
+        # 각 셀을 열에 배치
+        aligned_rows = assign_cells_to_columns(table_rows, column_centers)
+
+        # 고정 열 개수로 표 변환
+        table_text = format_table_with_fixed_columns(aligned_rows)
+    else:
+        # 기존 방식
+        table_text = format_table_as_text(table_rows)
 
     return table_text
 
@@ -183,8 +438,12 @@ def parse_size_table_to_dict(table_text: str) -> Dict[str, Any]:
     if not lines:
         return {}
 
-    # 헤더 찾기 (허리, 엉덩이 등이 포함된 행)
-    header_keywords = ["허리", "엉덩이", "왓밀위", "뜻밀위", "허벅지", "밀단", "총장"]
+    # 헤더 찾기 (교정된 헤더 포함)
+    header_keywords = [
+        "허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
+        # 오인식 버전도 포함 (교정 전 데이터 호환)
+        "왓밀위", "뜻밀위", "밀단", "I라우", "라우"
+    ]
     header_line = None
     header_index = 0
 
@@ -197,11 +456,15 @@ def parse_size_table_to_dict(table_text: str) -> Dict[str, Any]:
     if header_line is None:
         return {}
 
-    # 헤더 파싱
-    headers = [h.strip() for h in header_line.split("|")]
+    # 헤더 파싱 (교정 적용)
+    headers = []
+    for h in header_line.split("|"):
+        h = h.strip()
+        corrected = correct_header_text(h)
+        headers.append(corrected)
 
-    # 사이즈 라벨 (M, L, XL 등)
-    size_labels = ["M", "L", "XL", "2XL", "3XL", "FREE", "F"]
+    # 사이즈 라벨 (교정된 라벨 포함)
+    size_labels = ["S", "M", "L", "XL", "2XL", "3XL", "FREE", "F"]
 
     sizes = {}
 
@@ -209,11 +472,16 @@ def parse_size_table_to_dict(table_text: str) -> Dict[str, Any]:
     for line in lines[header_index + 1:]:
         parts = [p.strip() for p in line.split("|")]
 
-        # 첫 번째 항목이 사이즈 라벨인지 확인
-        if not parts or parts[0].upper() not in size_labels:
+        if not parts:
             continue
 
-        size_label = parts[0].upper()
+        # 첫 번째 항목에 사이즈 라벨 교정 적용
+        first_part = correct_size_label(parts[0])
+
+        if first_part.upper() not in size_labels:
+            continue
+
+        size_label = first_part.upper()
         values = parts[1:]
 
         # 헤더와 값 매핑
