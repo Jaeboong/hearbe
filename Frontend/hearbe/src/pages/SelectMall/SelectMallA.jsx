@@ -14,15 +14,15 @@ const SelectMall = () => {
 
     const handleSelectMall = (mall) => {
         if (mall === 'naver') {
-            navigate('/store', { state: { url: 'https://m.shopping.naver.com/' } });
+            navigate('/A/store', { state: { url: 'https://m.shopping.naver.com/' } });
         } else if (mall === 'coupang') {
-            navigate('/store', { state: { url: 'https://www.coupang.com' } });
+            navigate('/A/store', { state: { url: 'https://www.coupang.com' } });
         } else if (mall === '11st') {
-            navigate('/store', { state: { url: 'https://m.11st.co.kr/' } });
+            navigate('/A/store', { state: { url: 'https://m.11st.co.kr/' } });
         } else if (mall === 'emart') {
-            navigate('/store', { state: { url: 'https://m.ssg.com/' } });
+            navigate('/A/store', { state: { url: 'https://m.ssg.com/' } });
         } else if (mall === 'cart') {
-            navigate('/cart');
+            navigate('/A/cart');
         }
     };
 
@@ -33,7 +33,7 @@ const SelectMall = () => {
             <div className="mall-header">
                 <div className="header-title">쇼핑몰 선택</div>
                 <div className="header-nav">
-                    <div className="nav-item">
+                    <div className="nav-item" onClick={() => navigate('/')}>
                         <img src={iconHome} alt="Home" className="nav-icon" />
                         <span>홈</span>
                     </div>
@@ -41,7 +41,7 @@ const SelectMall = () => {
                         <img src={iconCart} alt="Cart" className="nav-icon" />
                         <span>카트</span>
                     </div>
-                    <div className="nav-item" onClick={() => navigate('/mypage')}>
+                    <div className="nav-item" onClick={() => navigate('/A/mypage')}>
                         <img src={iconUser} alt="My" className="nav-icon" />
                         <span>마이</span>
                     </div>

@@ -22,7 +22,7 @@ const Login = () => {
 
             if (response.code === 200) {
                 // 로그인 성공
-                navigate('/mall');
+                navigate('/A/mall');
             } else {
                 alert(response.message || "로그인에 실패했습니다.");
             }
@@ -78,7 +78,7 @@ const Login = () => {
                     <span className="login-separator">|</span>
                     <span>비밀번호 찾기</span>
                     <span className="login-separator">|</span>
-                    <span className="signup-link" onClick={() => navigate('/signup')} style={{ cursor: 'pointer' }}>회원가입</span>
+                    <span className="signup-link" onClick={() => navigate('/A/signup')} style={{ cursor: 'pointer' }}>회원가입</span>
                 </div>
             </div>
         </div>
