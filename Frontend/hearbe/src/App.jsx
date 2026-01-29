@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-
+import { motion } from 'framer-motion';
 
 // [공통 컴포넌트 및 설정 페이지]
 import InitialSetup from './pages/InitialSetup/InitialSetup';
