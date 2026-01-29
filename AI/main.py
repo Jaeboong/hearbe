@@ -170,9 +170,16 @@ class AIServer:
         async def websocket_endpoint_with_session(websocket: WebSocket, session_id: str):
             await self.ws_handler.handle_connection(websocket, session_id)
 
-        # 루트 엔드포인트
+        # 루트 엔드포인트 (healthcheck용)
+        _health_check_count = {"value": 0}  # mutable for closure
+
         @self.app.get("/")
         async def root():
+            # 3번에 1번 (약 1분 30초마다) 생존 로그 → 로그 로테이션 트리거 보장
+            _health_check_count["value"] += 1
+            if _health_check_count["value"] % 3 == 0:
+                logger.info("Server heartbeat")
+
             ws_url = self.config.server.public_ws_url
             if not ws_url:
                 base_url = self.config.server.public_base_url
