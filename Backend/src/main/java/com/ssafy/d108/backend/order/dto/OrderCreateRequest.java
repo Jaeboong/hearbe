@@ -1,12 +1,20 @@
 package com.ssafy.d108.backend.order.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
+/**
+ * 주문 생성 요청 DTO
+ * 여러 아이템을 한 번에 주문할 수 있음
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,18 +25,7 @@ public class OrderCreateRequest {
     @NotNull(message = "플랫폼 ID는 필수입니다.")
     private Long platformId;
 
-    @NotNull(message = "상품명은 필수입니다.")
-    private String name;
-
-    private String url;
-
-    @NotNull(message = "가격은 필수입니다.")
-    private Long price;
-
-    @JsonProperty("quantity")
-    @NotNull(message = "수량은 필수입니다.")
-    private Integer quantity;
-
-    @JsonProperty("img_url")
-    private String imgUrl;
+    @Valid
+    @NotEmpty(message = "주문 아이템은 최소 1개 이상이어야 합니다.")
+    private List<OrderItemDto> items;
 }

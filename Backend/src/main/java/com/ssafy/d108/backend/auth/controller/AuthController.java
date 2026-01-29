@@ -55,7 +55,7 @@ public class AuthController {
      * 아이디 찾기 (A형 - 복지카드 인증)
      */
     @Operation(summary = "아이디 찾기", description = "복지카드 정보로 아이디 찾기 (A형 전용)")
-    @PostMapping("/find-id")
+    @PostMapping("/findId")
     public ResponseEntity<ApiResponse<FindIdResponse>> findId(@Valid @RequestBody FindIdRequest request) {
         FindIdResponse response = authService.findId(request);
         return ResponseEntity.ok(ApiResponse.success(response));

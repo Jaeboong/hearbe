@@ -34,7 +34,7 @@ public class WelfareCardResponse {
     private LocalDate issueDate;
 
     @JsonProperty("expiration_date")
-    private LocalDate expirationDate;
+    private String expirationDate; // MM/YY 형식
 
     /**
      * CVC는 보안상 반환하지 않음

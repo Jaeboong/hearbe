@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderItemResponse {
 
-    @JsonProperty("product_name")
+    @JsonProperty("name")
     private String name;
 
     @JsonProperty("price")
