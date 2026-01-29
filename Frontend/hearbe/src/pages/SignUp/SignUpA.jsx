@@ -5,11 +5,7 @@ import iconLock from '../../assets/icon-lock.png';
 import iconCard from '../../assets/icon-card.png';
 import iconPhone from '../../assets/icon-phone.png';
 import iconCamera from '../../assets/icon-camera.png';
-<<<<<<< HEAD
-import hLogo from '../../assets/HearBe_A_logo.png';
-=======
 import logo from '../../assets/logoA.png';
->>>>>>> feat/front/login
 import { authAPI } from '../../services/authAPI';
 import './SignUpA.css';
 import BackButton from '../common/BackButtonA';
@@ -29,8 +25,8 @@ const formatPhoneNumber = (value) => {
 };
 
 const validateUserId = (userId) => {
-    // 영문자와 숫자 포함 필수, 3글자 이상
-    if (userId.length < 3) return false;
+    // 영문자와 숫자 포함 필수, 4글자 이상 (서버 요구사항)
+    if (userId.length < 4) return false;
     const hasLetter = /[a-zA-Z]/.test(userId);
     const hasNumber = /[0-9]/.test(userId);
     return hasLetter && hasNumber;
@@ -144,9 +140,9 @@ const SignUp = () => {
             return;
         }
 
-        // 아이디 형식 검증 (영문+숫자 포함, 3글자 이상)
+        // 아이디 형식 검증 (영문+숫자 포함, 4글자 이상)
         if (!validateUserId(formData.id)) {
-            setErrorMessage("아이디는 영문자와 숫자를 포함하여 3글자 이상이어야 합니다.");
+            setErrorMessage("아이디는 영문자와 숫자를 포함하여 4글자 이상이어야 합니다.");
             setShowError(true);
             return;
         }
@@ -198,25 +194,18 @@ const SignUp = () => {
 
     // 2. 최종 카드 등록 -> 데이터 저장 후 팝업 닫기
     const handleCardRegister = () => {
-<<<<<<< HEAD
-        setCardData({
-            company: '신한카드',
-            number: '0000-0000-0000-0000',
-            expiry: '01/21',
-=======
         // 현재 날짜를 issue_date로, expiry를 백엔드 형식으로 변환
         const today = new Date();
         const issueDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-        // expiry '01/21' -> '2021-01-31' 형식으로 변환 (임시로 월말 사용)
-        const expiryDate = '2030-12-31'; // 하드코딩된 만료일
+        // expiry '01/21' -> 서버 요구형식 'MM/YY'로 전송 (예: 12/30)
+        const expiryDate = '12/30'; // 하드코딩된 만료일 (MM/YY 형식)
 
         setCardData({
             company: '신한카드',
             number: '0000-0000-0000-0000',
             issueDate: issueDate,
             expiry: expiryDate,
->>>>>>> feat/front/login
             cvc: '123'
         });
         setShowCamera(false);
@@ -238,7 +227,7 @@ const SignUp = () => {
             return;
         }
         if (!validateUserId(formData.id)) {
-            setErrorMessage("아이디는 영문자와 숫자를 포함하여 3글자 이상이어야 합니다.");
+            setErrorMessage("아이디는 영문자와 숫자를 포함하여 4글자 이상이어야 합니다.");
             setShowError(true);
             return;
         }
@@ -269,15 +258,11 @@ const SignUp = () => {
         }
 
         // 4. 휴대전화번호 검증 (11자리)
-<<<<<<< HEAD
-        const phoneNumbers = formData.phone.replace(/[^\\d]/g, '');
-=======
         const phoneNumbers = formData.phone.replace(/[^0-9]/g, '');
         console.log("Debug Phone:", formData.phone);
         console.log("Debug Stripped:", phoneNumbers);
         console.log("Debug Length:", phoneNumbers.length);
 
->>>>>>> feat/front/login
         if (phoneNumbers.length !== 11) {
             setErrorMessage("휴대전화번호는 11자리 숫자여야 합니다.");
             setShowError(true);
@@ -301,18 +286,6 @@ const SignUp = () => {
         // 7. API 호출
         try {
             const userData = {
-<<<<<<< HEAD
-                user_id: formData.id,
-                password: formData.password,
-                password_check: formData.password, // PRD에서 제거되었지만 서버가 요구할 수 있음
-                username: formData.name,
-                email: null,
-                phone_number: formData.phone,
-                user_type: "BLIND", // 카드 등록 필수이므로 항상 BLIND
-                simple_password: null
-            };
-
-=======
                 username: formData.id,
                 name: formData.name,
                 email: `${formData.id}@hearbe.com`, // 임시 이메일 생성
@@ -330,7 +303,6 @@ const SignUp = () => {
 
             console.log('📤 전송할 데이터:', JSON.stringify(userData, null, 2));
 
->>>>>>> feat/front/login
             const response = await authAPI.register(userData);
 
             if (response.code === 201) {
@@ -352,21 +324,6 @@ const SignUp = () => {
     };
 
     return (
-<<<<<<< HEAD
-        <div className="signup-container-a">
-            {/* 뒤로가기 버튼 */}
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
-            <div className="signup-box-a">
-                {/* Logo Section */}
-                <div className="signup-logo-area-a">
-                    <img src={hLogo} alt="Logo" className="signup-logo-image-a" />
-                </div>
-
-                {/* ID Section */}
-                <div className="form-group-outline-a">
-                    <div className="input-row-a border-bottom-a">
-                        <img src={iconUser} alt="User" className="input-icon-a" />
-=======
         <div className="signup-container">
             {/* 뒤로가기 버튼 */}
             <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
@@ -380,37 +337,23 @@ const SignUp = () => {
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
                         <img src={iconUser} alt="User" className="input-icon" />
->>>>>>> feat/front/login
                         <input
                             type="text"
                             name="id"
                             placeholder="아이디"
-<<<<<<< HEAD
-                            className="signup-input-a"
-=======
                             className="signup-input"
->>>>>>> feat/front/login
                             value={formData.id}
                             onChange={handleInputChange}
                         />
                         <button className="check-btn" onClick={handleDuplicateCheck}>중복확인</button>
                     </div>
-<<<<<<< HEAD
-                    <div className="input-row-a">
-                        <img src={iconLock} alt="Lock" className="input-icon-a" />
-=======
                     <div className="input-row">
                         <img src={iconLock} alt="Lock" className="input-icon" />
->>>>>>> feat/front/login
                         <input
                             type="password"
                             name="password"
                             placeholder="비밀번호(숫자 6자리)"
-<<<<<<< HEAD
-                            className="signup-input-a"
-=======
                             className="signup-input"
->>>>>>> feat/front/login
                             value={formData.password}
                             onChange={handleInputChange}
                             maxLength={6}
@@ -419,66 +362,37 @@ const SignUp = () => {
                 </div>
 
                 {/* Name/Phone Section */}
-<<<<<<< HEAD
-                <div className="form-group-outline-a">
-                    <div className="input-row-a border-bottom-a">
-                        <img src={iconUser} alt="User" className="input-icon-a" />
-=======
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
                         <img src={iconUser} alt="User" className="input-icon" />
->>>>>>> feat/front/login
                         <input
                             type="text"
                             name="name"
                             placeholder="이름"
-<<<<<<< HEAD
-                            className="signup-input-a"
-=======
                             className="signup-input"
->>>>>>> feat/front/login
                             value={formData.name}
                             onChange={handleInputChange}
                         />
                     </div>
-<<<<<<< HEAD
-                    <div className="input-row-a">
-                        <img src={iconPhone} alt="Phone" className="input-icon-a" />
-=======
                     <div className="input-row">
                         <img src={iconPhone} alt="Phone" className="input-icon" />
->>>>>>> feat/front/login
                         <input
                             type="tel"
                             name="phone"
                             placeholder="휴대전화번호"
-<<<<<<< HEAD
-                            className="signup-input-a"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            maxLength={11}
-=======
                             className="signup-input"
                             value={formData.phone}
                             onChange={handleInputChange}
                             maxLength={13}
->>>>>>> feat/front/login
                         />
                     </div>
                 </div>
 
                 {/* Disability Card Section (메인 화면) */}
-<<<<<<< HEAD
-                <div className="form-group-outline-a card-section-a">
-                    <div className="input-row-a header-row-a">
-                        <img src={iconCard} alt="Card" className="input-icon-a" />
-                        <span className="label-a">장애인 복지카드 등록</span>
-=======
                 <div className="form-group-outline card-section">
                     <div className="input-row header-row">
                         <img src={iconCard} alt="Card" className="input-icon" />
                         <span className="label">장애인 복지카드 등록</span>
->>>>>>> feat/front/login
                     </div>
 
                     {/* 카드가 등록되었으면 정보 표시, 아니면 카메라 아이콘 표시 */}
@@ -505,40 +419,14 @@ const SignUp = () => {
                         </div>
                     ) : (
                         // 이 부분을 클릭하면 모달이 뜹니다!
-<<<<<<< HEAD
-                        <div className="camera-area-a" onClick={() => setShowCamera(true)} style={{ cursor: 'pointer' }}>
-                            <div className="camera-text-a">장애인 복지카드 촬영하기</div>
-                            <img src={iconCamera} alt="Camera" className="camera-icon-img-a" />
-=======
                         <div className="camera-area" onClick={() => setShowCamera(true)} style={{ cursor: 'pointer' }}>
                             <div className="camera-text">장애인 복지카드 촬영하기</div>
                             <img src={iconCamera} alt="Camera" className="camera-icon-img" />
->>>>>>> feat/front/login
                         </div>
                     )}
                 </div>
 
                 {/* Terms Section */}
-<<<<<<< HEAD
-                <div className="form-group-outline-a terms-section-a">
-                    <div className="term-row-a" onClick={handleAllAgree}>
-                        <div className={`check-circle-a ${terms.all ? 'checked' : ''}`}>
-                            {terms.all && '✓'}
-                        </div>
-                        <span className="term-text-a bold-a">전체 동의하기</span>
-                    </div>
-                    <div className="term-row-a" onClick={() => handleTermToggle('term1')}>
-                        <div className={`check-circle-a ${terms.term1 ? 'checked' : ''}`}>
-                            {terms.term1 && '✓'}
-                        </div>
-                        <span className="term-text-a">[필수] 이용약관 동의</span>
-                    </div>
-                    <div className="term-row-a" onClick={() => handleTermToggle('term2')}>
-                        <div className={`check-circle-a ${terms.term2 ? 'checked' : ''}`}>
-                            {terms.term2 && '✓'}
-                        </div>
-                        <span className="term-text-a">[필수] 개인정보 수집 및 이용 동의</span>
-=======
                 <div className="form-group-outline terms-section">
                     <div className="term-row" onClick={handleAllAgree}>
                         <div className={`check-circle ${terms.all ? 'checked' : ''}`}>
@@ -557,16 +445,11 @@ const SignUp = () => {
                             {terms.term2 && '✓'}
                         </div>
                         <span className="term-text">[필수] 개인정보 수집 및 이용 동의</span>
->>>>>>> feat/front/login
                     </div>
                 </div>
 
                 {/* Submit Button */}
-<<<<<<< HEAD
-                <button className="signup-submit-btn-a" onClick={handleSignUp}>회원가입하기</button>
-=======
                 <button className="signup-submit-btn" onClick={handleSignUp}>회원가입하기</button>
->>>>>>> feat/front/login
             </div>
 
 
@@ -584,13 +467,8 @@ const SignUp = () => {
                         {modalStep === 'camera' ? (
                             // 1단계: 카메라 촬영 화면
                             <>
-<<<<<<< HEAD
-                                <div className="modal-title">장애인 복지카드 촬영하기</div>
-                                <div className="modal-desc">장애인 복지 카드를 촬영합니다.</div>
-=======
                                 <div className="modal-title">카드 촬영</div>
                                 <div className="modal-desc">장애인 복지카드를 촬영해주세요.</div>
->>>>>>> feat/front/login
 
                                 <div className="modal-camera-area">
                                     {stream ? (
@@ -601,14 +479,6 @@ const SignUp = () => {
                                             <img src={iconCamera} alt="Camera" className="modal-camera-icon" />
                                         </>
                                     )}
-<<<<<<< HEAD
-                                    {stream && (
-                                        <div className="shutter-button" onClick={handleSnap}>
-                                            <div className="shutter-inner"></div>
-                                        </div>
-                                    )}
-                                </div>
-=======
                                 </div>
 
                                 {stream && (
@@ -616,16 +486,10 @@ const SignUp = () => {
                                         <div className="shutter-inner"></div>
                                     </div>
                                 )}
->>>>>>> feat/front/login
                             </>
                         ) : (
                             // 2단계: 카드 정보 확인 폼 (여기도 modal-box 안이라서 팝업처럼 보임)
                             <>
-<<<<<<< HEAD
-                                <div className="modal-title" style={{ fontSize: '50px' }}>정보 확인</div>
-                                <div className="modal-desc" style={{ marginBottom: '30px' }}>인식된 정보를 확인해주세요.</div>
-=======
->>>>>>> feat/front/login
 
                                 <div className="card-form-box" style={{ width: '100%', padding: '0', background: 'transparent', border: 'none', boxShadow: 'none' }}>
                                     <div className="card-form-header" style={{ justifyContent: 'center' }}>
@@ -633,12 +497,9 @@ const SignUp = () => {
                                         <span>장애인 복지카드 정보</span>
                                     </div>
 
-<<<<<<< HEAD
-=======
                                     <div className="modal-desc" style={{ marginBottom: '10px' }}>인식된 정보를 확인해주세요.</div>
 
 
->>>>>>> feat/front/login
                                     <div className="form-field-group">
                                         <label>카드사</label>
                                         <input type="text" value="신한카드" readOnly className="modal-input" />
@@ -660,49 +521,16 @@ const SignUp = () => {
                                         </div>
                                     </div>
 
-<<<<<<< HEAD
-                                    <button className="card-register-btn" onClick={handleCardRegister}>카드 등록하기</button>
-=======
 
                                     <div className="card-button-group">
                                         <button className="card-retake-btn" onClick={() => setModalStep('camera')}>다시 촬영</button>
                                         <button className="card-register-btn" onClick={handleCardRegister}>카드 등록</button>
                                     </div>
->>>>>>> feat/front/login
                                 </div>
                             </>
                         )}
                     </div>
                 </div>
-<<<<<<< HEAD
-            )}
-
-            {/* Error Message Modal */}
-            {showError && (
-                <div className="modal-overlay" onClick={() => setShowError(false)}>
-                    <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="error-message">{errorMessage}</div>
-                        <button className="error-confirm-btn" onClick={() => setShowError(false)}>확인</button>
-                    </div>
-                </div>
-            )}
-
-            {/* Success Message Modal */}
-            {showSuccess && (
-                <div className="modal-overlay" onClick={() => { }}>
-                    <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="success-icon">🎉</div>
-                        <div className="error-message">회원가입이 완료되었습니다!</div>
-                        <button className="error-confirm-btn" onClick={() => navigate('/A/login')}>로그인하러 가기</button>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
-export default SignUp;
-=======
             )
             }
 
@@ -735,4 +563,3 @@ export default SignUp;
 };
 
 export default SignUp;
->>>>>>> feat/front/login
