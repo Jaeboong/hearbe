@@ -23,22 +23,28 @@ def filter_texts(
     important_text_predicate: Optional[Callable[[str], bool]] = None,
 ) -> List[Tuple[str, float]]:
     filtered: List[Tuple[str, float]] = []
-    
+
     for text, score in zip(texts, scores):
         if not isinstance(text, str):
             continue
         text = text.strip()
         if not text:
             continue
+
+        # 중요 텍스트 여부 미리 판단 (점수/의미 필터 우회용)
+        is_important = important_text_predicate and important_text_predicate(text)
+
         if score < min_score:
-            if not (important_text_predicate and important_text_predicate(text)):
+            if not is_important:
                 continue
         if len(text) < min_length:
-            continue
+            if not is_important:  # 중요 텍스트면 min_length 우회 (M, L, XL 등)
+                continue
         if not is_meaningful_text(text):
-            continue
+            if not is_important:  # 중요 텍스트면 is_meaningful_text 우회
+                continue
         filtered.append((text, score))
-    
+
     return filtered
 
 
