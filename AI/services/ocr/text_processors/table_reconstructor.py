@@ -1,4 +1,5 @@
 # 좌표 기반 표 구조 복원
+import re
 from typing import List, Dict, Tuple, Any, Optional
 
 
@@ -58,6 +59,8 @@ HEADER_CORRECTION_MAP = {
     # 허벅지 오인식
     "허벅치": "허벅지",
     "허벅": "허벅지",
+    # 신발 헤더 오인식
+    "룸": "발볼",
 }
 
 # 사이즈 라벨 오인식 교정 맵
@@ -69,6 +72,12 @@ SIZE_LABEL_CORRECTION_MAP = {
     "2X7": "2XL",
     "3X7": "3XL",
     "F": "FREE",
+    # 한국식 사이즈 라벨 (그대로 유지하되 표준화)
+    "90호(S)": "90호(S)",
+    "95호(M)": "95호(M)",
+    "100호(L)": "100호(L)",
+    "105호(XL)": "105호(XL)",
+    "110호(2XL)": "110호(2XL)",
 }
 
 # 잡음 토큰 (헤더 행에서만 제거, 데이터 행에서는 유지)
@@ -96,6 +105,60 @@ def is_noise_token(text: str) -> bool:
     return text.strip() in NOISE_TOKENS
 
 
+def contains_size_label(text: str) -> bool:
+    """
+    텍스트에 사이즈 라벨이 포함되어 있는지 확인
+    - 정확 일치: "M", "L", "XL"
+    - 괄호 포함: "90호(M)", "95호(L)"
+    - 숫자호 패턴: "90호", "95호", "100호"
+    - 신발 사이즈 (mm): 220~300 범위
+    - 신발 국제 사이즈: 35~50 범위
+    """
+    size_labels = ["S", "M", "L", "XL", "2XL", "3XL", "FREE", "F"]
+    text_upper = text.strip().upper()
+    text_stripped = text.strip()
+
+    # 정확 일치
+    if text_upper in size_labels:
+        return True
+
+    # 괄호 안에 사이즈 라벨: "90호(M)", "95호(S)"
+    for label in size_labels:
+        if f"({label})" in text_upper:
+            return True
+
+    # 숫자호 패턴: "90호", "95호", "100호", "105호", "110호"
+    if re.match(r'^\d+호', text):
+        return True
+
+    # 신발 사이즈 패턴 (mm): 220~300 범위 (220, 225, 230, ..., 290, 295, 300)
+    shoe_mm_match = re.match(r'^(\d{3})(?:mm)?$', text_stripped, re.IGNORECASE)
+    if shoe_mm_match:
+        size_num = int(shoe_mm_match.group(1))
+        if 220 <= size_num <= 300:
+            return True
+
+    # 신발 국제 사이즈 패턴: 35~50 범위 (35, 36, 37, ..., 48, 49, 50)
+    intl_match = re.match(r'^(\d{2})$', text_stripped)
+    if intl_match:
+        size_num = int(intl_match.group(1))
+        if 35 <= size_num <= 50:
+            return True
+
+    return False
+
+
+def contains_measurement(text: str) -> bool:
+    """
+    텍스트에 측정값이 포함되어 있는지 확인
+    - "32cm", "35.5cm", "24-27 inch", "32", "35.5"
+    """
+    # 숫자 + 단위 패턴 (cm, inch 등)
+    if re.search(r'\d+\.?\d*\s*(cm|inch)?', text, re.IGNORECASE):
+        return True
+    return False
+
+
 def is_header_row(row: List[Dict[str, Any]]) -> bool:
     """헤더 행인지 판단"""
     header_keywords = [
@@ -103,19 +166,23 @@ def is_header_row(row: List[Dict[str, Any]]) -> bool:
         "허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
         "I라우", "라우", "왓밀위", "뜻밀위", "밀단",
         # 상의 헤더
-        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
+        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이",
+        # 신발 측정 헤더 (룸은 발볼 오인식)
+        "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
+        # 신발 사이즈 변환표
+        "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
     ]
     row_text = " ".join(item["text"] for item in row)
     return any(kw in row_text for kw in header_keywords)
 
 
 def is_size_data_row(row: List[Dict[str, Any]]) -> bool:
-    """사이즈 데이터 행인지 판단 (M, L, XL 등으로 시작)"""
+    """사이즈 데이터 행인지 판단 (M, L, XL, 90호 등으로 시작)"""
     if not row:
         return False
-    first_text = row[0]["text"].strip().upper()
-    size_labels = ["M", "L", "XL", "2XL", "3XL", "FREE", "F", "7", "7X", "S"]
-    return first_text in size_labels
+    first_text = row[0]["text"].strip()
+    # 유연한 사이즈 라벨 감지 사용
+    return contains_size_label(first_text)
 
 
 def correct_row_texts(row: List[Dict[str, Any]], is_header: bool = False) -> List[Dict[str, Any]]:
@@ -309,33 +376,44 @@ def assign_cells_to_columns(
 def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[int, int]]:
     """
     SIZE 표 영역 찾기
-    SIZE 키워드 또는 헤더 패턴이 있는 행부터 시작해서, 연속된 표 영역을 감지
+    측정 헤더가 있는 행을 우선 찾고, 그 행부터 연속된 표 영역을 감지
     """
     size_row_index = None
 
-    # 헤더 키워드 (SIZE 없이도 표 감지용)
-    header_patterns = [
+    # 측정 헤더 키워드 (실제 테이블 헤더)
+    measurement_headers = [
         # 하의 헤더
         "허리", "엉덩이", "앞밑위", "뒷밑위", "허벅지", "밑단", "총장",
+        "바지길이", "힙둘레", "밑단둘레",
         "I라우", "라우", "왓밀위", "뜻밀위", "밀단",
         # 상의 헤더
-        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
+        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이",
+        # 신발 측정 헤더 (룸은 발볼 오인식)
+        "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
+        # 신발 사이즈 변환표
+        "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
     ]
 
-    # SIZE 키워드 또는 헤더 패턴이 있는 행 찾기
+    # 1순위: 측정 헤더가 2개 이상 있는 행 찾기 (실제 테이블 헤더)
     for i, row in enumerate(rows):
         row_text = " ".join(item["text"] for item in row)
-        row_text_upper = row_text.upper()
 
-        # 1순위: SIZE/size/사이즈 키워드
-        if "SIZE" in row_text_upper or "size" in row_text.lower() or "사이즈" in row_text:
+        # 측정 헤더가 2개 이상 있어야 테이블 시작점으로 인식
+        # (단일 "허리"는 "허리밴드" 같은 설명 텍스트일 수 있음)
+        header_count = sum(1 for header in measurement_headers if header in row_text)
+        if header_count >= 2:
             size_row_index = i
             break
 
-        # 2순위: 헤더 패턴 (허리, 엉덩이, 어깨 등)
-        if any(pattern in row_text for pattern in header_patterns):
-            size_row_index = i
-            break
+    # 2순위: 측정 헤더가 없으면 SIZE/사이즈 키워드가 있는 행 찾기
+    if size_row_index is None:
+        for i, row in enumerate(rows):
+            row_text = " ".join(item["text"] for item in row)
+            row_text_upper = row_text.upper()
+
+            if "SIZE" in row_text_upper or "사이즈" in row_text:
+                size_row_index = i
+                break
 
     if size_row_index is None:
         return None
@@ -345,29 +423,66 @@ def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[i
     header_keywords = [
         # 하의 헤더
         "허리", "엉덩이", "왓밀위", "뜻밀위", "허벅지", "밀단", "총장", "I라우",
+        "단면", "기장", "다리",
         # 상의 헤더
-        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
+        "어깨", "가슴", "소매", "암홀", "가슴둘레", "어깨너비", "소매길이",
+        # 신발 측정 헤더 (룸은 발볼 오인식)
+        "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
+        # 신발 사이즈 변환표
+        "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
     ]
-    size_labels = ["M", "L", "XL", "2XL", "3XL", "FREE", "F", "7", "7X"]  # 7X는 XL 오타
 
     start_index = size_row_index
     end_index = size_row_index
+    max_lookahead = 3  # 비매칭 시 앞으로 몇 행까지 확인할지
+
+    def is_size_related_row(row_idx: int) -> bool:
+        """해당 행이 사이즈 관련 행인지 확인"""
+        if row_idx >= len(rows):
+            return False
+        r = rows[row_idx]
+        r_texts = [item["text"] for item in r]
+        r_joined = " ".join(r_texts)
+        has_h = any(kw in r_joined for kw in header_keywords)
+        has_s = any(contains_size_label(item["text"]) for item in r)
+        has_m = any(contains_measurement(item["text"]) for item in r)
+        return has_h or has_s or has_m
 
     # 헤더 행과 데이터 행을 모두 포함하도록 영역 확장
-    for i in range(size_row_index, len(rows)):
+    i = size_row_index
+    while i < len(rows):
         row = rows[i]
         row_texts = [item["text"] for item in row]
+        row_text_joined = " ".join(row_texts)
 
-        # 헤더나 사이즈 라벨이 있으면 표 영역으로 포함
-        has_header = any(keyword in " ".join(row_texts) for keyword in header_keywords)
-        has_size_label = any(label == item["text"].strip().upper() for item in row for label in size_labels)
-        has_numbers = any(item["text"].replace(".", "").replace(",", "").isdigit() for item in row)
+        # 헤더 키워드가 있으면 표 영역으로 포함
+        has_header = any(keyword in row_text_joined for keyword in header_keywords)
 
-        if has_header or has_size_label or (has_numbers and i > size_row_index):
+        # 사이즈 라벨이 포함되어 있으면 (90호(M), L, XL 등)
+        has_size_label = any(contains_size_label(item["text"]) for item in row)
+
+        # 측정값이 포함되어 있으면 (32cm, 35.5, 24-27 inch 등)
+        has_measurement = any(contains_measurement(item["text"]) for item in row)
+
+        if has_header or has_size_label or (has_measurement and i > size_row_index):
             end_index = i
-        elif i > size_row_index + 1 and not has_header and not has_size_label and not has_numbers:
-            # 표와 관련 없는 행이 나오면 종료
-            break
+            i += 1
+        elif i > size_row_index + 1:
+            # 비매칭 행 - look-ahead로 다음에 사이즈 관련 행이 있는지 확인
+            found_more = False
+            for lookahead in range(1, max_lookahead + 1):
+                if is_size_related_row(i + lookahead):
+                    found_more = True
+                    break
+
+            if found_more:
+                # 다음에 사이즈 관련 행이 있으면 현재 행은 건너뛰고 계속
+                i += 1
+            else:
+                # 다음에도 사이즈 관련 행이 없으면 종료
+                break
+        else:
+            i += 1
 
     return (start_index, end_index + 1)
 
@@ -470,7 +585,11 @@ def parse_size_table_to_dict(table_text: str) -> Dict[str, Any]:
         # 오인식 버전도 포함 (교정 전 데이터 호환)
         "왓밀위", "뜻밀위", "밀단", "I라우", "라우",
         # 상의 헤더
-        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이"
+        "어깨", "가슴", "소매", "기장", "암홀", "가슴둘레", "어깨너비", "소매길이",
+        # 신발 측정 헤더 (룸은 발볼 오인식)
+        "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
+        # 신발 사이즈 변환표
+        "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
     ]
     header_line = None
     header_index = 0
@@ -491,9 +610,6 @@ def parse_size_table_to_dict(table_text: str) -> Dict[str, Any]:
         corrected = correct_header_text(h)
         headers.append(corrected)
 
-    # 사이즈 라벨 (교정된 라벨 포함)
-    size_labels = ["S", "M", "L", "XL", "2XL", "3XL", "FREE", "F"]
-
     sizes = {}
 
     # 헤더 다음 행부터 데이터 행 파싱
@@ -506,10 +622,11 @@ def parse_size_table_to_dict(table_text: str) -> Dict[str, Any]:
         # 첫 번째 항목에 사이즈 라벨 교정 적용
         first_part = correct_size_label(parts[0])
 
-        if first_part.upper() not in size_labels:
+        # 유연한 사이즈 라벨 감지 사용
+        if not contains_size_label(first_part):
             continue
 
-        size_label = first_part.upper()
+        size_label = first_part
         values = parts[1:]
 
         # 헤더와 값 매핑

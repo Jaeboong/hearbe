@@ -354,17 +354,32 @@ def process_multiple_images(
         step_start = time.time()
 
         # SIZE 키워드 또는 헤더 패턴이 있는 원본 이미지 찾기 (병합 전 결과에서)
-        size_header_patterns = ["허리", "엉덩이", "총장", "어깨", "가슴", "소매", "기장"]
+        size_header_patterns = [
+            # 의류 (하의)
+            "허리", "엉덩이", "총장", "밑위", "허벅지", "바지길이", "힙둘레", "밑단",
+            # 의류 (상의)
+            "어깨", "가슴", "소매", "기장",
+            # 신발 측정 헤더 (룸은 발볼 오인식)
+            "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
+            # 신발 사이즈 변환표
+            "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
+        ]
         size_image_result = None
+        best_header_count = 0
+
         for ocr_result in ocr_results:
             result_texts = ocr_result.get("rec_texts", [])
             combined = " ".join(str(t) for t in result_texts)
-            # SIZE/사이즈 키워드 또는 헤더 패턴으로 찾기
-            has_size_keyword = "SIZE" in combined.upper() or "사이즈" in combined
-            has_header_pattern = any(pattern in combined for pattern in size_header_patterns)
-            if has_size_keyword or has_header_pattern:
+
+            # 헤더 패턴 개수 카운트
+            header_count = sum(1 for pattern in size_header_patterns if pattern in combined)
+
+            # 실제 SIZE 테이블이 있는 이미지 선택 기준:
+            # 1) 헤더 패턴이 2개 이상 있는 이미지 우선
+            # 2) 헤더 패턴이 가장 많은 이미지 선택
+            if header_count >= 2 and header_count > best_header_count:
+                best_header_count = header_count
                 size_image_result = ocr_result
-                break
 
         if size_image_result:
             # 원본 이미지의 OCR 결과로 SIZE 표 재구성

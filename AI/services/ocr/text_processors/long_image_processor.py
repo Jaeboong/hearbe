@@ -83,6 +83,12 @@ def split_image_to_chunks(
 
 def process_chunk_ocr(chunk: Image.Image, ocr_instance) -> List[Dict]:
     """청크 이미지에 OCR 수행 (numpy 배열 직접 전달로 임시파일 생략)"""
+    # RGBA(4채널) -> RGB(3채널) 변환 (PNG 투명도 처리)
+    if chunk.mode == 'RGBA':
+        chunk = chunk.convert('RGB')
+    elif chunk.mode != 'RGB':
+        chunk = chunk.convert('RGB')
+
     # PIL Image -> numpy array (RGB -> BGR for OpenCV compatibility)
     img_array = np.array(chunk)
     if len(img_array.shape) == 3 and img_array.shape[2] == 3:
@@ -92,7 +98,7 @@ def process_chunk_ocr(chunk: Image.Image, ocr_instance) -> List[Dict]:
 
 def adjust_coordinates(ocr_result: List[Dict], y_offset: int) -> List[Dict]:
     adjusted = []
-    
+
     for res in ocr_result:
         if hasattr(res, 'get'):
             new_res = res.copy()
@@ -106,7 +112,7 @@ def adjust_coordinates(ocr_result: List[Dict], y_offset: int) -> List[Dict]:
             adjusted.append(new_res)
         else:
             adjusted.append(res)
-    
+
     return adjusted
 
 
