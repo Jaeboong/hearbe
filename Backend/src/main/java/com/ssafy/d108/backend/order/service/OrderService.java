@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class OrderService {
     private final PlatformRepository platformRepository;
 
     /**
-     * 주문 생성 (단일 상품 주문)
+     * 주문 생성 (다중 상품 주문)
      */
     @Transactional
     public OrderResponse createOrder(Integer userId, OrderCreateRequest request) {
@@ -45,27 +46,35 @@ public class OrderService {
         // 1. Order 생성
         Order order = new Order();
         order.setUser(user);
-        order.setOrderDetailUrl(request.getUrl()); // 상품 URL을 주문 상세 URL로 일단 사용 (기획에 따라 다름)
-        // deliveryUrl은 현재 없음
+        // orderDetailUrl은 첫 번째 아이템의 URL 사용 (또는 null)
+        if (!request.getItems().isEmpty() && request.getItems().get(0).getUrl() != null) {
+            order.setOrderDetailUrl(request.getItems().get(0).getUrl());
+        }
 
         // Save Order
         Order savedOrder = orderRepository.save(order);
 
-        // 2. OrderItem 생성
-        OrderItem orderItem = new OrderItem();
-        orderItem.setOrder(savedOrder);
-        orderItem.setUser(user);
-        orderItem.setPlatform(platform);
-        orderItem.setName(request.getName());
-        orderItem.setPrice(request.getPrice());
-        orderItem.setQuantity(request.getQuantity()); // 요청에서 받은 수량 사용
-        orderItem.setUrl(request.getUrl());
-        orderItem.setImgUrl(request.getImgUrl());
+        // 2. 여러 OrderItem 생성
+        List<OrderItem> savedItems = new ArrayList<>();
+        for (com.ssafy.d108.backend.order.dto.OrderItemDto itemDto : request.getItems()) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(savedOrder);
+            orderItem.setUser(user);
+            orderItem.setPlatform(platform);
+            orderItem.setName(itemDto.getName());
+            orderItem.setPrice(itemDto.getPrice());
+            orderItem.setQuantity(itemDto.getQuantity());
+            orderItem.setUrl(itemDto.getUrl());
+            orderItem.setImgUrl(itemDto.getImgUrl());
 
-        OrderItem savedItem = orderItemRepository.save(orderItem);
+            savedItems.add(orderItemRepository.save(orderItem));
+        }
 
         // 3. Response 생성
-        List<OrderItemResponse> itemResponses = Collections.singletonList(OrderItemResponse.from(savedItem));
+        List<OrderItemResponse> itemResponses = savedItems.stream()
+                .map(OrderItemResponse::from)
+                .collect(Collectors.toList());
+
         return OrderResponse.of(savedOrder, itemResponses);
     }
 

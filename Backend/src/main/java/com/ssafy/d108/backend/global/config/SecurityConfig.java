@@ -55,7 +55,9 @@ public class SecurityConfig {
                                 "/ping",
                                 "/",
                                 "/cart/**",
-                                "/wishlist/**")
+                                "/wishlist/**",
+                                "/ws/**",
+                                "/sharing/**")
                         .permitAll()
 
                         // All other requests require authentication
@@ -73,10 +75,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("*")); // Allow all origins for dev
+        configuration.setAllowedOriginPatterns(List.of("*")); // Allow all origins with credentials
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(false); // Can't be true if origin is *
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
