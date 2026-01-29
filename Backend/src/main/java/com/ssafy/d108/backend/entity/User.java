@@ -46,7 +46,7 @@ public class User {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_type", nullable = false)
+    @Column(name = "user_type", nullable = false, columnDefinition = "VARCHAR(30)")
     private UserType userType = UserType.BLIND;
 
     @CreationTimestamp
