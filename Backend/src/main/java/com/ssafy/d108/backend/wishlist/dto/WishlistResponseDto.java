@@ -1,5 +1,6 @@
 package com.ssafy.d108.backend.wishlist.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,22 +11,42 @@ import java.util.List;
 @NoArgsConstructor
 public class WishlistResponseDto {
 
+    @JsonProperty("total_count")
+    private int totalCount;
 
-    private int totalCount;      // 전체 찜 개수 추가
-    private long totalPrice;     // 전체 금액 합계 추가
+    @JsonProperty("total_price")
+    private long totalPrice;
+
+    @JsonProperty("items")
     private List<WishlistItemDetail> items;
 
     @Getter
     @Setter
     @NoArgsConstructor
     public static class WishlistItemDetail {
+
+        @JsonProperty("wishlist_item_id")
         private Integer wishlistItemId;
+
+        @JsonProperty("product_name")
         private String productName;
+
+        @JsonProperty("product_url")
         private String productUrl;
+
+        @JsonProperty("platform_name")
         private String platformName;
+
+        @JsonProperty("created_at")
         private String createdAt;
+
+        @JsonProperty("img_url")
         private String imgUrl;
-        private long price;      // 개별 가격 정보 (합산을 위해 추가 권장)
+
+        @JsonProperty("price")
+        private long price;
+
+        @JsonProperty("liked")
         private Boolean liked;
     }
 }

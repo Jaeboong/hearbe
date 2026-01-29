@@ -1,7 +1,6 @@
 package com.ssafy.d108.backend.cartItem.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,25 +10,44 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CartItemListResponseDto {
 
+    @JsonProperty("cart_items")
     private List<CartItemDetail> cartItems;
+
+    @JsonProperty("total_count")
     private int totalCount;
+
+    @JsonProperty("total_price")
     private int totalPrice;
 
     @Getter
     @Setter
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class CartItemDetail {
+
+        @JsonProperty("cart_item_id")
         private Long cartItemId;
+
+        @JsonProperty("platform_id")
         private Long platformId;
+
+        @JsonProperty("name")
         private String name;
+
+        @JsonProperty("price")
         private int price;
+
+        @JsonProperty("img_url")
         private String imgUrl;
-        private String url;      // JSON에 없으면 null로 들어감
+
+        @JsonProperty("url")
+        private String url;
+
+        @JsonProperty("quantity")
         private int quantity;
-        private String createdAt; // 날짜 포맷팅 필요 시 LocalDateTime 권장
+
+        @JsonProperty("created_at")
+        private String createdAt;
     }
 }

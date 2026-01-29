@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/cart")
 @RequiredArgsConstructor
@@ -52,10 +55,14 @@ public class CartItemController {
      * 장바구니 삭제
      */
     @DeleteMapping("/{cart_item_id}")
-    public ResponseEntity<Void> deleteCartItem(
+    public ResponseEntity<Map<String, String>> deleteCartItem(
             @PathVariable("cart_item_id") Integer cartItemId) {
 
         cartItemService.deleteCartItem(cartItemId);
-        return ResponseEntity.noContent().build();
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "상품이 성공적으로 삭제되었습니다.");
+
+        return ResponseEntity.ok(response);
     }
 }

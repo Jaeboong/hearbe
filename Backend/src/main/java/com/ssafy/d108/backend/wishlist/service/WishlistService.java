@@ -41,7 +41,7 @@ public class WishlistService {
     }
 
     /**
-     * 찜 목록 조회 (GET /wishlist/user)
+     * 찜 목록 조회 (GET /wishlist/{userId})
      */
     public WishlistResponseDto getWishlistItems(Integer userId) {
         User user = findUserById(userId);
