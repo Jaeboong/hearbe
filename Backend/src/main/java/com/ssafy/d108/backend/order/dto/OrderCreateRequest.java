@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderCreateRequest {
 
-    @JsonProperty("platformId")
+    @JsonProperty("platform_id")
     @NotNull(message = "플랫폼 ID는 필수입니다.")
     private Long platformId;
 

@@ -28,12 +28,16 @@ public class OrderItemResponse {
     @JsonProperty("img_url")
     private String imgUrl;
 
+    @JsonProperty("deliver_url")
+    private String deliverUrl;
+
     public static OrderItemResponse from(OrderItem item) {
         return new OrderItemResponse(
                 item.getName(),
                 item.getPrice(),
                 item.getQuantity(),
                 item.getUrl(),
-                item.getImgUrl());
+                item.getImgUrl(),
+                item.getDeliverUrl());
     }
 }

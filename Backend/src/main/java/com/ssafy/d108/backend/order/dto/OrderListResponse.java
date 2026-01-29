@@ -26,6 +26,9 @@ public class OrderListResponse {
         @JsonProperty("order_id")
         private Integer orderId;
 
+        @JsonProperty("ordered_at")
+        private String orderedAt; // YYYY-MM-DD 형식
+
         @JsonProperty("order_url")
         private String orderUrl;
 
@@ -36,18 +39,18 @@ public class OrderListResponse {
         @JsonProperty("platform_id")
         private Long platformId;
 
-        @JsonProperty("deliver_url")
-        private String deliveryUrl;
-
         @JsonProperty("items")
         private List<OrderItemResponse> items;
 
         public static OrderDetailDto from(Order order, List<OrderItemResponse> items, Long platformId) {
+            // Format date as YYYY-MM-DD
+            String formattedDate = order.getCreatedAt().toLocalDate().toString();
+
             return new OrderDetailDto(
                     order.getId(),
+                    formattedDate,
                     order.getOrderDetailUrl(),
                     platformId,
-                    order.getDeliveryUrl(),
                     items);
         }
     }

@@ -43,10 +43,10 @@ public class CartItem {
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 1;
 
-    @Column(name = "url", columnDefinition = "TEXT")
+    @Column(name = "url", length = 500)
     private String url;
 
-    @Column(name = "img_url", columnDefinition = "TEXT")
+    @Column(name = "img_url", length = 1000)
     private String imgUrl;
 
     @Column(name = "price", nullable = false)

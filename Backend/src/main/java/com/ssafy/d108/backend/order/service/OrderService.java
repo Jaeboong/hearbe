@@ -66,6 +66,7 @@ public class OrderService {
             orderItem.setQuantity(itemDto.getQuantity());
             orderItem.setUrl(itemDto.getUrl());
             orderItem.setImgUrl(itemDto.getImgUrl());
+            orderItem.setDeliverUrl(itemDto.getDeliverUrl());
 
             savedItems.add(orderItemRepository.save(orderItem));
         }
@@ -80,21 +81,33 @@ public class OrderService {
 
     /**
      * 내 주문 내역 조회
+     * 
+     * @param userId 사용자 ID
+     * @return 주문 내역 리스트
      */
     public OrderListResponse getMyOrders(Integer userId) {
         List<Order> orders = orderRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 
-        List<OrderListResponse.OrderDetailDto> orderDtos = orders.stream().map(order -> {
-            List<OrderItem> items = orderItemRepository.findAllByOrderId(order.getId());
-            List<OrderItemResponse> itemResponses = items.stream()
-                    .map(OrderItemResponse::from)
-                    .collect(Collectors.toList());
+        List<OrderListResponse.OrderDetailDto> orderDtos = orders.stream()
+                .map(order -> {
+                    List<OrderItem> items = orderItemRepository.findAllByOrderId(order.getId());
 
-            // 플랫폼 ID 추출 (첫 번째 아이템 기준)
-            Long platformId = items.isEmpty() ? null : Long.valueOf(items.get(0).getPlatform().getId());
+                    // 아이템이 없으면 null 반환 (나중에 제거됨)
+                    if (items.isEmpty()) {
+                        return null;
+                    }
 
-            return OrderListResponse.OrderDetailDto.from(order, itemResponses, platformId);
-        }).collect(Collectors.toList());
+                    List<OrderItemResponse> itemResponses = items.stream()
+                            .map(OrderItemResponse::from)
+                            .collect(Collectors.toList());
+
+                    // 플랫폼 ID 추출 (첫 번째 아이템 기준)
+                    Long extractedPlatformId = Long.valueOf(items.get(0).getPlatform().getId());
+
+                    return OrderListResponse.OrderDetailDto.from(order, itemResponses, extractedPlatformId);
+                })
+                .filter(dto -> dto != null) // null 제거
+                .collect(Collectors.toList());
 
         return new OrderListResponse(orderDtos);
     }

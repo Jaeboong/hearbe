@@ -43,11 +43,11 @@ public class WishlistItem {
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 1;
 
-    // 상품 상세 페이지 링크 (긴 URL 대비 TEXT 타입)
-    @Column(name = "url", columnDefinition = "TEXT")
+    // 상품 상세 페이지 링크
+    @Column(name = "url", length = 500)
     private String url;
 
-    @Column(name = "img_url", columnDefinition = "TEXT")
+    @Column(name = "img_url", length = 1000)
     private String imgUrl;
 
     @Column(name = "price", nullable = false)
