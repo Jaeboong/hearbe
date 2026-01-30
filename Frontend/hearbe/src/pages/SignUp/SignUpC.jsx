@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, UserPlus } from 'lucide-react';
-import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail } from '../../utils/validation';
+import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
+import { authAPI } from '../../services/authAPI';
 import logoImage from '../../assets/HearBe_logo_.png';
 import './SignUpC.css';
 
@@ -13,8 +14,6 @@ export default function SignUpC({ onBack }) {
     password: '',
     email: '',
     name: '',
-    birthdate: '',
-    phone: '',
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,11 +25,18 @@ export default function SignUpC({ onBack }) {
     privacy: false
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUsernameChecked, setIsUsernameChecked] = useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
     if (errors[field]) {
       setErrors({ ...errors, [field]: null });
+    }
+    // 아이디 입력이 변경되면 중복확인 상태 초기화
+    if (field === 'username') {
+      setIsUsernameChecked(false);
+      setIsUsernameAvailable(false);
     }
   };
 
@@ -38,6 +44,30 @@ export default function SignUpC({ onBack }) {
     setConfirmPassword(value);
     if (errors.confirmPassword) {
       setErrors({ ...errors, confirmPassword: null });
+    }
+  };
+
+  const handleCheckUsername = async () => {
+    const usernameError = validateUsername(formData.username);
+    if (usernameError) {
+      alert(usernameError);
+      return;
+    }
+
+    try {
+      const response = await authAPI.checkDuplicate(formData.username);
+      if (response.available) {
+        setIsUsernameChecked(true);
+        setIsUsernameAvailable(true);
+        alert('사용 가능한 아이디입니다.');
+      } else {
+        setIsUsernameChecked(true);
+        setIsUsernameAvailable(false);
+        alert('이미 사용 중인 아이디입니다.');
+      }
+    } catch (error) {
+      console.error('Username check error:', error);
+      alert('아이디 중복 확인에 실패했습니다.');
     }
   };
 
@@ -51,7 +81,7 @@ export default function SignUpC({ onBack }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // 1. Validate Form
@@ -59,15 +89,24 @@ export default function SignUpC({ onBack }) {
     const passwordError = validatePassword(formData.password);
     const confirmPasswordError = validatePasswordConfirm(formData.password, confirmPassword);
     const emailError = validateEmail(formData.email);
-    const nameError = !formData.name.trim() ? '이름을 입력해주세요.' : null;
+    const nameError = validateName(formData.name);
+
+    // 아이디 중복확인 체크
+    if (!isUsernameChecked || !isUsernameAvailable) {
+      alert('아이디 중복확인을 해주세요.');
+      return;
+    }
 
     if (usernameError || passwordError || confirmPasswordError || emailError || nameError) {
+      const errorMsg = [usernameError, passwordError, confirmPasswordError, emailError, nameError].filter(Boolean).join('\n');
+      alert('필수 입력 정보를 확인해주세요.\n\n' + errorMsg);
+
       setErrors({
         username: usernameError,
         password: passwordError,
         confirmPassword: confirmPasswordError,
         email: emailError,
-        name: nameError
+        name: nameError,
       });
       return;
     }
@@ -77,31 +116,25 @@ export default function SignUpC({ onBack }) {
       return;
     }
 
-    // --- Mock DB Logic Start ---
+    // --- Real API Call ---
     try {
-      const existingUsers = JSON.parse(localStorage.getItem('hearbe_mock_users') || '[]');
-      const isDuplicate = existingUsers.some(user => user.username === formData.username);
-
-      if (isDuplicate) {
-        alert('이미 존재하는 아이디입니다.');
-        return;
-      }
-
-      const newUser = {
+      const payload = {
         username: formData.username,
         password: formData.password,
+        password_check: confirmPassword,
         name: formData.name,
         email: formData.email,
-        joinedAt: new Date().toISOString()
+        phone_number: null, // 휴대폰 번호 제외됨
+        user_type: "GENERAL", // C형 사용자
+        simple_password: null,
+        welfare_card: null
       };
 
-      existingUsers.push(newUser);
-      localStorage.setItem('hearbe_mock_users', JSON.stringify(existingUsers));
-
+      await authAPI.register(payload);
       setIsModalOpen(true);
     } catch (error) {
-      console.error('Mock signup error:', error);
-      alert('회원가입 중 오류가 발생했습니다.');
+      console.error('Signup error:', error);
+      alert(error.message || '회원가입 중 오류가 발생했습니다.');
     }
   };
 
@@ -110,26 +143,37 @@ export default function SignUpC({ onBack }) {
       <main className="signup-c-main">
         <div className="signup-card-c">
           <div className="signup-header-c">
-            <div className="header-title-group-c">
+            <img src={logoImage} alt="HearBe Logo" className="signup-logo-c" style={{ marginBottom: '20px' }} />
+            <div className="header-title-group-c" style={{ display: 'none' }}>
               <div className="title-icon-c">
                 <UserPlus size={32} />
               </div>
               <h1>회원가입</h1>
             </div>
-            <p className="signup-subtitle-c">HearBe 서비스 이용을 위한 회원가입을 진행합니다</p>
+            <p className="signup-subtitle-c" style={{ display: 'none' }}>HearBe 서비스 이용을 위한 회원가입을 진행합니다</p>
           </div>
 
           <form onSubmit={handleSubmit} className="signup-form-c">
             <div className="input-section-c">
               <div className={`input-c-group ${errors.username ? 'error' : ''}`}>
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => handleChange('username', e.target.value)}
-                  placeholder="아이디"
-                  className="signup-input-c gray-bg-c"
-                />
+                <div className="input-with-button-c">
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => handleChange('username', e.target.value)}
+                    placeholder="아이디"
+                    className="signup-input-c"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCheckUsername}
+                    className={`check-duplicate-btn-c ${isUsernameChecked && isUsernameAvailable ? 'checked' : ''}`}
+                  >
+                    {isUsernameChecked && isUsernameAvailable ? '✓ 확인완료' : '중복확인'}
+                  </button>
+                </div>
                 {errors.username && <span className="error-text-c">{errors.username}</span>}
+                {isUsernameChecked && !isUsernameAvailable && <span className="error-text-c">이미 사용 중인 아이디입니다.</span>}
               </div>
 
               <div className={`input-c-group ${errors.password ? 'error' : ''}`}>
@@ -138,7 +182,7 @@ export default function SignUpC({ onBack }) {
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={(e) => handleChange('password', e.target.value)}
-                    placeholder="비밀번호"
+                    placeholder="비밀번호 (8~20자 이내, 영문 + 숫자 조합)"
                     className="signup-input-c gray-bg-c"
                   />
                   <button

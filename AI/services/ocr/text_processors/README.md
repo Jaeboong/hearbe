@@ -1,131 +1,203 @@
 # OCR Text Processors
 
-OCR로 추출된 텍스트를 처리하고 LLM을 통해 요약하는 파이프라인입니다.
+상품 이미지에서 OCR 텍스트를 추출하고, LLM을 사용해 요약을 생성하는 파이프라인입니다.
 
 ---
 
-## 📊 전체 프로세스 흐름
+## 📊 구현 현황
 
-```mermaid
-flowchart TD
-    A["🖼️ 이미지 입력<br/>(jpg/png)"] --> B["paddleocr_korean_test.py"]
-    B --> C["*_res.json<br/>(OCR 결과)"]
-    C --> D["extract_rec_texts.py"]
-    D --> E["*_res_texts.json<br/>(텍스트 리스트)"]
-    E --> F["ocr_llm_summarizer.py"]
-    F --> G["ocr_text_preprocessor.py<br/>(전처리)"]
-    G --> H["product_type_detector.py<br/>(제품 타입 감지)"]
-    H --> I["LLM API 호출"]
-    I --> J["*_summary.json<br/>(요약 결과)"]
-    
-    J --> K{"--query 옵션?"}
-    K -->|Yes| L["질의 응답"]
-    K -->|No| M["완료"]
+| 기능 | 상태 | 담당 모듈 |
+|------|------|----------|
+| 한국어 OCR 처리 | ✅ 완료 | `korean_ocr.py` |
+| 긴 이미지 분할 처리 | ✅ 완료 | `long_image_processor.py` |
+| 텍스트 전처리/필터링 | ✅ 완료 | `ocr_text_preprocessor.py` |
+| 텍스트 병합 | ✅ 완료 | `ocr_text_merger.py` |
+| 상품 타입 감지 | ✅ 완료 | `product_type_detector.py` |
+| LLM 요약 생성 | ✅ 완료 | `ocr_llm_summarizer.py` |
+| 이미지 URL 필터링/다운로드 | ✅ 완료 | `image_fetcher.py` |
+| 통합 파이프라인 | ✅ 완료 | `ocr_pipeline.py` |
+| **WebSocket 연동** | ✅ 완료 | `services/summarizer/` |
+| **HTML 파서** | ✅ 완료 | `services/summarizer/html_parser.py` |
+| **MCP → OCR → TTS 통합** | ✅ 완료 | `api/websocket.py` |
+
+> 📖 상세 문서: [MCP_OCR_INTEGRATION.md](/docs/MCP_OCR_INTEGRATION.md)
+
+---
+
+## 🚀 빠른 시작
+
+```bash
+# 단일 이미지 처리
+python ocr_pipeline.py --input 샴푸.jpg
+
+# 여러 이미지 병합 처리
+python ocr_pipeline.py --inputs img1.jpg img2.jpg img3.jpg
+
+# URL 기반 처리
+python ocr_pipeline.py --urls "https://..." --site coupang
 ```
 
-**간략 흐름:**
-```
-이미지 → OCR → 텍스트 추출 → 전처리 → 타입 감지 → LLM 요약 → JSON 저장
+### Python에서 사용
+
+```python
+from ocr_pipeline import process_product_image, process_product_from_urls
+
+# 단일 이미지
+result = process_product_image("샴푸.jpg")
+print(result["summary"])
+
+# URL 기반 (MCP Playwright에서 추출한 URL 리스트)
+result = process_product_from_urls(urls, site="coupang")
+print(result["summary"])  # TTS용 요약
 ```
 
 ---
 
 ## 📁 파일 구조
 
-| 파일명 | 역할 | 입력 | 출력 |
-|--------|------|------|------|
-| `paddleocr_korean_test.py` | 이미지에서 텍스트 추출 (OCR) | 이미지 파일 | `*_res.json` |
-| `extract_rec_texts.py` | OCR 결과에서 텍스트만 추출 | `*_res.json` | `*_res_texts.json` |
-| `ocr_text_preprocessor.py` | 노이즈 제거, 신뢰도 필터링 | 텍스트 리스트 | 정제된 텍스트 |
-| `product_type_detector.py` | 제품 타입 감지 (식품/화장품 등) | 텍스트 리스트 | `ProductType` Enum |
-| `ocr_llm_summarizer.py` | LLM으로 핵심 정보 요약 | `*_res_texts.json` | `*_summary.json` |
+| 파일 | 역할 |
+|-----|-----|
+| `ocr_pipeline.py` | **통합 파이프라인 (메인 진입점)** |
+| `korean_ocr.py` | PaddleOCR 기반 OCR + 긴 이미지 자동 분할 |
+| `long_image_processor.py` | 슬라이딩 윈도우 분할 OCR |
+| `ocr_text_preprocessor.py` | 텍스트 정제/필터링 |
+| `ocr_text_merger.py` | 여러 OCR 결과 병합 + 중복 제거 |
+| `product_type_detector.py` | 제품 타입 분류 (30개 카테고리) |
+| `ocr_llm_summarizer.py` | 타입별 프롬프트 + LLM 요약 |
+| `image_fetcher.py` | 이미지 URL 필터링/다운로드 |
+| `extract_rec_texts.py` | OCR JSON에서 텍스트 추출 유틸 |
 
 ---
 
-## 🚀 실행 방법
+## 📊 파이프라인 흐름
 
-### Step 1. OCR 실행 (이미지 → 텍스트)
-
-```bash
-python paddleocr_korean_test.py
 ```
-
-- **입력**: `../tests/fixtures/<이미지>.jpg`
-- **출력**: `output/<이미지>_res.json`, `output/vis_<이미지>.jpg`
-
-### Step 2. 텍스트 추출 (JSON → 텍스트 리스트)
-
-```bash
-python extract_rec_texts.py --input output/<이미지>_res.json
-```
-
-- **입력**: `output/<이미지>_res.json`
-- **출력**: `output/<이미지>_res_texts.json`
-
-### Step 3. LLM 요약 (텍스트 → 정보 요약)
-
-```bash
-python ocr_llm_summarizer.py --input output/<이미지>_res_texts.json
-```
-
-- **입력**: `output/<이미지>_res_texts.json`
-- **출력**: `output/<이미지>_texts_summary.json`
-
-### Step 4. 요약 정보 질의 (선택)
-
-```bash
-python ocr_llm_summarizer.py --output output/<이미지>_texts_summary.json --query "가격이 얼마야?"
+[이미지 입력]
+      ↓
+[korean_ocr] OCR 처리 (긴 이미지는 자동 분할)
+      ↓
+[ocr_text_merger] 텍스트 병합 + 중복 제거
+      ↓
+[ocr_text_preprocessor] 전처리 (노이즈/저신뢰도 제거)
+      ↓
+[product_type_detector] 상품 타입 감지
+      ↓
+[ocr_llm_summarizer] LLM 요약 생성
+      ↓
+[TTS용 요약 텍스트 출력]
 ```
 
 ---
 
-## ⚙️ 환경 설정
+## 🚧 미구현 부분 (TODO)
 
-### 가상환경 설정
+> **팀원 분들께**: 아래 기능들은 프론트엔드/Playwright 연동이 필요합니다.
 
-```bash
-# 가상환경 생성
-python -m venv venv
+### 1. 웹 연동 - 자동 OCR 트리거
 
-# 가상환경 활성화 (Windows)
-venv\Scripts\activate
+**현재 상태:**
+- 이미지 URL 리스트를 수동으로 전달해야 함
+- `process_product_from_urls(urls)` 형태로 직접 호출 필요
 
-# 가상환경 활성화 (Linux/Mac)
-source venv/bin/activate
+**필요한 구현:**
+- 상품 페이지 접속 시 자동으로 OCR 파이프라인 실행
+- URL 패턴 감지 (쿠팡/네이버 상품 페이지인지 판별)
+- 트리거 조건 정의 (페이지 로드 완료, 버튼 클릭 등)
+
+---
+
+### 2. MCP Playwright 통합
+
+**현재 상태:**
+- CSS 셀렉터만 정의됨 (`image_fetcher.py`)
+  - 쿠팡: `.product-detail-content-inside img`
+  - 네이버: `#INTRODUCE img`
+
+**필요한 구현:**
+```python
+# 예상 구현 흐름
+async def extract_product_images(page_url: str):
+    # 1. Playwright로 페이지 접속
+    # 2. CSS 셀렉터로 img 태그 추출
+    # 3. src 속성에서 URL 추출
+    # 4. process_product_from_urls() 호출
+    pass
 ```
 
-### 환경변수 (.env) 설정
+**구현 시 참고:**
+- `image_fetcher.get_selector(site)` - 사이트별 CSS 셀렉터 반환
+- `image_fetcher.filter_product_images(urls)` - 광고/배너 URL 필터링
 
-`.env` 파일을 생성하고 아래 내용을 설정합니다:
+---
+
+### 3. API 인터페이스
+
+**현재 상태:**
+- CLI 및 Python 함수 호출만 지원
+
+**필요한 구현 (선택):**
+- REST API 엔드포인트 (Flask/FastAPI)
+- WebSocket 인터페이스 (실시간 처리)
+
+**예상 API 형태:**
+```
+POST /api/ocr/process
+Body: { "urls": ["...", "..."], "site": "coupang" }
+Response: { "summary": [...], "product_name": "..." }
+```
+
+---
+
+## 📝 연동 시 필요한 입출력 형식
+
+### 입력 (OCR 파이프라인 호출 시)
+
+```python
+# 방법 1: 이미지 경로
+process_product_image("path/to/image.jpg")
+
+# 방법 2: URL 리스트 (Playwright에서 추출)
+process_product_from_urls(
+    image_urls=["https://...", "https://..."],
+    site="coupang"  # 또는 "naver", "auto"
+)
+```
+
+### 출력 (TTS에서 사용)
+
+```json
+{
+  "product_type": "BEAUTY_HAIRCARE",
+  "product_name": "케라시스 샴푸",
+  "summary": [
+    "이 제품은 케라시스 데미지 클리닉 샴푸입니다.",
+    "손상된 모발을 위한 집중 케어 샴푸입니다.",
+    "용량은 600ml입니다."
+  ],
+  "keywords": {
+    "용량": {"answer": "600ml", "status": "found"},
+    "성분": {"answer": "케라틴, 아르간오일", "status": "found"}
+  }
+}
+```
+
+---
+
+## 환경 변수 (.env)
 
 ```env
-GMS_KEY=your_google_gemini_api_key_here
-```
-
-### 의존성 설치
-
-```bash
-# PaddlePaddle (CUDA 11.8)
-python -m pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
-
-# PaddlePaddle (CPU)
-python -m pip install paddlepaddle==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
-
-# PaddleOCR
-python -m pip install paddleocr
-
-# 기타 의존성
-pip install requests python-dotenv
+GMS_KEY=your_api_key_here
+OPENAI_MODEL=gpt-5-mini
 ```
 
 ---
 
-## 📂 출력 폴더 구조
+## 설치 의존성
 
-```
-output/
-├── 초코파이_detail_res.json       # OCR 원본 결과
-├── 초코파이_detail_res_texts.json # 추출된 텍스트 리스트
-├── 초코파이_texts_summary.json    # LLM 요약 결과
-└── vis_초코파이_detail.jpg        # OCR 시각화 이미지
+```bash
+# PaddlePaddle (GPU)
+python -m pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+
+# PaddleOCR + 기타
+python -m pip install paddleocr pillow requests python-dotenv
 ```

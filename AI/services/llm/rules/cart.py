@@ -10,6 +10,8 @@ from ..context.context_rules import (
     build_add_to_cart_commands,
     build_go_to_cart_commands
 )
+from ..context.context_rules import GeneratedCommand
+from ..sites.site_manager import get_page_type
 
 
 class CartRule(BaseRule):

@@ -1,26 +1,30 @@
 package com.ssafy.d108.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Getter
-@NoArgsConstructor
 @Table(name = "platforms")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Platform {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "platform_id")
-    private Integer platformId;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "shop_name", length = 100, nullable = false, unique = true)
-    private String shopName;
+    @Column(name = "platform_name", length = 50, unique = true)
+    private String platformName;
 
-    @Column(name = "base_url", length = 255)
+    @Column(name = "base_url", length = 500, nullable = false)
     private String baseUrl;
-
-    @Column(name = "api_endpoint_url", length = 255)
-    private String apiEndpointUrl;
 }
