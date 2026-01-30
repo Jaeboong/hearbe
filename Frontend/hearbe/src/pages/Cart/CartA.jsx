@@ -34,8 +34,8 @@ const CartA = () => {
 
                 // Transform API response to grouped format
                 const groupedData = {};
-                if (response.data && response.data.items) {
-                    response.data.items.forEach(item => {
+                if (response.cart_items) {
+                    response.cart_items.forEach(item => {
                         const platformName = platformNames[item.platform_id] || `Platform ${item.platform_id}`;
                         if (!groupedData[platformName]) {
                             groupedData[platformName] = [];
@@ -44,7 +44,9 @@ const CartA = () => {
                             id: item.cart_item_id,
                             image: item.img_url || 'https://via.placeholder.com/80',
                             name: item.name,
-                            price: item.price
+                            price: item.price,
+                            quantity: item.quantity || 1,
+                            url: item.url
                         });
                     });
                 }

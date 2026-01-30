@@ -27,14 +27,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                 const response = await cartAPI.getCart();
 
                 // Transform API response to CartC format
-                if (response.data && response.data.items) {
-                    const transformedItems = response.data.items.map(item => ({
+                if (response.cart_items) {
+                    const transformedItems = response.cart_items.map(item => ({
                         id: item.cart_item_id,
                         name: item.name,
                         price: item.price,
                         quantity: item.quantity || 1,
                         image: item.img_url || '📦',
                         mallName: platformNames[item.platform_id] || `Platform ${item.platform_id}`,
+                        url: item.url
                     }));
                     setCartItems(transformedItems);
                 }
