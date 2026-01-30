@@ -58,6 +58,7 @@ class BrowserTools(
             "extract": self.extract,
             "extract_detail": self.extract_detail,
             "extract_cart": self.extract_cart,
+            "get_dom_snapshot": self.get_dom_snapshot,
             "take_screenshot": self.take_screenshot,
             "scroll": self.scroll,
             "press_key": self.press_key,
@@ -67,6 +68,8 @@ class BrowserTools(
             "check_login_status": self.check_login_status,
             "get_pages": self.get_pages,
             "wait_for_new_page": self.wait_for_new_page,
+            "wait_for_selector": self.wait_for_selector,
+            "handle_captcha_modal": self.handle_captcha_modal,
         }
 
         if tool_name not in tools:
