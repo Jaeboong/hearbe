@@ -55,23 +55,14 @@ def run_ocr(img_path: str, output_dir: str = "output"):
     img_path = Path(img_path)
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
-    
-    print(f"이미지 인식 시작: {img_path}")
+
     result = ocr.predict(str(img_path))
-    
+
     for res in result:
-        # 1. 콘솔에 결과 출력
-        res.print()
-        
-        # 2. 결과 이미지 저장
         res.save_to_img(str(output_dir))
-        print(f"결과 이미지 저장 완료: {output_dir}/vis_{img_path.name}")
-        
-        # 3. 결과 JSON 저장
         res.save_to_json(str(output_dir))
         json_output = output_dir / f"{img_path.stem}_res.json"
-        print(f"결과 JSON 저장 완료: {json_output}")
-        
+
         return str(json_output)
 
 

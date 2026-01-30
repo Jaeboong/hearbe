@@ -107,21 +107,18 @@ def save_mapping_result(
     # JSON 저장
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
-    
-    print(f"[2단계] 매핑 완료: {output_path}")
+
     return result
 
 
 # CLI 실행
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python digit_to_dom_mapper.py <digits_json> [output.json] [dom_keys.json]")
         sys.exit(1)
-    
+
     json_path = sys.argv[1]
     output_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].endswith(".json") == False else None
-    
-    # 세 번째 인자가 있으면 DOM 키 파일로 처리
+
     dom_keys_path = None
     if len(sys.argv) > 3:
         dom_keys_path = sys.argv[3]
@@ -133,13 +130,9 @@ if __name__ == "__main__":
     if dom_keys_path:
         with open(dom_keys_path, 'r', encoding='utf-8') as f:
             dom_keys = json.load(f)
-        print(f"DOM 키 로드 완료: {dom_keys_path}")
-    
-    result = save_mapping_result(json_path, output_path, dom_keys)
-    
-    print(f"\n=== 매핑 결과 ===")
-    print(f"숫자: {result['digits']}")
-    print(f"매핑: {result['digit_to_key_mapping']}")
+
+    save_mapping_result(json_path, output_path, dom_keys)
+
 
 
 
