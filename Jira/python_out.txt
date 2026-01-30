@@ -1,0 +1,37 @@
+Connected to JIRA
+Searching for user '서해령'...
+Found User: 서해령 (712020:a745afbe-6fcd-47a4-89ac-6f15e2ca6555)
+Searching for Epics...
+Warning: Could not find Epics for: ['마이페이지', '장바구니', '쇼핑']
+
+Creating 6 issues...
+
+Processing: Feat: 마이페이지 (일반용/확대용)
+  -> Created Issue: S14P11D108-258
+  -> Set Story Points to 3 (Field: customfield_10031)
+  -> Added Label: Frontend
+
+Processing: Feat: 회원정보 수정
+  -> Created Issue: S14P11D108-259
+  -> Set Story Points to 3 (Field: customfield_10031)
+  -> Added Label: Frontend
+
+Processing: Feat: 통합 장바구니 (확대용)
+  -> Created Issue: S14P11D108-260
+  -> Set Story Points to 3 (Field: customfield_10031)
+  -> Added Label: Frontend
+
+Processing: Feat: 쇼핑사이트 선택 (일반용)
+  -> Created Issue: S14P11D108-261
+  -> Set Story Points to 3 (Field: customfield_10031)
+  -> Added Label: Frontend
+
+Processing: Feat: 쇼핑사이트 선택 (확대용)
+  -> Created Issue: S14P11D108-262
+  -> Set Story Points to 3 (Field: customfield_10031)
+  -> Added Label: Frontend
+
+Processing: Feat: 확대 쇼핑 뷰
+  -> Created Issue: S14P11D108-263
+  -> Set Story Points to 5 (Field: customfield_10031)
+  -> Added Label: Frontend
