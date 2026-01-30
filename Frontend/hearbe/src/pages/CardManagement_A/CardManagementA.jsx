@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BackButton from '../BackButton/BackButtonA';
+import BackButton from '../common/BackButtonA';
 import iconCamera from '../../assets/icon-camera.png';
 import iconCard from '../../assets/icon-card.png';
 import './CardManagementA.css';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './StoreBrowserA.css';
 import iconUser from '../../assets/icon-user.png';
@@ -8,7 +8,7 @@ import iconCard from '../../assets/icon-cart.png';
 import logo from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 
-import BackButton from '../BackButton/BackButtonA';
+import BackButton from '../common/BackButtonA';
 
 const StoreBrowser = () => {
     const navigate = useNavigate();

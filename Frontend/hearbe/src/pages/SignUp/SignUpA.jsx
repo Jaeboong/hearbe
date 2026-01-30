@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import iconUser from '../../assets/icon-user.png';
 import iconLock from '../../assets/icon-lock.png';
@@ -8,7 +8,7 @@ import iconCamera from '../../assets/icon-camera.png';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './SignUpA.css';
-import BackButton from '../BackButton/BackButtonA';
+import BackButton from '../common/BackButtonA';
 
 // Utility Functions
 const formatPhoneNumber = (value) => {

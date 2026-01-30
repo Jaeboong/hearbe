@@ -17,7 +17,7 @@ const Login = () => {
         }
         setIsLoading(true);
         try {
-            const response = await authAPI.login({ username: id, password: password });
+            const response = await authAPI.login(id, password);
 
             if (response.code === 200) {
                 if (response.data && response.data.accessToken) {
