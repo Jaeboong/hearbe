@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import hLogo from '../../assets/HearBe_logo_.png';
-import { findUser } from '../../utils/userStorage';
+import { authAPI } from '../../services/authAPI';
 import './LoginC.css';
 
 export default function LoginC() {
@@ -11,18 +11,39 @@ export default function LoginC() {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         if (!id || !password) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
         }
 
-        const user = findUser(id, password);
-        if (user) {
+        try {
+            // LoginRequest DTO requires 'username' and 'password'
+            const response = await authAPI.login({ username: id, password: password });
+
+            // Assuming response.data contains tokens or user info
+            // API Response format: ApiResponse<LoginResponse> -> data: LoginResponse
+            // LoginResponse fields needs to be checked. Usually it has accessToken/refreshToken/user info.
+            console.log("Login Success:", response);
+
+            // Save token if available (adjust based on actual response structure)
+            if (response.data && response.data.accessToken) {
+                localStorage.setItem('accessToken', response.data.accessToken);
+            }
+            if (response.data && response.data.refreshToken) {
+                localStorage.setItem('refreshToken', response.data.refreshToken);
+            }
+
+            // Save user info basics
+            if (response.data) {
+                localStorage.setItem('user', JSON.stringify(response.data));
+            }
+
             navigate('/C/mall');
-        } else {
-            alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+        } catch (error) {
+            console.error("Login failed:", error);
+            alert(error.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
     };
 
@@ -76,7 +97,7 @@ export default function LoginC() {
                 <p>© 2026 HearBe. All rights reserved.</p>
             </footer>
 
-            <div className="floating-question-c">?</div>
+
         </div>
     );
 }

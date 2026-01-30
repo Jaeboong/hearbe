@@ -35,20 +35,12 @@ export const validatePassword = (password) => {
         return '비밀번호는 20자 이하여야 합니다.';
     }
 
-    if (!/[A-Z]/.test(password)) {
-        return '비밀번호에 대문자를 포함해야 합니다.';
-    }
+    // 영문과 숫자가 모두 포함되어야 함
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
 
-    if (!/[a-z]/.test(password)) {
-        return '비밀번호에 소문자를 포함해야 합니다.';
-    }
-
-    if (!/[0-9]/.test(password)) {
-        return '비밀번호에 숫자를 포함해야 합니다.';
-    }
-
-    if (!/[!@#$%^&*]/.test(password)) {
-        return '비밀번호에 특수문자(!@#$%^&*)를 포함해야 합니다.';
+    if (!hasLetter || !hasNumber) {
+        return '비밀번호는 영문과 숫자를 모두 포함해야 합니다.';
     }
 
     return null;
@@ -89,6 +81,10 @@ export const validateName = (name) => {
 
     if (name.length < 2) {
         return '이름은 2자 이상이어야 합니다.';
+    }
+
+    if (name.length > 15) {
+        return '이름은 15자 이하여야 합니다.';
     }
 
     if (!/^[가-힣a-zA-Z\s]+$/.test(name)) {
