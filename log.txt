@@ -1,0 +1,31 @@
+commit cb51aea8167da1d3b7d1fcf71eb804cf2339ddec
+Merge: 54250f1 e45749f
+Author: kanghansol9266 <kanghansol9266@naver.com>
+Date:   Mon Jan 26 14:36:30 2026 +0900
+
+    Merge branch 'feat/front/login' of https://lab.ssafy.com/s14-webmobile1-sub1/S14P11D108 into feat/front/login
+
+commit 54250f1c744342fc3d696a3350d47dda25332e0f
+Author: kanghansol9266 <kanghansol9266@naver.com>
+Date:   Mon Jan 26 14:32:53 2026 +0900
+
+    feat: A 모드 추가
+
+commit e45749f928dea528f619be374bd5e84b2e801319
+Author: 서해령 <shl34101@naver.com>
+Date:   Sat Jan 24 11:34:18 2026 +0900
+
+    chore: react package 관리 react app 내부로 이동
+
+commit f7c203725e3101460b9e664a303e6c3eb73eeb14
+Merge: 77cbf66 ef91848
+Author: 서해령 <shl34101@naver.com>
+Date:   Fri Jan 23 17:17:40 2026 +0900
+
+    Merge branch 'dev/front' of https://lab.ssafy.com/s14-webmobile1-sub1/S14P11D108 into dev/front
+
+commit 77cbf66d746afbd98f0cd02282842c974c293d7f
+Author: 서해령 <shl34101@naver.com>
+Date:   Fri Jan 23 17:16:38 2026 +0900
+
+    chore: route내 .gitignore 에 react .gitignore 파일 추가

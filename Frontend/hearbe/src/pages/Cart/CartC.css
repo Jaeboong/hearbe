@@ -1,0 +1,424 @@
+/* CartPage.css */
+.cart-page-container {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100vh;
+    background-color: #f8f9fb;
+    /* C타입 공통 배경색으로 변경 */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-family: 'Pretendard', sans-serif;
+    color: #1a1a1a;
+    padding: 0;
+    margin: 0;
+}
+
+/* Header Styles */
+/* Header Styles */
+.cart-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid #f0f0f0;
+    padding: 0 4rem;
+    height: 6rem;
+    /* Reduced height */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+}
+
+.back-button-circle-c {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8B5CF6;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.back-button-circle-c:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
+    background: #fdfbff;
+}
+
+.title-area {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.title-icon-box {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: white;
+    box-shadow: 0 6px 12px rgba(124, 58, 237, 0.15);
+}
+
+.title-text h1 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: #111827 !important;
+}
+
+.subtitle {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #9ca3af;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+/* Nav Styles */
+.header-nav {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 6rem;
+    height: auto;
+    padding: 0.75rem;
+    border-radius: 1.5rem;
+    transition: all 0.3s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-item.active {
+    background-color: #f5f3ff;
+}
+
+.nav-item:hover {
+    background-color: #f5f3ff;
+    transform: translateY(-2px);
+}
+
+.nav-icon-box {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    margin-bottom: 0.4rem;
+    transition: all 0.3s;
+}
+
+.nav-icon-box.active {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: white;
+    box-shadow: 0 6px 12px rgba(124, 58, 237, 0.15);
+}
+
+.nav-item span {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.nav-item.active span {
+    color: #7c3aed;
+    font-weight: 800;
+}
+
+/* Main Content */
+.cart-content {
+    flex: 1;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 4rem 3rem;
+    /* Matches SelectMallC */
+    width: 100%;
+}
+
+.cart-list-wrapper {
+    margin-bottom: 3rem;
+}
+
+.mall-group {
+    margin-bottom: 3rem;
+    padding: 2.5rem;
+    background: white;
+    border-radius: 2.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    /* Flex gap 0으로 설정 */
+}
+
+.mall-header {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 0 !important;
+    /* 강제 마진 제거 */
+    padding-left: 2rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+}
+
+.mall-indicator {
+    width: 0.75rem;
+    height: 2rem;
+    background-color: #7c3aed;
+    border-radius: 1rem;
+    margin-right: 0.75rem;
+}
+
+.mall-header h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 0 !important;
+    /* 강제 마진 제거 */
+    line-height: 1;
+    padding-bottom: 0;
+    flex: 1;
+}
+
+.item-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 0 !important;
+    /* 여백 완전 제거 (0) */
+}
+
+.cart-item-card {
+    background-color: #fcfcfc;
+    /* 내부 카드는 살짝 어둡게 */
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: none;
+    /* 이중 그림자 방지 */
+    /* Softer shadow */
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.cart-item-card:hover {
+    transform: translateX(4px);
+    border-color: #d8b4fe;
+    box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1);
+}
+
+.item-image-box {
+    width: 8rem;
+    height: 8rem;
+    background-color: #f5f3ff;
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    flex-shrink: 0;
+}
+
+.item-info {
+    flex: 1;
+    text-align: left;
+}
+
+.item-info h3 {
+    font-size: 1.7rem;
+    /* 1.4rem -> 1.7rem */
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    color: #111827;
+}
+
+.item-price {
+    color: #7c3aed;
+    font-weight: 900;
+    font-size: 1.5rem;
+    /* 1.25rem -> 1.5rem */
+}
+
+.item-quantity-badge {
+    background-color: #f9fafb;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 6rem;
+}
+
+.item-quantity-badge .label {
+    font-size: 0.95rem;
+    /* 0.7rem -> 0.95rem */
+    font-weight: 900;
+    color: #9ca3af;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.item-quantity-badge .count {
+    font-size: 1.8rem;
+    /* 1.4rem -> 1.8rem */
+    font-weight: 900;
+    color: #1f2937;
+}
+
+.delete-button {
+    padding: 0.75rem 1.25rem;
+    border-radius: 1rem;
+    border: none;
+    background-color: #fff1f2;
+    color: #eb5757;
+    font-weight: 800;
+    display: flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 1.1rem;
+    /* 추가: 폰트 사이즈 명시 */
+}
+
+.delete-button:hover {
+    background-color: #ffe4e6;
+    transform: scale(1.05);
+}
+
+/* Mall Footer & Summary */
+.mall-footer {
+    margin-top: 2rem;
+    background-color: #f8fafc;
+    /* 연한 회색 배경 유지 */
+    padding: 2rem;
+    border-radius: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mall-summary-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.summary-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.3rem;
+    /* 1.1rem -> 1.3rem */
+    color: #4b5563;
+    font-weight: 700;
+}
+
+.summary-row.highlight {
+    margin-top: 0.5rem;
+}
+
+.summary-row .summary-label {
+    min-width: 10rem;
+    /* 라벨 너비도 살짝 확대 */
+}
+
+.summary-row .summary-value {
+    font-weight: 800;
+    color: #1f2937;
+    font-size: 1.4rem;
+    /* 기본 값 크기 확대 */
+}
+
+.summary-row .summary-value.price {
+    color: #7c3aed;
+    font-size: 1.8rem;
+    /* 1.5rem -> 1.8rem (가격 대폭 확대) */
+}
+
+/* .summary-price removed as it is replaced by .summary-row .summary-value.price */
+
+.mall-pay-button {
+    background-color: #7c3aed;
+    color: white;
+    padding: 1.25rem 3rem;
+    /* 좌우 패딩 확대 */
+    border-radius: 1.5rem;
+    font-weight: 900;
+    font-size: 1.5rem;
+    /* 1.25rem -> 1.5rem */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: none;
+    transition: transform 0.2s;
+}
+
+.mall-pay-button:hover {
+    background-color: #6d28d9;
+    transform: scale(1.05);
+}
+
+.total-summary-card {
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 2.5rem;
+    border: 2px solid #ede9fe;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.05);
+}
+
+.total-label {
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.total-price-sum {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #7c3aed;
+}
+
+/* .cart-footer-info removed to use global .landing-footer */
+
+.rotate-180 {
+    transform: rotate(180deg);
+}

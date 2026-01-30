@@ -1,0 +1,635 @@
+/* =========================================
+   1. 기본 설정 및 변수 (색상, 폰트)
+   ========================================= */
+:root {
+    --bg-dark: #141C29;
+    --bg-depp-dark: #0A0E14;
+    --accent-yellow: #FFF064;
+    --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-dark);
+    color: var(--accent-yellow);
+}
+
+/* =========================================
+   2. 유틸리티 & 공통 스타일
+   ========================================= */
+.flex-col-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 공통 버튼 스타일 */
+.check-btn,
+.signup-submit-btn,
+.error-confirm-btn,
+.card-register-btn {
+    background-color: var(--accent-yellow);
+    color: var(--bg-dark);
+    border: none;
+    font-family: var(--font-main);
+    font-weight: 900;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.check-btn:hover,
+.signup-submit-btn:hover,
+.error-confirm-btn:hover,
+.card-register-btn:hover {
+    opacity: 0.9;
+}
+
+/* 공통 Input 스타일 */
+.signup-input,
+.modal-input {
+    background: transparent;
+    color: var(--accent-yellow);
+    font-family: var(--font-main);
+    font-weight: bold;
+    outline: none;
+    width: 100%;
+}
+
+/* =========================================
+   3. 회원가입 메인 레이아웃
+   ========================================= */
+.signup-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+    width: 100%;
+    background-color: #141C29;
+    padding-bottom: clamp(20px, 5vw, 40px);
+    /* Scroll buffer */
+}
+
+/* Back Button Component Override */
+.signup-container .global-back-button.arrow-only {
+    left: clamp(12px, 4vw, 32px);
+    top: clamp(12px, 4vw, 32px);
+    transform: none;
+}
+
+.signup-container .global-back-button.arrow-only .back-arrow-svg {
+    width: clamp(48px, 16vw, 96px);
+    height: clamp(48px, 16vw, 96px);
+}
+
+.signup-box {
+    width: clamp(300px, 80vw, 700px);
+    padding: clamp(8px, 2vw, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 3vw, 24px);
+    box-sizing: border-box;
+    margin-top: clamp(20px, 5vw, 40px);
+}
+
+.signup-logo-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: clamp(8px, 2vw, 16px);
+}
+
+.signup-logo-image {
+    width: clamp(210px, 52.5vw, 420px);
+    height: auto;
+    object-fit: contain;
+}
+
+/* 뒤로가기 화살표 (fallback if not using component) */
+.back-arrow {
+    position: absolute;
+    top: clamp(12px, 3vw, 24px);
+    left: clamp(12px, 3vw, 24px);
+    font-size: clamp(24px, 8vw, 48px);
+    color: var(--accent-yellow);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* =========================================
+   4. 입력 폼 (Input) 스타일
+   ========================================= */
+.form-group-outline {
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
+    background-color: var(--bg-dark);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    padding: clamp(8px, 2vw, 16px);
+    font-weight: bold;
+    font-size: clamp(14px, 4vw, 24px);
+}
+
+.border-bottom {
+    border-bottom: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+}
+
+.header-row {
+    padding-left: clamp(8px, 2vw, 16px);
+    gap: clamp(8px, 2vw, 16px);
+}
+
+.input-icon {
+    width: clamp(24px, 8vw, 48px);
+    height: clamp(24px, 8vw, 48px);
+    object-fit: contain;
+}
+
+.signup-input {
+    flex: 1;
+    border: none;
+    padding: clamp(4px, 1vw, 8px);
+    font-size: clamp(18px, 5vw, 36px);
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+    height: auto;
+    min-width: 0;
+}
+
+.signup-input::placeholder {
+    color: var(--accent-yellow);
+    font-weight: bold;
+}
+
+/* 중복확인 버튼 */
+.check-btn {
+    padding: clamp(6px, 1.5vw, 12px) clamp(12px, 3vw, 24px);
+    border-radius: clamp(6px, 1.5vw, 12px);
+    font-size: clamp(16px, 5vw, 28px);
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: clamp(0.5px, 0.1vw, 1px);
+    margin-left: clamp(8px, 2vw, 16px);
+}
+
+/* 라벨 텍스트 */
+.label {
+    flex-grow: 1;
+    font-size: clamp(22px, 7vw, 42px);
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+}
+
+/* =========================================
+   5. 카드 섹션 (메인 화면)
+   ========================================= */
+.card-section {
+    padding: 0.5vw;
+}
+
+/* 메인 화면의 카메라 실행 버튼 영역 */
+.camera-area {
+    border: clamp(2px, 0.6vw, 5px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2vw, 16px);
+    margin: 0 clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px);
+    background-color: transparent;
+    padding: clamp(12px, 4vw, 32px);
+    min-height: clamp(80px, 25vw, 200px);
+}
+
+.camera-text {
+    font-weight: bold;
+    font-size: clamp(18px, 6vw, 36px);
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+}
+
+.camera-icon-img {
+    width: clamp(60px, 20vw, 140px);
+    height: auto;
+}
+
+/* 등록 완료 후 카드 정보 표시 박스 */
+.card-info-display {
+    padding: clamp(16px, 3vw, 30px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2vw, 20px);
+    border: clamp(2px, 0.4vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
+    margin: 0 clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px);
+}
+
+.info-row {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.5vw, 8px);
+}
+
+.info-row-flex {
+    display: flex;
+    gap: clamp(16px, 3vw, 32px);
+}
+
+.info-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.5vw, 8px);
+    flex: 1;
+}
+
+.info-label-main {
+    font-size: clamp(14px, 3vw, 24px);
+    color: var(--accent-yellow);
+    font-weight: bold;
+    opacity: 0.8;
+}
+
+.info-val-main {
+    font-size: clamp(20px, 4vw, 36px);
+    color: var(--accent-yellow);
+    font-weight: 900;
+    padding-left: clamp(4px, 1vw, 8px);
+    border-bottom: clamp(1px, 0.2vw, 2px) solid var(--accent-yellow);
+    padding-bottom: clamp(4px, 1vw, 8px);
+}
+
+/* =========================================
+   6. 약관 동의 (Terms) 섹션
+   ========================================= */
+.terms-section {
+    padding: clamp(8px, 2vw, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2vw, 16px);
+}
+
+.term-row {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(8px, 2vw, 16px);
+    cursor: pointer;
+    width: 100%;
+}
+
+.term-row:first-child {
+    align-items: center;
+}
+
+.check-circle {
+    width: clamp(18px, 6vw, 36px);
+    height: clamp(18px, 6vw, 36px);
+    min-width: clamp(18px, 6vw, 36px);
+    min-height: clamp(18px, 6vw, 36px);
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(12px, 4vw, 24px);
+    font-weight: 900;
+    color: var(--bg-dark);
+    background-color: transparent;
+    transition: background-color 0.2s;
+    -webkit-text-stroke: clamp(1px, 0.3vw, 3px) var(--bg-dark);
+    flex-shrink: 0;
+}
+
+.check-circle.checked {
+    background-color: var(--accent-yellow);
+}
+
+.term-text {
+    font-size: clamp(18px, 5.5vw, 32px);
+    font-weight: bold;
+}
+
+.bold {
+    font-weight: 900;
+    font-size: clamp(20px, 6.5vw, 38px);
+}
+
+/* 회원가입 제출 버튼 */
+.signup-submit-btn {
+    font-size: clamp(20px, 7vw, 42px);
+    padding: clamp(12px, 3vw, 24px);
+    border-radius: clamp(8px, 2vw, 16px);
+    margin-top: clamp(8px, 2vw, 16px);
+    width: 100%;
+    min-height: 44px;
+}
+
+/* =========================================
+   7. 모달 (팝업) 스타일
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1E2A3A;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(8px, 2vw, 16px);
+    backdrop-filter: blur(5px);
+}
+
+/* 모달이 열렸을 때 뒤로가기 버튼 숨기기 */
+.modal-overlay~.signup-container .global-back-button,
+body:has(.modal-overlay) .global-back-button {
+    display: none;
+}
+
+.modal-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vw;
+}
+
+.hearbe-text {
+    font-size: 4vw;
+    font-weight: 900;
+    color: var(--accent-yellow);
+    font-style: italic;
+    margin-bottom: 1vw;
+    align-self: flex-start;
+    margin-left: 1vw;
+    letter-spacing: 0.1vw;
+}
+
+/* 팝업 박스 본체 */
+.modal-box {
+    width: clamp(300px, 98vw, 900px);
+    max-width: 98vw;
+    max-height: 92vh;
+    overflow-y: auto;
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
+    padding: clamp(12px, 4vw, 32px) clamp(16px, 5vw, 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 2vw, 16px);
+    box-sizing: border-box;
+    background-color: #141C29;
+    position: relative;
+}
+
+/* 닫기 버튼 (X) */
+.modal-close-x,
+.modal-close-btn {
+    position: absolute;
+    top: clamp(8px, 2.5vw, 20px);
+    right: clamp(8px, 2.5vw, 20px);
+    font-size: clamp(32px, 12vw, 64px);
+    font-weight: 1000;
+    color: var(--accent-yellow);
+    cursor: pointer;
+    line-height: 1;
+    z-index: 30;
+    transition: transform 0.2s;
+}
+
+.modal-close-btn:hover {
+    transform: scale(1.1);
+}
+
+.modal-title {
+    font-size: clamp(36px, 11vw, 64px);
+    font-weight: 900;
+    color: var(--accent-yellow);
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+    text-align: center;
+}
+
+.modal-desc {
+    font-size: clamp(16px, 5vw, 28px);
+    font-weight: 900;
+    color: var(--accent-yellow);
+    margin-bottom: clamp(8px, 2vw, 16px);
+    text-align: center;
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+}
+
+/* 모달 내 카메라 영역 */
+.modal-camera-area {
+    width: 85%;
+    max-width: 600px;
+    border: clamp(2px, 0.4vw, 3px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 16px);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    height: 40vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-video-stream {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-camera-text {
+    font-size: 4vw;
+    font-weight: bold;
+    color: var(--accent-yellow);
+    margin-bottom: 2vw;
+}
+
+.modal-camera-icon {
+    width: 15vw;
+    height: auto;
+}
+
+/* 셔터 버튼 */
+.shutter-button {
+    width: clamp(40px, 12vw, 80px);
+    height: clamp(40px, 12vw, 80px);
+    border-radius: 50%;
+    background-color: transparent;
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: clamp(12px, 3vw, 24px);
+}
+
+.shutter-inner {
+    width: clamp(28px, 9vw, 60px);
+    height: clamp(28px, 9vw, 60px);
+    border-radius: 50%;
+    background-color: var(--accent-yellow);
+    transition: transform 0.1s;
+}
+
+.shutter-button:active .shutter-inner {
+    transform: scale(0.9);
+}
+
+/* =========================================
+   8. 모달 내 카드 폼 (Card Form in Modal)
+   ========================================= */
+.card-form-box {
+    width: 100%;
+    border: clamp(3px, 0.6vw, 6px) solid var(--accent-yellow);
+    border-radius: clamp(8px, 2vw, 20px);
+    padding: clamp(16px, 3vw, 30px);
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2vw, 20px);
+    box-sizing: border-box;
+    max-width: 600px;
+    /* Safety cap */
+    margin: 0 auto;
+}
+
+.card-form-header {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1.5vw, 12px);
+    font-size: clamp(36px, 11vw, 64px);
+    font-weight: 900;
+    color: var(--accent-yellow);
+    margin-bottom: clamp(4px, 1vw, 8px);
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.small-card-icon {
+    width: clamp(24px, 5vw, 50px);
+    height: auto;
+}
+
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 1vw, 10px);
+    width: 100%;
+}
+
+.form-field-group label {
+    font-size: clamp(14px, 3vw, 24px);
+    font-weight: bold;
+    color: var(--accent-yellow);
+    margin-left: clamp(2px, 0.5vw, 5px);
+}
+
+.modal-input {
+    border: clamp(2px, 0.4vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(6px, 1.5vw, 15px);
+    padding: clamp(8px, 1.5vw, 16px);
+    font-size: clamp(16px, 3.5vw, 28px);
+    box-sizing: border-box;
+}
+
+.form-row-group {
+    display: flex;
+    gap: clamp(10px, 2vw, 20px);
+    width: 100%;
+}
+
+.half {
+    flex: 1;
+}
+
+/* 카드 버튼 그룹 */
+.card-button-group {
+    display: flex;
+    gap: clamp(8px, 2vw, 16px);
+    width: 100%;
+    margin-top: clamp(8px, 1.5vw, 12px);
+}
+
+.card-retake-btn,
+.card-register-btn {
+    flex: 1;
+    font-size: clamp(20px, 6.5vw, 38px);
+    padding: clamp(12px, 3vw, 20px);
+    border-radius: clamp(6px, 1.5vw, 12px);
+    font-family: var(--font-main);
+    font-weight: 900;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: none;
+    min-height: 44px;
+}
+
+.card-retake-btn {
+    background-color: transparent;
+    border: clamp(2px, 0.4vw, 3px) solid var(--accent-yellow);
+    color: var(--accent-yellow);
+}
+
+.card-register-btn {
+    background-color: var(--accent-yellow);
+    color: var(--bg-dark);
+}
+
+.card-retake-btn:hover,
+.card-register-btn:hover {
+    opacity: 0.9;
+}
+
+/* =========================================
+   9. 에러/성공 모달
+   ========================================= */
+.error-modal-box {
+    width: 60vw;
+    background-color: var(--bg-dark);
+    border: 0.5vw solid var(--accent-yellow);
+    border-radius: 2vw;
+    padding: 5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4vw;
+    box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.5);
+    text-align: center;
+    position: relative;
+}
+
+.error-message {
+    font-size: 4vw !important;
+    font-weight: bold;
+    color: var(--accent-yellow);
+    line-height: 1.6;
+    word-break: keep-all;
+}
+
+.error-confirm-btn {
+    padding: 1.5vw 3vw 1.5vw;
+    border-radius: 1.5vw;
+    font-size: 5vw;
+}
+
+.success-icon {
+    font-size: 8vw;
+}
