@@ -1,33 +1,81 @@
-import { API_BASE_URL } from '../config';
+// 공통 회원 API
+// A형과 C형에서 공통으로 사용
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+// Helper function to get auth token
+const getAuthToken = () => {
+    return localStorage.getItem('accessToken');
+};
+
+// Helper function to get auth header
 const getAuthHeader = () => {
-    const token = localStorage.getItem('accessToken');
+    const token = getAuthToken();
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
+// Member API Service
 export const memberAPI = {
-    // 1. 프로필 조회
+    /**
+     * 회원 프로필 조회
+     * GET /members/profile
+     * @returns {Promise<Object>} 회원 프로필 데이터
+     */
     getProfile: async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/members/profile`, {
+            const token = getAuthToken();
+            if (!token) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
+            const response = await fetch(`${API_BASE_URL}/members/profile`, {
                 method: 'GET',
                 headers: {
                     ...getAuthHeader(),
+                    'Content-Type': 'application/json'
                 },
             });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || '프로필 조회 실패');
-            return data;
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('로그인이 필요합니다.');
+                }
+                if (response.status === 403) {
+                    throw new Error('접근 권한이 없습니다.');
+                }
+                if (response.status === 404) {
+                    throw new Error('회원정보를 찾을 수 없습니다.');
+                }
+                if (response.status >= 500) {
+                    throw new Error('서버 오류가 발생했습니다.');
+                }
+                throw new Error('요청이 실패했습니다.');
+            }
+
+            return await response.json();
         } catch (error) {
-            console.error('getProfile Error:', error);
+            if (error.message === 'Failed to fetch') {
+                throw new Error('네트워크 연결을 확인해주세요.');
+            }
+            console.error('getProfile API Error:', error);
             throw error;
         }
     },
 
-    // 2. 프로필 수정
+    /**
+     * 회원 프로필 수정
+     * PUT /members/profile
+     * @param {Object} profileData - 수정할 프로필 데이터
+     * @returns {Promise<Object>} 수정된 프로필 데이터
+     */
     updateProfile: async (profileData) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/members/profile`, {
+            const token = getAuthToken();
+            if (!token) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
+            const response = await fetch(`${API_BASE_URL}/members/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -35,12 +83,30 @@ export const memberAPI = {
                 },
                 body: JSON.stringify(profileData),
             });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || '프로필 수정 실패');
-            return data;
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('로그인이 필요합니다.');
+                }
+                if (response.status === 403) {
+                    throw new Error('접근 권한이 없습니다.');
+                }
+                if (response.status === 404) {
+                    throw new Error('회원정보를 찾을 수 없습니다.');
+                }
+                if (response.status >= 500) {
+                    throw new Error('서버 오류가 발생했습니다.');
+                }
+                throw new Error('요청이 실패했습니다.');
+            }
+
+            return await response.json();
         } catch (error) {
-            console.error('updateProfile Error:', error);
+            if (error.message === 'Failed to fetch') {
+                throw new Error('네트워크 연결을 확인해주세요.');
+            }
+            console.error('updateProfile API Error:', error);
             throw error;
         }
-    }
+    },
 };

@@ -50,27 +50,46 @@ export const authAPI = {
         }
     },
 
-    // ID 중복 확인 API (선택사항 - 해당 API가 있다면 사용)
-    checkDuplicate: async (userId) => {
+    // 사용자 프로필 조회 API
+    getUserProfile: async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/checkId`, {
-                method: 'POST',
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
+            const response = await fetch(`${API_BASE_URL}/auth/mypage`, {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: userId }),
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
 
-            const result = await response.json();
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('로그인이 필요합니다.');
+                }
+                if (response.status === 403) {
+                    throw new Error('접근 권한이 없습니다.');
+                }
+                if (response.status === 404) {
+                    throw new Error('회원정보를 찾을 수 없습니다.');
+                }
+                if (response.status >= 500) {
+                    throw new Error('서버 오류가 발생했습니다.');
+                }
+                throw new Error('요청이 실패했습니다.');
+            }
 
-            return {
-                available: !result.data, // true(중복)면 false(사용불가) 반환
-                message: result.message
-            };
+            return await response.json();
         } catch (error) {
-            console.error('Check Duplicate API Error:', error);
-            // API가 없으면 기본적으로 사용 가능으로 처리
-            return { available: true };
+            if (error.message === 'Failed to fetch') {
+                throw new Error('네트워크 연결을 확인해주세요.');
+            }
+            console.error('getUserProfile API Error:', error);
+            throw error;
         }
-    },
+    }
 };
