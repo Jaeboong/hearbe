@@ -87,23 +87,18 @@ def save_extracted_digits(
     # JSON 저장
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
-    
-    print(f"[1단계] 숫자 추출 완료: {output_path}")
+
     return result
 
 
 # CLI 실행
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python digit_extractor.py <ocr_result.json> [output.json]")
         sys.exit(1)
-    
+
     json_path = sys.argv[1]
     output_path = sys.argv[2] if len(sys.argv) > 2 else None
-    
-    result = save_extracted_digits(json_path, output_path)
-    
-    print(f"\n=== 추출된 숫자 ===")
-    print(f"순서: {result['extracted_digits']}")
-    print(f"개수: {result['total_count']}")
+
+    save_extracted_digits(json_path, output_path)
+
 
