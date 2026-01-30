@@ -538,3 +538,17 @@ session.json
 sessions/
 
 nul
+
+
+**/*service-account*.json
+**/*gcp*.json
+**/*google*account*.json
+
+# Ignore all wav by default
+*.wav
+
+# Allow only curated samples
+!AI/services/tts/samples/*.wav
+Backend/src/main/resources/application.properties
+
+google-service-account.json

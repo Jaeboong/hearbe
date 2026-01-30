@@ -337,4 +337,4 @@ test(network): WebSocket 연결 테스트 추가
 - [이벤트 명세서](docs/EVENT_SPECIFICATION.md) - 모듈 간 통신 이벤트 정의
 - [모듈 통합 가이드](docs/INTEGRATION_GUIDE.md) - main.py 통합 방법
 - [환경 변수 명세서](docs/ENV_SPECIFICATION.md) - .env 설정 가이드
-- [설정 가이드](docs/SETUP_GUIDE.md) - 개발 환경 설정
+- [클라이언트 설정 가이드](docs/MCP_CLIENT_SETUP_GUIDE.md) - 개발/배포 설정

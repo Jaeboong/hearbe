@@ -14,8 +14,11 @@ from core.interfaces import (
 )
 
 from ..generators.command_generator import CommandGenerator, CommandResult
-from ..generators.llm_generator import LLMGenerator, LLMResult
+from ..generators.llm_generator import LLMGenerator, LLMResult, resolve_llm_api_key
 from .routing import LLMRoutingPolicy
+from .selection import select_from_results, select_option_from_detail
+from .cart_action import handle_cart_action
+from .fallback import build_llm_fallback_response
 
 logger = logging.getLogger(__name__)
 
@@ -40,12 +43,15 @@ class LLMPlanner(ILLMPlanner):
         
         # LLM fallback 활성화 시
         if self._use_llm_fallback:
-            api_key = os.environ.get("OPENAI_API_KEY")
+            api_key = resolve_llm_api_key()
             if api_key:
                 self._llm_generator = LLMGenerator(api_key=api_key)
                 logger.info("LLMPlanner initialized with LLM fallback")
             else:
-                logger.warning("OPENAI_API_KEY not set, LLM fallback disabled")
+                logger.warning(
+                    "No LLM API key set (LLM_API_KEY_NAME or GMS_API_KEY/OPENAI_API_KEY), "
+                    "LLM fallback disabled"
+                )
                 self._use_llm_fallback = False
         else:
             logger.info("LLMPlanner initialized (rule-based only)")
@@ -72,9 +78,22 @@ class LLMPlanner(ILLMPlanner):
 
         current_url = session.current_url if session else ""
         conversation_history = session.conversation_history if session else None
+        session_context = session.context if session else None
 
         # 1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
+
+        # 1.5. Selection from recent search results (no trigger words)
+        if rule_result.matched_rule == "none":
+            selection = select_from_results(user_text, session)
+            if selection:
+                return selection
+            option_selection = select_option_from_detail(user_text, session)
+            if option_selection:
+                return option_selection
+            cart_action = handle_cart_action(user_text, session)
+            if cart_action:
+                return cart_action
         decision = self._routing_policy.decide(user_text, intent, rule_result)
 
         # 2. LLM fallback by policy
@@ -86,13 +105,24 @@ class LLMPlanner(ILLMPlanner):
                 llm_result = await self._llm_generator.generate(
                     user_text=user_text,
                     current_url=current_url,
-                    conversation_history=conversation_history
+                    conversation_history=conversation_history,
+                    session_context=session_context
                 )
                 
                 if llm_result.success and llm_result.commands:
                     return self._llm_result_to_response(llm_result)
-                else:
-                    logger.info("LLM fallback disabled or not initialized; using rule result")
+                if llm_result.success:
+                    fallback = build_llm_fallback_response(
+                        user_text=user_text,
+                        response_text=llm_result.response_text
+                    )
+                    if fallback:
+                        return fallback
+                logger.info(
+                    "LLM fallback returned no commands (success=%s, error=%s); using rule result",
+                    llm_result.success,
+                    llm_result.error
+                )
         return self._to_response(rule_result)
 
     def _to_response(self, result: CommandResult) -> LLMResponse:

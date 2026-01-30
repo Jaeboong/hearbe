@@ -1,74 +1,76 @@
 """
 TTS 서비스 구현
 
-ElevenLabs, MiniMax, Cartesia, CosyVoice 지원
+Google Cloud TTS Chirp 지원
 """
 
+import os
 import logging
-from typing import AsyncGenerator, Dict, List
+from typing import AsyncGenerator, Dict, List, Optional
 from core.interfaces import ITTSService, TTSChunk
 from core.config import get_config
 
 logger = logging.getLogger(__name__)
+
+# Google Cloud TTS (lazy import)
+texttospeech = None
 
 
 class TTSService(ITTSService):
     """
     TTS 서비스
 
-    지원 프로바이더:
-    - ElevenLabs Flash v2.5 (권장, 프로덕션)
-    - MiniMax Speech-02-HD (개발/MVP)
-    - Cartesia Sonic 2 (최저 지연)
-    - CosyVoice 2.0 (자체 호스팅)
+    Google Cloud TTS Chirp3 HD 사용 (한국어 최적화)
     """
 
     def __init__(self):
         self._config = get_config().tts
-        self._client = None
+        self._google_client = None
 
     async def initialize(self):
         """TTS 클라이언트 초기화"""
-        provider = self._config.provider
-
         try:
-            if provider == "elevenlabs":
-                await self._init_elevenlabs()
-            elif provider == "minimax":
-                await self._init_minimax()
-            elif provider == "cartesia":
-                await self._init_cartesia()
-            elif provider == "cosyvoice":
-                await self._init_cosyvoice()
-            else:
-                raise ValueError(f"Unknown TTS provider: {provider}")
-
-            logger.info(f"TTS service initialized: {provider}")
+            await self._init_google()
+            logger.info("TTS service initialized: Google Cloud TTS")
         except Exception as e:
             logger.error(f"Failed to initialize TTS: {e}")
             raise
 
-    async def _init_elevenlabs(self):
-        """ElevenLabs 클라이언트 초기화"""
-        # TODO: ElevenLabs SDK 초기화
-        # from elevenlabs import ElevenLabs
-        # self._client = ElevenLabs(api_key=self._config.api_key)
-        pass
+    async def _init_google(self):
+        """Google Cloud TTS 클라이언트 초기화"""
+        global texttospeech
 
-    async def _init_minimax(self):
-        """MiniMax 클라이언트 초기화"""
-        # TODO: MiniMax API 클라이언트 초기화
-        pass
+        # Lazy import
+        if texttospeech is None:
+            from google.cloud import texttospeech as tts_module
+            texttospeech = tts_module
 
-    async def _init_cartesia(self):
-        """Cartesia 클라이언트 초기화"""
-        # TODO: Cartesia SDK 초기화
-        pass
+        # 인증 설정: config value or env var
+        credentials_path = (
+            self._config.google_credentials_path
+            or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+        )
 
-    async def _init_cosyvoice(self):
-        """CosyVoice 모델 초기화 (자체 호스팅)"""
-        # TODO: CosyVoice 모델 로드
-        pass
+        if credentials_path:
+            # Convert relative path to absolute for Docker compatibility
+            if not os.path.isabs(credentials_path):
+                credentials_path = os.path.abspath(credentials_path)
+
+            # Verify file exists
+            if not os.path.exists(credentials_path):
+                raise FileNotFoundError(
+                    f"Google credentials file not found: {credentials_path}. "
+                    f"CWD: {os.getcwd()}"
+                )
+
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
+            logger.info(f"Using Google credentials from: {credentials_path}")
+        else:
+            logger.warning("No Google credentials path configured, using ADC")
+
+        # 클라이언트 초기화
+        self._google_client = texttospeech.TextToSpeechClient()
+        logger.info(f"Google Cloud TTS initialized with voice: {self._config.google_voice_name}")
 
     async def synthesize(self, text: str) -> bytes:
         """
@@ -78,50 +80,43 @@ class TTSService(ITTSService):
             text: 변환할 텍스트
 
         Returns:
-            bytes: 오디오 데이터 (WAV/MP3)
+            bytes: 오디오 데이터 (PCM 16-bit)
         """
-        provider = self._config.provider
-
         try:
-            if provider == "elevenlabs":
-                return await self._synthesize_elevenlabs(text)
-            elif provider == "minimax":
-                return await self._synthesize_minimax(text)
-            elif provider == "cartesia":
-                return await self._synthesize_cartesia(text)
-            elif provider == "cosyvoice":
-                return await self._synthesize_cosyvoice(text)
-            else:
-                raise ValueError(f"Unknown TTS provider: {provider}")
+            return await self._synthesize_google(text)
         except Exception as e:
             logger.error(f"TTS synthesis failed: {e}")
             raise
 
-    async def _synthesize_elevenlabs(self, text: str) -> bytes:
-        """ElevenLabs TTS"""
-        # TODO: 실제 구현
-        # audio = self._client.generate(
-        #     text=text,
-        #     voice=self._config.voice_id,
-        #     model=self._config.model_id
-        # )
-        # return audio
-        return b""
+    async def _synthesize_google(self, text: str) -> bytes:
+        """Google Cloud TTS Chirp"""
+        if self._google_client is None:
+            raise RuntimeError("Google TTS client not initialized")
 
-    async def _synthesize_minimax(self, text: str) -> bytes:
-        """MiniMax TTS"""
-        # TODO: 실제 구현
-        return b""
+        # 입력 텍스트 설정
+        synthesis_input = texttospeech.SynthesisInput(text=text)
 
-    async def _synthesize_cartesia(self, text: str) -> bytes:
-        """Cartesia TTS"""
-        # TODO: 실제 구현
-        return b""
+        # 음성 설정 (Chirp 모델)
+        voice = texttospeech.VoiceSelectionParams(
+            language_code="ko-KR",
+            name=self._config.google_voice_name,
+        )
 
-    async def _synthesize_cosyvoice(self, text: str) -> bytes:
-        """CosyVoice TTS (로컬)"""
-        # TODO: 실제 구현
-        return b""
+        # 오디오 출력 설정
+        audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.LINEAR16,
+            sample_rate_hertz=self._config.sample_rate,
+        )
+
+        # TTS 요청
+        response = self._google_client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config,
+        )
+
+        logger.debug(f"Google TTS synthesized {len(response.audio_content)} bytes")
+        return response.audio_content
 
     async def synthesize_stream(self, text: str) -> AsyncGenerator[TTSChunk, None]:
         """
@@ -133,58 +128,35 @@ class TTSService(ITTSService):
         Yields:
             TTSChunk: 오디오 청크
         """
-        provider = self._config.provider
-
         try:
-            if provider == "elevenlabs":
-                async for chunk in self._stream_elevenlabs(text):
-                    yield chunk
-            elif provider == "minimax":
-                async for chunk in self._stream_minimax(text):
-                    yield chunk
-            elif provider == "cartesia":
-                async for chunk in self._stream_cartesia(text):
-                    yield chunk
-            elif provider == "cosyvoice":
-                async for chunk in self._stream_cosyvoice(text):
-                    yield chunk
-            else:
-                # 스트리밍 미지원 시 전체 변환 후 청크로 분할
-                audio_data = await self.synthesize(text)
-                chunk_size = 4096
-                for i in range(0, len(audio_data), chunk_size):
-                    is_final = i + chunk_size >= len(audio_data)
-                    yield TTSChunk(
-                        audio_data=audio_data[i:i + chunk_size],
-                        is_final=is_final,
-                        sample_rate=self._config.sample_rate
-                    )
+            async for chunk in self._stream_google(text):
+                yield chunk
         except Exception as e:
             logger.error(f"TTS streaming failed: {e}")
             raise
 
-    async def _stream_elevenlabs(self, text: str) -> AsyncGenerator[TTSChunk, None]:
-        """ElevenLabs 스트리밍"""
-        # TODO: 실제 구현
-        # async for chunk in self._client.generate_stream(
-        #     text=text,
-        #     voice=self._config.voice_id,
-        #     model=self._config.model_id
-        # ):
-        #     yield TTSChunk(audio_data=chunk, sample_rate=self._config.sample_rate)
-        yield TTSChunk(audio_data=b"", is_final=True)
+    async def _stream_google(self, text: str) -> AsyncGenerator[TTSChunk, None]:
+        """
+        Google Cloud TTS 스트리밍
 
-    async def _stream_minimax(self, text: str) -> AsyncGenerator[TTSChunk, None]:
-        """MiniMax 스트리밍"""
-        yield TTSChunk(audio_data=b"", is_final=True)
+        전체 합성 후 청크로 분할하여 전송
+        """
+        # 전체 오디오 합성
+        audio_data = await self._synthesize_google(text)
 
-    async def _stream_cartesia(self, text: str) -> AsyncGenerator[TTSChunk, None]:
-        """Cartesia 스트리밍"""
-        yield TTSChunk(audio_data=b"", is_final=True)
+        # 청크로 분할하여 전송 (4KB 단위)
+        chunk_size = 4096
 
-    async def _stream_cosyvoice(self, text: str) -> AsyncGenerator[TTSChunk, None]:
-        """CosyVoice 스트리밍"""
-        yield TTSChunk(audio_data=b"", is_final=True)
+        for i in range(0, len(audio_data), chunk_size):
+            chunk_data = audio_data[i:i + chunk_size]
+            is_final = i + chunk_size >= len(audio_data)
+
+            yield TTSChunk(
+                audio_data=chunk_data,
+                is_final=is_final,
+                sample_rate=self._config.sample_rate,
+                format="pcm"
+            )
 
     def get_voice_list(self) -> List[Dict[str, str]]:
         """
@@ -193,26 +165,16 @@ class TTSService(ITTSService):
         Returns:
             List[Dict]: 음성 정보 목록
         """
-        # 프로바이더별 기본 한국어 음성 목록
-        voices = {
-            "elevenlabs": [
-                {"id": "korean_female_1", "name": "한국어 여성 1", "language": "ko"},
-                {"id": "korean_male_1", "name": "한국어 남성 1", "language": "ko"},
-            ],
-            "minimax": [
-                {"id": "zh_female_xiaoxin", "name": "Xiaoxin (여성)", "language": "ko"},
-                {"id": "zh_male_chunhou", "name": "Chunhou (남성)", "language": "ko"},
-            ],
-            "cartesia": [
-                {"id": "korean_female", "name": "한국어 여성", "language": "ko"},
-            ],
-            "cosyvoice": [
-                {"id": "default", "name": "기본 음성", "language": "ko"},
-            ],
-        }
-        return voices.get(self._config.provider, [])
+        return [
+            {"id": "ko-KR-Chirp3-HD-Leda", "name": "Leda (여성, Chirp3 HD)", "language": "ko"},
+            {"id": "ko-KR-Chirp3-HD-Aoede", "name": "Aoede (여성, Chirp3 HD)", "language": "ko"},
+            {"id": "ko-KR-Chirp3-HD-Puck", "name": "Puck (남성, Chirp3 HD)", "language": "ko"},
+            {"id": "ko-KR-Chirp3-HD-Charon", "name": "Charon (남성, Chirp3 HD)", "language": "ko"},
+            {"id": "ko-KR-Chirp3-HD-Kore", "name": "Kore (여성, Chirp3 HD)", "language": "ko"},
+            {"id": "ko-KR-Chirp3-HD-Fenrir", "name": "Fenrir (남성, Chirp3 HD)", "language": "ko"},
+        ]
 
     async def shutdown(self):
         """리소스 정리"""
-        self._client = None
+        self._google_client = None
         logger.info("TTS service shutdown")

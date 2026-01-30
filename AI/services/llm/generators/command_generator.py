@@ -17,7 +17,6 @@ from ..rules.select import SearchSelectRule
 from ..rules.search import SearchRule
 from ..rules.cart import CartRule
 from ..rules.checkout import CheckoutRule
-from ..rules.login import LoginRule
 from ..rules.generic import GenericClickRule
 
 logger = logging.getLogger(__name__)
@@ -51,7 +50,6 @@ class CommandGenerator:
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
             CartRule(self.site_manager),
-            LoginRule(self.site_manager),
             CheckoutRule(self.site_manager),
             GenericClickRule(self.site_manager),
         ]
@@ -128,10 +126,10 @@ class CommandGenerator:
         Returns:
             CommandResult
         """
-        import os
-        
-        # GMS_API_KEY 확인
-        if not (os.getenv("GMS_API_KEY") or os.getenv("OPENAI_API_KEY")):
+        from .llm_generator import resolve_llm_api_key
+
+        # API key availability check (configurable)
+        if not resolve_llm_api_key():
             return CommandResult(
                 commands=[],
                 response_text=f"'{user_text}' 명령을 어떻게 처리할지 모르겠습니다.",
