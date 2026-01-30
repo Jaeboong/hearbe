@@ -36,7 +36,7 @@ public class User {
     @Column(name = "password", length = 60)
     private String password;
 
-    @Column(name = "phone_number", length = 20, nullable = false, unique = true)
+    @Column(name = "phone_number", length = 20, nullable = true, unique = true)
     private String phoneNumber;
 
     @Column(name = "simple_password", length = 6)

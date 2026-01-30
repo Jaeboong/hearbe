@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>화면 공유 - 보호자 (뷰어)</title>
+    <script src="https://cdn.jsdelivr.net/npm/openvidu-browser@2.30.0/static/js/openvidu-browser-2.30.0.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #join-form {
+            margin: 20px 0;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 5px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 150px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        #video-container {
+            margin-top: 20px;
+            border: 2px dashed #ccc;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🛡️ 보호자 모드 (화면 보기)</h1>
+
+    <div id="join-form">
+        <h3>공유 코드 입력</h3>
+        <input type="text" id="code-input" placeholder="코드 6자리" maxlength="6">
+        <button onclick="joinSession()">입장하기</button>
+        <p id="status">코드를 입력하고 입장하세요.</p>
+    </div>
+
+    <div id="video-container">
+        <p style="color: white;">화면이 여기에 공유됩니다.</p>
+    </div>
+
+    <script>
+        let OV, session;
+
+        async function joinSession() {
+            const code = document.getElementById('code-input').value;
+            if (!code) {
+                alert('코드를 입력해주세요!');
+                return;
+            }
+
+            // OpenVidu 로드 확인
+            if (typeof OpenVidu === 'undefined') {
+                alert('OpenVidu 라이브러리 로드 실패');
+                return;
+            }
+
+            try {
+                document.getElementById('status').innerText = '입장 중...';
+
+                // 1. 토큰 발급 요청 (Backend)
+                const res = await fetch(`http://localhost:8080/sharing/token?meetingCode=${code}&role=SUBSCRIBER`, {
+                    method: 'POST'
+                });
+
+                if (!res.ok) {
+                    throw new Error('코드가 잘못되었거나 방이 없습니다.');
+                }
+
+                const data = await res.json();
+                const token = data.data.token;
+                console.log('토큰 획득:', token);
+
+                // 2. OpenVidu 세션 연결
+                OV = new OpenVidu();
+                session = OV.initSession();
+
+                // 스트림 수신 이벤트 (상대방이 화면 공유 시 발생)
+                session.on('streamCreated', event => {
+                    console.log('스트림 감지됨!');
+                    document.getElementById('video-container').innerHTML = ''; // 대기 텍스트 제거
+                    // subscriber 생성 및 비디오 삽입
+                    session.subscribe(event.stream, 'video-container');
+                    document.getElementById('status').innerText = '✅ 연결됨! 화면을 공유받고 있습니다.';
+                });
+
+                // 세션 접속
+                await session.connect(token);
+                document.getElementById('status').innerText = '✅ 방 입장 완료. 화면 공유를 기다리는 중...';
+
+            } catch (err) {
+                console.error('입장 실패:', err);
+                document.getElementById('status').innerText = '❌ 입장 실패: ' + err.message;
+            }
+        }
+    </script>
+</body>
+
+</html>
