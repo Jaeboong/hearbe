@@ -25,6 +25,8 @@ TTS_SAMPLE_RATE = 24000  # Google TTS Chirp default
 TTS_CHANNELS = 1
 TTS_FORMAT = pyaudio.paInt16 if pyaudio else None
 TTS_CHUNK_SIZE = 4096
+_STOP_SENTINEL = object()
+_FLUSH_SENTINEL = object()
 
 
 class AudioPlayer(IAudioPlayer):
@@ -103,9 +105,12 @@ class AudioPlayer(IAudioPlayer):
                 # Wait for audio data with timeout
                 item = self._audio_queue.get(timeout=0.5)
 
-                if item is None:
-                    # Sentinel value to stop
+                if item is _STOP_SENTINEL:
+                    self._on_playback_finished()
                     break
+                if item is _FLUSH_SENTINEL:
+                    self._on_playback_finished()
+                    continue
 
                 audio_data, is_final = item
                 self._play_chunk(audio_data)
@@ -182,7 +187,7 @@ class AudioPlayer(IAudioPlayer):
         """Stop TTS playback on barge-in hotkey"""
         if self.is_playing():
             logger.info("Hotkey pressed - stopping TTS playback")
-            self.stop()
+            self._request_stop_playback()
 
     def play(self, audio_data: bytes) -> None:
         """
@@ -202,17 +207,21 @@ class AudioPlayer(IAudioPlayer):
             except queue.Empty:
                 break
 
-        # Close stream
-        if self.stream is not None:
-            try:
-                self.stream.stop_stream()
-                self.stream.close()
-            except Exception:
-                pass
-            self.stream = None
-
+        # Let playback thread close the stream and publish finished.
+        self._audio_queue.put(_FLUSH_SENTINEL)
         self._playing = False
         logger.info("Playback stopped")
+
+    def _request_stop_playback(self) -> None:
+        """Request playback stop via playback thread to avoid concurrent stream close."""
+        # Clear the queue
+        while not self._audio_queue.empty():
+            try:
+                self._audio_queue.get_nowait()
+            except queue.Empty:
+                break
+        # Let the playback thread close the stream and publish finished.
+        self._audio_queue.put(_FLUSH_SENTINEL)
 
     def is_playing(self) -> bool:
         """Check if currently playing"""
@@ -223,7 +232,7 @@ class AudioPlayer(IAudioPlayer):
         logger.info("Stopping AudioPlayer...")
 
         self._stop_requested = True
-        self._audio_queue.put(None)  # Sentinel to stop thread
+        self._audio_queue.put(_STOP_SENTINEL)  # Sentinel to stop thread
 
         if self._playback_thread is not None:
             self._playback_thread.join(timeout=2.0)

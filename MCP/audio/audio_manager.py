@@ -33,6 +33,7 @@ FORMAT = pyaudio.paInt16 if pyaudio else None
 CHUNK_SIZE = 1024
 CHUNK_DURATION_SEC = 3.0  # 3초마다 전송
 MIN_RECORDING_SEC = 0.5   # 최소 녹음 시간
+RECORDING_START_DELAY_SEC = 0.2  # 중지 후 녹음 시작 딜레이
 
 
 class AudioManager:
@@ -69,6 +70,8 @@ class AudioManager:
         self._hotkey_pressed = False
         self._audio_thread: Optional[threading.Thread] = None
         self._has_partial_since_last_final = False
+        self._pending_recording_start = False
+        self._tts_playing = False
         
         logger.info(f"AudioManager initialized with hotkey: {hotkey}")
     
@@ -226,7 +229,7 @@ class AudioManager:
     def _audio_loop(self):
         """오디오 처리 메인 루프 (별도 스레드)"""
         logger.info("Audio loop started")
-        
+
         def on_hotkey_press(e):
             if not self._hotkey_pressed:
                 self._hotkey_pressed = True
@@ -235,11 +238,19 @@ class AudioManager:
                     data={"hotkey": self.hotkey},
                     source="audio"
                 )
+                if self._tts_playing:
+                    # Defer recording until TTS playback finishes
+                    self._pending_recording_start = True
+                    logger.info("TTS playing - deferring recording start")
+                    return
+                if RECORDING_START_DELAY_SEC > 0:
+                    time.sleep(RECORDING_START_DELAY_SEC)
                 self._start_recording()
-        
+
         def on_hotkey_release(e):
             self._hotkey_pressed = False
-        
+            self._pending_recording_start = False
+
         # 핫키 등록
         keyboard.on_press_key(self.hotkey, on_hotkey_press)
         keyboard.on_release_key(self.hotkey, on_hotkey_release)
@@ -306,7 +317,20 @@ class AudioManager:
     def setup_event_handlers(self):
         """이벤트 핸들러 등록"""
         subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
+        subscribe(EventType.TTS_AUDIO_RECEIVED, self._on_tts_audio_received)
+        subscribe(EventType.TTS_PLAYBACK_FINISHED, self._on_tts_playback_finished)
         logger.info("AudioManager event handlers registered")
+
+    async def _on_tts_audio_received(self, event):
+        self._tts_playing = True
+
+    async def _on_tts_playback_finished(self, event):
+        self._tts_playing = False
+        if self._pending_recording_start and self._hotkey_pressed and not self.recording:
+            if RECORDING_START_DELAY_SEC > 0:
+                time.sleep(RECORDING_START_DELAY_SEC)
+            self._pending_recording_start = False
+            self._start_recording()
     
     async def _on_shutdown(self, event):
         """종료 이벤트 핸들러"""
