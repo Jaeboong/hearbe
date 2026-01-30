@@ -1,5 +1,6 @@
 # 좌표 기반 표 구조 복원
 import re
+from collections import Counter
 from typing import List, Dict, Tuple, Any, Optional
 
 
@@ -157,6 +158,76 @@ def contains_measurement(text: str) -> bool:
     if re.search(r'\d+\.?\d*\s*(cm|inch)?', text, re.IGNORECASE):
         return True
     return False
+
+
+def correct_sequence_outliers(rows: List[List[Dict[str, Any]]]) -> List[List[Dict[str, Any]]]:
+    """
+    등차수열 기반 숫자 오인식 교정
+    같은 행의 숫자들이 등차수열을 이루는지 확인하고, 이상값을 교정
+    예: [38, 39, 40, 47, 42, 43, 44, 45] → 47을 41로 교정 (공차 1)
+
+    교정 조건:
+    - 행에 숫자가 4개 이상
+    - 과반수가 같은 공차
+    - 이상값이 정확히 1개
+    - 앞뒤 양쪽에서 계산한 기대값이 일치
+    """
+    corrected_rows = []
+    for row in rows:
+        # 숫자만 추출 (행 내 인덱스와 함께)
+        numeric_items = []
+        for idx, item in enumerate(row):
+            text = item["text"].strip()
+            if re.match(r'^\d+$', text):
+                numeric_items.append((idx, int(text)))
+
+        # 숫자가 4개 미만이면 패턴 판단 불가
+        if len(numeric_items) < 4:
+            corrected_rows.append(row)
+            continue
+
+        # 연속된 숫자들의 차이 계산
+        values = [v for _, v in numeric_items]
+        diffs = [values[i + 1] - values[i] for i in range(len(values) - 1)]
+
+        # 최빈 공차 계산
+        diff_counter = Counter(diffs)
+        common_diff, common_count = diff_counter.most_common(1)[0]
+
+        # 과반수 이상이 같은 공차여야 신뢰 가능
+        if common_count < len(diffs) / 2:
+            corrected_rows.append(row)
+            continue
+
+        # 이상값 찾기 (앞뒤 양쪽에서 기대값이 일치하는 경우만)
+        outliers = []
+        for i in range(len(values)):
+            expected_from_prev = values[i - 1] + common_diff if i > 0 else None
+            expected_from_next = values[i + 1] - common_diff if i < len(values) - 1 else None
+
+            if expected_from_prev is not None and expected_from_next is not None:
+                if expected_from_prev == expected_from_next and values[i] != expected_from_prev:
+                    outliers.append((i, expected_from_prev))
+
+        # 이상값이 정확히 1개일 때만 교정
+        if len(outliers) == 1:
+            outlier_idx, expected_val = outliers[0]
+            row_idx_in_row = numeric_items[outlier_idx][0]
+
+            new_row = []
+            for idx, item in enumerate(row):
+                if idx == row_idx_in_row:
+                    new_item = item.copy()
+                    new_item["original_text"] = item["text"]
+                    new_item["text"] = str(expected_val)
+                    new_row.append(new_item)
+                else:
+                    new_row.append(item)
+            corrected_rows.append(new_row)
+        else:
+            corrected_rows.append(row)
+
+    return corrected_rows
 
 
 def is_header_row(row: List[Dict[str, Any]]) -> bool:
@@ -551,6 +622,10 @@ def reconstruct_size_table(
     # 3. OCR 오인식 교정 (선택적)
     if use_ocr_correction and table_rows:
         table_rows = apply_ocr_corrections(table_rows)
+
+    # 3.5. 등차수열 기반 숫자 오인식 교정 (47→41 등)
+    if table_rows:
+        table_rows = correct_sequence_outliers(table_rows)
 
     # 4. X좌표 기반 열 클러스터링 (선택적)
     if use_column_clustering and table_rows:
