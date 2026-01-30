@@ -93,6 +93,23 @@ def _replace_comma_number(match: re.Match) -> str:
 _PERCENT_PATTERN = re.compile(r"(\d{1,3}(?:,\d{3})*|\d+)\s*%")
 _WON_PATTERN = re.compile(r"(\d{1,3}(?:,\d{3})*|\d+)\s*원")
 _COMMA_NUMBER_PATTERN = re.compile(r"(\d{1,3}(?:,\d{3})+)")
+_DATE_SLASH_PATTERN = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])\s*/\s*(3[01]|[12]\d|0?[1-9])(?!\d)")
+_DATE_CONTEXT_PATTERN = re.compile(
+    r"(도착|배송|보장|새벽|오전|오후|밤|오늘|내일|모레)"
+)
+
+
+def _normalize_date_slash(text: str) -> str:
+    def _repl(match: re.Match) -> str:
+        start, end = match.span()
+        window = text[max(0, start - 10):min(len(text), end + 10)]
+        if not _DATE_CONTEXT_PATTERN.search(window):
+            return match.group(0)
+        month = int(match.group(1))
+        day = int(match.group(2))
+        return f"{month}월 {day}일"
+
+    return _DATE_SLASH_PATTERN.sub(_repl, text)
 
 
 def normalize_tts_text(text: str) -> str:
@@ -100,6 +117,7 @@ def normalize_tts_text(text: str) -> str:
         return text
 
     normalized = text
+    normalized = _normalize_date_slash(normalized)
     normalized = _PERCENT_PATTERN.sub(_replace_percent, normalized)
     normalized = _WON_PATTERN.sub(_replace_won, normalized)
     normalized = _COMMA_NUMBER_PATTERN.sub(_replace_comma_number, normalized)
