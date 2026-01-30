@@ -68,15 +68,13 @@ def run_pipeline(
 
 def main() -> None:
     if len(sys.argv) < 2:
-        print("Usage: python payment_ocr_pipeline.py <image_path> [output_dir] [dom_keys.json]")
         sys.exit(1)
 
     image_path = sys.argv[1]
     output_dir = sys.argv[2] if len(sys.argv) > 2 else "output"
     dom_keys_path = sys.argv[3] if len(sys.argv) > 3 else None
 
-    mapped_path = run_pipeline(image_path, output_dir, dom_keys_path)
-    print(f"[Pipeline] Done: {mapped_path}")
+    run_pipeline(image_path, output_dir, dom_keys_path)
 
 
 if __name__ == "__main__":

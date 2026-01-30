@@ -539,6 +539,9 @@ sessions/
 
 nul
 
+# Ignore local AI_next workspace
+AI_next/
+
 
 **/*service-account*.json
 **/*gcp*.json

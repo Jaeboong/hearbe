@@ -10,6 +10,8 @@ import logging
 import os
 from typing import Dict, List, Optional
 
+from services.llm.errors.llm_errors import LLMClientError
+
 from .llm_logging import log_llm_request, log_llm_response
 
 logger = logging.getLogger(__name__)
@@ -51,6 +53,10 @@ class LLMClient:
         self.base_url = base_url
         self.model = model
         self.max_tokens = max_tokens
+        try:
+            self.timeout_seconds = float(os.environ.get("LLM_TIMEOUT_SECONDS", "20"))
+        except ValueError:
+            self.timeout_seconds = 20.0
         self._client = None
 
     @property
@@ -112,23 +118,40 @@ class LLMClient:
         content = None
         last_error = None
         for attempt in range(3):
-            response = await asyncio.to_thread(
-                self.client.chat.completions.create,
-                model=self.model,
-                messages=messages,
-                response_format={"type": "json_object"},
-                max_completion_tokens=self.max_tokens,
-            )
-            content = response.choices[0].message.content
-            logger.info("LLM response received: chars=%d", len(content or ""))
-            log_llm_response(logger, response, content)
-            if content:
-                break
-            last_error = "empty_response"
-            if attempt < 2:
-                logger.warning("Empty LLM response received, retrying (%d/2)", attempt + 1)
+            try:
+                response = await asyncio.wait_for(
+                    asyncio.to_thread(
+                        self.client.chat.completions.create,
+                        model=self.model,
+                        messages=messages,
+                        response_format={"type": "json_object"},
+                        max_completion_tokens=self.max_tokens,
+                    ),
+                    timeout=self.timeout_seconds,
+                )
+                content = response.choices[0].message.content
+                logger.info("LLM response received: chars=%d", len(content or ""))
+                log_llm_response(logger, response, content)
+                if content:
+                    break
+                last_error = "empty_response"
+                if attempt < 2:
+                    logger.warning("Empty LLM response received, retrying (%d/2)", attempt + 1)
+            except asyncio.TimeoutError as e:
+                raise LLMClientError("timeout", "LLM request timed out", e)
+            except Exception as e:
+                status = getattr(e, "status_code", None) or getattr(e, "status", None)
+                if status == 401 or status == 403:
+                    raise LLMClientError("auth_error", "LLM auth error", e)
+                if status == 429:
+                    raise LLMClientError("rate_limit", "LLM rate limit", e)
+                if status and 500 <= int(status) <= 599:
+                    raise LLMClientError("server_error", "LLM server error", e)
+                if status and 400 <= int(status) <= 499:
+                    raise LLMClientError("client_error", "LLM client error", e)
+                raise LLMClientError("network_error", "LLM network error", e)
 
         if not content:
-            raise ValueError(last_error or "empty_response")
+            raise LLMClientError("empty_response", last_error or "empty_response")
 
         return content

@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Any
 
 from ..context.context_rules import GeneratedCommand
 from .llm_logging import truncate
+from services.llm.errors.llm_errors import LLMParseError
 
 logger = logging.getLogger(__name__)
 
@@ -93,12 +94,7 @@ class LLMResponseParser:
 
         except json.JSONDecodeError as e:
             logger.error(f"JSON 파싱 실패: {e}, content: {content[:200]}")
-            return ParsedResponse(
-                commands=[],
-                response_text="응답을 처리할 수 없습니다.",
-                success=False,
-                error=f"JSON 파싱 실패: {e}"
-            )
+            raise LLMParseError("json_parse", f"JSON 파싱 실패: {e}", e)
 
     def _format_details(self, details: Dict[str, Any]) -> str:
         lines = ["???? ?? ?????."]

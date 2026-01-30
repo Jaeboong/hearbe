@@ -6,6 +6,7 @@ LLM 기반 명령 생성기
 
 import logging
 import os
+import asyncio
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
@@ -27,6 +28,8 @@ from .llm_client import LLMClient, resolve_llm_api_key
 from .llm_command_normalizer import LLMCommandNormalizer
 from .llm_response_parser import LLMResponseParser
 from .history_store import HistoryStore
+from services.llm.errors.error_handler import LLMErrorHandler
+from services.llm.errors.llm_errors import LLMError
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +70,7 @@ class LLMGenerator:
         self._normalizer = LLMCommandNormalizer()
         self._parser = LLMResponseParser(self._normalizer)
         self._history_store = HistoryStore(max_items=10)
+        self._error_handler = LLMErrorHandler()
     
     async def generate(
         self,
@@ -111,41 +115,13 @@ class LLMGenerator:
             page_context=page_context,
             session_context=session_context,
         )
-        try:
-            content = await self._client.request(
-                messages=messages,
-                current_url=current_url,
-                text_len=len(user_text),
-            )
-            parsed = self._parser.parse(content, current_url)
-            result = LLMResult(
-                commands=parsed.commands,
-                response_text=parsed.response_text,
-                success=parsed.success,
-                error=parsed.error,
-            )
-            logger.info(
-                "LLM parsed: success=%s, commands=%d, response_text_len=%d",
-                result.success,
-                len(result.commands),
-                len(result.response_text or "")
-            )
-            
-            # 로컬 기록 모드면 대화 추가
-            if conversation_history is None:
-                self._history_store.add_user(user_text)
-                self._history_store.add_assistant(result.response_text)
-            
-            return result
-            
-        except Exception as e:
-            logger.error(f"LLM 호출 실패: {e}")
-            return LLMResult(
-                commands=[],
-                response_text="죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.",
-                success=False,
-                error=str(e)
-            )
+        return await self._request_with_error_handling(
+            messages=messages,
+            current_url=current_url,
+            text_len=len(user_text),
+            user_text=user_text,
+            conversation_history=conversation_history,
+        )
 
     async def generate_with_messages(
         self,
@@ -153,35 +129,13 @@ class LLMGenerator:
         current_url: str = "",
     ) -> LLMResult:
         """Generate commands with pre-built messages."""
-        try:
-            content = await self._client.request(
-                messages=messages,
-                current_url=current_url,
-                label="custom messages",
-            )
-            parsed = self._parser.parse(content, current_url)
-            result = LLMResult(
-                commands=parsed.commands,
-                response_text=parsed.response_text,
-                success=parsed.success,
-                error=parsed.error,
-            )
-            logger.info(
-                "LLM parsed: success=%s, commands=%d, response_text_len=%d",
-                result.success,
-                len(result.commands),
-                len(result.response_text or "")
-            )
-            return result
-
-        except Exception as e:
-            logger.error(f"LLM 호출 실패: {e}")
-            return LLMResult(
-                commands=[],
-                response_text="죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.",
-                success=False,
-                error=str(e)
-            )
+        return await self._request_with_error_handling(
+            messages=messages,
+            current_url=current_url,
+            label="custom messages",
+            user_text=None,
+            conversation_history=None,
+        )
     
     # use helpers in llm_logging.py for truncation/logging
     
@@ -192,6 +146,62 @@ class LLMGenerator:
     def get_history(self) -> List[Dict[str, str]]:
         """현재 대화 기록 반환"""
         return self._history_store.get()
+
+    async def _request_with_error_handling(
+        self,
+        messages: List[Dict[str, str]],
+        current_url: str,
+        text_len: Optional[int] = None,
+        label: str = "",
+        user_text: Optional[str] = None,
+        conversation_history: Optional[List[Dict[str, str]]] = None,
+    ) -> LLMResult:
+        max_attempts = 2
+        for attempt in range(max_attempts):
+            try:
+                content = await self._client.request(
+                    messages=messages,
+                    current_url=current_url,
+                    text_len=text_len,
+                    label=label,
+                )
+                parsed = self._parser.parse(content, current_url)
+                result = LLMResult(
+                    commands=parsed.commands,
+                    response_text=parsed.response_text,
+                    success=parsed.success,
+                    error=parsed.error,
+                )
+                logger.info(
+                    "LLM parsed: success=%s, commands=%d, response_text_len=%d",
+                    result.success,
+                    len(result.commands),
+                    len(result.response_text or "")
+                )
+                if user_text and conversation_history is None:
+                    self._history_store.add_user(user_text)
+                    self._history_store.add_assistant(result.response_text)
+                return result
+            except LLMError as e:
+                decision = self._error_handler.handle(e, attempt)
+                if decision.retry and attempt < max_attempts - 1:
+                    if decision.retry_delay_ms:
+                        await asyncio.sleep(decision.retry_delay_ms / 1000)
+                    continue
+                return LLMResult(
+                    commands=[],
+                    response_text=decision.fallback_text,
+                    success=False,
+                    error=decision.error or e.message,
+                )
+            except Exception as e:
+                logger.error(f"LLM 호출 실패: {e}")
+                return LLMResult(
+                    commands=[],
+                    response_text="죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.",
+                    success=False,
+                    error=str(e)
+                )
 
 
 # 편의 함수
