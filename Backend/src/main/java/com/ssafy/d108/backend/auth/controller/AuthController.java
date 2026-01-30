@@ -2,6 +2,7 @@ package com.ssafy.d108.backend.auth.controller;
 
 import com.ssafy.d108.backend.auth.dto.FindIdRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
+import com.ssafy.d108.backend.auth.dto.CheckIdRequest;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
 import com.ssafy.d108.backend.auth.dto.SignupRequest;
@@ -59,6 +60,16 @@ public class AuthController {
     public ResponseEntity<ApiResponse<FindIdResponse>> findId(@Valid @RequestBody FindIdRequest request) {
         FindIdResponse response = authService.findId(request);
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 아이디 중복 확인
+     */
+    @Operation(summary = "아이디 중복 확인", description = "아이디 중복 여부를 확인합니다. true: 중복, false: 사용 가능")
+    @PostMapping("/checkId")
+    public ResponseEntity<ApiResponse<Boolean>> checkId(@Valid @RequestBody CheckIdRequest request) {
+        boolean isDuplicate = authService.checkIdDuplicate(request.getUsername());
+        return ResponseEntity.ok(ApiResponse.success(isDuplicate, isDuplicate ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다."));
     }
 
     /**

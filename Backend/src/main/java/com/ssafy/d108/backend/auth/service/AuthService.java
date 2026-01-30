@@ -99,7 +99,7 @@ public class AuthService {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateUserException("이미 사용 중인 아이디입니다.");
         }
-        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+        if (request.getPhoneNumber() != null && userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new DuplicateUserException("이미 등록된 휴대폰 번호입니다.");
         }
 
@@ -203,5 +203,12 @@ public class AuthService {
      */
     public void logout(Integer userId) {
         // TODO: 추후 JWT 토큰 무효화(Redis Blacklist) 등 구현
+    }
+
+    /**
+     * 아이디 중복 확인
+     */
+    public boolean checkIdDuplicate(String username) {
+        return userRepository.existsByUsername(username);
     }
 }
