@@ -543,7 +543,6 @@ nul
 AI_next/
 
 
-===
 **/*service-account*.json
 **/*gcp*.json
 **/*google*account*.json
@@ -553,3 +552,6 @@ AI_next/
 
 # Allow only curated samples
 !AI/services/tts/samples/*.wav
+Backend/src/main/resources/application.properties
+
+google-service-account.json

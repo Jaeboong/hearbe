@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>화면 공유 - 사용자</title>
+    <script src="https://cdn.jsdelivr.net/npm/openvidu-browser@2.30.0/static/js/openvidu-browser-2.30.0.js"
+        onload="console.log('✅ OpenVidu 라이브러리 로드 완료')" onerror="console.error('❌ OpenVidu CDN 로드 실패!')"></script>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #code {
+            color: blue;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📱 화면 공유 (사용자)</h1>
+
+    <div class="status">
+        <h3>미팅 코드: <span id="code">-</span></h3>
+        <p id="status">버튼을 눌러서 시작하세요.</p>
+    </div>
+
+    <button onclick="createRoom()">1️⃣ 방 만들기</button>
+    <button onclick="startSharing()">2️⃣ 화면 공유 시작</button>
+    <button onclick="stopSharing()">❌ 종료</button>
+
+    <script>
+        let OV, session, publisher, meetingCode;
+
+        async function createRoom() {
+            try {
+                document.getElementById('status').innerText = '방 생성 중...';
+
+                const res = await fetch('http://localhost:8080/sharing/create?userId=1', {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                meetingCode = data.data.meetingCode;
+
+                document.getElementById('code').innerText = meetingCode;
+                document.getElementById('status').innerText = '✅ 방이 생성되었습니다! 코드를 보호자에게 알려주세요.';
+
+                console.log('방 생성 완료:', meetingCode);
+            } catch (err) {
+                console.error('방 생성 실패:', err);
+                document.getElementById('status').innerText = '❌ 방 생성 실패: ' + err.message;
+            }
+        }
+
+        async function startSharing() {
+            if (!meetingCode) {
+                alert('먼저 방을 만들어주세요!');
+                return;
+            }
+
+            // OpenVidu 라이브러리 확인
+            if (typeof OpenVidu === 'undefined') {
+                alert('❌ OpenVidu 라이브러리가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+                console.error('OpenVidu is not defined. CDN may have failed to load.');
+                return;
+            }
+
+            try {
+                document.getElementById('status').innerText = '토큰 발급 중...';
+
+                // 토큰 발급
+                const res = await fetch(`http://localhost:8080/sharing/token?meetingCode=${meetingCode}&role=PUBLISHER`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                const token = data.data.token;
+                console.log('토큰 발급 완료');
+
+                // OpenVidu 세션 연결
+                OV = new OpenVidu();
+                session = OV.initSession();
+
+                document.getElementById('status').innerText = '세션 연결 중...';
+                await session.connect(token);
+                console.log('세션 연결 완료');
+
+                // 화면 공유
+                document.getElementById('status').innerText = '화면 공유 권한 요청 중...';
+                publisher = await OV.initPublisherAsync(undefined, {
+                    videoSource: 'screen',
+                    publishAudio: false,
+                    publishVideo: true,
+                    mirror: false
+                });
+
+                await session.publish(publisher);
+                document.getElementById('status').innerText = '🎥 화면 공유 중! 보호자가 볼 수 있습니다.';
+                console.log('화면 공유 시작!');
+
+            } catch (err) {
+                console.error('화면 공유 실패:', err);
+                document.getElementById('status').innerText = '❌ 실패: ' + err.message;
+            }
+        }
+
+        async function stopSharing() {
+            if (session) {
+                await session.disconnect();
+                document.getElementById('status').innerText = '화면 공유가 종료되었습니다.';
+                console.log('세션 종료');
+            }
+        }
+    </script>
+</body>
+
+</html>
