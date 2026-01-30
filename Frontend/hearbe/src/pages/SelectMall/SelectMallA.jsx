@@ -7,7 +7,7 @@ import iconHome from '../../assets/home.png';
 import iconCart from '../../assets/icon-cart.png'; // Use cart.png
 import iconNaver from '../../assets/naver.png';
 import iconCoupang from '../../assets/coupang.png';
-import BackButton from '../common/BackButtonA';
+import BackButton from '../BackButton/BackButtonA';
 
 const SelectMall = () => {
     const navigate = useNavigate();

@@ -79,6 +79,30 @@ function AppContent() {
         }
       />
 
+      {/* Type A Routes 수정 제안 */}
+      <Route
+        path="/A/login"
+        element={
+          <LoginA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onLoginSuccess={() => navigate('/A/mall')}
+            onSignup={() => navigate('/A/signup')}
+          />
+        }
+      />
+
+      <Route
+        path="/A/mall"
+        element={
+          <SelectMallA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onSelectMall={(mall) => navigate('/A/store', { state: { url: mall.url } })}
+          />
+        }
+      />
+
       {/* Type C Routes */}
       <Route
         path="/C/login"

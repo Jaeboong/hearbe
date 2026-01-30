@@ -8,7 +8,7 @@ import iconCard from '../../assets/icon-cart.png';
 import logo from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 
-import BackButton from '../common/BackButtonA';
+import BackButton from '../BackButton/BackButtonA';
 
 const StoreBrowser = () => {
     const navigate = useNavigate();

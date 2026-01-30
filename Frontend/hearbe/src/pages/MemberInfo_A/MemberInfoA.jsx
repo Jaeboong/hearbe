@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BackButton from '../common/BackButtonA';
+import BackButton from '../BackButton/BackButtonA';
 import { authAPI } from '../../services/authAPI';
 import './MemberInfoA.css';
 

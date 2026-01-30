@@ -8,7 +8,7 @@ import iconCamera from '../../assets/icon-camera.png';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './SignUpA.css';
-import BackButton from '../common/BackButtonA';
+import BackButton from '../BackButton/BackButtonA';
 
 // Utility Functions
 const formatPhoneNumber = (value) => {

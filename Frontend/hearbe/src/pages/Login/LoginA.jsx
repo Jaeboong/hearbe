@@ -15,10 +15,9 @@ const Login = () => {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
         }
-
         setIsLoading(true);
         try {
-            const response = await authAPI.login(id, password);
+            const response = await authAPI.login({ username: id, password: password });
 
             if (response.code === 200) {
                 // 로그인 성공
