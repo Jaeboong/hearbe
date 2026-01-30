@@ -204,7 +204,89 @@
     flex-shrink: 0;
 }
 
-.track-delivery-btn:hover {
+.track-delivery-btn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.track-delivery-btn.disabled,
+.track-delivery-btn:disabled {
+    background-color: #CCCCCC;
+    color: #888888;
+    cursor: not-allowed;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(60px, 10vw, 100px);
+    gap: clamp(16px, 3vw, 24px);
+}
+
+.loading-state .spinner {
+    width: clamp(40px, 8vw, 60px);
+    height: clamp(40px, 8vw, 60px);
+    border: clamp(3px, 0.6vw, 5px) solid rgba(255, 240, 100, 0.3);
+    border-top-color: #FFF064;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-state p {
+    font-size: clamp(18px, 3.5vw, 28px);
+    font-weight: bold;
+    color: #FFF064;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+}
+
+/* Error State */
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(60px, 10vw, 100px);
+    gap: clamp(12px, 2.5vw, 20px);
+}
+
+.error-state .error-message {
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: bold;
+    color: #FF6B6B;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    text-align: center;
+}
+
+.error-state .error-detail {
+    font-size: clamp(14px, 2.5vw, 20px);
+    color: #AAAAAA;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    text-align: center;
+}
+
+.error-state .retry-btn {
+    margin-top: clamp(8px, 2vw, 16px);
+    padding: clamp(12px, 2.5vw, 18px) clamp(28px, 5vw, 40px);
+    background-color: #FFF064;
+    color: #1E2A3A;
+    border: none;
+    border-radius: clamp(6px, 1.5vw, 10px);
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: opacity 0.2s;
+}
+
+.error-state .retry-btn:hover {
     opacity: 0.9;
 }
 
