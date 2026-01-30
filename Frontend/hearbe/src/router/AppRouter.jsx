@@ -79,7 +79,7 @@ function AppContent() {
         }
       />
 
-      {/* Type A Routes 수정 제안 */}
+      {/* Type A Routes */}
       <Route
         path="/A/login"
         element={
@@ -98,7 +98,6 @@ function AppContent() {
           <SelectMallA
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
-            onSelectMall={(mall) => navigate('/A/store', { state: { url: mall.url } })}
           />
         }
       />
@@ -153,10 +152,11 @@ function AppContent() {
       <Route
         path="/C/cart"
         element={
-          <CartC
-            onClose={() => navigate(-1)}
+          <MyPageC
+            mode="common"
+            onBack={() => navigate(-1)}
             onHome={() => navigate('/')}
-            onCart={() => navigate('/C/mypage', { state: { activeTab: 'cart' } })}
+            onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/mypage')}
           />
         }
@@ -168,7 +168,31 @@ function AppContent() {
             mode="common"
             onBack={() => navigate(-1)}
             onHome={() => navigate('/')}
-            onCart={() => navigate('/C/mypage', { state: { activeTab: 'cart' } })}
+            onCart={() => navigate('/C/cart')}
+            onMyPage={() => navigate('/C/mypage')}
+          />
+        }
+      />
+      <Route
+        path="/C/orders"
+        element={
+          <MyPageC
+            mode="common"
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/')}
+            onCart={() => navigate('/C/cart')}
+            onMyPage={() => navigate('/C/mypage')}
+          />
+        }
+      />
+      <Route
+        path="/C/wishlist"
+        element={
+          <MyPageC
+            mode="common"
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/')}
+            onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/mypage')}
           />
         }
@@ -178,7 +202,7 @@ function AppContent() {
       <Route path="/A/login" element={<LoginA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
       <Route path="/A/signup" element={<SignUpA mode={selectedMode} />} />
       <Route path="/A/mall" element={<SelectMallA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
-      <Route path="/A/store" element={<StoreBrowserA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
+      <Route path="/A/store/:mallId" element={<StoreBrowserA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
       <Route path="/A/cart" element={<CartA mode={selectedMode} />} />
       <Route path="/A/mypage" element={<Navigate to="/A/member-info" replace />} />
       <Route path="/A/member-info" element={<MemberInfoA mode={selectedMode} />} />

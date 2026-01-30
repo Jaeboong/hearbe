@@ -14,13 +14,13 @@ const SelectMall = () => {
 
     const handleSelectMall = (mall) => {
         if (mall === 'naver') {
-            navigate('/A/store', { state: { url: 'https://m.shopping.naver.com/' } });
+            window.open('https://shopping.naver.com/ns/home', '_blank');
         } else if (mall === 'coupang') {
-            navigate('/A/store', { state: { url: 'https://www.coupang.com' } });
+            window.open('https://www.coupang.com', '_blank');
         } else if (mall === '11st') {
-            navigate('/A/store', { state: { url: 'https://m.11st.co.kr/' } });
+            window.open('https://m.11st.co.kr/', '_blank');
         } else if (mall === 'emart') {
-            navigate('/A/store', { state: { url: 'https://m.ssg.com/' } });
+            window.open('https://m.ssg.com/', '_blank');
         } else if (mall === 'cart') {
             navigate('/A/cart');
         }

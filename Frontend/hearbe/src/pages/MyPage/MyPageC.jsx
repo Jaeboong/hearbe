@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, User, Mail, Lock, ShoppingCart, Heart,
@@ -6,19 +6,27 @@ import {
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import CartPage from '../Cart/CartC';
+import { mallAPI } from '../../services/mallAPI';
 import './MyPageC.css';
 
 export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
     const navigate = useNavigate();
     const location = useLocation();
-    const [activeTab, setActiveTab] = useState('settings'); // Default to settings (dashboard)
+    // Determine active tab from URL
+    const getActiveTabFromPath = () => {
+        const path = location.pathname;
+        if (path === '/C/orders') return 'orders';
+        if (path === '/C/wishlist') return 'wishlist';
+        if (path === '/C/cart') return 'cart';
+        return 'settings'; // default for /C/mypage
+    };
 
-    // Check for initial tab state
+    const [activeTab, setActiveTab] = useState(getActiveTabFromPath());
+
+    // Update active tab when URL changes
     React.useEffect(() => {
-        if (location.state && location.state.activeTab) {
-            setActiveTab(location.state.activeTab);
-        }
-    }, [location.state]);
+        setActiveTab(getActiveTabFromPath());
+    }, [location.pathname]);
 
     const [userData] = useState({
         name: '김싸피',
@@ -26,46 +34,104 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
     });
 
     const sidebarItems = [
-        { id: 'settings', label: '계정 설정' },
-        { id: 'orders', label: '주문내역' },
-        { id: 'wishlist', label: '찜한 상품' },
-        { id: 'cart', label: '장바구니', onClick: () => setActiveTab('cart') },
+        { id: 'settings', label: '계정 설정', path: '/C/mypage' },
+        { id: 'orders', label: '주문내역', path: '/C/orders' },
+        { id: 'wishlist', label: '찜한 상품', path: '/C/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/C/cart' },
     ];
 
-    const orders = [
-        {
-            mall: '쿠팡',
-            items: [
-                { id: 1, name: '노이몬 황사 방역용 마스크...', price: '18,650원', quantity: '1개', date: '2021. 12. 24', icon: '😷' },
-            ]
-        },
-        {
-            mall: '11번가',
-            items: [
-                { id: 2, name: '무로 바라나스 마사지 릴...', price: '18,980원', quantity: '1개', date: '2021. 12. 24', icon: '🥖' },
-                { id: 3, name: '무로 바라나스 마사지 릴...', price: '18,980원', quantity: '1개', date: '2021. 09. 08', icon: '🥖' }
-            ]
-        }
-    ];
+    // Orders and wishlist state
+    const [orders, setOrders] = useState([]);
+    const [wishlists, setWishlists] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const wishlists = [
-        {
-            mall: '쿠팡',
-            count: 2,
-            items: [
-                { id: 101, name: '몽베스트 위드어스 무라벨 생수, 500ml, 40개', price: 19900, tag: '와우 가입 쿠폰', icon: '💧' },
-                { id: 102, name: '애니가드 미세먼지 마스크 KF94 100매', price: 34500, icon: '😷' }
-            ]
-        },
-        {
-            mall: '이마트몰',
-            count: 2,
-            items: [
-                { id: 201, name: '노브랜드 유기농 아침 우유 900ml', price: 2180, icon: '🥛' },
-                { id: 202, name: '피코크 등심 돈까스 600g', price: 8900, icon: '🥩' }
-            ]
+    // Platform ID to name mapping
+    const platformNames = {
+        1: '쿠팡',
+        2: '네이버',
+        3: '11번가',
+        4: 'SSG',
+        5: 'G마켓',
+        6: '컬리'
+    };
+
+    // Fetch data when switching tabs
+    useEffect(() => {
+        if (activeTab === 'orders') {
+            fetchOrders();
+        } else if (activeTab === 'wishlist') {
+            fetchWishlist();
         }
-    ];
+    }, [activeTab]);
+
+    const fetchOrders = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const response = await mallAPI.getMyOrders();
+
+            // Transform API response to component format
+            const groupedOrders = [];
+            if (response.data && response.data.orders) {
+                const ordersByMall = {};
+                response.data.orders.forEach(order => {
+                    const mallName = platformNames[order.platform_id] || `Platform ${order.platform_id}`;
+                    if (!ordersByMall[mallName]) {
+                        ordersByMall[mallName] = { mall: mallName, items: [] };
+                    }
+                    ordersByMall[mallName].items.push({
+                        id: order.order_id,
+                        name: order.product_name || order.name,
+                        price: `${order.price.toLocaleString()}원`,
+                        quantity: `${order.quantity || 1}개`,
+                        date: new Date(order.created_at).toLocaleDateString('ko-KR'),
+                        icon: '📦'
+                    });
+                });
+                setOrders(Object.values(ordersByMall));
+            }
+        } catch (err) {
+            console.error('Failed to fetch orders:', err);
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const fetchWishlist = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const response = await mallAPI.getWishlist();
+
+            // Transform API response to component format
+            const groupedWishlist = [];
+            if (response.data && response.data.items) {
+                const wishlistByMall = {};
+                response.data.items.forEach(item => {
+                    const mallName = platformNames[item.platform_id] || `Platform ${item.platform_id}`;
+                    if (!wishlistByMall[mallName]) {
+                        wishlistByMall[mallName] = { mall: mallName, count: 0, items: [] };
+                    }
+                    wishlistByMall[mallName].items.push({
+                        id: item.wishlist_item_id,
+                        name: item.name,
+                        price: item.price,
+                        tag: '',
+                        icon: '❤️'
+                    });
+                    wishlistByMall[mallName].count++;
+                });
+                setWishlists(Object.values(wishlistByMall));
+            }
+        } catch (err) {
+            console.error('Failed to fetch wishlist:', err);
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="mypage-container">
@@ -118,7 +184,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                         {sidebarItems.map((item) => (
                             <button
                                 key={item.id}
-                                onClick={() => item.onClick ? item.onClick() : setActiveTab(item.id)}
+                                onClick={() => navigate(item.path)}
                                 className={`mp-sidebar-item ${activeTab === item.id ? 'active' : ''}`}
                                 style={{
                                     display: 'flex',
@@ -220,33 +286,47 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                         <section className="dashboard-card full-height">
                             <h2 className="card-title-lg">주문내역</h2>
                             <div className="orders-list">
-                                {orders.map((group, idx) => (
-                                    <div key={idx} className="mall-order-group">
-                                        <div className="mall-order-header">
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                <div className="mall-order-indicator"></div>
-                                                <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0, color: '#111827' }}>{group.mall}</h2>
+                                {isLoading ? (
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+                                        주문내역을 불러오는 중...
+                                    </div>
+                                ) : error ? (
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#e53e3e' }}>
+                                        {error}
+                                    </div>
+                                ) : orders.length === 0 ? (
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+                                        주문내역이 없습니다.
+                                    </div>
+                                ) : (
+                                    orders.map((group, idx) => (
+                                        <div key={idx} className="mall-order-group">
+                                            <div className="mall-order-header">
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                    <div className="mall-order-indicator"></div>
+                                                    <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0, color: '#111827' }}>{group.mall}</h2>
+                                                </div>
+                                                <div className="order-group-actions">
+                                                    <button className="btn-outline-sm">상세 조회</button>
+                                                    <button className="btn-fill-sm">배송 조회</button>
+                                                </div>
                                             </div>
-                                            <div className="order-group-actions">
-                                                <button className="btn-outline-sm">상세 조회</button>
-                                                <button className="btn-fill-sm">배송 조회</button>
-                                            </div>
-                                        </div>
-                                        <div className="group-items">
-                                            {group.items.map((item) => (
-                                                <div key={item.id} className="item-row-card">
-                                                    <div className="item-row-left">
-                                                        <div className="item-thumb">{item.icon}</div>
-                                                        <div className="item-info-text">
-                                                            <div className="item-name-lg">{item.name}</div>
-                                                            <div className="item-meta-text">{item.date} · {item.quantity}</div>
+                                            <div className="group-items">
+                                                {group.items.map((item) => (
+                                                    <div key={item.id} className="item-row-card">
+                                                        <div className="item-row-left">
+                                                            <div className="item-thumb">{item.icon}</div>
+                                                            <div className="item-info-text">
+                                                                <div className="item-name-lg">{item.name}</div>
+                                                                <div className="item-meta-text">{item.date} · {item.quantity}</div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </section>
                     )}
@@ -256,41 +336,55 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                         <section className="dashboard-card full-height">
                             <h2 className="card-title-lg">찜한 상품</h2>
                             <div className="wishlist-content">
-                                {wishlists.map((group, idx) => (
-                                    <div key={idx} className="mall-wish-group">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                                            <div className="mall-order-indicator"></div>
-                                            <h3 className="mall-header-text" style={{ marginBottom: 0 }}>{group.mall} <span className="count-badge">{group.count}개</span></h3>
-                                        </div>
+                                {isLoading ? (
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+                                        찜한 상품을 불러오는 중...
+                                    </div>
+                                ) : error ? (
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#e53e3e' }}>
+                                        {error}
+                                    </div>
+                                ) : wishlists.length === 0 ? (
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+                                        찜한 상품이 없습니다.
+                                    </div>
+                                ) : (
+                                    wishlists.map((group, idx) => (
+                                        <div key={idx} className="mall-wish-group">
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                                                <div className="mall-order-indicator"></div>
+                                                <h3 className="mall-header-text" style={{ marginBottom: 0 }}>{group.mall} <span className="count-badge">{group.count}개</span></h3>
+                                            </div>
 
-                                        {/* Selection Toolbar */}
-                                        <div className="selection-toolbar">
-                                            <button className="check-all-btn">
-                                                <CheckSquare size={40} /> 전체선택
-                                            </button>
-                                            <button className="delete-selected-btn">선택삭제</button>
-                                        </div>
+                                            {/* Selection Toolbar */}
+                                            <div className="selection-toolbar">
+                                                <button className="check-all-btn">
+                                                    <CheckSquare size={40} /> 전체선택
+                                                </button>
+                                                <button className="delete-selected-btn">선택삭제</button>
+                                            </div>
 
-                                        <div className="group-items">
-                                            {group.items.map((item) => (
-                                                <div key={item.id} className="item-row-card">
-                                                    <div className="item-row-left">
-                                                        <button className="check-item-btn"><CheckSquare size={40} color="#ddd" /></button>
-                                                        <div className="item-thumb">{item.icon}</div>
-                                                        <div className="item-info-text">
-                                                            <div className="item-name-lg">{item.name}</div>
-                                                            <div className="item-price-lg">{item.price.toLocaleString()}원</div>
+                                            <div className="group-items">
+                                                {group.items.map((item) => (
+                                                    <div key={item.id} className="item-row-card">
+                                                        <div className="item-row-left">
+                                                            <button className="check-item-btn"><CheckSquare size={40} color="#ddd" /></button>
+                                                            <div className="item-thumb">{item.icon}</div>
+                                                            <div className="item-info-text">
+                                                                <div className="item-name-lg">{item.name}</div>
+                                                                <div className="item-price-lg">{item.price.toLocaleString()}원</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item-row-actions vertical">
+                                                            <button className="btn-outline-rounded">장바구니 담기</button>
+                                                            <button className="btn-text-grey">삭제</button>
                                                         </div>
                                                     </div>
-                                                    <div className="item-row-actions vertical">
-                                                        <button className="btn-outline-rounded">장바구니 담기</button>
-                                                        <button className="btn-text-grey">삭제</button>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </section>
                     )}

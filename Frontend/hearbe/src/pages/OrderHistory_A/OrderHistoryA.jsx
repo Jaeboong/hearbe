@@ -1,62 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackButton from '../BackButton/BackButtonA';
+import { mallAPI } from '../../services/mallAPI';
 import './OrderHistoryA.css';
 
 const OrderHistoryA = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Order data grouped by mall, then by date+time
-    const [orderData] = useState({
-        '쿠팡': [
-            {
-                datetime: '2021.12.24 14:30',
-                orders: [
-                    {
-                        id: 1,
-                        image: 'https://via.placeholder.com/80',
-                        name: '노비타 물티슈 방문판 마스크... 18,650원, 1개',
-                        price: 18650,
-                        quantity: 1
-                    }
-                ]
-            },
-            {
-                datetime: '2021.09.08 11:20',
-                orders: [
-                    {
-                        id: 2,
-                        image: 'https://via.placeholder.com/80',
-                        name: '무용 비비니스 머서 힐... 18,980원, 1개',
-                        price: 18980,
-                        quantity: 1
-                    }
-                ]
+    // Order data state
+    const [orderData, setOrderData] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Platform ID to name mapping
+    const platformNames = {
+        1: '쿠팡',
+        2: '네이버',
+        3: '11번가',
+        4: 'SSG'
+    };
+
+    // Fetch orders on mount
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                const response = await mallAPI.getMyOrders();
+
+                // Transform API response to component format
+                const groupedData = {};
+                if (response.data && response.data.orders) {
+                    response.data.orders.forEach(order => {
+                        const platformName = platformNames[order.platform_id] || `Platform ${order.platform_id}`;
+                        if (!groupedData[platformName]) {
+                            groupedData[platformName] = [];
+                        }
+
+                        // Group by date
+                        const orderDate = new Date(order.created_at);
+                        const datetime = `${orderDate.getFullYear()}.${String(orderDate.getMonth() + 1).padStart(2, '0')}.${String(orderDate.getDate()).padStart(2, '0')} ${String(orderDate.getHours()).padStart(2, '0')}:${String(orderDate.getMinutes()).padStart(2, '0')}`;
+
+                        groupedData[platformName].push({
+                            datetime,
+                            orders: [{
+                                id: order.order_id,
+                                image: order.img_url || 'https://via.placeholder.com/80',
+                                name: order.product_name || order.name,
+                                price: order.price,
+                                quantity: order.quantity || 1
+                            }]
+                        });
+                    });
+                }
+                setOrderData(groupedData);
+            } catch (err) {
+                console.error('Failed to fetch orders:', err);
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
             }
-        ],
-        '네이버': [
-            {
-                datetime: '2021.11.15 09:45',
-                orders: [
-                    {
-                        id: 3,
-                        image: 'https://via.placeholder.com/80',
-                        name: '스마트 블루투스 이어폰',
-                        price: 45000,
-                        quantity: 2
-                    },
-                    {
-                        id: 4,
-                        image: 'https://via.placeholder.com/80',
-                        name: 'USB-C 충전 케이블',
-                        price: 12000,
-                        quantity: 1
-                    }
-                ]
-            }
-        ]
-    });
+        };
+
+        fetchOrders();
+    }, []);
 
     // Collapsed state for each mall section
     const [collapsedMalls, setCollapsedMalls] = useState({});
@@ -107,63 +115,73 @@ const OrderHistoryA = () => {
                 <main className="orderhistory-main">
                     <h2 className="content-title">주문내역</h2>
 
-                    {/* Orders by Mall */}
-                    {Object.entries(orderData).map(([mallName, orderGroups]) => (
-                        <div key={mallName} className="mall-section">
-                            <div
-                                className="mall-header"
-                                onClick={() => toggleMallSection(mallName)}
-                            >
-                                <h3 className="mall-name">{mallName}</h3>
-                                <span className="toggle-icon">
-                                    {collapsedMalls[mallName] ? '▼' : '▲'}
-                                </span>
-                            </div>
-
-                            {!collapsedMalls[mallName] && (
-                                <div className="orders-list">
-                                    {orderGroups.map((group, index) => (
-                                        <div key={index} className="order-group">
-                                            <div className="order-date-header">
-                                                {group.datetime.split(' ')[0]}
-                                            </div>
-
-                                            <div className="order-details">
-                                                <div className="order-items">
-                                                    {group.orders.map(order => (
-                                                        <div key={order.id} className="order-item">
-                                                            <img
-                                                                src={order.image}
-                                                                alt={order.name}
-                                                                className="order-item-image"
-                                                            />
-                                                            <div className="order-item-info">
-                                                                <div className="order-item-name">{order.name}</div>
-                                                                <div className="order-item-meta">
-                                                                    {order.price.toLocaleString()}원, {order.quantity}개
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                <button
-                                                    className="track-delivery-btn"
-                                                    onClick={() => handleTrackDelivery(mallName, group.datetime)}
-                                                >
-                                                    배송 조회
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                    {isLoading ? (
+                        <div className="empty-orders">
+                            주문내역을 불러오는 중...
                         </div>
-                    ))}
-
-                    {Object.keys(orderData).length === 0 && (
+                    ) : error ? (
+                        <div className="empty-orders" style={{ color: '#e53e3e' }}>
+                            {error}
+                        </div>
+                    ) : Object.keys(orderData).length === 0 ? (
                         <div className="empty-orders">
                             주문내역이 없습니다.
                         </div>
+                    ) : (
+                        <>
+                            {/* Orders by Mall */}
+                            {Object.entries(orderData).map(([mallName, orderGroups]) => (
+                                <div key={mallName} className="mall-section">
+                                    <div
+                                        className="mall-header"
+                                        onClick={() => toggleMallSection(mallName)}
+                                    >
+                                        <h3 className="mall-name">{mallName}</h3>
+                                        <span className="toggle-icon">
+                                            {collapsedMalls[mallName] ? '▼' : '▲'}
+                                        </span>
+                                    </div>
+
+                                    {!collapsedMalls[mallName] && (
+                                        <div className="orders-list">
+                                            {orderGroups.map((group, index) => (
+                                                <div key={index} className="order-group">
+                                                    <div className="order-date-header">
+                                                        {group.datetime.split(' ')[0]}
+                                                    </div>
+
+                                                    <div className="order-details">
+                                                        <div className="order-items">
+                                                            {group.orders.map(order => (
+                                                                <div key={order.id} className="order-item">
+                                                                    <img
+                                                                        src={order.image}
+                                                                        alt={order.name}
+                                                                        className="order-item-image"
+                                                                    />
+                                                                    <div className="order-item-info">
+                                                                        <div className="order-item-name">{order.name}</div>
+                                                                        <div className="order-item-meta">
+                                                                            {order.price.toLocaleString()}원, {order.quantity}개
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <button
+                                                            className="track-delivery-btn"
+                                                            onClick={() => handleTrackDelivery(mallName, group.datetime)}
+                                                        >
+                                                            배송 조회
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </>
                     )}
                 </main>
             </div>
