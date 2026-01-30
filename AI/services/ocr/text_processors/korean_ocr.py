@@ -89,13 +89,11 @@ def process_image(
     from pathlib import Path
     
     width, height = get_image_size(image_path)
-    print(f"이미지 크기: {width}x{height}px")
     
     if ocr_instance is None:
         ocr_instance = create_ocr_instance()
     
     if height > max_height:
-        print(f"긴 이미지 감지 (높이 {height}px > {max_height}px) → 분할 처리")
         
         try:
             from . import long_image_processor
@@ -110,7 +108,6 @@ def process_image(
         )
         result["processing_mode"] = "split"
     else:
-        print(f"일반 이미지 (높이 {height}px <= {max_height}px) → 직접 처리")
 
         # RGBA(PNG 투명도) 처리를 위해 이미지를 RGB로 변환 후 numpy 배열로 전달
         from PIL import Image
@@ -128,7 +125,6 @@ def process_image(
             os.makedirs(output_dir, exist_ok=True)
             for res in ocr_raw_result:
                 res.save_to_img(output_dir)
-            print(f"Saved visualization images: {output_dir}/")
 
         texts_with_scores = extract_texts_with_scores(ocr_raw_result)
 
@@ -149,17 +145,7 @@ def process_image(
     try:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
-        print(f"완료! 총 {result['total_count']}개 텍스트 추출됨")
-        print(f"결과 저장: {output_path}")
-    except Exception as e:
-        print(f"❌ JSON 저장 실패: {type(e).__name__}: {e}")
-        print(f"  result 타입: {type(result)}")
-        print(f"  result keys: {result.keys() if isinstance(result, dict) else 'N/A'}")
-        if isinstance(result, dict):
-            for key, value in result.items():
-                print(f"    {key}: {type(value).__name__}")
-                if isinstance(value, list) and value:
-                    print(f"      첫 번째 요소 타입: {type(value[0]).__name__}")
+    except Exception:
         raise
     
     return result
@@ -209,7 +195,6 @@ def process_images_parallel(
     results = []
     if isinstance(DEFAULT_DEVICE, str) and DEFAULT_DEVICE.startswith("gpu"):
         max_workers = min(max_workers, 2)
-    print(f"병렬 OCR 처리 시작: {len(image_paths)}개 이미지, {max_workers} 워커")
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_path = {
@@ -222,10 +207,7 @@ def process_images_parallel(
             try:
                 result = future.result()
                 results.append(result)
-                status = "✓" if result["processing_mode"] != "error" else "✗"
-                print(f"  {status} {result['source']}: {result['total_count']}개 텍스트")
             except Exception as e:
-                print(f"  ✗ {Path(path).name}: 처리 실패 - {e}")
                 results.append({
                     "rec_texts": [],
                     "rec_scores": [],
@@ -240,7 +222,6 @@ def process_images_parallel(
     results.sort(key=lambda x: path_order.get(x["source"], 999))
     
     total_texts = sum(r["total_count"] for r in results)
-    print(f"병렬 OCR 완료: 총 {total_texts}개 텍스트 추출")
     
     return results
 
@@ -254,8 +235,6 @@ if __name__ == "__main__":
     parser.add_argument("--max-height", type=int, default=DEFAULT_MAX_HEIGHT)
     parser.add_argument("--save-chunks", action="store_true")
     args = parser.parse_args()
-    
-    print(f"이미지 인식 시작: {args.input}")
     
     result = process_image(
         args.input,

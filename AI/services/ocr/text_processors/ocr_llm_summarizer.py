@@ -27,7 +27,7 @@ try:
     env_path = Path(__file__).parent / ".env"
     load_dotenv(dotenv_path=env_path)
 except ImportError:
-    print("경고: python-dotenv가 설치되지 않았습니다.")
+    pass
 
 DEFAULT_INPUT = os.path.join("output", "샴푸_res_texts.json")
 DEFAULT_OUTPUT = os.path.join("output", "샴푸_texts_summary.json")
@@ -37,7 +37,6 @@ try:
     PREPROCESSOR_AVAILABLE = True
 except ImportError:
     PREPROCESSOR_AVAILABLE = False
-    print("경고: ocr_text_preprocessor 모듈을 찾을 수 없습니다.")
 
 
 def _load_ocr_texts(path: str, preprocess: bool = True) -> Tuple[List[str], Dict]:
@@ -79,7 +78,7 @@ def _build_prompt(texts: List[str], product_type: ProductType, size_table: str =
             "   - mm 사이즈는 보통 230~290 범위, EU 사이즈는 35~50 범위입니다.\n"
             "   - 예: OCR에 '240', '245', '250', '255', '260', '265', '270', '275'가 있으면 → \"240-275mm\" (240부터!)\n"
             "   - 예: OCR에 '38', '39', '40', '42', '43', '44', '45'가 있으면 → \"38-45\" (38부터!)\n"
-            "   - **🚫 흔한 실수: 250부터 시작하면 안 됩니다! 240이 있으면 반드시 240부터 시작하세요.**\n"
+            '   - 숫자 1이 흔히 7로 오인식 되는 경우가 많습니다. 텍스트에서 전체 숫자 흐름을 파악하고 오인식된 숫자를 수정하세요.\n'
             "3. **(중요) 줄글로 나열된 표 해석 가이드**:\n"
             "   OCR 결과가 표 구조 없이 'M 34 67 35...' 처럼 줄글로 나열돼 있어도 당황하지 마세요.\n"
             "   - **패턴 인식**: '허리, 엉덩이, 총장, 기장, 가슴둘레, 어깨넓이, 어깨너비, 소매길이' 같은 헤더가 먼저 나오고, 그 뒤에 'M', 'L' 같은 행(Row) 시작점이 나옵니다.\n"
@@ -190,9 +189,6 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
                 headers=headers,
                 timeout=(10, 120),
             )
-            if response.status_code >= 400:
-                print(f"\n[DEBUG] HTTP {response.status_code} 에러")
-                print(f"[DEBUG] 응답 본문: {response.text}")
             response.raise_for_status()
             raw = response.json()
 
@@ -217,8 +213,6 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
             last_error = e
             if attempt < max_retries - 1:
                 wait_time = 2 ** attempt
-                print(f"API 요청 실패 (시도 {attempt + 1}/{max_retries}): {e}")
-                print(f"{wait_time}초 후 재시도합니다...")
                 time.sleep(wait_time)
             else:
                 raise RuntimeError(f"LLM 요청이 {max_retries}회 재시도 후에도 실패했습니다: {last_error}") from last_error
@@ -244,9 +238,6 @@ def summarize_texts(
     
     if product_type is None:
         product_type = detect_product_type(texts)
-        if verbose:
-            type_desc = get_type_description(product_type)
-            print(f"    제품 타입 자동 감지: {type_desc} ({product_type.value})")
     
     model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     if use_cache:
@@ -258,19 +249,13 @@ def summarize_texts(
         )
         cached = load_summary_cache(summary_hash)
         if cached:
-            if verbose:
-                print("    LLM summary cache hit")
             return cached
 
     prompt = _build_prompt(texts, product_type, size_table)
 
-    if verbose:
-        print("    LLM API 호출 중...", end="", flush=True)
     summary = _call_openai(prompt)
     if use_cache:
         save_summary_cache(summary_hash, summary)
-    if verbose:
-        print(" 완료!")
     
     return summary
 

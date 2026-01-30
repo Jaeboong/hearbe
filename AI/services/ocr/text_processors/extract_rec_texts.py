@@ -32,9 +32,6 @@ def extract_rec_texts(input_path: str, output_path: str = None) -> list:
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     
-    print(f"추출 완료: {len(rec_texts)}개 텍스트")
-    print(f"저장 위치: {output_path}")
-    
     return rec_texts
 
 

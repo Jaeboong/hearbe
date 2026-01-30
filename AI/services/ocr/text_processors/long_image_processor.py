@@ -43,13 +43,11 @@ def split_image_to_chunks(
         new_size = (max(1, int(width * scale)), resize_max_height)
         img = img.resize(new_size, Image.LANCZOS)
         width, height = img.size
-        print(f"큰 이미지 리사이즈: {new_size[0]}x{new_size[1]}px (scale={scale:.3f})")
     
     if save_chunks:
         base_name = Path(image_path).stem
         chunk_dir = output_dir or os.path.join(OUTPUT_DIR, "chunks", base_name)
         os.makedirs(chunk_dir, exist_ok=True)
-        print(f"청크 저장 디렉토리: {chunk_dir}")
     
     chunks = []
     y = 0
@@ -65,12 +63,9 @@ def split_image_to_chunks(
         chunk = img.crop((0, y, width, y_end))
         chunks.append((chunk, y))
         
-        print(f"  청크 {chunk_index + 1}: y={y} ~ {y_end} (높이: {y_end - y}px)")
-        
         if save_chunks:
             chunk_path = os.path.join(chunk_dir, f"chunk_{chunk_index + 1:02d}_y{y}-{y_end}.jpg")
             chunk.save(chunk_path, "JPEG", quality=95)
-            print(f"    저장됨: {chunk_path}")
         
         chunk_index += 1
         y = y_end - overlap
@@ -181,10 +176,8 @@ def process_long_image(
     save_chunks: bool = False
 ) -> Dict:
     width, height = get_image_size(image_path)
-    print(f"이미지 크기: {width}x{height}px")
     
     if not should_split_image(image_path, max_height):
-        print(f"분할 불필요 (높이 {height}px <= {max_height}px)")
         if ocr_instance:
             result = ocr_instance.predict(image_path)
             all_texts = []
@@ -213,9 +206,7 @@ def process_long_image(
     if ocr_instance is None:
         ocr_instance = korean_ocr.create_ocr_instance()
     
-    print(f"이미지 분할 시작 (max_height={max_height}, overlap={overlap})")
     chunks = split_image_to_chunks(image_path, max_height, overlap, save_chunks=save_chunks)
-    print(f"총 {len(chunks)}개 청크로 분할됨")
     
     if save_chunks:
         base_name = Path(image_path).stem
@@ -224,7 +215,6 @@ def process_long_image(
     
     all_results = []
     for idx, (chunk, y_offset) in enumerate(chunks):
-        print(f"청크 {idx + 1}/{len(chunks)} OCR 처리 중...")
         
         result = process_chunk_ocr(chunk, ocr_instance)
         
@@ -235,8 +225,6 @@ def process_long_image(
                     chunk_texts.extend(res.get('rec_texts', []))
                 if hasattr(res, 'save_to_img'):
                     res.save_to_img(debug_dir)
-            print(f"  → 청크 {idx + 1} 결과: {len(chunk_texts)}개 텍스트")
-            print(f"     샘플: {chunk_texts[:5]}...")
             
             chunk_result_path = os.path.join(debug_dir, f"chunk_{idx + 1:02d}_result.json")
             with open(chunk_result_path, "w", encoding="utf-8") as f:
@@ -245,13 +233,10 @@ def process_long_image(
         adjusted = adjust_coordinates(result, y_offset)
         all_results.append(adjusted)
     
-    print("결과 병합 및 중복 제거 중...")
     merged = remove_duplicate_texts(all_results, overlap)
     merged["split_count"] = len(chunks)
     merged["image_size"] = {"width": int(width), "height": int(height)}
     merged["processing_mode"] = "split"
-
-    print(f"완료! 총 {merged['total_count']}개 텍스트 추출됨")
 
     return merged
 
@@ -282,7 +267,6 @@ def main():
         output_path = args.output
     
     save_json(result, output_path)
-    print(f"결과 저장: {output_path}")
 
     return 0
 
