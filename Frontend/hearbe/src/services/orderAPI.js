@@ -1,4 +1,4 @@
-// 주문내역 API
+// 공통 주문내역 API
 // A형과 C형에서 공통으로 사용
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
@@ -40,15 +40,42 @@ export const orderAPI = {
     /**
      * 주문내역 조회
      * GET /orders/me
+     *
      * @returns {Promise<Object>} 주문내역 데이터
+     *
+     * Response 구조:
+     * {
+     *   code: 200,
+     *   message: "성공적으로 처리되었습니다.",
+     *   data: {
+     *     orders: [
+     *       {
+     *         order_id: number,
+     *         ordered_at: string (YYYY-MM-DD),
+     *         order_url: string,
+     *         platform_id: number (1:쿠팡, 2:네이버, 3:11번가, 4:SSG),
+     *         items: [
+     *           {
+     *             name: string,
+     *             price: number,
+     *             quantity: number,
+     *             url: string,
+     *             img_url: string,
+     *             deliver_url: string | null
+     *           }
+     *         ]
+     *       }
+     *     ]
+     *   }
+     * }
      */
     getOrders: async () => {
-        const token = getAuthToken();
-        if (!token) {
-            throw new Error('로그인이 필요합니다.');
-        }
-
         try {
+            const token = getAuthToken();
+            if (!token) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
             const response = await fetch(`${API_BASE_URL}/orders/me`, {
                 method: 'GET',
                 headers: {
