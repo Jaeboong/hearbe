@@ -72,18 +72,36 @@ Authorization: Bearer {accessToken}
 
 ## 4. 구현 요구사항
 
-### 4.1 API 서비스 생성
-- services/orderAPI.js 생성
-- getOrders() 메서드 구현
+### 4.1 API 서비스 (공통 로직)
+- 위치: services/orderAPI.js
+- A형, C형에서 공통으로 사용
+- cartAPI.js와 동일한 패턴 적용
 
-### 4.2 OrderHistoryA.jsx 수정
+```javascript
+// 사용법
+import { orderAPI } from '../../services/orderAPI';
+
+const response = await orderAPI.getOrders();
+// response.data.orders 로 접근
+```
+
+### 4.2 에러 처리
+| HTTP 상태 | 에러 메시지 |
+|-----------|------------|
+| 401 | 로그인이 필요합니다. |
+| 403 | 접근 권한이 없습니다. |
+| 404 | 주문내역을 찾을 수 없습니다. |
+| 500+ | 서버 오류가 발생했습니다. |
+| 네트워크 | 네트워크 연결을 확인해주세요. |
+
+### 4.3 OrderHistoryA.jsx 수정
 - 하드코딩 데이터 제거
 - useEffect로 API 호출
 - 로딩/에러 상태 처리
 - platform_id를 플랫폼명으로 변환
 - 날짜별, 플랫폼별 그룹화
 
-### 4.3 데이터 변환 로직
+### 4.4 데이터 변환 로직
 ```javascript
 // API Response -> UI 데이터 변환
 // platform_id 매핑
@@ -98,7 +116,7 @@ const platformNames = {
 response.data.orders를 platform_id별로 그룹화
 ```
 
-### 4.4 배송조회 기능
+### 4.5 배송조회 기능
 - deliver_url이 null이 아니면 배송조회 버튼 활성화
 - 클릭 시 deliver_url로 이동 (새 탭)
 
