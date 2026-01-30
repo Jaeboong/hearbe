@@ -155,7 +155,6 @@ def download_image(
         
         content_type = response.headers.get("Content-Type", "")
         if not content_type.startswith("image/"):
-            print(f"⚠️  이미지가 아닌 컨텐츠: {url}")
             return None
         
         with open(local_path, "wb") as f:
@@ -164,8 +163,7 @@ def download_image(
         
         return local_path
         
-    except requests.RequestException as e:
-        print(f"⚠️  다운로드 실패: {url} - {e}")
+    except requests.RequestException:
         return None
 
 
@@ -185,8 +183,6 @@ def download_images(
     
     local_paths = []
     
-    print(f"📥 이미지 다운로드 시작: {len(urls)}개, {max_workers} 워커")
-    
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_url = {
             executor.submit(download_image, url, save_dir, timeout): url
@@ -199,11 +195,8 @@ def download_images(
                 local_path = future.result()
                 if local_path:
                     local_paths.append(local_path)
-                    print(f"  ✓ {Path(local_path).name}")
-            except Exception as e:
-                print(f"  ✗ 다운로드 오류: {url} - {e}")
-    
-    print(f"📥 다운로드 완료: {len(local_paths)}/{len(urls)}개 성공")
+            except Exception:
+                pass
     
     return local_paths
 

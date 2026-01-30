@@ -102,26 +102,6 @@ def preprocess_ocr_texts(
     stats["duplicates_removed"] = original_cleaned_count - len(cleaned)
     stats["final_count"] = len(cleaned)
     
-    if verbose:
-        print("\n=== OCR 텍스트 전처리 통계 ===")
-        print(f"원본 텍스트 개수: {stats['original_count']}")
-        print(f"점수 미달로 제외됨 (< {min_score}): {stats['filtered_by_score']}")
-        if filtered_examples["by_score"]:
-            print(f"  예시: {', '.join(filtered_examples['by_score'])}")
-        print(f"길이 미달로 제외됨 (< {min_length}): {stats['filtered_by_length']}")
-        if filtered_examples["by_length"]:
-            print(f"  예시: {', '.join(filtered_examples['by_length'])}")
-        print(f"패턴 필터링으로 제외됨: {stats['filtered_by_pattern']}")
-        if filtered_examples["by_pattern"]:
-            print(f"  예시: {', '.join(filtered_examples['by_pattern'])}")
-        print(f"중복 제거됨: {stats['duplicates_removed']}")
-        print(f"최종 정제된 텍스트 개수: {stats['final_count']}")
-        
-        reduction_count = stats['original_count'] - stats['final_count']
-        reduction_rate = (1 - stats['final_count'] / max(stats['original_count'], 1)) * 100
-        print(f"감소량: {reduction_count}개 텍스트 ({reduction_rate:.1f}% 감소)")
-        print("=" * 60 + "\n")
-    
     return cleaned, stats
 
 
@@ -138,8 +118,6 @@ def load_and_preprocess_ocr_json(
         raise ValueError("JSON 데이터에 'rec_texts'가 없습니다.")
     
     if not scores:
-        if verbose:
-            print("참고: 'rec_scores'가 없어 모든 텍스트의 점수를 1.0으로 가정합니다.")
         scores = [1.0] * len(texts)
     
     return preprocess_ocr_texts(texts, scores, min_score, min_length, verbose)

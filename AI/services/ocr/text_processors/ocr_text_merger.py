@@ -153,7 +153,6 @@ def main() -> int:
         similarity_threshold=args.similarity_threshold,
     )
     save_json(result, args.output)
-    print(f"병합 완료: {result['count']}개 텍스트 -> {args.output}")
     return 0
 
 

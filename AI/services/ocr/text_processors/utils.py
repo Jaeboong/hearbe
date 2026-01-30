@@ -97,8 +97,7 @@ def load_cache(image_hash: str, ttl_days: int = DEFAULT_CACHE_TTL_DAYS) -> Optio
             # 만료된 캐시 삭제
             os.remove(cache_path)
             return None
-    except Exception as e:
-        print(f"⚠️  캐시 로드 실패: {e}")
+    except Exception:
         return None
 
 
@@ -145,8 +144,7 @@ def load_summary_cache(summary_hash: str, ttl_days: int = DEFAULT_CACHE_TTL_DAYS
             return cache_data.get("summary")
         os.remove(cache_path)
         return None
-    except Exception as e:
-        print(f"LLM cache load failed: {e}")
+    except Exception:
         return None
 
 
@@ -196,8 +194,7 @@ def load_pipeline_cache(pipeline_hash: str, ttl_days: int = DEFAULT_CACHE_TTL_DA
             return cache_data.get("result")
         os.remove(cache_path)
         return None
-    except Exception as e:
-        print(f"Pipeline cache load failed: {e}")
+    except Exception:
         return None
 
 
