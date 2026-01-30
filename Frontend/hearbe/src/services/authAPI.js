@@ -67,14 +67,14 @@ export const authAPI = {
     },
 
     // 로그인 API
-    login: async (id, password) => {
+    login: async ({ username, password }) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username: id, password }),
+                body: JSON.stringify({ username, password }),
             });
 
             const text = await response.text();
@@ -101,7 +101,7 @@ export const authAPI = {
             if (data.data && data.data.id) {
                 localStorage.setItem('user_id', data.data.id);
                 // 가입 시 아이디인 username도 저장 (장바구니 API 등에서 사용)
-                localStorage.setItem('username', id);
+                localStorage.setItem('username', username);
             }
 
             return data;
