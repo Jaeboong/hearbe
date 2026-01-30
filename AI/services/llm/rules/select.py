@@ -7,15 +7,19 @@
 from typing import Optional
 from . import BaseRule, RuleResult
 from ..context.context_rules import (
+    GeneratedCommand,
     build_click_text_command,
     build_click_command,
     build_wait_command,
 )
-from ..sites.site_manager import get_page_type
+from ..sites.site_manager import get_page_type, get_current_site
+from ..planner.selection.site_extractors import build_product_extract_command_for_site
+from core.korean_numbers import extract_ordinal_index
 
 
 SELECTION_TRIGGERS = ["선택", "골라", "고르", "열어", "눌러", "클릭", "열어줘", "열어봐"]
-FILLER_WORDS = ["해줘", "해주세요", "해", "좀", "줘", "봐", "봐줘", "상품", "결과"]
+FILLER_WORDS = ["그거", "이거", "저거", "해줘", "해주세요", "해", "좀", "줘", "봐", "봐줘", "상품", "결과"]
+DEICTIC_WORDS = {"그거", "이거", "저거", "그것", "이것", "저것"}
 
 
 def _extract_selection_target(text: str) -> str:
@@ -25,6 +29,12 @@ def _extract_selection_target(text: str) -> str:
     for kw in FILLER_WORDS:
         target = target.replace(kw, "").strip()
     return target
+
+
+def _is_ordinal_target(target: str) -> bool:
+    if not target:
+        return False
+    return extract_ordinal_index(target) is not None
 
 
 class SearchSelectRule(BaseRule):
@@ -43,10 +53,18 @@ class SearchSelectRule(BaseRule):
         target = _extract_selection_target(text)
 
         if target:
+            if target in DEICTIC_WORDS or _is_ordinal_target(target):
+                return None
             commands = [
                 build_click_text_command(target, f"검색 결과에서 '{target}' 선택"),
+                GeneratedCommand(
+                    tool_name="wait_for_new_page",
+                    arguments={"timeout_ms": 1500, "focus": True},
+                    description="detect new tab and focus",
+                ),
                 build_wait_command(1500, "상품 페이지 로딩 대기"),
             ]
+            _append_detail_extract(commands, current_site, current_url)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -61,8 +79,14 @@ class SearchSelectRule(BaseRule):
         if selector:
             commands = [
                 build_click_command(selector, "검색 결과 첫 상품 선택"),
+                GeneratedCommand(
+                    tool_name="wait_for_new_page",
+                    arguments={"timeout_ms": 1500, "focus": True},
+                    description="detect new tab and focus",
+                ),
                 build_wait_command(1500, "상품 페이지 로딩 대기"),
             ]
+            _append_detail_extract(commands, current_site, current_url)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -71,3 +95,27 @@ class SearchSelectRule(BaseRule):
             )
 
         return None
+
+
+def _append_detail_extract(
+    commands: list[GeneratedCommand],
+    current_site,
+    current_url: str,
+):
+    if current_site is None and current_url:
+        current_site = get_current_site(current_url)
+
+    if not current_site:
+        return
+
+    detail_cmd = build_product_extract_command_for_site(current_site, current_url=current_url)
+    if not detail_cmd:
+        return
+
+    commands.append(
+        GeneratedCommand(
+            tool_name=detail_cmd.tool_name,
+            arguments=detail_cmd.arguments,
+            description=detail_cmd.description or "extract product details",
+        )
+    )

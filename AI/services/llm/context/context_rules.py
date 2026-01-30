@@ -62,6 +62,20 @@ def build_wait_command(ms: int = 1000, description: str = "") -> GeneratedComman
     )
 
 
+def build_wait_for_selector_command(
+    selector: str,
+    state: str = "visible",
+    timeout: int = 5000,
+    description: str = "",
+) -> GeneratedCommand:
+    """선택자가 특정 상태가 될 때까지 대기"""
+    return GeneratedCommand(
+        tool_name="wait_for_selector",
+        arguments={"selector": selector, "state": state, "timeout": timeout},
+        description=description or f"{selector}({state}) 대기",
+    )
+
+
 def build_click_command(selector: str, description: str = "") -> GeneratedCommand:
     """클릭 명령 생성"""
     return GeneratedCommand(
@@ -96,6 +110,72 @@ def build_click_text_command(text: str, description: str = "") -> GeneratedComma
         arguments={"text": text},
         description=description or f"'{text}' 텍스트 클릭"
     )
+
+def build_extract_products_command(
+    site: Optional[SiteConfig],
+    current_url: str = "",
+    limit: int = 0,
+) -> Optional[GeneratedCommand]:
+    """
+    Build an extract command for search results.
+
+    Intended to run after search to capture product names for follow-up selection.
+    """
+    from ..sites.site_manager import get_selector
+
+    selectors: Dict[str, str] = {}
+    if site:
+        page = site.get_page_selectors("search")
+        if page and page.selectors:
+            selectors = page.selectors
+
+    item_selector = (
+        selectors.get("product_list")
+        or selectors.get("product_item")
+        or (get_selector(current_url, "product_list") if current_url else None)
+        or (get_selector(current_url, "product_item") if current_url else None)
+    )
+    if not item_selector:
+        return None
+
+    field_selectors: Dict[str, str] = {}
+    field_attributes: Dict[str, str] = {}
+    title_selector = selectors.get("product_title") or selectors.get("product_name")
+    if title_selector:
+        field_selectors["name"] = title_selector
+    if selectors.get("product_price"):
+        field_selectors["price"] = selectors["product_price"]
+    rating_selector = selectors.get("product_rating")
+    if rating_selector:
+        field_selectors["rating"] = rating_selector
+        field_attributes["rating"] = "aria-label"
+    review_selector = selectors.get("product_review") or selectors.get("product_reviews")
+    if review_selector:
+        field_selectors["review_count"] = review_selector
+    if selectors.get("product_discount"):
+        field_selectors["discount"] = selectors["product_discount"]
+    if selectors.get("product_delivery"):
+        field_selectors["delivery"] = selectors["product_delivery"]
+    if selectors.get("product_free_shipping"):
+        field_selectors["free_shipping"] = selectors["product_free_shipping"]
+    if selectors.get("product_free_return"):
+        field_selectors["free_return"] = selectors["product_free_return"]
+
+    fields = list(field_selectors.keys()) or ["name"]
+
+    return GeneratedCommand(
+        tool_name="extract",
+        arguments={
+            "selector": item_selector,
+            "fields": fields,
+            "field_selectors": field_selectors,
+            "field_attributes": field_attributes,
+            "limit": limit,
+            "fallback_dynamic": True,
+        },
+        description="Extract search results"
+    )
+
 
 
 # =============================================================================

@@ -1,66 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BackButton from '../BackButton/BackButtonA';
-import { mallAPI } from '../../services/mallAPI';
+import BackButton from '../common/BackButtonA';
+import { wishlistAPI } from '../../services/wishlistAPI';
+import { cartAPI } from '../../services/cartAPI';
 import './WishlistA.css';
 
 const WishlistA = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Wishlist data state
+    // 상태 관리
     const [wishlistData, setWishlistData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Platform ID to name mapping
-    const platformNames = {
-        1: '쿠팡',
-        2: '네이버',
-        3: '11번가',
-        4: 'SSG'
+    // platformName 매핑 (영문 -> 한글)
+    const platformDisplayNames = {
+        'coupang': '쿠팡',
+        'naver': '네이버',
+        '11st': '11번가',
+        'ssg': 'SSG',
+        'gmarket': 'G마켓'
     };
-
-    // Fetch wishlist on mount
-    useEffect(() => {
-        const fetchWishlist = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-                const response = await mallAPI.getWishlist();
-
-                // Transform API response to component format
-                const groupedData = {};
-                if (response.data && response.data.items) {
-                    response.data.items.forEach(item => {
-                        const platformName = platformNames[item.platform_id] || `Platform ${item.platform_id}`;
-                        if (!groupedData[platformName]) {
-                            groupedData[platformName] = [];
-                        }
-
-                        const itemDate = item.created_at ? new Date(item.created_at) : new Date();
-                        const formattedDate = `${itemDate.getFullYear()}.${String(itemDate.getMonth() + 1).padStart(2, '0')}.${String(itemDate.getDate()).padStart(2, '0')}`;
-
-                        groupedData[platformName].push({
-                            id: item.wishlist_item_id,
-                            image: item.img_url || 'https://via.placeholder.com/150',
-                            date: formattedDate,
-                            name: item.name,
-                            price: `${item.price.toLocaleString()}원`
-                        });
-                    });
-                }
-                setWishlistData(groupedData);
-            } catch (err) {
-                console.error('Failed to fetch wishlist:', err);
-                setError(err.message);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchWishlist();
-    }, []);
 
     const menuItems = [
         { id: 'profile', label: '회원정보', path: '/A/member-info' },
@@ -72,35 +33,82 @@ const WishlistA = () => {
 
     const currentPath = location.pathname;
 
-    const handleDeleteAll = async (mallName) => {
-        if (!window.confirm(`${mallName}의 모든 찜한 상품을 삭제하시겠습니까?`)) return;
+    // API 호출
+    useEffect(() => {
+        fetchWishlist();
+    }, []);
 
+    const fetchWishlist = async () => {
         try {
-            const items = wishlistData[mallName] || [];
-            await Promise.all(items.map(item => mallAPI.deleteWishlistItem(item.id)));
-            setWishlistData(prev => ({
-                ...prev,
-                [mallName]: []
-            }));
+            setIsLoading(true);
+            setError(null);
+            const response = await wishlistAPI.getWishlist();
+
+            // 응답 데이터 변환: 플랫폼별로 그룹화
+            const groupedData = {};
+
+            if (response.items && response.items.length > 0) {
+                response.items.forEach(item => {
+                    const platform = platformDisplayNames[item.platformName] || item.platformName;
+
+                    if (!groupedData[platform]) {
+                        groupedData[platform] = [];
+                    }
+
+                    groupedData[platform].push({
+                        id: item.wishlistItemId,
+                        image: item.imgUrl || 'https://via.placeholder.com/150',
+                        date: item.createdAt ? item.createdAt.split('T')[0].replace(/-/g, '.') : '',
+                        name: item.productName,
+                        url: item.productUrl,
+                        liked: item.liked === 'true'
+                    });
+                });
+            }
+
+            setWishlistData(groupedData);
         } catch (err) {
-            alert(err.message || '삭제에 실패했습니다.');
+            console.error('Failed to fetch wishlist:', err);
+            setError(err.message);
+
+            // 401 에러 시 로그인 페이지로 이동
+            if (err.message === '로그인이 필요합니다.') {
+                navigate('/A/login');
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleDeleteItem = async (mallName, itemId) => {
         try {
-            await mallAPI.deleteWishlistItem(itemId);
+            await wishlistAPI.deleteWishlist(itemId);
             setWishlistData(prev => ({
                 ...prev,
                 [mallName]: prev[mallName].filter(item => item.id !== itemId)
             }));
         } catch (err) {
+            console.error('Failed to delete wishlist item:', err);
             alert(err.message || '삭제에 실패했습니다.');
         }
     };
 
-    const handleAddToCart = (item) => {
-        alert(`${item.name}을(를) 장바구니에 담았습니다.`);
+    const handleAddToCart = async (item) => {
+        try {
+            await cartAPI.addCart({
+                productUrl: item.url,
+                productName: item.name,
+                imgUrl: item.image
+            });
+            alert(`${item.name}을(를) 장바구니에 담았습니다.`);
+        } catch (err) {
+            console.error('Failed to add to cart:', err);
+            alert(err.message || '장바구니 담기에 실패했습니다.');
+        }
+    };
+
+    const handleRetry = () => {
+        fetchWishlist();
     };
 
     return (
@@ -128,15 +136,27 @@ const WishlistA = () => {
                 <main className="wishlist-main">
                     <h2 className="content-title">찜한 상품</h2>
 
-                    {isLoading ? (
-                        <div className="empty-wishlist">
-                            찜한 상품을 불러오는 중...
+                    {/* 로딩 상태 */}
+                    {isLoading && (
+                        <div className="loading-state">
+                            <div className="spinner"></div>
+                            <p>찜한 상품을 불러오는 중...</p>
                         </div>
-                    ) : error ? (
-                        <div className="empty-wishlist" style={{ color: '#e53e3e' }}>
-                            {error}
+                    )}
+
+                    {/* 에러 상태 */}
+                    {!isLoading && error && (
+                        <div className="error-state">
+                            <p className="error-message">찜한 상품을 불러오지 못했습니다.</p>
+                            <p className="error-detail">{error}</p>
+                            <button className="retry-btn" onClick={handleRetry}>
+                                다시 시도
+                            </button>
                         </div>
-                    ) : Object.keys(wishlistData).length === 0 ? (
+                    )}
+
+                    {/* 빈 상태 */}
+                    {!isLoading && !error && Object.keys(wishlistData).length === 0 && (
                         <div className="empty-wishlist">
                             찜한 상품이 없습니다.
                         </div>
@@ -167,6 +187,54 @@ const WishlistA = () => {
                                                         <div className="item-date">{item.date}</div>
                                                         <div className="item-name">{item.name}</div>
                                                         <div className="item-price">{item.price}</div>
+                                                    </div>
+                                                    <div className="item-actions">
+                                                        <button
+                                                            className="add-cart-btn"
+                                                            onClick={() => handleAddToCart(item)}
+                                                        >
+                                                            장바구니 담기
+                                                        </button>
+                                                        <button
+                                                            className="delete-btn"
+                                                            onClick={() => handleDeleteItem(mallName, item.id)}
+                                                        >
+                                                            삭제
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            ))}
+                        </>
+                    )}
+
+                    {/* 찜 목록 데이터 */}
+                    {!isLoading && !error && Object.keys(wishlistData).length > 0 && (
+                        <>
+                            {Object.entries(wishlistData).map(([mallName, items]) => (
+                                items.length > 0 && (
+                                    <div key={mallName} className="mall-section">
+                                        <div className="mall-header">
+                                            <h3 className="mall-name">{mallName}</h3>
+                                        </div>
+
+                                        <div className="items-list">
+                                            {items.map(item => (
+                                                <div key={item.id} className="wishlist-item">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="item-image"
+                                                        onError={(e) => {
+                                                            e.target.src = 'https://via.placeholder.com/150';
+                                                        }}
+                                                    />
+                                                    <div className="item-details">
+                                                        <div className="item-date">{item.date}</div>
+                                                        <div className="item-name">{item.name}</div>
                                                     </div>
                                                     <div className="item-actions">
                                                         <button

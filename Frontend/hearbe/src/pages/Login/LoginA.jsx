@@ -20,6 +20,12 @@ const Login = () => {
             const response = await authAPI.login({ username: id, password: password });
 
             if (response.code === 200) {
+                if (response.data && response.data.accessToken) {
+                    localStorage.setItem('accessToken', response.data.accessToken);
+                }
+                if (response.data && response.data.refreshToken) {
+                    localStorage.setItem('refreshToken', response.data.refreshToken);
+                }
                 // 로그인 성공
                 navigate('/A/mall');
             } else {

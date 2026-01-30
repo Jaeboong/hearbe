@@ -189,6 +189,7 @@ huggingface_cache/
 *.zip
 *.tar.gz
 *.rar
+!Backend/MCPDesktop_1.0.0.zip
 
 # virtual machine crash logs
 hs_err_pid*
@@ -244,6 +245,7 @@ jspm_packages/
 
 # Vite
 dist-ssr
+**/.vite/
 
 # Lerna
 lerna-debug.log*
@@ -538,3 +540,20 @@ session.json
 sessions/
 
 nul
+
+# Ignore local AI_next workspace
+AI_next/
+
+
+**/*service-account*.json
+**/*gcp*.json
+**/*google*account*.json
+
+# Ignore all wav by default
+*.wav
+
+# Allow only curated samples
+!AI/services/tts/samples/*.wav
+Backend/src/main/resources/application.properties
+
+google-service-account.json

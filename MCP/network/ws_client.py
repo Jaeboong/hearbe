@@ -26,8 +26,11 @@ logger = logging.getLogger(__name__)
 class MessageType(str, Enum):
     """WebSocket 메시지 타입 (AI 서버 프로토콜과 동일)"""
     # Client → Server
+    AUDIO_CHUNK = "audio_chunk"  # PTT 오디오 청크
     USER_INPUT = "user_input"
     MCP_RESULT = "mcp_result"
+    INTERRUPT = "interrupt"
+    PAGE_UPDATE = "page_update"
     
     # Server → Client
     ASR_RESULT = "asr_result"
@@ -57,18 +60,18 @@ class WSClient:
         
     @property
     def is_connected(self) -> bool:
-        """연결 상태 확인"""
+        """연결 상태 확인
+        
+        Note: websocket.closed 속성은 비동기 환경에서 불안정할 수 있어
+        단순히 websocket 객체 존재 여부만 확인하고, 실제 전송 시 예외 처리로 대응
+        """
         if self._websocket is None:
             return False
-        try:
-            # websockets 14.x+ 호환
-            return not self._websocket.closed
-        except AttributeError:
-            # 이전 버전 호환
-            try:
-                return self._websocket.open
-            except AttributeError:
-                return False
+        if hasattr(self._websocket, "open"):
+            return bool(self._websocket.open)
+        if hasattr(self._websocket, "closed"):
+            return not bool(self._websocket.closed)
+        return True
     
     @property
     def session_id(self) -> str:
@@ -78,6 +81,9 @@ class WSClient:
     def setup_event_handlers(self):
         """이벤트 핸들러 등록"""
         event_bus.subscribe(EventType.MCP_RESULT, self._on_mcp_result)
+        event_bus.subscribe(EventType.AUDIO_READY, self._on_audio_ready)  # PTT 오디오
+        event_bus.subscribe(EventType.HOTKEY_PRESSED, self._on_hotkey_pressed)
+        event_bus.subscribe(EventType.PAGE_URL_UPDATED, self._on_page_url_updated)
         event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
         logger.info("WSClient event handlers registered")
     
@@ -169,8 +175,8 @@ class WSClient:
         Returns:
             전송 성공 여부
         """
-        if not self.is_connected:
-            logger.warning("Not connected to AI server")
+        if self._websocket is None:
+            logger.warning("Not connected to AI server (no websocket)")
             return False
         
         message = {
@@ -184,6 +190,13 @@ class WSClient:
             await self._websocket.send(json.dumps(message))
             logger.debug(f"Sent message: {msg_type}")
             return True
+        except websockets.ConnectionClosed as e:
+            logger.warning(f"WebSocket connection closed during send: {e}")
+            self._websocket = None
+            # 재연결 트리거
+            if self._running and not self._reconnect_task:
+                self._reconnect_task = asyncio.create_task(self._reconnect())
+            return False
         except Exception as e:
             logger.error(f"Failed to send message: {e}")
             return False
@@ -327,6 +340,33 @@ class WSClient:
                 source="network.ws_client"
             )
     
+    async def _on_audio_ready(self, event):
+        """
+        AUDIO_READY 이벤트 핸들러
+        
+        AudioManager에서 발행한 오디오 청크를 AI 서버로 전송
+        """
+        data = event.data
+        if not data:
+            return
+        
+        audio_b64 = data.get("audio", "")
+        seq = data.get("seq", 0)
+        is_final = data.get("is_final", False)
+        
+        status = "FINAL" if is_final else "PARTIAL"
+        logger.debug(f"Sending audio chunk: {status} #{seq}")
+        
+        # AI 서버로 audio_chunk 전송
+        await self.send_message(
+            MessageType.AUDIO_CHUNK,
+            {
+                "audio": audio_b64,
+                "seq": seq,
+                "is_final": is_final
+            }
+        )
+    
     async def _on_mcp_result(self, event):
         """
         MCP_RESULT 이벤트 핸들러
@@ -341,6 +381,9 @@ class WSClient:
         success = data.get("success", False)
         result = data.get("result", {})
         error = data.get("error")
+        page_data = data.get("page_data")
+        tool_name = data.get("tool_name")
+        arguments = data.get("arguments")
         
         logger.info(f"MCP result: request_id={request_id}, success={success}")
         
@@ -351,8 +394,34 @@ class WSClient:
                 "request_id": request_id,
                 "success": success,
                 "result": result,
-                "error": error
+                "error": error,
+                "page_data": page_data,
+                "tool_name": tool_name,
+                "arguments": arguments
             }
+        )
+
+    async def _on_hotkey_pressed(self, event):
+        """Send interrupt to server on barge-in hotkey"""
+        if not self.is_connected:
+            return
+
+        await self.send_message(
+            MessageType.INTERRUPT,
+            {"reason": "hotkey"}
+        )
+
+    async def _on_page_url_updated(self, event):
+        """Send page URL updates to server."""
+        if not self.is_connected:
+            return
+        data = event.data or {}
+        url = data.get("url")
+        if not url:
+            return
+        await self.send_message(
+            MessageType.PAGE_UPDATE,
+            {"url": url}
         )
     
     async def _on_shutdown(self, _event):

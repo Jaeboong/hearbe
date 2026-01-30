@@ -3,10 +3,12 @@
 ## 🚨 CRITICAL RULES - READ FIRST
 
 ### 1. NEVER Read Terminal Output Directly
+
 **❌ WRONG**: Running scripts and reading from terminal (UTF-8 encoding breaks on Windows)
 **✅ CORRECT**: Always use `search_issues.py` which saves to temp markdown file, then read that file
 
 ### 2. Workflow for ALL Read Operations
+
 ```
 1. Run: python search_issues.py [options]
 2. Parse output to get: TEMP_FILE_PATH:/path/to/temp.md
@@ -16,6 +18,7 @@
 ```
 
 ### 3. Always Change Directory First
+
 ```bash
 cd c:\ssafy\공통\Jira
 ```
@@ -27,18 +30,23 @@ cd c:\ssafy\공통\Jira
 ### Before First Use
 
 **1. Check Python Installation**
+
 ```bash
 python --version
 ```
+
 If Python is not installed, **run the following command** to install it automatically:
+
 ```bash
 curl -o python_installer.exe https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
 python_installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
 del python_installer.exe
 ```
+
 **Note**: You may need to ask the user to restart their terminal after installation.
 
 **2. Install Required Package**
+
 ```bash
 pip install jira
 ```
@@ -58,17 +66,20 @@ python search_issues.py [--project PROJECT] [--filter KEYWORD] [--jql JQL_QUERY]
 ```
 
 **Parameters:**
+
 - `--project`: Project key (default: S14P11D108)
 - `--filter`: Keyword to search in summary/description
 - `--jql`: Custom JQL query
 
 **Output Format:**
+
 ```
 TEMP_FILE_PATH:/path/to/temp.md
 ISSUE_COUNT:N
 ```
 
 **Examples:**
+
 ```bash
 # All issues in project
 python search_issues.py --project S14P11D108
@@ -82,6 +93,7 @@ python search_issues.py --jql "assignee = currentUser()"
 ```
 
 **Always:**
+
 1. Run the command
 2. Extract TEMP_FILE_PATH from output
 3. Read that markdown file
@@ -96,6 +108,7 @@ python create_issues.py --project PROJECT --summary "TITLE" --description "DESC"
 ```
 
 **Parameters:**
+
 - `--project`: Project key (required, e.g., S14P11D108)
 - `--summary`: Issue title (required)
 - `--description`: Issue description
@@ -104,6 +117,7 @@ python create_issues.py --project PROJECT --summary "TITLE" --description "DESC"
 - `--points`: Story Points (integer)
 
 **Examples:**
+
 ```bash
 # Create a story with story points
 python create_issues.py --project S14P11D108 --summary "Feat: New Feature" \
@@ -122,6 +136,7 @@ python update_issues.py --key ISSUE_KEY [OPTIONS]
 ```
 
 **Parameters:**
+
 - `--key`: Issue key (required, e.g., S14P11D108-82)
 - `--status`: Change status (e.g., "진행 중", "완료", "해야 할 일")
 - `--assign`: Assign to user (`me` = current user, or username)
@@ -130,6 +145,7 @@ python update_issues.py --key ISSUE_KEY [OPTIONS]
 - `--points`: Set Story Points (integer)
 
 **Examples:**
+
 ```bash
 # Assign to yourself
 python update_issues.py --key S14P11D108-82 --assign me
@@ -150,10 +166,12 @@ python link_epic.py --issue ISSUE_KEY --epic EPIC_KEY
 ```
 
 **Parameters:**
+
 - `--issue`: Story/Task issue key (e.g., S14P11D108-82)
 - `--epic`: Epic issue key (e.g., S14P11D108-80)
 
 **Example:**
+
 ```bash
 python link_epic.py --issue S14P11D108-82 --epic S14P11D108-80
 ```
@@ -163,6 +181,7 @@ python link_epic.py --issue S14P11D108-82 --epic S14P11D108-80
 ## Common Workflows
 
 ### 1. "Show me recent issues"
+
 ```bash
 cd c:\ssafy\공통\Jira
 python search_issues.py --project S14P11D108
@@ -170,6 +189,7 @@ python search_issues.py --project S14P11D108
 ```
 
 ### 2. "Search for WebSocket issues"
+
 ```bash
 cd c:\ssafy\공통\Jira
 python search_issues.py --filter "WebSocket"
@@ -177,6 +197,7 @@ python search_issues.py --filter "WebSocket"
 ```
 
 ### 3. "Create a new Story with 8 story points"
+
 ```bash
 cd c:\ssafy\공통\Jira
 python create_issues.py --project S14P11D108 --summary "Feat: Feature Name" \
@@ -184,6 +205,7 @@ python create_issues.py --project S14P11D108 --summary "Feat: Feature Name" \
 ```
 
 ### 4. "Show my assigned issues"
+
 ```bash
 cd c:\ssafy\공통\Jira
 python search_issues.py --jql "assignee = currentUser()"
@@ -191,12 +213,14 @@ python search_issues.py --jql "assignee = currentUser()"
 ```
 
 ### 5. "Update issue status to Done"
+
 ```bash
 cd c:\ssafy\공통\Jira
 python update_issues.py --key S14P11D108-82 --status "완료"
 ```
 
 ### 6. "Create Epic and link Stories"
+
 ```bash
 cd c:\ssafy\공통\Jira
 
@@ -218,25 +242,27 @@ python link_epic.py --issue S14P11D108-82 --epic S14P11D108-80
 
 ### Common Errors
 
-| Error | Solution |
-|-------|----------|
-| **Authentication failure** | Check `config.py`: JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN |
-| **IP not allowed** | Contact JIRA admin to whitelist IP |
-| **Invalid JQL** | Check JQL syntax (use double quotes for strings) |
-| **UTF-8 encoding error** | You're using `read_issues.py` - switch to `search_issues.py` |
-| **Story Points failed** | `customfield_10016` may differ - check with admin |
-| **Python not found** | Run auto-install command (see Setup section) |
-| **jira module not found** | Run `pip install jira` |
+| Error                      | Solution                                                     |
+| -------------------------- | ------------------------------------------------------------ |
+| **Authentication failure** | Check `config.py`: JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN      |
+| **IP not allowed**         | Contact JIRA admin to whitelist IP                           |
+| **Invalid JQL**            | Check JQL syntax (use double quotes for strings)             |
+| **UTF-8 encoding error**   | You're using `read_issues.py` - switch to `search_issues.py` |
+| **Story Points failed**    | `customfield_10016` may differ - check with admin            |
+| **Python not found**       | Run auto-install command (see Setup section)                 |
+| **jira module not found**  | Run `pip install jira`                                       |
 
 ---
 
 ## Quick Reference
 
 ### Default Settings
+
 - **Project**: S14P11D108
 - **Story Points Field**: customfield_10016
 
 ### Most Common Commands
+
 ```bash
 # Search
 python search_issues.py --project S14P11D108
@@ -256,6 +282,7 @@ python link_epic.py --issue STORY_KEY --epic EPIC_KEY
 ```
 
 ### JQL Quick Examples
+
 ```jql
 project = S14P11D108
 project = S14P11D108 AND issuetype = Epic
@@ -263,6 +290,61 @@ project = S14P11D108 AND status = "해야 할 일"
 assignee = currentUser()
 key in (S14P11D108-80, S14P11D108-81)
 ```
+
+### Smart Commit
+
+Here is the updated section in English, formatted to fit perfectly into your guide with minimal changes.
+
+---
+
+### Smart Commit
+
+**Update Jira issues directly via Git commit messages.**
+
+**Basic Syntax:**
+
+```
+<ISSUE_KEY> #<COMMAND> <OPTIONAL_MESSAGE>
+
+```
+
+| Action            | Command     | Example                                         |
+| ----------------- | ----------- | ----------------------------------------------- |
+| **Add Comment**   | `#comment`  | `S14P11D108-82 #comment Fixed logic error`      |
+| **Change Status** | `#[status]` | `S14P11D108-82 #done #comment Feature complete` |
+
+**Rules:**
+
+- **Transition Names**: Use the status name from Jira. If it has spaces, use hyphens (e.g., `#in-progress`) or just the first word (e.g., `#done`).
+- **Email Match**: Your Git email (`git config user.email`) must match your Jira account email.
+- **One Line**: The command must stay on a single line within the commit message.
+
+---
+
+### Updated Quick Reference (Add to the end)
+
+```bash
+# Git Smart Commit Examples
+git commit -m "S14P11D108-82 #comment Investigating the issue"
+git commit -m "S14P11D108-82 #in-progress"
+git commit -m "S14P11D108-82 #done #comment Finalizing the PR"
+
+```
+
+---
+
+### If You Forgot to Add the Issue Key in Commit Messages
+
+**Recommended (safe after push):**
+
+```bash
+git commit --allow-empty -m "S14P11D108-275 #comment Link to this PR/commit"
+```
+
+**Notes:**
+
+- Avoid rewriting history (rebase) if you already pushed.
+- If needed, update Jira directly (comment/description/status) after the PR.
 
 ---
 

@@ -404,4 +404,4 @@ self.hotkey_manager.start()
 
 - 이벤트 명세: [EVENT_SPECIFICATION.md](EVENT_SPECIFICATION.md)
 - 환경 변수 명세: [ENV_SPECIFICATION.md](ENV_SPECIFICATION.md)
-- 설정 가이드: [SETUP_GUIDE.md](../SETUP_GUIDE.md)
+- 설정 가이드: [MCP_CLIENT_SETUP_GUIDE.md](../MCP_CLIENT_SETUP_GUIDE.md)

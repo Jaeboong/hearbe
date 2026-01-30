@@ -1,66 +1,46 @@
-# Payment 모듈
+# Payment OCR (필요 데이터 / 추출 데이터)
 
-결제 비밀번호 입력 화면의 랜덤 키패드를 OCR로 인식하고, DOM 키와 매핑하는 모듈입니다.
+## 필요한 데이터
 
-## 파일 구조
+1) 결제 키패드 **이미지 파일**
+- 예: `../tests/fixtures/결제.png`
 
-| 파일 | 역할 |
-|------|------|
-| `payment_ocr.py` | OCR 인식 (이미지 → JSON) |
-| `digit_extractor.py` | 숫자 추출 (JSON → 숫자 리스트) |
-| `digit_to_dom_mapper.py` | DOM 키 매핑 (숫자 → DOM 키) |
-| `payment_keypad_cli.py` | 통합 실행 (1+2 한번에) |
+2) **DOM 키 순서 배열** (`dom_keys.json`)
+- 키패드 버튼의 실제 DOM 식별자(예: `data-key`, `id`, `class`)를
+  **화면 표시 순서대로** 0~9 배열로 제공
+- 없으면 기본값 `["0","1","2","3","4","5","6","7","8","9"]` 사용
 
-## 파이프라인
-
-```
-[이미지] → payment_ocr.py → 결제_res.json
-              ↓
-         digit_extractor.py → 결제_res_digits.json
-              ↓
-         digit_to_dom_mapper.py → 결제_res_mapped.json
+예시:
+```json
+["key-0","key-1","key-2","key-3","key-4","key-5","key-6","key-7","key-8","key-9"]
 ```
 
-## 사용법
+---
 
-### 0단계: OCR 인식
-```bash
-cd AI/services/ocr/payment
-python payment_ocr.py
-# 또는
-python payment_ocr.py "../tests/fixtures/결제.png"
-```
+## 추출되는 데이터
 
-### 1단계: 숫자 추출
-```bash
-python digit_extractor.py "output/결제_res.json"
-```
+### 최종 출력 파일
+- `output/<이미지명>_mapped.json`
 
-### 2단계: DOM 매핑
-```bash
-python digit_to_dom_mapper.py "output/결제_res_digits.json"
-```
+### 출력 형식
+- 숫자 → DOM 키 매핑 JSON
 
-### 통합 실행
-```bash
-python payment_keypad_cli.py "output/결제_res.json"
-```
-
-## 출력 예시
-
+예시:
 ```json
 {
-  "extracted_digits": ["2", "6", "8", "0", "9", "7", "3", "5", "4", "1"],
+  "digits": ["2","6","8","0","9","7","3","5","4","1"],
+  "dom_keys": ["key-0","key-1","key-2","key-3","key-4","key-5","key-6","key-7","key-8","key-9"],
   "digit_to_key_mapping": {
-    "2": "0", "6": "1", "8": "2", ...
+    "2": "key-0",
+    "6": "key-1",
+    "8": "key-2",
+    "0": "key-3",
+    "9": "key-4",
+    "7": "key-5",
+    "3": "key-6",
+    "5": "key-7",
+    "4": "key-8",
+    "1": "key-9"
   }
 }
-```
-
-
-## 설정
-
-`payment_ocr.py` 상단에서 이미지 경로 수정:
-```python
-img_path = "../tests/fixtures/결제2.png"
 ```

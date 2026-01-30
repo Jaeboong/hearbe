@@ -1,33 +1,57 @@
-# MCP 데스크탑 앱 의존성
+# MCP Desktop App Dependencies
 
-# 오디오 처리
-pyaudio>=0.2.13          # 오디오 녹음/재생
-pynput>=1.7.6            # 핫키 처리
+# ----------------------------
+# Audio / Hotkeys
+# ----------------------------
+# Prefer sounddevice (PortAudio backend, wheels are usually more available)
+sounddevice>=0.4.6
 
-# 네트워크 통신
-websockets>=12.0         # WebSocket 클라이언트
-aiohttp>=3.9.0           # 비동기 HTTP 클라이언트
+# If you must keep PyAudio, make it optional per-OS and document system deps.
+# pyaudio is painful on linux without portaudio dev headers.
+pyaudio>=0.2.13; platform_system == "Windows"
 
-# 브라우저 자동화
-playwright>=1.40.0       # 브라우저 자동화 (MCP 도구용)
-psutil>=5.9.0            # 프로세스 관리
+keyboard>=0.13.5; platform_system == "Windows"     # Windows only (Linux needs root access / 제한 많음)
+pynput>=1.7.6                                      # Cross-platform (X11/Wayland 환경 따라 제약)
 
-# UI
-pystray>=0.19.0          # 시스템 트레이 아이콘
-Pillow>=10.0.0           # 이미지 처리 (아이콘용)
+# ----------------------------
+# Networking
+# ----------------------------
+websockets>=12.0
+aiohttp>=3.9.0
 
-# 설정 관리
-python-dotenv>=1.0.0     # 환경 변수 로드
+# ----------------------------
+# Browser automation
+# ----------------------------
+playwright>=1.40.0
+psutil>=5.9.0
 
-# 테스트
-pytest>=7.4.0            # 테스트 프레임워크
-pytest-asyncio>=0.21.0   # 비동기 테스트
-pytest-cov>=4.1.0        # 테스트 커버리지
+# ----------------------------
+# UI / Tray
+# ----------------------------
+pystray>=0.19.0
+Pillow>=10.0.0
 
-# 개발 도구
-black>=23.0.0            # 코드 포매터
-flake8>=6.0.0            # 코드 린터
-mypy>=1.5.0              # 타입 체커
+# ----------------------------
+# Config
+# ----------------------------
+python-dotenv>=1.0.0
 
-# 배포
-pyinstaller>=6.0.0       # .exe 패키징
+# ----------------------------
+# Testing
+# ----------------------------
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+
+# ----------------------------
+# Dev tools
+# ----------------------------
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# ----------------------------
+# Packaging
+# ----------------------------
+pyinstaller>=6.0.0; platform_system == "Windows"
+pyinstaller>=6.0.0; platform_system == "Linux"

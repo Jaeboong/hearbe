@@ -19,7 +19,7 @@ class MiniWindow:
         self.status_label: Optional[tk.Label] = None
         self.message_label: Optional[tk.Label] = None
         self.current_status = "대기 중"
-        self.current_message = "Hotkey: V키"
+        self.current_message = "Hotkey: space 스페이스"
         self.exit_callback = None
 
     def create_window(self):

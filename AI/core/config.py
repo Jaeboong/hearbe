@@ -7,6 +7,7 @@
 import os
 import logging
 import logging.handlers
+import time
 from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass
@@ -46,13 +47,11 @@ class LLMConfig:
 
 @dataclass
 class TTSConfig:
-    """TTS (음성 합성) 설정"""
-    provider: str = "elevenlabs"  # elevenlabs, minimax, cartesia, cosyvoice
-    api_key: Optional[str] = None
-    voice_id: str = "korean_female_1"
-    model_id: str = "eleven_flash_v2_5"
+    """TTS (음성 합성) 설정 - Google Cloud TTS"""
     sample_rate: int = 24000
     streaming: bool = True
+    google_credentials_path: Optional[str] = None
+    google_voice_name: str = "ko-KR-Chirp3-HD-Leda"  # Chirp 3 HD 한국어 음성
 
 
 @dataclass
@@ -79,16 +78,22 @@ class ServerConfig:
     ws_path: str = "/ws"
     cors_origins: str = "*"
     debug: bool = False
+    public_base_url: Optional[str] = None
+    public_ws_url: Optional[str] = None
 
 
 @dataclass
 class LogConfig:
     """로깅 설정"""
     level: str = "INFO"
+    console_level: Optional[str] = None
+    file_level: Optional[str] = None
     log_dir: str = "logs"
     log_file: str = "ai_server.log"
-    max_bytes: int = 10 * 1024 * 1024  # 10MB
+    rotate_when: str = "midnight"
+    rotate_interval: int = 1
     backup_count: int = 5
+    rotate_utc: bool = False
 
 
 @dataclass
@@ -146,6 +151,17 @@ class ConfigManager:
         """환경 변수 가져오기"""
         return os.getenv(key, default)
 
+    def _get_env_profile(self, key: str, default: str = "") -> str:
+        """APP_ENV별 기본값을 적용하고, 동일 키가 있으면 override"""
+        app_env = self._get_env("APP_ENV", "dev").strip().lower()
+        profile_key = f"{app_env.upper()}_{key}"
+
+        if os.getenv(key) is not None:
+            return os.getenv(key)
+        if os.getenv(profile_key) is not None:
+            return os.getenv(profile_key)
+        return default
+
     def _get_env_int(self, key: str, default: int) -> int:
         """환경 변수를 정수로 가져오기"""
         try:
@@ -167,6 +183,27 @@ class ConfigManager:
         value = self._get_env(key, str(default)).lower()
         return value in ("true", "1", "yes", "on")
 
+    def _get_env_profile_int(self, key: str, default: int) -> int:
+        """APP_ENV 기본값 + override 적용 (int)"""
+        try:
+            return int(self._get_env_profile(key, str(default)))
+        except ValueError:
+            logger.warning(f"Invalid integer value for {key}, using default: {default}")
+            return default
+
+    def _get_env_profile_float(self, key: str, default: float) -> float:
+        """APP_ENV 기본값 + override 적용 (float)"""
+        try:
+            return float(self._get_env_profile(key, str(default)))
+        except ValueError:
+            logger.warning(f"Invalid float value for {key}, using default: {default}")
+            return default
+
+    def _get_env_profile_bool(self, key: str, default: bool) -> bool:
+        """APP_ENV 기본값 + override 적용 (bool)"""
+        value = self._get_env_profile(key, str(default)).lower()
+        return value in ("true", "1", "yes", "on")
+
     def _create_config(self) -> AppConfig:
         """환경 변수를 기반으로 설정 생성"""
         # ASR 설정
@@ -186,23 +223,23 @@ class ConfigManager:
         )
 
         # LLM 설정
+        llm_key_name = self._get_env("LLM_API_KEY_NAME")
+        llm_api_key = self._get_env(llm_key_name) if llm_key_name else None
         llm = LLMConfig(
             model_name=self._get_env("LLM_MODEL_NAME", "gpt-4o-mini"),
-            api_key=self._get_env("OPENAI_API_KEY") or self._get_env("GMS_KEY") or None,
+            api_key=llm_api_key or self._get_env("OPENAI_API_KEY") or self._get_env("GMS_API_KEY") or None,
             base_url=self._get_env("OPENAI_BASE_URL") or None,
             max_tokens=self._get_env_int("LLM_MAX_TOKENS", 2048),
             temperature=self._get_env_float("LLM_TEMPERATURE", 0.7),
             timeout=self._get_env_int("LLM_TIMEOUT", 30)
         )
 
-        # TTS 설정
+        # TTS 설정 (Google Cloud TTS)
         tts = TTSConfig(
-            provider=self._get_env("TTS_PROVIDER", "elevenlabs"),
-            api_key=self._get_env("TTS_API_KEY") or self._get_env("ELEVENLABS_API_KEY") or None,
-            voice_id=self._get_env("TTS_VOICE_ID", "korean_female_1"),
-            model_id=self._get_env("TTS_MODEL_ID", "eleven_flash_v2_5"),
             sample_rate=self._get_env_int("TTS_SAMPLE_RATE", 24000),
-            streaming=self._get_env_bool("TTS_STREAMING", True)
+            streaming=self._get_env_bool("TTS_STREAMING", True),
+            google_credentials_path=self._get_env("GOOGLE_APPLICATION_CREDENTIALS") or None,
+            google_voice_name=self._get_env("TTS_GOOGLE_VOICE", "ko-KR-Chirp3-HD-Leda")
         )
 
         # OCR 설정
@@ -225,16 +262,22 @@ class ConfigManager:
             port=self._get_env_int("SERVER_PORT", 8000),
             ws_path=self._get_env("WS_PATH", "/ws"),
             cors_origins=self._get_env("CORS_ORIGINS", "*"),
-            debug=self._get_env_bool("DEBUG", False)
+            debug=self._get_env_profile_bool("DEBUG", False),
+            public_base_url=self._get_env("PUBLIC_BASE_URL") or None,
+            public_ws_url=self._get_env("PUBLIC_WS_URL") or None
         )
 
         # Log 설정
         log = LogConfig(
-            level=self._get_env("LOG_LEVEL", "INFO"),
-            log_dir=self._get_env("LOG_DIR", "logs"),
-            log_file=self._get_env("LOG_FILE", "ai_server.log"),
-            max_bytes=self._get_env_int("LOG_MAX_BYTES", 10 * 1024 * 1024),
-            backup_count=self._get_env_int("LOG_BACKUP_COUNT", 5)
+            level=self._get_env_profile("LOG_LEVEL", "INFO"),
+            console_level=self._get_env_profile("LOG_CONSOLE_LEVEL") or None,
+            file_level=self._get_env_profile("LOG_FILE_LEVEL") or None,
+            log_dir=self._get_env_profile("LOG_DIR", "logs"),
+            log_file=self._get_env_profile("LOG_FILE", "ai_server.log"),
+            rotate_when=self._get_env_profile("LOG_ROTATE_WHEN", "midnight"),
+            rotate_interval=self._get_env_profile_int("LOG_ROTATE_INTERVAL", 1),
+            backup_count=self._get_env_profile_int("LOG_BACKUP_COUNT", 5),
+            rotate_utc=self._get_env_profile_bool("LOG_ROTATE_UTC", False)
         )
 
         return AppConfig(
@@ -283,20 +326,50 @@ def setup_logging(config: AppConfig):
         "ERROR": logging.ERROR,
         "CRITICAL": logging.CRITICAL
     }
-    log_level = level_map.get(config.log.level.upper(), logging.INFO)
-
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.handlers.RotatingFileHandler(
-                log_file,
-                maxBytes=config.log.max_bytes,
-                backupCount=config.log.backup_count,
-                encoding="utf-8"
-            ),
-            logging.StreamHandler()
-        ]
+    console_level = level_map.get(
+        (config.log.console_level or config.log.level).upper(),
+        logging.INFO
     )
+    file_level = level_map.get(
+        (config.log.file_level or config.log.level).upper(),
+        logging.INFO
+    )
+    root_level = min(console_level, file_level)
 
-    logger.info(f"Logging configured: level={config.log.level}, file={log_file}")
+    root_logger = logging.getLogger()
+    root_logger.setLevel(root_level)
+    root_logger.handlers.clear()
+
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    if config.log.rotate_utc:
+        formatter.converter = time.gmtime
+
+    file_handler = logging.handlers.TimedRotatingFileHandler(
+        log_file,
+        when=config.log.rotate_when,
+        interval=config.log.rotate_interval,
+        backupCount=config.log.backup_count,
+        utc=config.log.rotate_utc,
+        encoding="utf-8"
+    )
+    file_handler.suffix = "%Y-%m-%d.log"
+    file_handler.setLevel(file_level)
+    file_handler.setFormatter(formatter)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(console_level)
+    console_handler.setFormatter(formatter)
+
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(console_handler)
+
+    logger.info(
+        "Logging configured: level=%s console=%s file=%s file_path=%s rotate=%s/%s backups=%s",
+        config.log.level,
+        config.log.console_level or config.log.level,
+        config.log.file_level or config.log.level,
+        log_file,
+        config.log.rotate_when,
+        config.log.rotate_interval,
+        config.log.backup_count
+    )

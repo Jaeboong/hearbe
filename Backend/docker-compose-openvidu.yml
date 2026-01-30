@@ -1,0 +1,9 @@
+services:
+  openvidu:
+    image: openvidu/openvidu-dev:2.30.0
+    container_name: openvidu-dev
+    ports:
+      - "4443:4443"
+    environment:
+      - OPENVIDU_SECRET=MY_SECRET
+      - OPENVIDU_RECORDING=false

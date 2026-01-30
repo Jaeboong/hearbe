@@ -1,54 +1,58 @@
 package com.ssafy.d108.backend.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Getter
-@NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "welfare_cards")
+@Getter
+@Setter
+@NoArgsConstructor
 public class WelfareCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "welfare_card_id")
-    private Integer welfareCardId;
+    @Column(name = "id")
+    private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(name = "cvc")
+    @Column(name = "card_company", length = 50)
+    private String cardCompany;
+
+    @Column(name = "card_number", length = 255, nullable = false)
+    private String cardNumber;
+
+    @Column(name = "cvc", length = 255)
     private String cvc;
 
-    @Column(name = "owner_name", length = 50)
-    private String ownerName;
-
-    @Column(name = "birth_date", length = 6)
-    private String birthDate;
-
-    @Column(name = "gender", length = 10)
-    private String gender;
-
-    @Column(name = "issue_date")
+    @Column(name = "issue_date", nullable = false)
     private LocalDate issueDate;
 
-    @Column(name = "expiration_date")
-    private LocalDate expirationDate;
+    @Column(name = "expiration_date", length = 5, nullable = false)
+    private String expirationDate; // MM/YY 형식
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }

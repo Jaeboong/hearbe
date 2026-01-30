@@ -30,9 +30,6 @@ public class SharingSessionLog {
     @Column(name = "ended_at")
     private LocalDateTime endedAt;
 
-    @Column(name = "duration_seconds")
-    private Integer durationSeconds = 0;
-
     @Column(name = "meeting_code", length = 10, unique = true)
     private String meetingCode;
 
