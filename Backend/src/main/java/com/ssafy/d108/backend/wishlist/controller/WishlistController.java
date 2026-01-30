@@ -35,12 +35,15 @@ public class WishlistController {
      * 찜 목록 조회 (GET /wishlist)
      * Request Header: Authorization (Bearer token)
      */
-    @GetMapping("/{userId}") // 경로상의 {userId}를
-    public ResponseEntity<WishlistResponseDto> getWishlistItems(
-            @PathVariable("userId") Integer userId) { // 여기서 낚아챕니다.
+    @GetMapping
+    public ResponseEntity<WishlistResponseDto> getWishlistItems() {
 
-        // 이 경우 SecurityUtil을 쓰지 않고 경로에 들어온 userId를 바로 사용하게 됩니다.
+        // 1. 서버 저장소(SecurityContext)에서 로그인한 유저의 ID를 안전하게 꺼냅니다.
+        Integer userId = SecurityUtil.getCurrentUserId();
+
+        // 2. 추출한 ID를 서비스로 넘겨 본인의 목록만 조회합니다.
         WishlistResponseDto response = wishlistService.getWishlistItems(userId);
+
         return ResponseEntity.ok(response);
     }
 
