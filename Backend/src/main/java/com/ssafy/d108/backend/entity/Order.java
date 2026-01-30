@@ -1,47 +1,49 @@
 package com.ssafy.d108.backend.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "orders")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
-    private Integer orderId;
+    @Column(name = "id")
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "total_amount", nullable = false)
-    private Integer totalAmount = 0;
-
-    @Column(name = "pay_status", length = 20, nullable = false)
-    private String payStatus = "PAID";
-
-    @Column(name = "order_detail_url", columnDefinition = "TEXT")
+    @Column(name = "order_detail_url", length = 1000)
     private String orderDetailUrl;
 
-    @Column(name = "product_metadata", columnDefinition = "JSON")
-    private String productMetadata;
+    // 주문 전체 배송 조회를 위한 필드 추가
+    @Column(name = "delivery_url", length = 1000)
+    private String deliveryUrl;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }
