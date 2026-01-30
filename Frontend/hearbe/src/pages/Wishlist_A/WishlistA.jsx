@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackButton from '../common/BackButtonA';
 import { wishlistAPI } from '../../services/wishlistAPI';
@@ -28,7 +28,7 @@ const WishlistA = () => {
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: '장애인 복지카드 변경', path: '/A/card-management' }
+        { id: 'card', label: '결제카드 변경', path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -47,21 +47,24 @@ const WishlistA = () => {
             // 응답 데이터 변환: 플랫폼별로 그룹화
             const groupedData = {};
 
+            // 백엔드 응답 필드명: snake_case
+            // wishlist_item_id, product_name, product_url, platform_name, created_at, img_url, price, liked
             if (response.items && response.items.length > 0) {
                 response.items.forEach(item => {
-                    const platform = platformDisplayNames[item.platformName] || item.platformName;
+                    const platform = platformDisplayNames[item.platform_name] || item.platform_name;
 
                     if (!groupedData[platform]) {
                         groupedData[platform] = [];
                     }
 
                     groupedData[platform].push({
-                        id: item.wishlistItemId,
-                        image: item.imgUrl || 'https://via.placeholder.com/150',
-                        date: item.createdAt ? item.createdAt.split('T')[0].replace(/-/g, '.') : '',
-                        name: item.productName,
-                        url: item.productUrl,
-                        liked: item.liked === 'true'
+                        id: item.wishlist_item_id,
+                        image: item.img_url || 'https://via.placeholder.com/150',
+                        date: item.created_at ? item.created_at.split('T')[0].replace(/-/g, '.') : '',
+                        name: item.product_name,
+                        price: item.price ? `${item.price.toLocaleString()}원` : '',
+                        url: item.product_url,
+                        liked: item.liked
                     });
                 });
             }
@@ -89,6 +92,24 @@ const WishlistA = () => {
             }));
         } catch (err) {
             console.error('Failed to delete wishlist item:', err);
+            alert(err.message || '삭제에 실패했습니다.');
+        }
+    };
+
+    const handleDeleteAll = async (mallName) => {
+        const items = wishlistData[mallName] || [];
+        if (items.length === 0) {
+            return;
+        }
+
+        try {
+            await Promise.all(items.map(item => wishlistAPI.deleteWishlist(item.id)));
+            setWishlistData(prev => ({
+                ...prev,
+                [mallName]: []
+            }));
+        } catch (err) {
+            console.error('Failed to delete wishlist items:', err);
             alert(err.message || '삭제에 실패했습니다.');
         }
     };
@@ -156,7 +177,7 @@ const WishlistA = () => {
                     )}
 
                     {/* 빈 상태 */}
-                    {!isLoading && !error && Object.keys(wishlistData).length === 0 && (
+                    {!isLoading && !error && Object.keys(wishlistData).length === 0 ? (
                         <div className="empty-wishlist">
                             찜한 상품이 없습니다.
                         </div>
@@ -172,7 +193,7 @@ const WishlistA = () => {
                                                 className="delete-all-btn"
                                                 onClick={() => handleDeleteAll(mallName)}
                                             >
-                                                선택 상품 관리/삭제
+                                                전체 삭제
                                             </button>
                                         </div>
 
@@ -182,48 +203,6 @@ const WishlistA = () => {
                                                     <div className="item-checkbox">
                                                         <input type="checkbox" />
                                                     </div>
-                                                    <img src={item.image} alt={item.name} className="item-image" />
-                                                    <div className="item-details">
-                                                        <div className="item-date">{item.date}</div>
-                                                        <div className="item-name">{item.name}</div>
-                                                        <div className="item-price">{item.price}</div>
-                                                    </div>
-                                                    <div className="item-actions">
-                                                        <button
-                                                            className="add-cart-btn"
-                                                            onClick={() => handleAddToCart(item)}
-                                                        >
-                                                            장바구니 담기
-                                                        </button>
-                                                        <button
-                                                            className="delete-btn"
-                                                            onClick={() => handleDeleteItem(mallName, item.id)}
-                                                        >
-                                                            삭제
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )
-                            ))}
-                        </>
-                    )}
-
-                    {/* 찜 목록 데이터 */}
-                    {!isLoading && !error && Object.keys(wishlistData).length > 0 && (
-                        <>
-                            {Object.entries(wishlistData).map(([mallName, items]) => (
-                                items.length > 0 && (
-                                    <div key={mallName} className="mall-section">
-                                        <div className="mall-header">
-                                            <h3 className="mall-name">{mallName}</h3>
-                                        </div>
-
-                                        <div className="items-list">
-                                            {items.map(item => (
-                                                <div key={item.id} className="wishlist-item">
                                                     <img
                                                         src={item.image}
                                                         alt={item.name}
@@ -235,6 +214,7 @@ const WishlistA = () => {
                                                     <div className="item-details">
                                                         <div className="item-date">{item.date}</div>
                                                         <div className="item-name">{item.name}</div>
+                                                        <div className="item-price">{item.price}</div>
                                                     </div>
                                                     <div className="item-actions">
                                                         <button

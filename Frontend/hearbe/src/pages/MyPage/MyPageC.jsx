@@ -6,7 +6,8 @@ import {
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import CartPage from '../Cart/CartC';
-import { mallAPI } from '../../services/mallAPI';
+import { orderAPI } from '../../services/orderAPI';
+import { wishlistAPI } from '../../services/wishlistAPI';
 import './MyPageC.css';
 
 export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
@@ -69,10 +70,9 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await mallAPI.getMyOrders();
+            const response = await orderAPI.getOrders();
 
             // Transform API response to component format
-            const groupedOrders = [];
             if (response.data && response.data.orders) {
                 const ordersByMall = {};
                 response.data.orders.forEach(order => {
@@ -80,54 +80,79 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                     if (!ordersByMall[mallName]) {
                         ordersByMall[mallName] = { mall: mallName, items: [] };
                     }
-                    ordersByMall[mallName].items.push({
-                        id: order.order_id,
-                        name: order.product_name || order.name,
-                        price: `${order.price.toLocaleString()}원`,
-                        quantity: `${order.quantity || 1}개`,
-                        date: new Date(order.created_at).toLocaleDateString('ko-KR'),
-                        icon: '📦'
-                    });
+                    // 새 API는 order 안에 items 배열이 있음
+                    if (order.items && order.items.length > 0) {
+                        order.items.forEach(item => {
+                            ordersByMall[mallName].items.push({
+                                id: `${order.order_id}-${item.name}`,
+                                name: item.name,
+                                price: `${item.price.toLocaleString()}원`,
+                                quantity: `${item.quantity || 1}개`,
+                                date: order.ordered_at || '',
+                                icon: '📦'
+                            });
+                        });
+                    }
                 });
                 setOrders(Object.values(ordersByMall));
             }
         } catch (err) {
             console.error('Failed to fetch orders:', err);
             setError(err.message);
+            // 401 에러 시 로그인 페이지로 이동
+            if (err.message === '로그인이 필요합니다.') {
+                navigate('/C/login');
+            }
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // platformName 매핑 (영문 -> 한글)
+    const platformDisplayNames = {
+        'coupang': '쿠팡',
+        'naver': '네이버',
+        '11st': '11번가',
+        'ssg': 'SSG',
+        'gmarket': 'G마켓'
     };
 
     const fetchWishlist = async () => {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await mallAPI.getWishlist();
+            const response = await wishlistAPI.getWishlist();
 
             // Transform API response to component format
-            const groupedWishlist = [];
-            if (response.data && response.data.items) {
+            // 백엔드 응답 필드명: snake_case (platform_name, wishlist_item_id, product_name, price 등)
+            if (response.items && response.items.length > 0) {
                 const wishlistByMall = {};
-                response.data.items.forEach(item => {
-                    const mallName = platformNames[item.platform_id] || `Platform ${item.platform_id}`;
+                response.items.forEach(item => {
+                    // 백엔드는 platform_name (snake_case)
+                    const mallName = platformDisplayNames[item.platform_name] || item.platform_name;
                     if (!wishlistByMall[mallName]) {
                         wishlistByMall[mallName] = { mall: mallName, count: 0, items: [] };
                     }
                     wishlistByMall[mallName].items.push({
                         id: item.wishlist_item_id,
-                        name: item.name,
-                        price: item.price,
+                        name: item.product_name,
+                        price: item.price || 0,
                         tag: '',
                         icon: '❤️'
                     });
                     wishlistByMall[mallName].count++;
                 });
                 setWishlists(Object.values(wishlistByMall));
+            } else {
+                setWishlists([]);
             }
         } catch (err) {
             console.error('Failed to fetch wishlist:', err);
             setError(err.message);
+            // 401 에러 시 로그인 페이지로 이동
+            if (err.message === '로그인이 필요합니다.') {
+                navigate('/C/login');
+            }
         } finally {
             setIsLoading(false);
         }

@@ -66,7 +66,7 @@ public class Profile {
     @Column(name = "shoe_size")
     private ShoeSize shoeSize;
 
-    @ElementCollection(targetClass = Allergy.class, fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = Allergy.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "profile_allergies", joinColumns = @JoinColumn(name = "profile_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "allergy")

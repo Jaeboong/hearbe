@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackButton from '../common/BackButtonA';
 import { memberAPI } from '../../services/memberAPI';
@@ -40,10 +40,15 @@ const MemberInfoA = () => {
                 setError(null);
                 const response = await memberAPI.getProfile();
 
+                // 백엔드 ProfileResponse 구조:
+                // username: 실제 이름 (user.getName())
+                // phoneNumber: 전화번호
+                // userType: 사용자 유형 (BLIND, LOW_VISION, GENERAL)
                 setUserData({
-                    name: response.data.name || '-',
-                    phone: response.data.phoneNumber || '-',
-                    password: '******'
+                    name: response.data?.username || '-',
+                    phone: formatPhoneNumber(response.data?.phoneNumber) || '-',
+                    password: '******',
+                    userType: response.data?.userType || '-'
                 });
             } catch (err) {
                 console.error('Failed to fetch user profile:', err);
