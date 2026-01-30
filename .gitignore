@@ -244,6 +244,7 @@ jspm_packages/
 
 # Vite
 dist-ssr
+**/.vite/
 
 # Lerna
 lerna-debug.log*
