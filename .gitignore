@@ -189,6 +189,7 @@ huggingface_cache/
 *.zip
 *.tar.gz
 *.rar
+!Backend/MCPDesktop_1.0.0.zip
 
 # virtual machine crash logs
 hs_err_pid*
