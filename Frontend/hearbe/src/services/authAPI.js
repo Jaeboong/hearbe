@@ -20,10 +20,10 @@ export const authAPI = {
 
             // 응답이 비어있거나 204 No Content인 경우
             if (response.status === 204) {
-                return { success: true, message: '회원가입이 완료되었습니다.' };
+                return { success: true, message: '회원가입이 완료되었습니다' };
             }
 
-            // JSON 파싱 전에 응답 텍스트 확인
+            // JSON 파싱 전에 응답 텍스트를 확인
             const text = await response.text();
             console.log('Response text:', text);
 
@@ -69,12 +69,22 @@ export const authAPI = {
     // 로그인 API
     login: async (id, password) => {
         try {
+            if (typeof id !== 'string' || typeof password !== 'string') {
+                throw new Error('로그인 값이 올바르지 않습니다.');
+            }
+            const username = id.trim();
+            const resolvedPassword = password;
+
+            if (!username || !resolvedPassword) {
+                throw new Error('로그인 값이 올바르지 않습니다.');
+            }
+
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username: id, password }),
+                body: JSON.stringify({ username, password: resolvedPassword }),
             });
 
             const text = await response.text();
@@ -93,15 +103,15 @@ export const authAPI = {
                 throw new Error(data.message || '로그인에 실패했습니다.');
             }
 
-            // 토큰 및 사용자 정보 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
+            // 토큰 받아 사용자 정보 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
             if (data.data && data.data.accessToken) {
                 localStorage.setItem('accessToken', data.data.accessToken);
             }
             // user_id 저장
             if (data.data && data.data.id) {
                 localStorage.setItem('user_id', data.data.id);
-                // 가입 시 아이디인 username도 저장 (장바구니 API 등에서 사용)
-                localStorage.setItem('username', id);
+                // 가입할때의 username도 저장(사람구분니 API 호출에서 사용)
+                localStorage.setItem('username', username);
             }
 
             return data;
@@ -117,7 +127,7 @@ export const authAPI = {
             const token = localStorage.getItem('accessToken');
 
             if (!token) {
-                throw new Error('로그인이 필요합니다.');
+                throw new Error('로그인이 필요합니다');
             }
 
             const response = await fetch(`${API_BASE_URL}/auth/mypage`, {
@@ -130,7 +140,7 @@ export const authAPI = {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    throw new Error('로그인이 필요합니다.');
+                    throw new Error('로그인이 필요합니다');
                 }
                 if (response.status === 403) {
                     throw new Error('접근 권한이 없습니다.');

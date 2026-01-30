@@ -20,7 +20,7 @@ export default function LoginC() {
 
         try {
             // LoginRequest DTO requires 'username' and 'password'
-            const response = await authAPI.login({ username: id, password: password });
+            const response = await authAPI.login(id, password);
 
             // Assuming response.data contains tokens or user info
             // API Response format: ApiResponse<LoginResponse> -> data: LoginResponse
