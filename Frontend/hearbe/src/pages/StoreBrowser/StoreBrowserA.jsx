@@ -216,7 +216,7 @@ const StoreBrowser = () => {
                     {/* Menu Bubble */}
                     {isMenuOpen && (
                         <div className="menu-bubble">
-                            <div className="menu-item" onClick={() => navigate('/mypage')}>
+                            <div className="menu-item" onClick={() => navigate('/A/mypage')}>
                                 <img src={iconUser} alt="My Page" className="menu-icon" />
                                 <span className="menu-text">마이페이지</span>
                             </div>

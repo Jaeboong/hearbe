@@ -1,78 +1,18 @@
 import { API_BASE_URL } from '../config';
 
 const getAuthHeader = () => {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('accessToken');
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
 export const mallAPI = {
     // --- 장바구니 (Cart) ---
-    getCart: async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/cart`, {
-                method: 'GET',
-                headers: { ...getAuthHeader() },
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || '장바구니 조회 실패');
-            return data;
-        } catch (error) {
-            console.error('getCart Error:', error);
-            throw error;
-        }
-    },
-
-    addCart: async (item) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/cart`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...getAuthHeader(),
-                },
-                body: JSON.stringify(item),
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || '장바구니 추가 실패');
-            return data;
-        } catch (error) {
-            console.error('addCart Error:', error);
-            throw error;
-        }
-    },
-
-    updateCartQuantity: async (cartItemId, quantity) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/cart/${cartItemId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...getAuthHeader(),
-                },
-                body: JSON.stringify({ quantity }),
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || '장바구니 수정 실패');
-            return data;
-        } catch (error) {
-            console.error('updateCartQuantity Error:', error);
-            throw error;
-        }
-    },
-
-    deleteCartItem: async (cartItemId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/cart/${cartItemId}`, {
-                method: 'DELETE',
-                headers: { ...getAuthHeader() },
-            });
-            if (!response.ok) throw new Error('장바구니 삭제 실패');
-            return true;
-        } catch (error) {
-            console.error('deleteCartItem Error:', error);
-            throw error;
-        }
-    },
+    // DEPRECATED: 장바구니 관련 메서드는 cartAPI.js로 이동되었습니다.
+    // import { cartAPI } from './cartAPI'를 사용하세요.
+    // - cartAPI.getCart()
+    // - cartAPI.addCart(item)
+    // - cartAPI.updateCart(cartItemId, quantity)
+    // - cartAPI.deleteCart(cartItemId)
 
     // --- 찜 (Wishlist) ---
     getWishlist: async () => {
