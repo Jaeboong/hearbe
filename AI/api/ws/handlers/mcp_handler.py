@@ -31,12 +31,23 @@ logger = logging.getLogger(__name__)
 class MCPHandler:
     """Handles MCP execution results and summary pipeline."""
 
-    def __init__(self, sender, session_manager, action_feedback, failure_notifier=None, login_guard=None):
+    def __init__(
+        self,
+        sender,
+        session_manager,
+        action_feedback,
+        failure_notifier=None,
+        login_guard=None,
+        login_feedback=None,
+        dom_fallback=None,
+    ):
         self._sender = sender
         self._session = session_manager
         self._action_feedback = action_feedback
         self._failure_notifier = failure_notifier
         self._login_guard = login_guard
+        self._login_feedback = login_feedback
+        self._dom_fallback = dom_fallback
         self._file_manager = TempFileManager()  # Manages temporary JSON files
 
     async def handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
@@ -83,6 +94,15 @@ class MCPHandler:
             session_id=session_id
         )
 
+        if tool_name == "get_dom_snapshot" and self._dom_fallback:
+            handled = await self._dom_fallback.handle_dom_snapshot(
+                session_id=session_id,
+                result=result if isinstance(result, dict) else {},
+                current_url=page_url or (session.current_url if session else ""),
+            )
+            if handled:
+                return
+
         handled = await self._action_feedback.handle_mcp_result(
             session_id=session_id,
             tool_name=tool_name,
@@ -91,6 +111,17 @@ class MCPHandler:
             result=result
         )
         if self._failure_notifier:
+            if self._dom_fallback:
+                triggered = await self._dom_fallback.maybe_trigger(
+                    session_id=session_id,
+                    tool_name=tool_name,
+                    arguments=arguments,
+                    error=error,
+                    current_url=page_url or (session.current_url if session else ""),
+                    success=success,
+                )
+                if triggered:
+                    return
             await self._failure_notifier.handle_mcp_result(
                 session_id=session_id,
                 tool_name=tool_name,
@@ -115,10 +146,17 @@ class MCPHandler:
                     self._session.set_context(session_id, "cart_items", cart_items)
                     self._session.set_context(session_id, "cart_summary", cart_summary)
                     self._save_cart_to_file(cart_items, cart_summary, session_id)
+            previous_url = session.current_url
             if page_url:
-                if session.current_url and session.current_url != page_url:
-                    self._session.set_context(session_id, "previous_url", session.current_url)
+                if previous_url and previous_url != page_url:
+                    self._session.set_context(session_id, "previous_url", previous_url)
                 session.current_url = page_url
+                if self._login_feedback:
+                    await self._login_feedback.maybe_announce_login_success(
+                        session_id,
+                        previous_url,
+                        page_url
+                    )
             if cart_items is not None:
                 tts_text = build_cart_read_tts(cart_items, cart_summary or {})
                 await self._sender.send_tts_response(session_id, tts_text)
@@ -162,7 +200,7 @@ class MCPHandler:
                     if name:
                         self._session.set_context(session_id, "last_mentioned_product", name)
                 if has_more:
-                    tts_text += " 더 읽어드릴까요? 'n개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
+                    tts_text += " 더 읽어드릴까요? '몇 개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
                 await self._sender.send_tts_response(session_id, tts_text)
 
         if tool_name == "check_login_status" and self._login_guard:
@@ -172,6 +210,15 @@ class MCPHandler:
                 page_url or (session.current_url if session else "")
             )
             if handled:
+                return
+
+        if tool_name == "handle_captcha_modal":
+            if isinstance(result, dict) and result.get("captcha_found"):
+                await self._sender.send_tts_response(
+                    session_id,
+                    "보안 캡차 인증이 떴습니다. 음성으로 듣기 버튼을 눌렀어요. "
+                    "들리는 보안문자를 입력해 주세요."
+                )
                 return
 
         if SUMMARIZER_AVAILABLE and html_content:
