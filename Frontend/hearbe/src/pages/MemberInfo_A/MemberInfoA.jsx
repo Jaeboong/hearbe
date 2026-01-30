@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackButton from '../common/BackButtonA';
-import { authAPI } from '../../services/authAPI';
+import { memberAPI } from '../../services/memberAPI';
 import './MemberInfoA.css';
 
 const MemberInfoA = () => {
@@ -38,11 +38,11 @@ const MemberInfoA = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await authAPI.getUserProfile();
+                const response = await memberAPI.getProfile();
 
                 setUserData({
-                    name: response.user.username || '-',
-                    phone: formatPhoneNumber(response.user.phone_number),
+                    name: response.data.name || '-',
+                    phone: response.data.phoneNumber || '-',
                     password: '******'
                 });
             } catch (err) {
@@ -50,9 +50,8 @@ const MemberInfoA = () => {
                 setError(err.message);
 
                 // Redirect to login on 401
-                if (err.message.includes('401')) {
-                    alert('로그인이 필요합니다.');
-                    navigate('/login');
+                if (err.message === '로그인이 필요합니다.') {
+                    navigate('/A/login');
                 }
             } finally {
                 setLoading(false);
