@@ -4,10 +4,8 @@ LLM 기반 명령 생성기
 규칙 기반 매칭 실패 시 OpenAI API를 사용하여 명령을 생성합니다.
 """
 
-import json
 import logging
 import os
-import asyncio
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
@@ -25,31 +23,13 @@ except ImportError:
 from ..context.context_builder import ContextBuilder, get_page_context, PageContext
 from ..context.context_rules import GeneratedCommand
 from ..sites.site_manager import get_site_manager
-from .llm_logging import log_llm_request, log_llm_response, truncate
+from .llm_client import LLMClient, resolve_llm_api_key
+from .llm_command_normalizer import LLMCommandNormalizer
+from .llm_response_parser import LLMResponseParser
+from .history_store import HistoryStore
 
 logger = logging.getLogger(__name__)
 
-
-def resolve_llm_api_key(explicit_key: Optional[str] = None) -> Optional[str]:
-    """
-    Resolve LLM API key based on environment configuration.
-
-    Order:
-    1) explicit_key (if provided)
-    2) LLM_API_KEY_NAME -> env value
-    3) GMS_API_KEY, GMS_KEY, OPENAI_API_KEY
-    """
-    if explicit_key:
-        return explicit_key
-    key_name = os.environ.get("LLM_API_KEY_NAME")
-    if key_name:
-        key_value = os.environ.get(key_name)
-        if key_value:
-            return key_value
-    return (
-        os.environ.get("GMS_API_KEY")
-        or os.environ.get("OPENAI_API_KEY")
-    )
 
 
 @dataclass
@@ -78,25 +58,15 @@ class LLMGenerator:
         except ValueError:
             self.max_tokens = 1000
         self.context_builder = ContextBuilder()
-        self._client = None
-        
-        # 로컬 대화 기록 (테스트용)
-        self._local_history: List[Dict[str, str]] = []
-    
-    @property
-    def client(self):
-        """OpenAI 클라이언트 lazy 로딩 (GMS 프록시 사용)"""
-        if self._client is None:
-            try:
-                from openai import OpenAI
-                self._client = OpenAI(
-                    api_key=self.api_key,
-                    base_url=self.base_url
-                )
-            except ImportError:
-                logger.error("openai 패키지가 설치되지 않았습니다: pip install openai")
-                raise
-        return self._client
+        self._client = LLMClient(
+            api_key=self.api_key,
+            base_url=self.base_url,
+            model=self.model,
+            max_tokens=self.max_tokens,
+        )
+        self._normalizer = LLMCommandNormalizer()
+        self._parser = LLMResponseParser(self._normalizer)
+        self._history_store = HistoryStore(max_items=10)
     
     async def generate(
         self,
@@ -121,7 +91,7 @@ class LLMGenerator:
             LLMResult: 생성된 명령 및 응답
         """
         # 대화 기록: 외부에서 전달받거나 로컬 기록 사용
-        history = conversation_history if conversation_history is not None else self._local_history
+        history = conversation_history if conversation_history is not None else self._history_store.get()
         
         # 페이지 컨텍스트 생성
         site = get_site_manager().get_site_by_url(current_url)
@@ -141,49 +111,19 @@ class LLMGenerator:
             page_context=page_context,
             session_context=session_context,
         )
-        logger.info(
-            "LLM request: model=%s, text_len=%d, url=%s",
-            self.model,
-            len(user_text),
-            current_url or "(empty)"
-        )
-        token_param = "max_completion_tokens"
-        log_llm_request(
-            logger,
-            model=self.model,
-            base_url=self.base_url,
-            messages=messages,
-            max_tokens=self.max_tokens,
-            response_format={"type": "json_object"},
-            token_param=token_param,
-        )
-        
         try:
-            # OpenAI API 호출 (blocking -> thread), empty 응답 시 최대 2회 재시도
-            content = None
-            last_error = None
-            for attempt in range(3):
-                response = await asyncio.to_thread(
-                    self.client.chat.completions.create,
-                    model=self.model,
-                    messages=messages,
-                    response_format={"type": "json_object"},
-                    max_completion_tokens=self.max_tokens,
-                )
-                content = response.choices[0].message.content
-                logger.info("LLM response received: chars=%d", len(content or ""))
-                log_llm_response(logger, response, content)
-                if content:
-                    break
-                last_error = "empty_response"
-                if attempt < 2:
-                    logger.warning("Empty LLM response received, retrying (%d/2)", attempt + 1)
-
-            if not content:
-                raise ValueError(last_error or "empty_response")
-
-            # 응답 파싱
-            result = self._parse_response(content)
+            content = await self._client.request(
+                messages=messages,
+                current_url=current_url,
+                text_len=len(user_text),
+            )
+            parsed = self._parser.parse(content, current_url)
+            result = LLMResult(
+                commands=parsed.commands,
+                response_text=parsed.response_text,
+                success=parsed.success,
+                error=parsed.error,
+            )
             logger.info(
                 "LLM parsed: success=%s, commands=%d, response_text_len=%d",
                 result.success,
@@ -193,11 +133,8 @@ class LLMGenerator:
             
             # 로컬 기록 모드면 대화 추가
             if conversation_history is None:
-                self._local_history.append({"role": "user", "content": user_text})
-                self._local_history.append({"role": "assistant", "content": result.response_text})
-                # 최근 10개만 유지
-                if len(self._local_history) > 10:
-                    self._local_history = self._local_history[-10:]
+                self._history_store.add_user(user_text)
+                self._history_store.add_assistant(result.response_text)
             
             return result
             
@@ -209,149 +146,52 @@ class LLMGenerator:
                 success=False,
                 error=str(e)
             )
-    
-    def _parse_response(self, content: str) -> LLMResult:
-        """LLM 응답 JSON 파싱"""
+
+    async def generate_with_messages(
+        self,
+        messages: List[Dict[str, str]],
+        current_url: str = "",
+    ) -> LLMResult:
+        """Generate commands with pre-built messages."""
         try:
-            data = json.loads(content)
-            
-            response_text = data.get("response", "")
-            if isinstance(response_text, str):
-                response_text = response_text.strip()
-            else:
-                response_text = str(response_text)
-            commands_data = data.get("commands")
-            if commands_data is None:
-                commands_data = data.get("tool_calls")
-                if commands_data is None:
-                    commands_data = data.get("actions")
-            if commands_data is None:
-                logger.warning(
-                    "LLM response missing commands/tool_calls. keys=%s content=%s",
-                    list(data.keys()),
-                    truncate(content)
-                )
-                commands_data = []
-
-            if not response_text or len(response_text) < 5:
-                details = data.get("details")
-                if isinstance(details, dict) and details:
-                    response_text = self._format_details(details)
-
-            commands = []
-            for cmd in commands_data:
-                action = (
-                    cmd.get("tool_name")
-                    or cmd.get("action")
-                    or cmd.get("tool")
-                    or ""
-                )
-                args = cmd.get("arguments") or cmd.get("args") or {}
-                desc = cmd.get("description") or cmd.get("desc") or ""
-                
-                # 유효한 명령인지 검증
-                if self._validate_command(action, args):
-                    commands.append(GeneratedCommand(
-                        tool_name=action,
-                        arguments=args,
-                        description=desc
-                    ))
-                else:
-                    logger.warning(f"유효하지 않은 명령 무시: {cmd}")
-            
-            result = LLMResult(
-                commands=commands,
-                response_text=response_text,
-                success=True
+            content = await self._client.request(
+                messages=messages,
+                current_url=current_url,
+                label="custom messages",
             )
-            if not commands:
-                logger.warning(
-                "LLM produced no commands. response_text=%s content=%s",
-                truncate(response_text),
-                truncate(content)
+            parsed = self._parser.parse(content, current_url)
+            result = LLMResult(
+                commands=parsed.commands,
+                response_text=parsed.response_text,
+                success=parsed.success,
+                error=parsed.error,
+            )
+            logger.info(
+                "LLM parsed: success=%s, commands=%d, response_text_len=%d",
+                result.success,
+                len(result.commands),
+                len(result.response_text or "")
             )
             return result
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON 파싱 실패: {e}, content: {content[:200]}")
+
+        except Exception as e:
+            logger.error(f"LLM 호출 실패: {e}")
             return LLMResult(
                 commands=[],
-                response_text="응답을 처리할 수 없습니다.",
+                response_text="죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.",
                 success=False,
-                error=f"JSON 파싱 실패: {e}"
+                error=str(e)
             )
     
-    def _format_details(self, details: Dict[str, Any]) -> str:
-        lines = ["???? ?? ?????."]
-        for key, value in details.items():
-            if isinstance(value, dict):
-                lines.append(f"- {key}:")
-                for sub_key, sub_value in value.items():
-                    lines.append(f"  - {sub_key}: {sub_value}")
-            else:
-                lines.append(f"- {key}: {value}")
-        return "\n".join(lines)
-
-    def _validate_command(self, action: str, args: Dict[str, Any]) -> bool:
-        """명령 유효성 검증"""
-        valid_actions = [
-            "goto",
-            "click",
-            "fill",
-            "press",
-            "wait",
-            "click_text",
-            "scroll",
-            "extract",
-            "extract_cart",
-            "extract_detail",
-            "get_visible_buttons",
-            "get_text",
-            "get_pages",
-            "navigate_to_url",
-            "click_element",
-            "fill_input",
-            "press_key",
-            "take_screenshot",
-            "wait_for_new_page",
-        ]
-        
-        if action not in valid_actions:
-            return False
-        
-        # 필수 인자 검증
-        if action == "goto" and "url" not in args:
-            return False
-        if action == "click" and "selector" not in args:
-            return False
-        if action == "fill" and ("selector" not in args or "text" not in args):
-            return False
-        if action == "click_text" and "text" not in args:
-            return False
-        if action == "extract" and "selector" not in args:
-            return False
-        if action == "extract_detail":
-            return True
-        if action == "get_text" and "selector" not in args:
-            return False
-        if action == "click_element" and "selector" not in args:
-            return False
-        if action == "fill_input" and ("selector" not in args or "value" not in args):
-            return False
-        if action == "press_key" and "selector" not in args:
-            return False
-
-        return True
-
     # use helpers in llm_logging.py for truncation/logging
     
     def clear_history(self):
         """로컬 대화 기록 초기화"""
-        self._local_history = []
+        self._history_store.clear()
     
     def get_history(self) -> List[Dict[str, str]]:
         """현재 대화 기록 반환"""
-        return self._local_history.copy()
+        return self._history_store.get()
 
 
 # 편의 함수

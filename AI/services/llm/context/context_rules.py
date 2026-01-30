@@ -62,6 +62,20 @@ def build_wait_command(ms: int = 1000, description: str = "") -> GeneratedComman
     )
 
 
+def build_wait_for_selector_command(
+    selector: str,
+    state: str = "visible",
+    timeout: int = 5000,
+    description: str = "",
+) -> GeneratedCommand:
+    """선택자가 특정 상태가 될 때까지 대기"""
+    return GeneratedCommand(
+        tool_name="wait_for_selector",
+        arguments={"selector": selector, "state": state, "timeout": timeout},
+        description=description or f"{selector}({state}) 대기",
+    )
+
+
 def build_click_command(selector: str, description: str = "") -> GeneratedCommand:
     """클릭 명령 생성"""
     return GeneratedCommand(
