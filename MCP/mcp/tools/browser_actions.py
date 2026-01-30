@@ -4,6 +4,7 @@
 요소 클릭, 입력, 키 입력 등 브라우저 조작 기능
 """
 
+import asyncio
 import logging
 from typing import Any, Dict, Optional
 
@@ -157,17 +158,99 @@ class BrowserActionsMixin:
         Args:
             text: 찾을 텍스트
         Returns:
-            {"success": bool, "result": str}
+            {"success": bool, "result": str, "previous_url": str, "current_url": str, "url_changed": bool}
         """
         page = await self._get_active_page()
         if not page:
             return {"success": False, "error": "Not connected to browser"}
 
+        previous_url = page.url
         try:
-            return await click_text_util(page, text)
+            result = await click_text_util(page, text)
+
+            # 클릭 후 잠시 대기하여 URL 변경 감지
+            await asyncio.sleep(0.1)
+
+            current_url = page.url
+            url_changed = previous_url != current_url
+
+            logger.info(f"Clicked text '{text}', URL changed: {url_changed} ({previous_url} -> {current_url})")
+
+            # 기존 결과에 URL 정보 추가
+            if isinstance(result, dict):
+                result["previous_url"] = previous_url
+                result["current_url"] = current_url
+                result["url_changed"] = url_changed
+                return result
+            else:
+                return {
+                    "success": True,
+                    "result": str(result),
+                    "previous_url": previous_url,
+                    "current_url": current_url,
+                    "url_changed": url_changed,
+                }
         except Exception as e:
+            current_url = page.url if page else ""
             logger.error(f"Click text failed: {e}")
-            return {"success": False, "error": str(e)}
+            return {
+                "success": False,
+                "error": str(e),
+                "previous_url": previous_url,
+                "current_url": current_url,
+                "url_changed": previous_url != current_url,
+            }
+
+    async def wait_for_selector(
+        self,
+        selector: str,
+        state: str = "visible",
+        timeout: int = 5000,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Wait for a selector to reach a given state.
+
+        Args:
+            selector: CSS selector
+            state: "attached", "detached", "visible", or "hidden"
+            timeout: wait timeout (ms)
+            frame_selector: iframe CSS selector (optional)
+            frame_name: iframe name attribute (optional)
+            frame_url: iframe URL match (optional)
+            frame_index: iframe index (optional)
+
+        Returns:
+            {"success": bool, "element_found": bool}
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "element_found": False, "error": "Not connected to browser"}
+
+        try:
+            context_type, context, error = resolve_frame_context(
+                page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "element_found": False, "error": error}
+
+            if context_type == "frame_locator":
+                locator = context.locator(selector)
+                await locator.wait_for(state=state, timeout=timeout)
+            else:
+                await context.wait_for_selector(selector, state=state, timeout=timeout)
+
+            return {"success": True, "element_found": True}
+        except Exception as e:
+            logger.error(f"Wait for selector failed: {e}")
+            return {"success": False, "element_found": False, "error": str(e)}
 
     async def _click_with_frame(
         self,
@@ -183,7 +266,9 @@ class BrowserActionsMixin:
         if not page:
             return {"success": False, "error": "Not connected to browser"}
 
+        previous_url = page.url
         try:
+
             context_type, context, error = resolve_frame_context(
                 page,
                 frame_selector=frame_selector,
@@ -202,9 +287,29 @@ class BrowserActionsMixin:
                 await context.wait_for_selector(selector, timeout=wait_timeout)
                 await context.click(selector)
 
-            logger.info(f"Clicked element: {selector}")
-            return {"success": True, "element_found": True}
+            # 클릭 후 잠시 대기하여 URL 변경 감지
+            await asyncio.sleep(0.1)
+
+            current_url = page.url
+            url_changed = previous_url != current_url
+
+            logger.info(f"Clicked element: {selector}, URL changed: {url_changed} ({previous_url} -> {current_url})")
+            return {
+                "success": True,
+                "element_found": True,
+                "previous_url": previous_url,
+                "current_url": current_url,
+                "url_changed": url_changed,
+            }
 
         except Exception as e:
+            current_url = page.url if page else ""
             logger.error(f"Click failed: {e}")
-            return {"success": False, "element_found": False, "error": str(e)}
+            return {
+                "success": False,
+                "element_found": False,
+                "error": str(e),
+                "previous_url": previous_url,
+                "current_url": current_url,
+                "url_changed": previous_url != current_url,
+            }

@@ -20,6 +20,7 @@ class BrowserTabsMixin:
         if not page:
             return {"success": False, "error": "Not connected to browser"}
 
+        previous_url = page.url
         context = page.context
         before_pages = [p for p in context.pages if not p.is_closed()]
         before_set = set(before_pages)
@@ -38,7 +39,13 @@ class BrowserTabsMixin:
                     break
 
         if not new_page:
-            return {"success": True, "new_page": False}
+            return {
+                "success": True,
+                "new_page": False,
+                "previous_url": previous_url,
+                "current_url": page.url,
+                "url_changed": False,
+            }
 
         if focus:
             try:
@@ -51,8 +58,15 @@ class BrowserTabsMixin:
         except Exception:
             pass
 
-        logger.info("Detected new page and focused")
-        return {"success": True, "new_page": True, "page_url": new_page.url}
+        current_url = new_page.url
+        logger.info(f"Detected new page and focused: {previous_url} -> {current_url}")
+        return {
+            "success": True,
+            "new_page": True,
+            "previous_url": previous_url,
+            "current_url": current_url,
+            "url_changed": previous_url != current_url,
+        }
 
     async def get_pages(self) -> Dict[str, Any]:
         """

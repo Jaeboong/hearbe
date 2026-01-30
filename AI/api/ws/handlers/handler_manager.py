@@ -6,13 +6,15 @@ Handler manager: orchestrates WS handlers and session lifecycle.
 import base64
 import logging
 
-from services.llm.sites.site_manager import get_current_site
+from services.llm.sites.site_manager import get_current_site, get_page_type
 
 from .audio_handler import AudioHandler
 from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
+from .dom_fallback import DomFallbackManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
+from ..feedback.login_feedback import LoginFeedbackManager
 from ..feedback.tool_failure_notifier import ToolFailureNotifier
 
 logger = logging.getLogger(__name__)
@@ -37,6 +39,14 @@ class HandlerManager:
         self._action_feedback = ActionFeedbackManager(sender)
         self._failure_notifier = ToolFailureNotifier(sender)
         self._login_guard = LoginGuard(session_manager, sender, self._action_feedback)
+        self._login_feedback = LoginFeedbackManager(session_manager, sender)
+        self._dom_fallback = DomFallbackManager(
+            sender=sender,
+            session_manager=session_manager,
+            action_feedback=self._action_feedback,
+            login_guard=self._login_guard,
+            login_feedback=self._login_feedback,
+        )
 
         self._text_handler = TextHandler(
             nlu_service=nlu_service,
@@ -45,7 +55,8 @@ class HandlerManager:
             session_manager=session_manager,
             sender=sender,
             action_feedback=self._action_feedback,
-            login_guard=self._login_guard
+            login_guard=self._login_guard,
+            login_feedback=self._login_feedback
         )
         self._audio_handler = AudioHandler(
             asr_service=asr_service,
@@ -57,7 +68,9 @@ class HandlerManager:
             session_manager=session_manager,
             action_feedback=self._action_feedback,
             failure_notifier=self._failure_notifier,
-            login_guard=self._login_guard
+            login_guard=self._login_guard,
+            login_feedback=self._login_feedback,
+            dom_fallback=self._dom_fallback
         )
 
     async def create_session(self, session_id: str):
@@ -69,6 +82,8 @@ class HandlerManager:
         await self._text_handler.cleanup_session(session_id)
         self._action_feedback.clear_pending(session_id)
         self._login_guard.clear_pending(session_id)
+        self._login_feedback.clear_pending(session_id)
+        self._dom_fallback.clear_pending(session_id)
         self._mcp_handler.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
@@ -91,11 +106,15 @@ class HandlerManager:
         await self._text_handler.handle_cancel(session_id)
         self._action_feedback.clear_pending(session_id)
         self._login_guard.clear_pending(session_id)
+        self._login_feedback.clear_pending(session_id)
+        self._dom_fallback.clear_pending(session_id)
 
     async def handle_interrupt(self, session_id: str):
         await self._audio_handler.clear_audio(session_id)
         await self._text_handler.interrupt(session_id)
         self._action_feedback.clear_pending(session_id)
+        self._login_feedback.clear_pending(session_id)
+        self._dom_fallback.clear_pending(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
 
@@ -109,12 +128,29 @@ class HandlerManager:
         session = self._session.get_session(session_id) if self._session else None
         if not session:
             return
-        if session.current_url and session.current_url != url:
-            self._session.set_context(session_id, "previous_url", session.current_url)
+        previous_url = session.current_url
+        if previous_url and previous_url != url:
+            self._session.set_context(session_id, "previous_url", previous_url)
         session.current_url = url
         site = get_current_site(url)
         if site:
             session.current_site = site.name
+
+        # One-time login page guidance after redirect
+        if not previous_url or previous_url == url:
+            return
+        if get_page_type(url) != "login":
+            return
+        if get_page_type(previous_url) == "login":
+            return
+        if not self._session or self._session.get_context(session_id, "login_guidance_shown", False):
+            return
+        if self._sender:
+            await self._sender.send_tts_response(
+                session_id,
+                "로그인 페이지입니다. 이메일+비밀번호 또는 휴대폰 번호 중 어떤 방식으로 진행할까요?"
+            )
+        self._session.set_context(session_id, "login_guidance_shown", True)
 
     async def handle_invalid_message(self, session_id: str, error: str):
         await self._sender.send_error(session_id, error)

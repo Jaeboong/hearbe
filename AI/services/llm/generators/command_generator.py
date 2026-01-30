@@ -17,7 +17,6 @@ from ..rules.select import SearchSelectRule
 from ..rules.search import SearchRule
 from ..rules.cart import CartRule
 from ..rules.checkout import CheckoutRule
-from ..rules.login import LoginRule
 from ..rules.generic import GenericClickRule
 
 logger = logging.getLogger(__name__)
@@ -51,7 +50,6 @@ class CommandGenerator:
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
             CartRule(self.site_manager),
-            LoginRule(self.site_manager),
             CheckoutRule(self.site_manager),
             GenericClickRule(self.site_manager),
         ]

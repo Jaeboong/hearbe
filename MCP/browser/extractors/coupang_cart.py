@@ -19,7 +19,18 @@ async def extract_coupang_cart(page) -> Dict[str, Any]:
         return '';
       };
       const pickPriceFrom = (root) => {
-        const priceEl = root.querySelector('[data-id="sale-price-ccid"], .price, .twc-text-[20px]');
+        // Avoid invalid selector errors for utility class names like twc-text-[20px]
+        const selectors = [
+          '[data-id="sale-price-ccid"]',
+          '.price',
+          '[class~="twc-text-[20px]"]',
+          '[class*="twc-text-[20px]"]',
+        ];
+        let priceEl = null;
+        for (const sel of selectors) {
+          priceEl = root.querySelector(sel);
+          if (priceEl) break;
+        }
         if (!priceEl) return '';
         return parsePrice(getText(priceEl));
       };
@@ -43,13 +54,14 @@ async def extract_coupang_cart(page) -> Dict[str, Any]:
       }
       for (const item of bundles) {
         const checkbox = item.querySelector('input[type="checkbox"]');
-        if (!checkbox) continue;
 
         const nameEl = item.querySelector('a span.twc-text-custom-black')
           || item.querySelector('#name span.twc-text-custom-black')
-          || item.querySelector('#name span');
+          || item.querySelector('#name span')
+          || item.querySelector('span.twc-text-custom-black')
+          || item.querySelector('a span');
         let name = getText(nameEl);
-        if (!name) {
+        if (!name && checkbox) {
           name = (checkbox.getAttribute('title') || '').trim();
         }
 

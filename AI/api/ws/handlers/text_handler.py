@@ -7,14 +7,32 @@ Coordinates text processing pipeline and delegates to specialized handlers.
 
 import asyncio
 import logging
+import sys
+from pathlib import Path
 from typing import Dict, Any
 
-from core.interfaces import ASRResult
+from core.interfaces import ASRResult, MCPCommand
 from .search_query_handler import SearchQueryHandler
+from .command_pipeline import CommandPipeline
 
 logger = logging.getLogger(__name__)
 
 MAX_TEXT_QUEUE_SIZE = 20  # Max pending text messages per session
+
+
+def _try_load_ai_next_router():
+    """Best-effort AI_next router loader (no hard dependency)."""
+    try:
+        repo_root = Path(__file__).resolve().parents[4]
+        ai_next_root = repo_root / "AI_next"
+        if not ai_next_root.exists():
+            return None
+        if str(repo_root) not in sys.path:
+            sys.path.insert(0, str(repo_root))
+        from AI_next.core.decision.router import RuleRouter  # type: ignore
+        return RuleRouter()
+    except Exception:
+        return None
 
 
 class TextHandler:
@@ -27,7 +45,17 @@ class TextHandler:
     - Coordinating NLU/LLM pipeline
     """
 
-    def __init__(self, nlu_service, llm_planner, flow_engine, session_manager, sender, action_feedback, login_guard=None):
+    def __init__(
+        self,
+        nlu_service,
+        llm_planner,
+        flow_engine,
+        session_manager,
+        sender,
+        action_feedback,
+        login_guard=None,
+        login_feedback=None,
+    ):
         self._nlu = nlu_service
         self._llm = llm_planner
         self._flow = flow_engine
@@ -35,6 +63,14 @@ class TextHandler:
         self._sender = sender
         self._action_feedback = action_feedback
         self._login_guard = login_guard
+        self._login_feedback = login_feedback
+        self._ai_next_router = _try_load_ai_next_router()
+        self._command_pipeline = CommandPipeline(
+            sender=sender,
+            action_feedback=action_feedback,
+            login_guard=login_guard,
+            login_feedback=login_feedback,
+        )
 
         # Specialized handlers
         self._search_query_handler = SearchQueryHandler(session_manager, sender)
@@ -173,6 +209,11 @@ class TextHandler:
             if self._is_interrupted(session_id, epoch):
                 return
 
+            # AI_next router (before LLM)
+            handled = await self._handle_ai_next_rules(session_id, text, session, epoch)
+            if handled:
+                return
+
             # NLU/LLM pipeline (default)
             await self._handle_llm_pipeline(session_id, text, session, epoch)
 
@@ -220,51 +261,58 @@ class TextHandler:
                 return
             await self._sender.send_flow_step(session_id, step)
         else:
-            if response.commands:
-                if self._is_interrupted(session_id, epoch):
-                    return
-                guard_commands = None
-                if self._login_guard:
-                    guard_commands = self._login_guard.prepare_guard(
-                        session_id,
-                        response.commands,
-                        response.text,
-                        session.current_url or ""
-                    )
-                if guard_commands:
-                    await self._sender.send_tool_calls(session_id, guard_commands)
-                    return
-                await self._sender.send_tool_calls(session_id, response.commands)
-            else:
+            commands = self._command_pipeline.prepare_commands(
+                session_id,
+                response.commands,
+                session.current_url or ""
+            )
+            if not commands:
                 logger.info(
                     "No commands generated for session=%s text='%s'",
                     session_id,
                     resolved_text[:80]
                 )
-
-        # Action feedback & TTS response
-        pending_msg = None
-        if response.commands:
-            pending_msg = self._action_feedback.register_commands(
+            tts_text = await self._command_pipeline.dispatch(
                 session_id,
-                response.commands,
-                session.current_url or ""
+                commands,
+                response.text,
+                session.current_url or "",
+                lambda: self._is_interrupted(session_id, epoch),
             )
+            if tts_text and self._session:
+                self._session.add_to_history(session_id, "assistant", tts_text)
 
-        if pending_msg:
-            if self._is_interrupted(session_id, epoch):
-                return
-            logger.info(f"Sending pending TTS response: '{pending_msg[:80]}...'")
-            await self._sender.send_tts_response(session_id, pending_msg)
-            if self._session:
-                self._session.add_to_history(session_id, "assistant", pending_msg)
-        elif response.text:
-            if self._is_interrupted(session_id, epoch):
-                return
-            logger.info(f"Sending TTS response: '{response.text[:80]}...'")
-            await self._sender.send_tts_response(session_id, response.text)
-            if self._session:
-                self._session.add_to_history(session_id, "assistant", response.text)
+    async def _handle_ai_next_rules(self, session_id: str, text: str, session, epoch: int) -> bool:
+        if not self._ai_next_router:
+            return False
+        try:
+            result = self._ai_next_router.route(text, session.current_url or "")
+        except Exception:
+            return False
+        if not result:
+            return False
+
+        commands = [
+            MCPCommand(tool_name=c.tool_name, arguments=c.arguments, description=c.description)
+            for c in result.commands
+        ]
+
+        commands = self._command_pipeline.prepare_commands(
+            session_id,
+            commands,
+            session.current_url or ""
+        )
+        tts_text = await self._command_pipeline.dispatch(
+            session_id,
+            commands,
+            result.response_text,
+            session.current_url or "",
+            lambda: self._is_interrupted(session_id, epoch),
+        )
+        if tts_text and self._session:
+            self._session.add_to_history(session_id, "assistant", tts_text)
+
+        return True
 
     async def _handle_flow_input(self, session_id: str, text: str):
         """Handle input when flow is active."""

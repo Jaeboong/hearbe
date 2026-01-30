@@ -294,6 +294,58 @@ class BrowserExtractionMixin:
             logger.error(f"Get visible buttons failed: {e}")
             return {"success": False, "error": str(e), "buttons": []}
 
+    async def get_dom_snapshot(
+        self,
+        include_frames: bool = True,
+        max_chars: int = 200000,
+        frame_max_chars: int = 80000,
+    ) -> Dict[str, Any]:
+        """
+        Return DOM snapshot for the current page.
+
+        Args:
+            include_frames: include iframe contents
+            max_chars: max characters for main DOM
+            frame_max_chars: max characters per frame
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        def _truncate(text: str, limit: int) -> str:
+            if not text:
+                return ""
+            return text if len(text) <= limit else text[:limit]
+
+        try:
+            dom = await page.content()
+            dom = _truncate(dom, max_chars)
+            frames: list[Dict[str, Any]] = []
+            if include_frames:
+                for frame in page.frames:
+                    if frame == page.main_frame:
+                        continue
+                    try:
+                        content = await frame.content()
+                        frames.append(
+                            {
+                                "url": frame.url or "",
+                                "name": frame.name or "",
+                                "content": _truncate(content, frame_max_chars),
+                            }
+                        )
+                    except Exception:
+                        frames.append({"url": frame.url or "", "name": frame.name or "", "content": ""})
+            return {
+                "success": True,
+                "dom": dom,
+                "frames": frames,
+                "current_url": page.url,
+            }
+        except Exception as e:
+            logger.error(f"Get DOM snapshot failed: {e}")
+            return {"success": False, "error": str(e)}
+
     async def extract_cart(self) -> Dict[str, Any]:
         """
         Extract cart items and summary from cart page.
