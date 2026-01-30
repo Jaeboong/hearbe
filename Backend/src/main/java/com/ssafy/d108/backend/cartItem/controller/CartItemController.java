@@ -25,16 +25,21 @@ public class CartItemController {
     public ResponseEntity<CartItemCreateResponseDto> addCartItem(
             @Valid @RequestBody CartItemRequestDto requestDto) {
 
+        // SecurityUtil에서 추출한 ID를 사용하여 안전하게 저장
         return ResponseEntity.ok(cartItemService.addCartItem(SecurityUtil.getCurrentUserId(), requestDto));
     }
 
     /**
      * 장바구니 목록 조회
      */
-    @GetMapping("/{userId}")
-    public ResponseEntity<CartItemListResponseDto> getCartItems(@PathVariable("userId") Integer userId) {
+    @GetMapping
+    public ResponseEntity<CartItemListResponseDto> getCartItems() {
 
-        // 경로 변수로 받은 userId를 서비스로 전달
+        // 경로 변수(@PathVariable) 대신 SecurityUtil을 사용하여
+        // "로그인한 유저 본인"의 ID를 꺼내옵니다.
+        Integer userId = SecurityUtil.getCurrentUserId();
+
+        // 본인의 ID로만 조회하므로 다른 사람의 정보를 볼 수 없어 안전합니다.
         CartItemListResponseDto response = cartItemService.getCartItems(userId);
 
         return ResponseEntity.ok(response);
