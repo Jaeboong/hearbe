@@ -46,11 +46,11 @@ const WishlistA = () => {
     });
 
     const menuItems = [
-        { id: 'profile', label: '회원정보', path: '/mypage/profile' },
-        { id: 'orders', label: '주문내역', path: '/mypage/orders' },
-        { id: 'cart', label: '장바구니', path: '/cart' },
-        { id: 'wishlist', label: '찜한 상품', path: '/mypage/wishlist' },
-        { id: 'card', label: '장애인 복지카드 변경', path: '/mypage/card' }
+        { id: 'profile', label: '회원정보', path: '/A/member-info' },
+        { id: 'orders', label: '주문내역', path: '/A/order-history' },
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
+        { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
+        { id: 'card', label: '장애인 복지카드 변경', path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;

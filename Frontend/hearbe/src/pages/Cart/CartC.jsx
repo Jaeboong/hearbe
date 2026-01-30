@@ -1,36 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, ShoppingCart, Home, User } from 'lucide-react';
+import { cartAPI } from '../../services/cartAPI';
 import './CartC.css';
 
 export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }) {
     const navigate = useNavigate();
-    const [cartItems, setCartItems] = useState([
-        {
-            id: 1,
-            name: '무선 블루투스 이어폰',
-            price: 45000,
-            quantity: 1,
-            image: '🎧',
-            mallName: '이마트몰',
-        },
-        {
-            id: 2,
-            name: '스마트워치',
-            price: 89000,
-            quantity: 2,
-            image: '⌚',
-            mallName: '쿠팡',
-        },
-        {
-            id: 3,
-            name: 'USB-C 충전 케이블',
-            price: 12000,
-            quantity: 3,
-            image: '🔌',
-            mallName: '이마트몰',
-        },
-    ]);
+    const [cartItems, setCartItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Platform ID to name mapping (A형과 동일)
+    const platformNames = {
+        1: '쿠팡',
+        2: '네이버',
+        3: '11번가',
+        4: 'SSG'
+    };
+
+    // Fetch cart items on mount
+    useEffect(() => {
+        const fetchCartItems = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                const response = await cartAPI.getCart();
+
+                // Transform API response to CartC format
+                if (response.data && response.data.items) {
+                    const transformedItems = response.data.items.map(item => ({
+                        id: item.cart_item_id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity || 1,
+                        image: item.img_url || '📦',
+                        mallName: platformNames[item.platform_id] || `Platform ${item.platform_id}`,
+                    }));
+                    setCartItems(transformedItems);
+                }
+            } catch (err) {
+                console.error('Failed to fetch cart items:', err);
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCartItems();
+    }, []);
 
     // 쇼핑몰별 그룹화 로직
     const groupedItems = cartItems.reduce((acc, item) => {
@@ -39,8 +56,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
         return acc;
     }, {});
 
-    const handleRemoveItem = (id) => {
-        setCartItems(items => items.filter(item => item.id !== id));
+    const handleRemoveItem = async (id) => {
+        try {
+            await cartAPI.deleteCart(id);
+            // API 호출 성공 시 로컬 상태 업데이트
+            setCartItems(items => items.filter(item => item.id !== id));
+        } catch (err) {
+            console.error('Failed to delete cart item:', err);
+            alert(err.message || '상품 삭제에 실패했습니다.');
+        }
     };
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -103,7 +127,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
             {/* Main Content */}
             <main className="cart-content" style={isEmbedded ? { padding: 0 } : {}}>
                 <div className="cart-list-wrapper" style={isEmbedded ? { marginBottom: 0 } : {}}>
-                    {cartItems.length === 0 ? (
+                    {isLoading ? (
+                        <div className="empty-cart">
+                            <p>장바구니를 불러오는 중...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="empty-cart">
+                            <p style={{ color: '#e53e3e' }}>{error}</p>
+                        </div>
+                    ) : cartItems.length === 0 ? (
                         <div className="empty-cart">
                             <ShoppingCart className="empty-icon" />
                             <p>장바구니가 비어있습니다</p>

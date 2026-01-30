@@ -30,7 +30,7 @@ const CartA = () => {
             try {
                 setIsLoading(true);
                 setError(null);
-                const response = await cartAPI.getCartItems();
+                const response = await cartAPI.getCart();
 
                 // Transform API response to grouped format
                 const groupedData = {};
@@ -61,11 +61,11 @@ const CartA = () => {
     }, []);
 
     const menuItems = [
-        { id: 'profile', label: '회원정보', path: '/mypage/profile' },
-        { id: 'orders', label: '주문내역', path: '/mypage/orders' },
-        { id: 'cart', label: '장바구니', path: '/cart' },
-        { id: 'wishlist', label: '찜한 상품', path: '/mypage/wishlist' },
-        { id: 'card', label: '장애인 복지카드 변경', path: '/mypage/card' }
+        { id: 'profile', label: '회원정보', path: '/A/member-info' },
+        { id: 'orders', label: '주문내역', path: '/A/order-history' },
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
+        { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
+        { id: 'card', label: '장애인 복지카드 변경', path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -80,11 +80,18 @@ const CartA = () => {
         }));
     };
 
-    const handleDeleteItem = (mallName, itemId) => {
-        setCartData(prev => ({
-            ...prev,
-            [mallName]: prev[mallName].filter(item => item.id !== itemId)
-        }));
+    const handleDeleteItem = async (mallName, itemId) => {
+        try {
+            await cartAPI.deleteCart(itemId);
+            // API 호출 성공 시 로컬 상태 업데이트
+            setCartData(prev => ({
+                ...prev,
+                [mallName]: prev[mallName].filter(item => item.id !== itemId)
+            }));
+        } catch (err) {
+            console.error('Failed to delete cart item:', err);
+            alert(err.message || '상품 삭제에 실패했습니다.');
+        }
     };
 
     const calculateSelectedTotal = (mallName, items) => {

@@ -7,7 +7,7 @@ export const sharingAPI = {
     // 세션 시작 기록
     startSession: async (sessionData) => {
         // sessionData: { hostUserId: number, meetingCode: string }
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('accessToken');
         try {
             const response = await axios.post(`${API_PATH}/start`, sessionData, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -21,7 +21,7 @@ export const sharingAPI = {
 
     // 세션 종료 기록
     endSession: async (sessionId) => {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('accessToken');
         try {
             const response = await axios.post(`${API_PATH}/end/${sessionId}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
