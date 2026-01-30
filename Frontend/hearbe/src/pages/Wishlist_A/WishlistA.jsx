@@ -160,6 +160,55 @@ const WishlistA = () => {
                         <div className="empty-wishlist">
                             찜한 상품이 없습니다.
                         </div>
+                    ) : (
+                        <>
+                            {/* Wishlist by Mall */}
+                            {Object.entries(wishlistData).map(([mallName, items]) => (
+                                items.length > 0 && (
+                                    <div key={mallName} className="mall-section">
+                                        <div className="mall-header">
+                                            <h3 className="mall-name">{mallName}</h3>
+                                            <button
+                                                className="delete-all-btn"
+                                                onClick={() => handleDeleteAll(mallName)}
+                                            >
+                                                선택 상품 관리/삭제
+                                            </button>
+                                        </div>
+
+                                        <div className="items-list">
+                                            {items.map(item => (
+                                                <div key={item.id} className="wishlist-item">
+                                                    <div className="item-checkbox">
+                                                        <input type="checkbox" />
+                                                    </div>
+                                                    <img src={item.image} alt={item.name} className="item-image" />
+                                                    <div className="item-details">
+                                                        <div className="item-date">{item.date}</div>
+                                                        <div className="item-name">{item.name}</div>
+                                                        <div className="item-price">{item.price}</div>
+                                                    </div>
+                                                    <div className="item-actions">
+                                                        <button
+                                                            className="add-cart-btn"
+                                                            onClick={() => handleAddToCart(item)}
+                                                        >
+                                                            장바구니 담기
+                                                        </button>
+                                                        <button
+                                                            className="delete-btn"
+                                                            onClick={() => handleDeleteItem(mallName, item.id)}
+                                                        >
+                                                            삭제
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            ))}
+                        </>
                     )}
 
                     {/* 찜 목록 데이터 */}

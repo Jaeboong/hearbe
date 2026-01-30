@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './StoreBrowserA.css';
 import iconUser from '../../assets/icon-user.png';
 import iconCart from '../../assets/icon-cart.png';
@@ -8,12 +8,25 @@ import iconCard from '../../assets/icon-cart.png';
 import logo from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 
-import BackButton from '../common/BackButtonA';
+import BackButton from '../BackButton/BackButtonA';
 
 const StoreBrowser = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const url = location.state?.url || 'https://m.naver.com';
+    const { mallId } = useParams();
+
+    // Map mallId to URL
+    const getMallUrl = (id) => {
+        const urlMap = {
+            '1': 'https://www.coupang.com',
+            '2': 'https://m.shopping.naver.com/',
+            '3': 'https://m.11st.co.kr/',
+            '4': 'https://m.ssg.com/'
+        };
+        return urlMap[id] || 'https://m.shopping.naver.com/';
+    };
+
+    const url = location.state?.url || getMallUrl(mallId);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);

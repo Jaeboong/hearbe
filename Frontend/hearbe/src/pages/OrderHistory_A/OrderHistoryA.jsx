@@ -178,6 +178,61 @@ const OrderHistoryA = () => {
                         <div className="empty-orders">
                             주문내역이 없습니다.
                         </div>
+                    ) : (
+                        <>
+                            {/* Orders by Mall */}
+                            {Object.entries(orderData).map(([mallName, orderGroups]) => (
+                                <div key={mallName} className="mall-section">
+                                    <div
+                                        className="mall-header"
+                                        onClick={() => toggleMallSection(mallName)}
+                                    >
+                                        <h3 className="mall-name">{mallName}</h3>
+                                        <span className="toggle-icon">
+                                            {collapsedMalls[mallName] ? '▼' : '▲'}
+                                        </span>
+                                    </div>
+
+                                    {!collapsedMalls[mallName] && (
+                                        <div className="orders-list">
+                                            {orderGroups.map((group, index) => (
+                                                <div key={index} className="order-group">
+                                                    <div className="order-date-header">
+                                                        {group.datetime.split(' ')[0]}
+                                                    </div>
+
+                                                    <div className="order-details">
+                                                        <div className="order-items">
+                                                            {group.orders.map(order => (
+                                                                <div key={order.id} className="order-item">
+                                                                    <img
+                                                                        src={order.image}
+                                                                        alt={order.name}
+                                                                        className="order-item-image"
+                                                                    />
+                                                                    <div className="order-item-info">
+                                                                        <div className="order-item-name">{order.name}</div>
+                                                                        <div className="order-item-meta">
+                                                                            {order.price.toLocaleString()}원, {order.quantity}개
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <button
+                                                            className="track-delivery-btn"
+                                                            onClick={() => handleTrackDelivery(mallName, group.datetime)}
+                                                        >
+                                                            배송 조회
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </>
                     )}
 
                     {/* 주문내역 데이터 */}
