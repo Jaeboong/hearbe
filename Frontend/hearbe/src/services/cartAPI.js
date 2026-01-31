@@ -16,9 +16,23 @@ const getAuthHeader = () => {
 
 // 공통 에러 핸들링
 const handleResponse = async (response) => {
-    const data = await response.json();
+    const text = await response.text();
+    let data;
+    try {
+        data = text ? JSON.parse(text) : {};
+    } catch (e) {
+        console.error('JSON Parse Error:', e);
+        data = { message: text };
+    }
+
     if (!response.ok) {
-        throw new Error(data.message || '요청이 실패했습니다.');
+        console.error('================ API ERROR INFO ================');
+        console.error('URL:', response.url);
+        console.error('Status:', response.status, response.statusText);
+        console.error('Body:', data);
+        console.error('================================================');
+
+        throw new Error(data.message || `요청 실패 (${response.status})`);
     }
     return data;
 };
@@ -40,6 +54,7 @@ export const cartAPI = {
             const response = await fetch(`${API_BASE_URL}/cart`, {
                 method: 'GET',
                 headers: {
+                    'Content-Type': 'application/json',
                     ...getAuthHeader(),
                 },
             });

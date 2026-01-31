@@ -26,18 +26,41 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                 setError(null);
                 const response = await cartAPI.getCart();
 
-                // Transform API response to CartC format
-                if (response.cart_items) {
-                    const transformedItems = response.cart_items.map(item => ({
-                        id: item.cart_item_id,
-                        name: item.name,
-                        price: item.price,
+                console.log("-------------------------------");
+                console.log("1. 서버 전체 응답:", response);
+                console.log("2. 데이터 존재 여부:", !!response.data);
+                if (response.data) {
+                    console.log("3. items 배열 확인:", response.data.items);
+                    console.log("4. items가 배열인가?:", Array.isArray(response.data.items));
+                }
+
+                // 1. 응답 구조 확인 (데이터가 어디에 들어있는지 찾기)
+                let itemsList = [];
+                if (Array.isArray(response)) {
+                    itemsList = response;
+                } else if (response.data && Array.isArray(response.data.items)) {
+                    itemsList = response.data.items;
+                } else if (response.data && Array.isArray(response.data)) {
+                    itemsList = response.data;
+                } else if (response.items && Array.isArray(response.items)) {
+                    itemsList = response.items;
+                }
+
+                console.log("Found items list:", itemsList);
+
+                // 2. 데이터 변환 (필드명이 달라도 최대한 매핑)
+                if (itemsList.length > 0) {
+                    const transformedItems = itemsList.map(item => ({
+                        id: item.id || item.cart_item_id || item.cartId,
+                        name: item.name || item.product_name || '상품명 없음',
+                        price: item.price || 0,
                         quantity: item.quantity || 1,
-                        image: item.img_url || '📦',
-                        mallName: platformNames[item.platform_id] || `Platform ${item.platform_id}`,
-                        url: item.url
+                        image: item.img_url || item.image || item.thumbnail || '📦',
+                        mallName: platformNames[item.platform_id] || item.platform_name || item.mall_name || '기타 쇼핑몰',
                     }));
                     setCartItems(transformedItems);
+                } else {
+                    setCartItems([]);
                 }
             } catch (err) {
                 console.error('Failed to fetch cart items:', err);

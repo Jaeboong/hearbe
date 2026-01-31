@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackButton from '../common/BackButtonA';
 import { orderAPI } from '../../services/orderAPI';
@@ -29,7 +29,7 @@ const OrderHistoryA = () => {
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: '장애인 복지카드 변경', path: '/A/card-management' }
+        { id: 'card', label: '결제카드 변경', path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;

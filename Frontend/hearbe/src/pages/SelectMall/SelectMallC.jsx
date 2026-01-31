@@ -7,7 +7,7 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
 
     const malls = [
-        { id: 'naver', name: '네이버 쇼핑', desc: '국내 최대 규모의 쇼핑 플랫폼', color: '#03C75A', initial: 'N', url: 'https://m.shopping.naver.com' },
+        { id: 'naver', name: '네이버 쇼핑', desc: '국내 최대 규모의 쇼핑 플랫폼', color: '#03C75A', initial: 'N', url: 'https://shopping.naver.com/ns/home' },
         { id: 'coupang', name: '쿠팡', desc: '"로켓배송"으로 만나는 내일', color: '#E2211C', initial: 'C', url: 'https://www.coupang.com' },
         { id: 'gmarket', name: 'G마켓', desc: '다양한 혜택과 빅세일', color: '#0055ff', initial: 'G', url: 'https://www.gmarket.co.kr' },
         { id: 'kurly', name: '마켓컬리', desc: '신선한 아침을 여는 샛별배송', color: '#5f0080', initial: 'K', url: 'https://www.kurly.com' },
@@ -16,11 +16,8 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     ];
 
     const handleSelect = (mall) => {
-        if (onSelectMall) {
-            onSelectMall(mall);
-        } else {
-            navigate('/C/store', { state: { url: mall.url, name: mall.name } });
-        }
+        // Open shopping mall in new tab
+        window.open(mall.url, '_blank');
     };
 
     return (
