@@ -2,13 +2,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Home, ShoppingCart, User, ArrowUpRight, Layout } from 'lucide-react';
 import './SelectMallC.css';
+import coupangLogo from '../../assets/coupang_logo.png';
+import naverLogo from '../../assets/naver.png';
 
 const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
 
     const malls = [
-        { id: 'naver', name: '네이버 쇼핑', desc: '국내 최대 규모의 쇼핑 플랫폼', color: '#03C75A', initial: 'N', url: 'https://shopping.naver.com/ns/home' },
-        { id: 'coupang', name: '쿠팡', desc: '"로켓배송"으로 만나는 내일', color: '#E2211C', initial: 'C', url: 'https://www.coupang.com' },
+        { id: 'coupang', name: '쿠팡', desc: '', color: '#E2211C', initial: 'C', logo: coupangLogo, logoSize: 280, url: 'https://www.coupang.com' },
+        { id: 'naver', name: '네이버 쇼핑', desc: '', color: '#03C75A', initial: 'N', logo: naverLogo, logoSize: 200, url: 'https://shopping.naver.com/ns/home' },
         { id: 'gmarket', name: 'G마켓', desc: '다양한 혜택과 빅세일', color: '#0055ff', initial: 'G', url: 'https://www.gmarket.co.kr' },
         { id: 'kurly', name: '마켓컬리', desc: '신선한 아침을 여는 샛별배송', color: '#5f0080', initial: 'K', url: 'https://www.kurly.com' },
         { id: '11st', name: '11번가', desc: '세상 모든 쇼핑의 시작', color: '#FF4B4B', initial: '1', url: 'https://www.11st.co.kr' },
@@ -41,11 +43,11 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>
-                    <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage', { state: { activeTab: 'cart' } }))}>
+                    <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
-                    <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/mypage'))}>
+                    <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
                     </button>
@@ -69,16 +71,22 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                             onClick={() => handleSelect(mall)}
                         >
                             <div className="card-top-row-c">
-                                <div className="card-num-badge-c" style={{ backgroundColor: mall.color }}>
-                                    {index + 1}
+                                <div className="card-title-row-c">
+                                    <div className="card-num-badge-c" style={{ backgroundColor: mall.color }}>
+                                        {index + 1}
+                                    </div>
+                                    <h3 className="mall-card-name-c">{mall.name}</h3>
                                 </div>
                                 <ArrowUpRight className="card-link-icon-c" size={20} />
                             </div>
 
-                            <div className="card-watermark-c">{mall.initial}</div>
+                            {mall.logo ? (
+                                <img src={mall.logo} alt={mall.name} className="card-watermark-logo-c" style={mall.logoSize ? { width: `${mall.logoSize}px` } : {}} />
+                            ) : (
+                                <div className="card-watermark-c">{mall.initial}</div>
+                            )}
 
                             <div className="card-content-c">
-                                <h3 className="mall-card-name-c">{mall.name}</h3>
                                 <p className="mall-card-desc-c">{mall.desc}</p>
                             </div>
 

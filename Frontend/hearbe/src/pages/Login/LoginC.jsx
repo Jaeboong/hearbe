@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import hLogo from '../../assets/HearBe_logo_.png';
+import logoC from '../../assets/logoC.png'; // C형 로고로 변경
 import { authAPI } from '../../services/authAPI';
 import './LoginC.css';
 
@@ -10,6 +10,16 @@ export default function LoginC() {
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
+    const [rememberId, setRememberId] = useState(false); 
+
+    useEffect(() => {
+        const savedUsername = localStorage.getItem('rememberedUsername');
+        if (savedUsername) {
+            setId(savedUsername);
+            setRememberId(true);
+        }
+    }, []);
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -35,6 +45,13 @@ export default function LoginC() {
                 localStorage.setItem('refreshToken', response.data.refreshToken);
             }
 
+            // 아이디 저장 여부에 따라 localStorage에 저장/삭제
+            if (rememberId) {
+                localStorage.setItem('rememberedUsername', id);
+            } else {
+                localStorage.removeItem('rememberedUsername');
+            }
+
             // Save user info basics
             if (response.data) {
                 localStorage.setItem('user', JSON.stringify(response.data));
@@ -54,7 +71,7 @@ export default function LoginC() {
             <main className="login-c-content">
                 <div className="login-c-card">
                     <div className="logo-area-c">
-                        <img src={hLogo} alt="HearBe Logo" className="logo-image-c" />
+                        <img src={logoC} alt="HearBe Logo" className="logo-image-c" />
                     </div>
 
                     <form className="login-c-form" onSubmit={handleLogin}>
@@ -82,8 +99,13 @@ export default function LoginC() {
                         <button type="submit" className="login-submit-btn-c">로그인</button>
 
                         <div className="login-keep-c">
-                            <input type="checkbox" id="keep" />
-                            <label htmlFor="keep">로그인 유지</label>
+                            <input
+                                type="checkbox"
+                                id="rememberId" // ID를 'rememberId'로 변경
+                                checked={rememberId} // rememberId 상태에 연결
+                                onChange={(e) => setRememberId(e.target.checked)} // 상태 변경 핸들러 연결
+                            />
+                            <label htmlFor="rememberId">아이디 저장</label> {/* 라벨 텍스트 변경 */}
                         </div>
 
                         <div className="login-links-c">

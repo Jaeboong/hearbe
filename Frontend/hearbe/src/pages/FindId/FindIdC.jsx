@@ -1,7 +1,7 @@
 import { ArrowLeft, User, Mail, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import logoImage from '../../assets/HearBe_logo_.png';
 import './FindIdC.css';
+import logoC from '../../assets/logoC.png'; 
 
 export default function FindIdPage({ onBack, micPermissionGranted }) {
     const [name, setName] = useState('');
@@ -57,7 +57,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
             <main className="find-id-main">
                 <div className="find-id-card">
                     <div className="card-header">
-                        <img src={logoImage} alt="HearBe" className="mini-logo" />
+                        <img src={logoC} alt="HearBe" className="mini-logo" />
                         <h1>아이디 찾기</h1>
                         <p>가입 시 등록한 정보로 아이디를 찾을 수 있습니다.</p>
                     </div>
@@ -138,7 +138,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                             <span className="result-label-c">회원님의 아이디는</span>
                             <strong className="result-value-c">{foundUserId}</strong>
                         </div>
-                        <button onClick={onBack} className="modal-confirm-btn-c">
+                        <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c"> {/* 로그인 페이지로 이동 */}
                             확인 및 로그인하기
                         </button>
                     </div>

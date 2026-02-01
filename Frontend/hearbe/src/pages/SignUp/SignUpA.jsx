@@ -157,9 +157,12 @@ const SignUp = () => {
                 setShowError(true);
             }
         } catch (error) {
-            // API가 없거나 네트워크 오류 시 기본적으로 통과
-            setIsIdChecked(true);
-            alert("사용 가능한 아이디입니다.");
+            // authAPI.checkDuplicate에서 던져진 에러를 여기서 처리
+            // 에러 발생 시 아이디 중복 확인이 완료되지 않았으므로 isIdChecked는 false
+            // 사용자에게는 실패 메시지를 보여줍니다.
+            setErrorMessage(error.message || "아이디 중복 확인에 실패했습니다.");
+            setShowError(true);
+            setIsIdChecked(false); // 에러 발생 시 중복확인 상태 초기화
         }
     };
 
@@ -301,11 +304,11 @@ const SignUp = () => {
                 }
             };
 
-            console.log('📤 전송할 데이터:', JSON.stringify(userData, null, 2));
+            console.log('전송할 데이터:', JSON.stringify(userData, null, 2));
 
             const response = await authAPI.register(userData);
 
-            if (response.code === 201) {
+            if (response.success) {
                 setShowSuccess(true);
             } else {
                 throw new Error(response.message || '회원가입에 실패했습니다.');

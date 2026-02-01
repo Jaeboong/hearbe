@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, User, AtSign, Mail, Lock, ShieldCheck } from 'lucide-react';
-import logoImage from '../../assets/HearBe_logo_.png';
+import logoC from '../../assets/logoC.png'; // C형 로고로 변경
 import './FindPasswordC.css';
 
 export default function FindPasswordPage({ onBack, micPermissionGranted }) {
@@ -29,7 +29,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             return;
         }
         setIsSent(true);
-        alert('인증번호가 이메일로 전송되었습니다. (테스트 번호: 123456)');
+        alert('인증번호가 이메일로 전송되었습니다.');
     };
 
     const handleVerifyCode = () => {
@@ -60,7 +60,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             <main className="find-pw-main-c">
                 <div className="pw-form-card-c">
                     <div className="pw-card-header-c">
-                        <img src={logoImage} alt="HearBe" className="pw-logo-c" />
+                        <img src={logoC} alt="HearBe" className="pw-logo-c" />
                         <h1>비밀번호 재설정</h1>
                         <p className="pw-desc-c">안전한 서비스 이용을 위해 본인 확인이 필요합니다.</p>
                     </div>

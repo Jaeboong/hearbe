@@ -8,18 +8,19 @@ import { useLocation } from 'react-router-dom';
 import CartPage from '../Cart/CartC';
 import { orderAPI } from '../../services/orderAPI';
 import { wishlistAPI } from '../../services/wishlistAPI';
+import { memberAPI } from '../../services/memberAPI';
 import './MyPageC.css';
 
 export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
     const navigate = useNavigate();
     const location = useLocation();
-    // Determine active tab from URL
+    // Determine active tab from URL (A형과 동일한 URL 구조)
     const getActiveTabFromPath = () => {
         const path = location.pathname;
-        if (path === '/C/orders') return 'orders';
+        if (path === '/C/order-history') return 'order-history';
         if (path === '/C/wishlist') return 'wishlist';
         if (path === '/C/cart') return 'cart';
-        return 'settings'; // default for /C/mypage
+        return 'order-history'; // 기본 탭
     };
 
     const [activeTab, setActiveTab] = useState(getActiveTabFromPath());
@@ -29,14 +30,32 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
         setActiveTab(getActiveTabFromPath());
     }, [location.pathname]);
 
-    const [userData] = useState({
-        name: '김싸피',
-        email: 'kimssafy@ssafy.com',
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
     });
 
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await memberAPI.getProfile();
+                if (response && response.data) {
+                    setUserData({
+                        name: response.data.name || '사용자',
+                        email: response.data.email || '',
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to fetch user info:', err);
+                // navigate('/C/login'); // 옵션: 로그인 실패시 이동
+            }
+        };
+        fetchUserInfo();
+    }, []);
+
     const sidebarItems = [
-        { id: 'settings', label: '계정 설정', path: '/C/mypage' },
-        { id: 'orders', label: '주문내역', path: '/C/orders' },
+        { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
+        { id: 'order-history', label: '주문 내역', path: '/C/order-history' },
         { id: 'wishlist', label: '찜한 상품', path: '/C/wishlist' },
         { id: 'cart', label: '장바구니', path: '/C/cart' },
     ];
@@ -59,7 +78,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
 
     // Fetch data when switching tabs
     useEffect(() => {
-        if (activeTab === 'orders') {
+        if (activeTab === 'order-history') {
             fetchOrders();
         } else if (activeTab === 'wishlist') {
             fetchWishlist();
@@ -108,6 +127,52 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
         }
     };
 
+    const fetchWishlist = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const response = await wishlistAPI.getWishlist();
+
+            // Transform API response
+            // Assuming response.data or response is the list of wishlist items
+            const items = response.data || response || [];
+
+            if (Array.isArray(items)) {
+                const wishlistsByMall = {};
+                items.forEach(item => {
+                    const mallName = item.mallName || platformNames[item.platformId] || '기타 쇼핑몰';
+                    if (!wishlistsByMall[mallName]) {
+                        wishlistsByMall[mallName] = {
+                            mall: mallName,
+                            count: 0,
+                            items: []
+                        };
+                    }
+                    wishlistsByMall[mallName].items.push({
+                        id: item.wishlistId || item.id,
+                        name: item.productName || item.name,
+                        price: item.price || 0,
+                        imgUrl: item.imageUrl || item.imgUrl,
+                        icon: '🎁'
+                    });
+                    wishlistsByMall[mallName].count++;
+                });
+                setWishlists(Object.values(wishlistsByMall));
+            } else {
+                setWishlists([]);
+            }
+
+        } catch (err) {
+            console.error('Failed to fetch wishlist:', err);
+            setError(err.message);
+            if (err.message === '로그인이 필요합니다.') {
+                navigate('/C/login');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // platformName 매핑 (영문 -> 한글)
     const platformDisplayNames = {
         'coupang': '쿠팡',
@@ -115,47 +180,6 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
         '11st': '11번가',
         'ssg': 'SSG',
         'gmarket': 'G마켓'
-    };
-
-    const fetchWishlist = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            const response = await wishlistAPI.getWishlist();
-
-            // Transform API response to component format
-            // 백엔드 응답 필드명: snake_case (platform_name, wishlist_item_id, product_name, price 등)
-            if (response.items && response.items.length > 0) {
-                const wishlistByMall = {};
-                response.items.forEach(item => {
-                    // 백엔드는 platform_name (snake_case)
-                    const mallName = platformDisplayNames[item.platform_name] || item.platform_name;
-                    if (!wishlistByMall[mallName]) {
-                        wishlistByMall[mallName] = { mall: mallName, count: 0, items: [] };
-                    }
-                    wishlistByMall[mallName].items.push({
-                        id: item.wishlist_item_id,
-                        name: item.product_name,
-                        price: item.price || 0,
-                        tag: '',
-                        icon: '❤️'
-                    });
-                    wishlistByMall[mallName].count++;
-                });
-                setWishlists(Object.values(wishlistByMall));
-            } else {
-                setWishlists([]);
-            }
-        } catch (err) {
-            console.error('Failed to fetch wishlist:', err);
-            setError(err.message);
-            // 401 에러 시 로그인 페이지로 이동
-            if (err.message === '로그인이 필요합니다.') {
-                navigate('/C/login');
-            }
-        } finally {
-            setIsLoading(false);
-        }
     };
 
     return (
@@ -183,7 +207,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
-                    <button className="nav-item-c active">
+                    <button className="nav-item-c active" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
                     </button>
@@ -209,7 +233,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                         {sidebarItems.map((item) => (
                             <button
                                 key={item.id}
-                                onClick={() => navigate(item.path)}
+                                onClick={() => navigate(item.path)} // MyPageC 내부 탭 이동
                                 className={`mp-sidebar-item ${activeTab === item.id ? 'active' : ''}`}
                                 style={{
                                     display: 'flex',
@@ -250,7 +274,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', background: 'transparent', border: 'none', cursor: 'pointer', padding: '1rem' }}
                                     >
                                         <div className="quick-icon-box"><Package size={32} /></div>
-                                        <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#4b5563' }}>주문내역</span>
+                                        <span style={{ fontSize: '1.1rem', fontWeight: '700', color: '#4b5563' }}>주문 내역</span>
                                     </button>
                                     <button
                                         className="quick-link-item"
@@ -275,7 +299,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                             <section className="dashboard-card">
                                 <div className="card-header-row">
                                     <ShieldCheck size={24} className="purple-text" />
-                                    <h3 className="card-title">계정 설정</h3>
+                                    <h3 className="card-title">회원 정보</h3>
                                 </div>
                                 <div className="info-list-full">
                                     <div className="info-row-full">
@@ -307,7 +331,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                     )}
 
                     {/* Orders Tab - Refactored Layout */}
-                    {activeTab === 'orders' && (
+                    {activeTab === 'order-history' && (
                         <section className="dashboard-card full-height">
                             <h2 className="card-title-lg">주문내역</h2>
                             <div className="orders-list">
@@ -320,7 +344,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                         {error}
                                     </div>
                                 ) : orders.length === 0 ? (
-                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
                                         주문내역이 없습니다.
                                     </div>
                                 ) : (
@@ -370,7 +394,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                         {error}
                                     </div>
                                 ) : wishlists.length === 0 ? (
-                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
                                         찜한 상품이 없습니다.
                                     </div>
                                 ) : (
@@ -394,7 +418,13 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                                     <div key={item.id} className="item-row-card">
                                                         <div className="item-row-left">
                                                             <button className="check-item-btn"><CheckSquare size={40} color="#ddd" /></button>
-                                                            <div className="item-thumb">{item.icon}</div>
+                                                            <div className="item-thumb">
+                                                                {item.imgUrl ? (
+                                                                    <img src={item.imgUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1rem' }} />
+                                                                ) : (
+                                                                    item.icon
+                                                                )}
+                                                            </div>
                                                             <div className="item-info-text">
                                                                 <div className="item-name-lg">{item.name}</div>
                                                                 <div className="item-price-lg">{item.price.toLocaleString()}원</div>

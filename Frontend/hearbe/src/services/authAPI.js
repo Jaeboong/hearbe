@@ -14,42 +14,38 @@ export const authAPI = {
                 body: JSON.stringify(userData),
             });
 
-            // 응답 상태 확인
             console.log('Response status:', response.status);
             console.log('Response ok:', response.ok);
 
-            // 응답이 비어있거나 204 No Content인 경우
-            if (response.status === 204) {
-                return { success: true, message: '회원가입이 완료되었습니다' };
-            }
-
-            // JSON 파싱 전에 응답 텍스트를 확인
             const text = await response.text();
             console.log('Response text:', text);
 
-            let data;
-            try {
+            let data = {};
+            if (text) { // 응답 본문이 있을 경우에만 JSON 파싱 시도
+                try { // 백엔드는 201 Created와 함께 ApiResponse 객체를 반환합니다.
+                // data는 { code: 201, message: "회원가입 완료", data: userId } 형태
                 data = text ? JSON.parse(text) : {};
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+                } catch (e) {
+                    console.error('JSON parse error for response text:', e);
+                    throw new Error('서버 응답 형식이 올바르지 않습니다. 응답: ' + text);
+                }
             }
 
-            if (!response.ok) {
-                throw new Error(data.message || '회원가입에 실패했습니다.');
+            if (response.status === 201) { // 백엔드는 201 Created를 반환합니다.
+                return { success: true, message: data.message || '회원가입이 완료되었습니다', data: data.data };
+            } else { // 201이 아닌 모든 다른 상태 코드 (4xx, 5xx 또는 예상치 못한 2xx)는 실패로 처리
+                throw new Error(data.message || `회원가입에 실패했습니다. (상태: ${response.status})`);
             }
-
-            return data;
         } catch (error) {
             console.error('Register API Error:', error);
             throw error;
         }
     },
 
-    // ID 중복 확인 API (선택사항 - 해당 API가 있다면 사용)
+    // ID 중복 확인 API
     checkDuplicate: async (userId) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/check-duplicate`, {
+            const response = await fetch(`${API_BASE_URL}/auth/checkId`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,11 +54,15 @@ export const authAPI = {
             });
 
             const data = await response.json();
-            return data;
+            // 백엔드 응답: { code: 200, message: "...", data: true/false }
+            // 여기서 data: true는 중복, data: false는 사용 가능을 의미
+            // 프론트엔드는 { available: true/false } 형태를 기대하며, available: true가 사용 가능
+            // 따라서 백엔드의 data 값을 반전시켜 available로 반환
+            // response.ok가 false인 경우 (4xx, 5xx)는 catch 블록에서 처리
+            return { available: !data.data };
         } catch (error) {
             console.error('Check Duplicate API Error:', error);
-            // API가 없으면 기본적으로 사용 가능으로 처리
-            return { available: true };
+            throw new Error(error.message || '아이디 중복 확인 중 네트워크 오류가 발생했습니다.'); // 에러를 다시 던짐
         }
     },
 
