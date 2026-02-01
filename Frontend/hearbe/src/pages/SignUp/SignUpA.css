@@ -153,8 +153,8 @@ body {
 }
 
 .input-icon {
-    width: clamp(24px, 8vw, 48px);
-    height: clamp(24px, 8vw, 48px);
+    width: clamp(28px, 9vw, 56px);
+    height: clamp(28px, 9vw, 56px);
     object-fit: contain;
 }
 
@@ -166,11 +166,28 @@ body {
     letter-spacing: clamp(1px, 0.2vw, 2px);
     height: auto;
     min-width: 0;
+    background-repeat: no-repeat;
+    background-position: left clamp(8px, 2vw, 16px) center;
+    background-size: clamp(28px, 6vw, 48px);
+    padding-left: clamp(48px, 10vw, 72px);
 }
 
 .signup-input::placeholder {
     color: var(--accent-yellow);
     font-weight: bold;
+}
+
+.signup-input.input-id,
+.signup-input.input-name {
+    background-image: url('../../assets/icon-user.png');
+}
+
+.signup-input.input-password {
+    background-image: url('../../assets/icon-lock.png');
+}
+
+.signup-input.input-phone {
+    background-image: url('../../assets/icon-phone.png');
 }
 
 /* 중복확인 버튼 */
@@ -189,6 +206,14 @@ body {
     flex-grow: 1;
     font-size: clamp(22px, 7vw, 42px);
     letter-spacing: clamp(1px, 0.2vw, 2px);
+}
+
+.label.card-label {
+    background-image: url('../../assets/icon-card.png');
+    background-repeat: no-repeat;
+    background-position: left clamp(8px, 2vw, 16px) center;
+    background-size: clamp(28px, 6vw, 48px);
+    padding-left: clamp(48px, 10vw, 72px);
 }
 
 /* =========================================

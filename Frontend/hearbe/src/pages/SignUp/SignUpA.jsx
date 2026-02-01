@@ -336,24 +336,22 @@ const SignUp = () => {
                 {/* ID Section */}
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
-                        <img src={iconUser} alt="User" className="input-icon" />
                         <input
                             type="text"
                             name="id"
                             placeholder="아이디"
-                            className="signup-input"
+                            className="signup-input input-id"
                             value={formData.id}
                             onChange={handleInputChange}
                         />
                         <button className="check-btn" onClick={handleDuplicateCheck}>중복확인</button>
                     </div>
                     <div className="input-row">
-                        <img src={iconLock} alt="Lock" className="input-icon" />
                         <input
                             type="password"
                             name="password"
                             placeholder="비밀번호(숫자 6자리)"
-                            className="signup-input"
+                            className="signup-input input-password"
                             value={formData.password}
                             onChange={handleInputChange}
                             maxLength={6}
@@ -364,23 +362,21 @@ const SignUp = () => {
                 {/* Name/Phone Section */}
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
-                        <img src={iconUser} alt="User" className="input-icon" />
                         <input
                             type="text"
                             name="name"
                             placeholder="이름"
-                            className="signup-input"
+                            className="signup-input input-name"
                             value={formData.name}
                             onChange={handleInputChange}
                         />
                     </div>
                     <div className="input-row">
-                        <img src={iconPhone} alt="Phone" className="input-icon" />
                         <input
                             type="tel"
                             name="phone"
                             placeholder="휴대전화번호"
-                            className="signup-input"
+                            className="signup-input input-phone"
                             value={formData.phone}
                             onChange={handleInputChange}
                             maxLength={13}
@@ -391,8 +387,7 @@ const SignUp = () => {
                 {/* Disability Card Section (메인 화면) */}
                 <div className="form-group-outline card-section">
                     <div className="input-row header-row">
-                        <img src={iconCard} alt="Card" className="input-icon" />
-                        <span className="label">장애인 복지카드 등록</span>
+                        <span className="label card-label">장애인 복지카드 등록</span>
                     </div>
 
                     {/* 카드가 등록되었으면 정보 표시, 아니면 카메라 아이콘 표시 */}
