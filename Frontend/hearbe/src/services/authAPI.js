@@ -23,8 +23,8 @@ export const authAPI = {
             let data = {};
             if (text) { // 응답 본문이 있을 경우에만 JSON 파싱 시도
                 try { // 백엔드는 201 Created와 함께 ApiResponse 객체를 반환합니다.
-                // data는 { code: 201, message: "회원가입 완료", data: userId } 형태
-                data = text ? JSON.parse(text) : {};
+                    // data는 { code: 201, message: "회원가입 완료", data: userId } 형태
+                    data = text ? JSON.parse(text) : {};
                 } catch (e) {
                     console.error('JSON parse error for response text:', e);
                     throw new Error('서버 응답 형식이 올바르지 않습니다. 응답: ' + text);
@@ -110,7 +110,7 @@ export const authAPI = {
             // user_id 저장
             if (data.data && data.data.id) {
                 localStorage.setItem('user_id', data.data.id);
-                // 가입할때의 username도 저장(사람구분니 API 호출에서 사용)
+                // 가입할때의 username도 저장
                 localStorage.setItem('username', username);
             }
 
@@ -160,6 +160,77 @@ export const authAPI = {
                 throw new Error('네트워크 연결을 확인해주세요.');
             }
             console.error('getUserProfile API Error:', error);
+            throw error;
+        }
+    },
+    // 이메일 인증번호 발송 API
+    sendEmailVerification: async (email, username = null, name = null) => {
+        try {
+            const body = { email };
+            if (username) body.username = username;
+            if (name) body.name = name;
+
+            const response = await fetch(`${API_BASE_URL}/auth/email/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '인증번호 발송 실패');
+            return data;
+        } catch (error) {
+            console.error('Send Email Verification Error:', error);
+            throw error;
+        }
+    },
+
+    // 비밀번호 재설정 API
+    resetPassword: async (username, newPassword) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/user/findPassword`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, newPassword }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '비밀번호 재설정 실패');
+            return data;
+        } catch (error) {
+            console.error('Reset Password API Error:', error);
+            throw error;
+        }
+    },
+
+    // 이메일 인증번호 확인 API
+    verifyEmailCode: async (email, code) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/email/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '인증번호 확인 실패');
+            return data;
+        } catch (error) {
+            console.error('Verify Email Code Error:', error);
+            throw error;
+        }
+    },
+
+    // 아이디 찾기 API
+    findId: async (name, email) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/findId`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '아이디 찾기 실패');
+            return data;
+        } catch (error) {
+            console.error('Find ID API Error:', error);
             throw error;
         }
     }

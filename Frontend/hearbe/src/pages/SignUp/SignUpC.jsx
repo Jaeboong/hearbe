@@ -56,7 +56,7 @@ export default function SignUpC({ onBack }) {
 
     try {
       const apiResponse = await authAPI.checkDuplicate(formData.username);
-      if (apiResponse.available) { // 이제 authAPI.js에서 { available: true/false } 형태로 반환
+      if (apiResponse.available) {
         setIsUsernameChecked(true);
         setIsUsernameAvailable(true);
         alert('사용 가능한 아이디입니다.');
@@ -125,14 +125,14 @@ export default function SignUpC({ onBack }) {
         password_check: confirmPassword,
         name: formData.name,
         email: formData.email,
-        phone_number: null, // 휴대폰 번호 제외됨
+        phone_number: null,
         user_type: "GENERAL", // C형 사용자
         simple_password: null,
         welfare_card: null
       };
 
       const apiResponse = await authAPI.register(payload);
-      if (apiResponse.success) { // authAPI.js에서 { success: true, message: ... } 형태로 반환
+      if (apiResponse.success) {
         setIsModalOpen(true);
       } else {
         alert(apiResponse.message || '회원가입에 실패했습니다.');

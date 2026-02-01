@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Home, ShoppingCart, ShieldCheck } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
-import '../MyPage/MyPageC.css'; // MyPageC와 동일한 레이아웃 스타일 사용
+import '../MyPage/MyPageC.css';
 
 export default function MemberInfoC({ onHome }) {
     const navigate = useNavigate();
@@ -29,20 +29,18 @@ export default function MemberInfoC({ onHome }) {
                 setIsLoading(true);
                 setError(null);
                 const response = await memberAPI.getProfile();
-                console.log('Profile API response:', response); // 디버깅용
 
-                // API 응답 구조에 따라 데이터 매핑 (response.data 또는 response 직접)
+                // 데이터 매핑
                 const profileData = response.data || response;
                 setUserData({
                     name: profileData.username || profileData.name || '',
-                    email: profileData.email || '', // 백엔드에서 email 미제공
+                    email: profileData.email || '',
                     phone: profileData.phoneNumber || profileData.phone || '',
                 });
             } catch (err) {
                 console.error('Failed to fetch user profile:', err);
                 setError(err.message);
 
-                // 로그인이 필요하거나 접근 권한이 없는 경우 (토큰 만료 포함) 로그인 페이지로 이동
                 if (err.message === '로그인이 필요합니다.' || err.message === '접근 권한이 없습니다.') {
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');

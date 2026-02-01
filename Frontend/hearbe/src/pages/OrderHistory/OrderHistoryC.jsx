@@ -104,13 +104,13 @@ export default function OrderHistoryC({ onHome }) {
             {/* Header */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c order-history-header-title-area">
+                    <div className="title-area-c" style={{ marginLeft: 0 }}>
                         <div className="title-icon-box-c">
-                            <Package size={24} />
+                            <User size={24} />
                         </div>
                         <div className="title-text-c">
-                            <h1>주문 내역</h1>
-                            <span className="subtitle-c">Order History</span>
+                            <h1>마이페이지</h1>
+                            <span className="subtitle-c">My Page</span>
                         </div>
                     </div>
                 </div>
@@ -161,7 +161,16 @@ export default function OrderHistoryC({ onHome }) {
                 {/* Main Content */}
                 <main className="mypage-content">
                     <section className="dashboard-card full-height">
-                        <h2 className="card-title-lg">주문 내역</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                            <div style={{
+                                width: '50px', height: '50px', borderRadius: '1rem',
+                                backgroundColor: '#f3e8ff', color: '#7c3aed',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <Package size={28} />
+                            </div>
+                            <h2 className="card-title-lg" style={{ marginBottom: 0 }}>주문 내역</h2>
+                        </div>
                         <div className="wishlist-content">
                             {isLoading ? (
                                 <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>

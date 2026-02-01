@@ -10,7 +10,7 @@ export default function LoginC() {
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberId, setRememberId] = useState(false); 
+    const [rememberId, setRememberId] = useState(false);
 
     useEffect(() => {
         const savedUsername = localStorage.getItem('rememberedUsername');
@@ -29,15 +29,9 @@ export default function LoginC() {
         }
 
         try {
-            // LoginRequest DTO requires 'username' and 'password'
             const response = await authAPI.login(id, password);
 
-            // Assuming response.data contains tokens or user info
-            // API Response format: ApiResponse<LoginResponse> -> data: LoginResponse
-            // LoginResponse fields needs to be checked. Usually it has accessToken/refreshToken/user info.
-            console.log("Login Success:", response);
-
-            // Save token if available (adjust based on actual response structure)
+            // 토큰 저장
             if (response.data && response.data.accessToken) {
                 localStorage.setItem('accessToken', response.data.accessToken);
             }
@@ -101,11 +95,11 @@ export default function LoginC() {
                         <div className="login-keep-c">
                             <input
                                 type="checkbox"
-                                id="rememberId" // ID를 'rememberId'로 변경
-                                checked={rememberId} // rememberId 상태에 연결
-                                onChange={(e) => setRememberId(e.target.checked)} // 상태 변경 핸들러 연결
+                                id="rememberId"
+                                checked={rememberId}
+                                onChange={(e) => setRememberId(e.target.checked)}
                             />
-                            <label htmlFor="rememberId">아이디 저장</label> {/* 라벨 텍스트 변경 */}
+                            <label htmlFor="rememberId">아이디 저장</label>
                         </div>
 
                         <div className="login-links-c">

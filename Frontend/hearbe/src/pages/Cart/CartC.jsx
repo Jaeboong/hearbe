@@ -8,7 +8,6 @@ import '../SelectMall/SelectMallC.css';
 import './CartC.css';
 
 export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }) {
-    console.log('CartPage 컴포넌트 렌더링됨');
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -53,17 +52,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
 
     // Fetch cart items on mount
     useEffect(() => {
-        console.log('useEffect 실행됨');
         const fetchCartItems = async () => {
-            console.log('fetchCartItems 함수 시작');
             try {
                 setIsLoading(true);
                 setError(null);
-                console.log('API 호출 시작');
+                setIsLoading(true);
+                setError(null);
                 const response = await cartAPI.getCart();
-                console.log('Cart API Response:', response);
 
-                // 1. 응답 구조 확인 - 다양한 형식 지원
+                // 1. 응답 처리
                 let itemsList = [];
                 if (Array.isArray(response)) {
                     itemsList = response;
@@ -81,7 +78,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                     itemsList = response.cart;
                 }
 
-                console.log('Parsed items list:', itemsList);
 
                 // 2. 데이터 변환
                 if (itemsList.length > 0) {
@@ -93,7 +89,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                         image: item.img_url || item.imgUrl || item.image || item.thumbnail || '📦',
                         mallName: platformNames[item.platform_id] || item.platform_name || item.platformName || item.mall_name || '기타 쇼핑몰',
                     }));
-                    console.log('Transformed items:', transformedItems);
                     setCartItems(transformedItems);
                 } else {
                     setCartItems([]);
@@ -222,11 +217,11 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                 <div className="header-left-c">
                     <div className="title-area-c" style={{ marginLeft: 0 }}>
                         <div className="title-icon-box-c">
-                            <ShoppingCart size={24} />
+                            <User size={24} />
                         </div>
                         <div className="title-text-c">
-                            <h1>장바구니</h1>
-                            <span className="subtitle-c">Shopping Cart</span>
+                            <h1>마이페이지</h1>
+                            <span className="subtitle-c">My Page</span>
                         </div>
                     </div>
                 </div>
@@ -292,7 +287,16 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                 {/* Main Content */}
                 <main className="mypage-content">
                     <section className="dashboard-card full-height">
-                        <h2 className="card-title-lg">장바구니</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                            <div style={{
+                                width: '50px', height: '50px', borderRadius: '1rem',
+                                backgroundColor: '#f3e8ff', color: '#7c3aed',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <ShoppingCart size={28} />
+                            </div>
+                            <h2 className="card-title-lg" style={{ marginBottom: 0 }}>장바구니</h2>
+                        </div>
                         <div className="wishlist-content">
                             {isLoading ? (
                                 <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
