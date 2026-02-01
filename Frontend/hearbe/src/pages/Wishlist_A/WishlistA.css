@@ -1,4 +1,4 @@
-/* Wishlist Page Styles */
+﻿/* Wishlist Page Styles */
 
 .wishlist-container {
     min-height: 100vh;
@@ -23,7 +23,7 @@
     display: flex;
     gap: clamp(30px, 5vw, 60px);
     max-width: 1400px;
-    margin: clamp(80px, 15vw, 120px) auto 0;
+    margin: clamp(40px, 8vw, 80px) auto 0;
     padding: 0 clamp(20px, 3vw, 40px);
 }
 
@@ -37,7 +37,7 @@
     font-weight: 900;
     color: #FFF064;
     margin-bottom: clamp(30px, 5vw, 50px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .sidebar-nav {
@@ -54,7 +54,7 @@
     border-radius: clamp(8px, 2vw, 12px);
     cursor: pointer;
     transition: background-color 0.2s;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .sidebar-item:hover {
@@ -75,7 +75,7 @@
     font-weight: 900;
     color: #FFF064;
     margin-bottom: clamp(30px, 5vw, 50px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 /* Mall Section */
@@ -87,8 +87,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
-    background-color: #4A6FA5;
+    padding: clamp(24px, 3.6vw, 36px) clamp(16px, 3vw, 24px);
+    background-color: #FFF064;
     border-radius: clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px) 0 0;
     margin-bottom: clamp(2px, 0.4vw, 4px);
 }
@@ -96,21 +96,21 @@
 .mall-name {
     font-size: clamp(20px, 3.5vw, 32px);
     font-weight: 900;
-    color: #FFFFFF;
+    color: #1E2A3A;
     margin: 0;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .delete-all-btn {
     padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
-    background-color: #FFF064;
-    color: #1E2A3A;
+    background-color: #1E2A3A;
+    color: #FFF064;
     border: none;
     border-radius: clamp(6px, 1.5vw, 10px);
     font-size: clamp(14px, 2.5vw, 20px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
 }
 
@@ -163,14 +163,14 @@
     font-size: clamp(12px, 2vw, 16px);
     color: #666666;
     font-weight: bold;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .item-name {
     font-size: clamp(16px, 3vw, 22px);
     color: #1E2A3A;
     font-weight: bold;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     line-height: 1.4;
 }
 
@@ -178,7 +178,7 @@
     font-size: clamp(18px, 3.5vw, 26px);
     color: #1E2A3A;
     font-weight: 900;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 /* Item Actions */
@@ -197,7 +197,7 @@
     font-size: clamp(14px, 2.5vw, 20px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
     white-space: nowrap;
 }
@@ -246,7 +246,7 @@
     font-size: clamp(18px, 3.5vw, 28px);
     font-weight: bold;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 /* Error State */
@@ -263,14 +263,14 @@
     font-size: clamp(20px, 4vw, 32px);
     font-weight: bold;
     color: #FF6B6B;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     text-align: center;
 }
 
 .error-state .error-detail {
     font-size: clamp(14px, 2.5vw, 20px);
     color: #AAAAAA;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     text-align: center;
 }
 
@@ -284,7 +284,7 @@
     font-size: clamp(16px, 3vw, 24px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
 }
 
@@ -299,7 +299,7 @@
     font-size: clamp(20px, 4vw, 32px);
     font-weight: bold;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 /* Responsive */
@@ -336,3 +336,49 @@
         width: 100%;
     }
 }
+/* MyPage Top Bar */
+.mypage-topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: clamp(6px, 1vw, 12px) 0 clamp(12px, 2.5vw, 24px);
+}
+
+.mypage-topbar-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(32px, 4.5vw, 52px);
+    font-weight: 900;
+    color: #FFF064;
+    margin: 0;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+}
+
+.mypage-topbar-actions {
+    display: flex;
+    gap: clamp(8px, 1.6vw, 14px);
+}
+
+.topbar-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    color: #FFF064;
+    padding: clamp(8px, 1.6vw, 14px);
+    border-radius: 0.75rem;
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+}
+
+.topbar-action:hover {
+    background-color: rgba(255, 240, 100, 0.12);
+}
+
+

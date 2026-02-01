@@ -1,7 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Home, LogOut, Store } from 'lucide-react';
 import BackButton from '../common/BackButtonA';
 import { memberAPI } from '../../services/memberAPI';
+import { authAPI } from '../../services/authAPI';
 import './MemberInfoA.css';
 
 const MemberInfoA = () => {
@@ -66,10 +68,18 @@ const MemberInfoA = () => {
         fetchUserProfile();
     }, [navigate]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('userData');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch (err) {
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = 'http://localhost:5173/';
+        }
     };
 
     const handleRetry = () => {
@@ -81,12 +91,29 @@ const MemberInfoA = () => {
 
     return (
         <div className="memberinfo-container">
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
+            <BackButton onClick={() => navigate('/A/mall')} variant="arrow-only" />
+
+            <div className="mypage-topbar">
+                <h1 className="mypage-topbar-title">마이페이지</h1>
+                <div className="mypage-topbar-actions">
+                    <button className="topbar-action" onClick={() => navigate('/')}>
+                        <Home size={72} />
+                        <span>홈</span>
+                    </button>
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                        <Store size={72} />
+                        <span>쇼핑몰</span>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </div>
 
             <div className="memberinfo-content">
                 {/* Sidebar Navigation */}
                 <aside className="memberinfo-sidebar">
-                    <h1 className="sidebar-title">마이페이지</h1>
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <div
@@ -148,3 +175,7 @@ const MemberInfoA = () => {
 };
 
 export default MemberInfoA;
+
+
+
+

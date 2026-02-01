@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../common/BackButtonA';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './LoginA.css';
@@ -9,10 +10,19 @@ const Login = () => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [rememberId, setRememberId] = useState(true);
+
+    useEffect(() => {
+        const savedId = localStorage.getItem('savedLoginId');
+        if (savedId) {
+            setId(savedId);
+            setRememberId(true);
+        }
+    }, []);
 
     const handleLogin = async () => {
         if (!id || !password) {
-            alert("아이디와 비밀번호를 입력해주세요.");
+            alert('아이디와 비밀번호를 입력해주세요.');
             return;
         }
         setIsLoading(true);
@@ -26,14 +36,19 @@ const Login = () => {
                 if (response.data && response.data.refreshToken) {
                     localStorage.setItem('refreshToken', response.data.refreshToken);
                 }
+                if (rememberId) {
+                    localStorage.setItem('savedLoginId', id);
+                } else {
+                    localStorage.removeItem('savedLoginId');
+                }
                 // 로그인 성공
                 navigate('/A/mall');
             } else {
-                alert(response.message || "로그인에 실패했습니다.");
+                alert(response.message || '로그인에 실패했습니다.');
             }
         } catch (error) {
             console.error('Login Error:', error);
-            alert(error.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
+            alert(error.message || '아이디 또는 비밀번호가 일치하지 않습니다.');
         } finally {
             setIsLoading(false);
         }
@@ -41,6 +56,7 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            <BackButton onClick={() => navigate('/')} variant="arrow-only" />
             <div className="login-box">
                 {/* Logo Section */}
                 <div className="logo-area">
@@ -66,12 +82,18 @@ const Login = () => {
                 </div>
 
                 {/* Login Button */}
-                <button className="login-button" onClick={handleLogin}>로그인</button>
+                <button className="login-button" onClick={handleLogin} disabled={isLoading}>
+                    {isLoading ? '로그인 중...' : '로그인'}
+                </button>
 
                 {/* Features (Save ID) */}
                 <div className="login-options">
                     <label className="checkbox-container">
-                        <input type="checkbox" defaultChecked />
+                        <input
+                            type="checkbox"
+                            checked={rememberId}
+                            onChange={(e) => setRememberId(e.target.checked)}
+                        />
                         <span className="checkmark"></span>
                         아이디 저장
                     </label>
@@ -83,7 +105,9 @@ const Login = () => {
                     <span className="login-separator">|</span>
                     <span>비밀번호 찾기</span>
                     <span className="login-separator">|</span>
-                    <span className="signup-link" onClick={() => navigate('/A/signup')} style={{ cursor: 'pointer' }}>회원가입</span>
+                    <span className="signup-link" onClick={() => navigate('/A/signup')} style={{ cursor: 'pointer' }}>
+                        회원가입
+                    </span>
                 </div>
             </div>
         </div>

@@ -1,8 +1,10 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Home, LogOut, Store } from 'lucide-react';
 import BackButton from '../common/BackButtonA';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import { cartAPI } from '../../services/cartAPI';
+import { authAPI } from '../../services/authAPI';
 import './WishlistA.css';
 
 const WishlistA = () => {
@@ -28,10 +30,24 @@ const WishlistA = () => {
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: '결제카드 변경', path: '/A/card-management' }
+        { id: 'card', label: '장애인 복지카드 변경', path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
+
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch (err) {
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = 'http://localhost:5173/';
+        }
+    };
 
     // API 호출
     useEffect(() => {
@@ -44,10 +60,10 @@ const WishlistA = () => {
             setError(null);
             const response = await wishlistAPI.getWishlist();
 
-            // 응답 데이터 변환: 플랫폼별로 그룹화
+            // 응답 데이터 변환 후 그룹핑
             const groupedData = {};
 
-            // 백엔드 응답 필드명: snake_case
+            // 백엔드 응답 필드명 snake_case
             // wishlist_item_id, product_name, product_url, platform_name, created_at, img_url, price, liked
             if (response.items && response.items.length > 0) {
                 response.items.forEach(item => {
@@ -134,12 +150,29 @@ const WishlistA = () => {
 
     return (
         <div className="wishlist-container">
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
+            <BackButton onClick={() => navigate('/A/mall')} variant="arrow-only" />
+
+            <div className="mypage-topbar">
+                <h1 className="mypage-topbar-title">마이페이지</h1>
+                <div className="mypage-topbar-actions">
+                    <button className="topbar-action" onClick={() => navigate('/')}>
+                        <Home size={72} />
+                        <span>홈</span>
+                    </button>
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                        <Store size={72} />
+                        <span>쇼핑몰</span>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </div>
 
             <div className="wishlist-content">
                 {/* Sidebar */}
                 <aside className="wishlist-sidebar">
-                    <h1 className="sidebar-title">마이페이지</h1>
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <div
@@ -203,14 +236,7 @@ const WishlistA = () => {
                                                     <div className="item-checkbox">
                                                         <input type="checkbox" />
                                                     </div>
-                                                    <img
-                                                        src={item.image}
-                                                        alt={item.name}
-                                                        className="item-image"
-                                                        onError={(e) => {
-                                                            e.target.src = 'https://via.placeholder.com/150';
-                                                        }}
-                                                    />
+                                                    <img src={item.image} alt={item.name} className="item-image" />
                                                     <div className="item-details">
                                                         <div className="item-date">{item.date}</div>
                                                         <div className="item-name">{item.name}</div>
@@ -245,3 +271,4 @@ const WishlistA = () => {
 };
 
 export default WishlistA;
+

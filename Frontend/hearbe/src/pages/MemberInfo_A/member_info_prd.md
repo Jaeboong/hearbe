@@ -29,23 +29,20 @@ Authorization: Bearer {accessToken}
 ### 3.2 Response
 ```json
 {
-  "code": 200,
-  "message": "Success",
-  "data": {
-    "id": 1,
-    "username": "testuser123",
-    "name": "홍길동",
-    "userType": "BLIND",
-    "phoneNumber": "010-1234-5678",
+  "user": {
+    "user_id": "string",
+    "username": "string",
+    "phone_number": "string",
+    "user_type": "USER",
+    "last_login_at": "timestamp",
+    "created_at": "timestamp"
+  },
+  "profile": {
     "gender": "M",
-    "birthDate": "1990-01-01",
-    "height": 175.5,
-    "weight": 70.0,
-    "topSize": "L",
-    "bottomSize": "32",
-    "shoeSize": "270",
-    "allergies": ["NUTS", "DAIRY"],
-    "etcAllergy": "복숭아"
+    "height": 170.5,
+    "weight": 60.2,
+    "birth_date": "1999-01-01",
+    "updated_at": "timestamp"
   }
 }
 ```
@@ -54,20 +51,17 @@ Authorization: Bearer {accessToken}
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| id | number | 사용자 ID |
-| username | string | 로그인 아이디 |
-| name | string | 사용자 이름 |
-| userType | string | 사용자 타입 (BLIND 등) |
-| phoneNumber | string | 휴대폰번호 |
-| gender | string | 성별 (M/F) |
-| birthDate | string | 생년월일 (YYYY-MM-DD) |
-| height | number | 키 (cm) |
-| weight | number | 몸무게 (kg) |
-| topSize | string | 상의 사이즈 (S/M/L/XL) |
-| bottomSize | string | 하의 사이즈 (26/27/28...) |
-| shoeSize | string | 신발 사이즈 (mm) |
-| allergies | array | 알레르기 목록 |
-| etcAllergy | string | 기타 알레르기 |
+| user.user_id | string | 사용자 ID |
+| user.username | string | 로그인 아이디 |
+| user.phone_number | string | 휴대폰번호 |
+| user.user_type | string | 사용자 타입 (USER 등) |
+| user.last_login_at | timestamp | 마지막 로그인 시간 |
+| user.created_at | timestamp | 계정 생성 시간 |
+| profile.gender | string | 성별 (M/F) |
+| profile.height | number | 키 (cm) |
+| profile.weight | number | 몸무게 (kg) |
+| profile.birth_date | string | 생년월일 (YYYY-MM-DD) |
+| profile.updated_at | timestamp | 프로필 수정 시간 |
 
 ## 4. 구현 요구사항
 

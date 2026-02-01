@@ -67,7 +67,7 @@ export const authAPI = {
     },
 
     // 로그인 API
-    login: async ({ username, password }) => {
+    login: async (id, password) => {
         try {
             if (typeof id !== 'string' || typeof password !== 'string') {
                 throw new Error('로그인 값이 올바르지 않습니다.');
@@ -84,11 +84,7 @@ export const authAPI = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-<<<<<<< HEAD
-                body: JSON.stringify({ username, password }),
-=======
                 body: JSON.stringify({ username, password: resolvedPassword }),
->>>>>>> d223338fb30fb50998496b32f6eb706b10ca2c90
             });
 
             const text = await response.text();
@@ -114,11 +110,7 @@ export const authAPI = {
             // user_id 저장
             if (data.data && data.data.id) {
                 localStorage.setItem('user_id', data.data.id);
-<<<<<<< HEAD
-                // 가입 시 아이디인 username도 저장 (장바구니 API 등에서 사용)
-=======
                 // 가입할때의 username도 저장(사람구분니 API 호출에서 사용)
->>>>>>> d223338fb30fb50998496b32f6eb706b10ca2c90
                 localStorage.setItem('username', username);
             }
 
@@ -168,6 +160,46 @@ export const authAPI = {
                 throw new Error('네트워크 연결을 확인해주세요.');
             }
             console.error('getUserProfile API Error:', error);
+            throw error;
+        }
+    },
+
+    // 로그아웃 API
+    logout: async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                return { success: true };
+            }
+
+            const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (response.status === 204) {
+                return { success: true };
+            }
+
+            const text = await response.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '로그아웃에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Logout API Error:', error);
             throw error;
         }
     }

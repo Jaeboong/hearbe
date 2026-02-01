@@ -1,8 +1,10 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Home, LogOut, Store } from 'lucide-react';
 import BackButton from '../common/BackButtonA';
 import iconCamera from '../../assets/icon-camera.png';
 import iconCard from '../../assets/icon-card.png';
+import { authAPI } from '../../services/authAPI';
 import './CardManagementA.css';
 
 const CardManagementA = () => {
@@ -103,14 +105,45 @@ const CardManagementA = () => {
 
     const currentPath = location.pathname;
 
+const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch (err) {
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = 'http://localhost:5173/';
+        }
+    };
+
     return (
         <div className="cardmgmt-container">
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
+            <BackButton onClick={() => navigate('/A/mall')} variant="arrow-only" />
+
+            <div className="mypage-topbar">
+                <h1 className="mypage-topbar-title">마이페이지</h1>
+                <div className="mypage-topbar-actions">
+                    <button className="topbar-action" onClick={() => navigate('/')}>
+                        <Home size={72} />
+                        <span>홈</span>
+                    </button>
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                        <Store size={72} />
+                        <span>쇼핑몰</span>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </div>
 
             <div className="cardmgmt-content">
                 {/* Sidebar */}
                 <aside className="cardmgmt-sidebar">
-                    <h1 className="sidebar-title">마이페이지</h1>
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <div
@@ -233,3 +266,5 @@ const CardManagementA = () => {
 };
 
 export default CardManagementA;
+
+

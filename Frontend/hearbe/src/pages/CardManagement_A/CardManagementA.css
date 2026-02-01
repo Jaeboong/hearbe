@@ -23,7 +23,7 @@
     display: flex;
     gap: clamp(30px, 5vw, 60px);
     max-width: 1400px;
-    margin: clamp(80px, 15vw, 120px) auto 0;
+    margin: clamp(40px, 8vw, 80px) auto 0;
     padding: 0 clamp(20px, 3vw, 40px);
 }
 
@@ -366,4 +366,48 @@
     .cardmgmt-sidebar {
         flex: none;
     }
+}
+/* MyPage Top Bar */
+.mypage-topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: clamp(6px, 1vw, 12px) 0 clamp(12px, 2.5vw, 24px);
+}
+
+.mypage-topbar-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(32px, 4.5vw, 52px);
+    font-weight: 900;
+    color: #FFF064;
+    margin: 0;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+}
+
+.mypage-topbar-actions {
+    display: flex;
+    gap: clamp(8px, 1.6vw, 14px);
+}
+
+.topbar-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    color: #FFF064;
+    padding: clamp(8px, 1.6vw, 14px);
+    border-radius: 0.75rem;
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+}
+
+.topbar-action:hover {
+    background-color: rgba(255, 240, 100, 0.12);
 }
