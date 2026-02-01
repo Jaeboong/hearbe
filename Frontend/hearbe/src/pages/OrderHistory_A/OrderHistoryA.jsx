@@ -15,8 +15,6 @@ const OrderHistoryA = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Collapsed state for each mall section
-    const [collapsedMalls, setCollapsedMalls] = useState({});
 
     // Platform ID to name mapping
     const platformNames = {
@@ -115,13 +113,6 @@ const OrderHistoryA = () => {
 
         fetchOrders();
     }, [navigate]);
-
-    const toggleMallSection = (mallName) => {
-        setCollapsedMalls(prev => ({
-            ...prev,
-            [mallName]: !prev[mallName]
-        }));
-    };
 
     const handleTrackDelivery = (deliverUrl) => {
         if (deliverUrl) {
@@ -226,69 +217,61 @@ const OrderHistoryA = () => {
                         <>
                             {Object.entries(orderData).map(([mallName, orderGroups]) => (
                                 <div key={mallName} className="mall-section">
-                                    <div
-                                        className="mall-header"
-                                        onClick={() => toggleMallSection(mallName)}
-                                    >
+                                    <div className="mall-header">
                                         <h3 className="mall-name">{mallName}</h3>
-                                        <span className="toggle-icon">
-                                            {collapsedMalls[mallName] ? '▲' : '▼'}
-                                        </span>
                                     </div>
 
-                                    {!collapsedMalls[mallName] && (
-                                        <div className="orders-list">
-                                            {orderGroups.map((group, index) => (
-                                                <div key={`${group.orderId}-${index}`} className="order-group">
-                                                    <div className="order-date-header">
-                                                        {formatDate(group.datetime)}
-                                                    </div>
+                                    <div className="orders-list">
+                                        {orderGroups.map((group, index) => (
+                                            <div key={`${group.orderId}-${index}`} className="order-group">
+                                                <div className="order-date-header">
+                                                    {formatDate(group.datetime)}
+                                                </div>
 
-                                                    <div className="order-details">
-                                                        <div className="order-items">
-                                                            {group.orders.map((order, orderIndex) => (
-                                                                <div key={`${order.id}-${orderIndex}`} className="order-item">
-                                                                    <img
-                                                                        src={order.image}
-                                                                        alt={order.name}
-                                                                        className="order-item-image"
-                                                                        onError={(e) => {
-                                                                            e.target.src = 'https://via.placeholder.com/80';
-                                                                        }}
-                                                                    />
-                                                                    <div className="order-item-info">
-                                                                        <div className="order-item-name">{order.name}</div>
-                                                                        <div className="order-item-meta">
-                                                                            {order.price.toLocaleString()}원, {order.quantity}개
-                                                                        </div>
+                                                <div className="order-details">
+                                                    <div className="order-items">
+                                                        {group.orders.map((order, orderIndex) => (
+                                                            <div key={`${order.id}-${orderIndex}`} className="order-item">
+                                                                <img
+                                                                    src={order.image}
+                                                                    alt={order.name}
+                                                                    className="order-item-image"
+                                                                    onError={(e) => {
+                                                                        e.target.src = 'https://via.placeholder.com/80';
+                                                                    }}
+                                                                />
+                                                                <div className="order-item-info">
+                                                                    <div className="order-item-name">{order.name}</div>
+                                                                    <div className="order-item-meta">
+                                                                        {order.price.toLocaleString()}원, {order.quantity}개
                                                                     </div>
                                                                 </div>
-                                                            ))}
-                                                        </div>
-                                                        <div className="order-actions">
-                                                            <button
-                                                                className={`track-delivery-btn ${!group.orderUrl ? 'disabled' : ''}`}
-                                                                onClick={() => handleOrderDetail(group.orderUrl)}
-                                                                disabled={!group.orderUrl}
-                                                            >
-                                                                상세 조회
-                                                            </button>
-                                                            <button
-                                                                className={`track-delivery-btn ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
-                                                                onClick={() => {
-                                                                    const deliverUrl = group.orders.find(o => o.deliverUrl)?.deliverUrl;
-                                                                    handleTrackDelivery(deliverUrl);
-                                                                }}
-                                                                disabled={!group.orders.some(o => o.deliverUrl)}
-                                                            >
-                                                                배송조회
-                                                            </button>
-                                                        </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div className="order-actions">
+                                                        <button
+                                                            className={`track-delivery-btn ${!group.orderUrl ? 'disabled' : ''}`}
+                                                            onClick={() => handleOrderDetail(group.orderUrl)}
+                                                            disabled={!group.orderUrl}
+                                                        >
+                                                            상세 조회
+                                                        </button>
+                                                        <button
+                                                            className={`track-delivery-btn ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
+                                                            onClick={() => {
+                                                                const deliverUrl = group.orders.find(o => o.deliverUrl)?.deliverUrl;
+                                                                handleTrackDelivery(deliverUrl);
+                                                            }}
+                                                            disabled={!group.orders.some(o => o.deliverUrl)}
+                                                        >
+                                                            배송조회
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             ))}
                         </>

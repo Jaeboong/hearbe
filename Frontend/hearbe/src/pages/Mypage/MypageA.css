@@ -7,6 +7,18 @@
     --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
 }
 
+body:has(.mypage-container-a) {
+    background-color: #1E2A3A;
+}
+
+
+
+
+
+
+
+
+
 .mypage-container-a {
     display: flex;
     flex-direction: column;
@@ -18,7 +30,9 @@
     position: relative;
     overflow-x: hidden;
     box-sizing: border-box;
-    padding: clamp(20px, 5vw, 40px);
+    padding: 0;
+    padding-top: 10px;
+    padding-right: 10px;
 }
 
 /* Header & Nav */
@@ -161,4 +175,28 @@
     font-weight: 900;
     color: var(--color-text-yellow);
     white-space: nowrap;
+}
+
+@media (max-width: 1024px), (max-height: 900px) {
+    .mypage-container-a {
+        padding: 0;
+    }
+
+    .top-nav-area {
+        position: static;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .user-info-area {
+        padding-left: 0;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .menu-list {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
 }

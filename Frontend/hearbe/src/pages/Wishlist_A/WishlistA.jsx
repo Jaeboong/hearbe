@@ -67,7 +67,8 @@ const WishlistA = () => {
             // wishlist_item_id, product_name, product_url, platform_name, created_at, img_url, price, liked
             if (response.items && response.items.length > 0) {
                 response.items.forEach(item => {
-                    const platform = platformDisplayNames[item.platform_name] || item.platform_name;
+                    const platformKey = (item.platform_name || '').toLowerCase();
+                    const platform = platformDisplayNames[platformKey] || item.platform_name;
 
                     if (!groupedData[platform]) {
                         groupedData[platform] = [];
