@@ -23,8 +23,8 @@
     display: flex;
     gap: clamp(30px, 5vw, 60px);
     max-width: 1400px;
-    margin: clamp(40px, 8vw, 80px) auto 0;
-    padding: 0 clamp(20px, 3vw, 40px);
+    margin: 0;
+    padding: clamp(40px, 5vw, 64px) clamp(30px, 4vw, 48px);
 }
 
 /* Sidebar */
@@ -67,7 +67,7 @@
 
 /* Main Content */
 .wishlist-main {
-    flex: 1;
+    flex: 1.3;
 }
 
 .content-title {

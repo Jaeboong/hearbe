@@ -23,8 +23,8 @@
     display: flex;
     gap: clamp(30px, 5vw, 60px);
     max-width: 1400px;
-    margin: clamp(40px, 8vw, 80px) auto 0;
-    padding: 0 clamp(20px, 3vw, 40px);
+    margin: 0;
+    padding: 0;
 }
 
 /* Sidebar */
@@ -256,6 +256,3 @@
 .topbar-action:hover {
     background-color: rgba(255, 240, 100, 0.12);
 }
-
-
-
