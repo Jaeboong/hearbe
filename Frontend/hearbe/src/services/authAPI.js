@@ -233,5 +233,45 @@ export const authAPI = {
             console.error('Find ID API Error:', error);
             throw error;
         }
+    },
+
+    // 로그아웃 API
+    logout: async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                return { success: true };
+            }
+
+            const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (response.status === 204) {
+                return { success: true };
+            }
+
+            const text = await response.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '로그아웃에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Logout API Error:', error);
+            throw error;
+        }
     }
 };

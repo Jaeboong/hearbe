@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Home, ShoppingCart, ShieldCheck } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
+import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
 
 export default function MemberInfoC({ onHome }) {
@@ -85,12 +86,20 @@ export default function MemberInfoC({ onHome }) {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (window.confirm('로그아웃 하시겠습니까?')) {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('user');
-            navigate('/C/login');
+            try {
+                await authAPI.logout();
+            } catch (error) {
+                console.error('Logout failed:', error);
+            } finally {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('username');
+                navigate('/C/login');
+            }
         }
     };
 
