@@ -117,7 +117,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     json_path = sys.argv[1]
-    output_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].endswith(".json") == False else None
+    output_path = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2].endswith(".json") else None
 
     dom_keys_path = None
     if len(sys.argv) > 3:
