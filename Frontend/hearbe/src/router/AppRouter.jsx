@@ -1,5 +1,5 @@
 ﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
 // [페이지 컴포넌트]
 import MainLanding from '../pages/MainLanding';
@@ -38,13 +38,7 @@ function AppContent() {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState('audio');
   const [micPermissionGranted, setMicPermissionGranted] = useState(false);
-  const [showInitialSetup, setShowInitialSetup] = useState(false);
   const modeSelectionRef = useRef(null);
-
-  const handleSetupComplete = (micGranted) => {
-    setMicPermissionGranted(micGranted);
-    setShowInitialSetup(false);
-  };
 
   const handleModeSelect = (mode, label) => {
     if (micPermissionGranted || mode === 'audio') {
