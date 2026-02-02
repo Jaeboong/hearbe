@@ -4,6 +4,7 @@
 Playwright를 사용하여 CDP로 브라우저 연결 및 페이지 관리
 """
 
+import asyncio
 import logging
 from typing import Optional
 
@@ -23,6 +24,8 @@ class BrowserConnectionMixin:
         self._cdp_url: Optional[str] = None
         self._tracked_pages: set[int] = set()
         self._last_published_url: Optional[str] = None
+        self._last_published_page_id: Optional[int] = None
+        self._focus_poll_task: Optional[asyncio.Task] = None
 
     @property
     def is_connected(self) -> bool:
@@ -64,6 +67,7 @@ class BrowserConnectionMixin:
                 self._page = await context.new_page()
 
             self._attach_browser_listeners()
+            self._start_focus_poll()
             logger.info(f"Connected to browser via CDP: {cdp_url}")
             return True
 
@@ -110,15 +114,48 @@ class BrowserConnectionMixin:
         except Exception as e:
             logger.debug(f"Failed to attach page listeners: {e}")
 
+    def _start_focus_poll(self):
+        if self._focus_poll_task and not self._focus_poll_task.done():
+            return
+        self._focus_poll_task = asyncio.create_task(self._focus_poll_loop())
+
+    async def _focus_poll_loop(self):
+        while self.is_connected and self._browser:
+            focused_page: Optional[Page] = None
+            try:
+                for context in self._browser.contexts:
+                    for page in context.pages:
+                        if page.is_closed():
+                            continue
+                        try:
+                            has_focus = await page.evaluate("document.hasFocus()")
+                        except Exception:
+                            continue
+                        if has_focus:
+                            focused_page = page
+                            break
+                    if focused_page:
+                        break
+                if focused_page and focused_page != self._page:
+                    self._page = focused_page
+                    self._publish_page_url(focused_page)
+            except Exception:
+                pass
+            await asyncio.sleep(0.8)
+
     def _publish_page_url(self, page: Page):
         try:
             url = page.url or ""
-            if not url or url == self._last_published_url:
+            page_id = id(page)
+            if not url:
+                return
+            if url == self._last_published_url and page_id == self._last_published_page_id:
                 return
             self._last_published_url = url
+            self._last_published_page_id = page_id
             publish_sync(
                 EventType.PAGE_URL_UPDATED,
-                data={"url": url},
+                data={"url": url, "page_id": page_id},
                 source="browser"
             )
         except Exception:
@@ -165,6 +202,9 @@ class BrowserConnectionMixin:
 
     async def disconnect(self):
         """브라우저 연결 해제"""
+        if self._focus_poll_task:
+            self._focus_poll_task.cancel()
+            self._focus_poll_task = None
         if self._browser:
             try:
                 await self._browser.close()

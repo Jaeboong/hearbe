@@ -72,41 +72,6 @@ AVAILABLE_COMMANDS: Dict[str, Dict[str, Any]] = {
             '"description": "Scroll down"}'
         ),
     },
-    "extract": {
-        "description": "Extract product data from a list",
-        "args": {
-            "selector": "CSS selector for items",
-            "fields": "List of fields (name, price, rating, review_count)",
-            "field_selectors": "Optional field->selector mapping",
-            "limit": "Max items",
-        },
-        "example": (
-            '{"tool_name": "extract", "arguments": {"selector": ".search-product", '
-            '"fields": ["name", "price"], "limit": 20}, "description": "Extract search results"}'
-        ),
-    },
-    "extract_detail": {
-        "description": "Extract product detail fields on a product page",
-        "args": {
-            "fields": "Field names to extract",
-            "field_selectors": "Field -> selector mapping",
-            "field_attributes": "Field -> attribute mapping (optional)",
-            "image_selector": "Selector for detail images (optional)",
-            "image_attribute": "Image attribute (optional)",
-        },
-        "example": (
-            '{"tool_name": "extract_detail", "arguments": {"fields": ["name", "price"], '
-            '"field_selectors": {"name": "h1.product-title span", "price": ".final-price-amount"}}, '
-            '"description": "Extract product detail"}'
-        ),
-    },
-    "extract_cart": {
-        "description": "Extract cart items and summary on cart page",
-        "args": {},
-        "example": (
-            '{"tool_name": "extract_cart", "arguments": {}, "description": "Extract cart items"}'
-        ),
-    },
     "get_text": {
         "description": "Get text content from an element",
         "args": {

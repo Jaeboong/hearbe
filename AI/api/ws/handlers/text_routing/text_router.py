@@ -1,0 +1,95 @@
+# -*- coding: utf-8 -*-
+"""
+Text routing orchestrator.
+"""
+
+from typing import Optional
+
+from core.interfaces import MCPCommand
+
+
+class TextRouter:
+    def __init__(
+        self,
+        session_manager,
+        payment_keypad,
+        flow_handler,
+        search_query_handler,
+        ai_next_router,
+        llm_pipeline_handler,
+        history_writer,
+        interrupt_manager,
+        command_pipeline,
+    ):
+        self._session = session_manager
+        self._payment_keypad = payment_keypad
+        self._flow_handler = flow_handler
+        self._search_query_handler = search_query_handler
+        self._ai_next_router = ai_next_router
+        self._llm_pipeline = llm_pipeline_handler
+        self._history = history_writer
+        self._interrupts = interrupt_manager
+        self._command_pipeline = command_pipeline
+
+    async def handle_text(self, session_id: str, text: str) -> Optional[str]:
+        session = self._session.get_session(session_id) if self._session else None
+        if not session:
+            return None
+        epoch = self._interrupts.get_epoch(session_id)
+
+        if self._payment_keypad:
+            handled = await self._payment_keypad.handle_user_text(session_id, text)
+            if handled:
+                return None
+
+        self._history.add_user(session_id, text)
+
+        if self._interrupts.is_interrupted(session_id, epoch):
+            return None
+
+        if self._flow_handler and self._flow_handler.is_flow_active(session_id):
+            await self._flow_handler.handle_flow_input(session_id, text, session)
+            return None
+
+        if self._interrupts.is_interrupted(session_id, epoch):
+            return None
+
+        handled = await self._search_query_handler.handle_query(session_id, text, session)
+        if handled:
+            return None
+
+        if self._interrupts.is_interrupted(session_id, epoch):
+            return None
+
+        if self._ai_next_router:
+            ai_next_result = self._ai_next_router.route(text, session.current_url or "")
+            if ai_next_result:
+                commands = [
+                    MCPCommand(tool_name=c.tool_name, arguments=c.arguments, description=c.description)
+                    for c in ai_next_result.commands
+                ]
+                commands = self._command_pipeline.prepare_commands(
+                    session_id,
+                    commands,
+                    session.current_url or "",
+                    allow_extract=False,
+                )
+                tts_text = await self._command_pipeline.dispatch(
+                    session_id,
+                    commands,
+                    ai_next_result.response_text,
+                    session.current_url or "",
+                    lambda: self._interrupts.is_interrupted(session_id, epoch),
+                )
+                return tts_text
+
+        if self._interrupts.is_interrupted(session_id, epoch):
+            return None
+
+        tts_text = await self._llm_pipeline.handle(
+            session_id,
+            text,
+            session,
+            lambda: self._interrupts.is_interrupted(session_id, epoch),
+        )
+        return tts_text or None

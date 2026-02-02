@@ -417,11 +417,12 @@ class WSClient:
             return
         data = event.data or {}
         url = data.get("url")
+        page_id = data.get("page_id")
         if not url:
             return
         await self.send_message(
             MessageType.PAGE_UPDATE,
-            {"url": url}
+            {"url": url, "page_id": page_id}
         )
     
     async def _on_shutdown(self, _event):
