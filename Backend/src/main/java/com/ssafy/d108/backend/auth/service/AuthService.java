@@ -1,9 +1,11 @@
 package com.ssafy.d108.backend.auth.service;
 
 import com.ssafy.d108.backend.auth.dto.FindIdRequest;
+import com.ssafy.d108.backend.auth.dto.FindIdByEmailRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordRequest;
 import com.ssafy.d108.backend.auth.dto.SignupRequest;
 import com.ssafy.d108.backend.auth.dto.WelfareCardRequest;
 import com.ssafy.d108.backend.auth.repository.UserRepository;
@@ -210,5 +212,27 @@ public class AuthService {
      */
     public boolean checkIdDuplicate(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    /**
+     * 아이디 찾기 (C형 - 이메일 인증)
+     */
+    public FindIdResponse findIdByEmail(FindIdByEmailRequest request) {
+        User user = userRepository.findByNameAndEmail(request.getName(), request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("일치하는 회원 정보가 없습니다."));
+
+        return new FindIdResponse(user.getUsername(), "아이디를 찾았습니다.");
+    }
+
+    /**
+     * 비밀번호 재설정 (C형 - 이메일 인증)
+     */
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("해당 이메일로 가입된 회원이 없습니다."));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

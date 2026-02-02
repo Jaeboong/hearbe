@@ -1,0 +1,120 @@
+.wishlist-header-title-area {
+    margin-left: 0 !important;
+}
+
+.wishlist-status-message {
+    text-align: center;
+    padding: 3rem;
+    color: #888;
+}
+
+.wishlist-error-message {
+    text-align: center;
+    padding: 3rem;
+    color: #e53e3e;
+}
+
+.wishlist-content,
+.mall-wish-group,
+.group-items {
+    width: 100%;
+    /* 모든 컨테이너가 가로로 꽉 차도록 설정 */
+}
+
+.mall-wish-group {
+    margin-bottom: 3rem;
+    padding: 2.5rem;
+    background: white;
+    border-radius: 2.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+}
+
+.mall-header-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #7c3aed;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.count-badge {
+    color: #9ca3af;
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+.selection-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    /* 버튼을 우측으로 정렬 */
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+}
+
+.wishlist-detail-btn {
+    font-size: 1.25rem !important;
+    padding: 0.8rem 1.6rem !important;
+}
+
+.item-row-card {
+    width: 100%;
+    /* 카드가 부모 너비를 꽉 채우도록 설정 */
+    background: #fcfcfc;
+    border: 1px solid #f1f5f9;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item-row-left {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    flex: 1;
+}
+
+.item-thumb {
+    width: 10rem;
+    height: 10rem;
+    background: #f8fafc;
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    overflow: hidden;
+}
+
+.wishlist-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+}
+
+.item-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.item-name-lg {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+.item-price-lg {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #111827;
+}

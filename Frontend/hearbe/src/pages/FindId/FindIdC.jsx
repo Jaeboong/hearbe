@@ -1,9 +1,14 @@
 import { ArrowLeft, User, Mail, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import logoImage from '../../assets/HearBe_logo_.png';
+import { useNavigate } from 'react-router-dom';
 import './FindIdC.css';
+import logoC from '../../assets/logoC.png';
+
+import { authAPI } from '../../services/authAPI';
+import { emailService } from '../../services/emailService';
 
 export default function FindIdPage({ onBack, micPermissionGranted }) {
+    const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
@@ -21,43 +26,63 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
         }
     }, [micPermissionGranted]);
 
-    const handleSendVerification = () => {
+    const handleSendVerification = async () => {
         if (!name || !email) {
             alert('이름과 이메일 주소를 입력해주세요.');
             return;
         }
-        setIsSent(true);
-        alert('인증번호가 이메일로 전송되었습니다. (테스트 번호: 123456)');
-    };
-
-    const handleVerifyCode = () => {
-        if (verificationCode === '123456') {
-            setIsVerified(true);
-            alert('인증이 완료되었습니다.');
-        } else {
-            alert('인증번호가 일치하지 않습니다.');
+        try {
+            // EmailJS로 인증번호 발송 (클라이언트 사이드)
+            await emailService.sendVerificationCode(email, name);
+            setIsSent(true);
+            alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
+        } catch (error) {
+            alert(error.message || '인증번호 전송에 실패했습니다.');
         }
     };
 
-    const handleFindId = () => {
+    const handleVerifyCode = () => {
+        if (!verificationCode) {
+            alert('인증번호를 입력해주세요.');
+            return;
+        }
+        try {
+            // EmailJS 인증번호 확인 (클라이언트 사이드)
+            emailService.verifyCode(email, verificationCode);
+            setIsVerified(true);
+            alert('인증이 완료되었습니다.');
+        } catch (error) {
+            alert(error.message || '인증번호가 일치하지 않습니다.');
+        }
+    };
+
+    const handleFindId = async () => {
         if (!isVerified) {
             alert('먼저 이메일 인증을 완료해주세요.');
             return;
         }
-        setFoundUserId('hearbe_user');
-        setShowIdPopup(true);
+        try {
+            const response = await authAPI.findId(name, email);
+            // 백엔드 응답: { code, message, data: { username, message } }
+            if (response.data && response.data.username) {
+                setFoundUserId(response.data.username);
+                setShowIdPopup(true);
+            } else {
+                alert('해당 정보로 가입된 아이디를 찾을 수 없습니다.');
+            }
+        } catch (error) {
+            alert(error.message || '아이디 찾기에 실패했습니다.');
+        }
     };
 
     return (
         <div className="find-id-container">
-            <button onClick={onBack} className="back-button-circle-c" title="뒤로 가기">
-                <ArrowLeft size={24} />
-            </button>
+
 
             <main className="find-id-main">
                 <div className="find-id-card">
                     <div className="card-header">
-                        <img src={logoImage} alt="HearBe" className="mini-logo" />
+                        <img src={logoC} alt="HearBe" className="mini-logo" />
                         <h1>아이디 찾기</h1>
                         <p>가입 시 등록한 정보로 아이디를 찾을 수 있습니다.</p>
                     </div>
@@ -114,8 +139,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
 
                         <button
                             onClick={handleFindId}
-                            disabled={!isVerified}
-                            className={`submit-full-btn ${isVerified ? 'active' : 'disabled'}`}
+                            className="submit-full-btn active"
                         >
                             아이디 확인하기
                         </button>
@@ -138,7 +162,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                             <span className="result-label-c">회원님의 아이디는</span>
                             <strong className="result-value-c">{foundUserId}</strong>
                         </div>
-                        <button onClick={onBack} className="modal-confirm-btn-c">
+                        <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c"> {/* 로그인 페이지로 이동 */}
                             확인 및 로그인하기
                         </button>
                     </div>

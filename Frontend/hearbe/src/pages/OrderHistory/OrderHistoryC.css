@@ -1,0 +1,143 @@
+.order-history-header-title-area {
+    margin-left: 0 !important;
+}
+
+.order-history-status-message {
+    text-align: center;
+    padding: 3rem;
+    color: #888;
+}
+
+.order-history-error-message {
+    text-align: center;
+    padding: 3rem;
+    color: #e53e3e;
+}
+
+.orders-list,
+.mall-order-group,
+.group-items {
+    width: 100%;
+    /* 가로 너비 100% 보장 */
+}
+
+.mall-header-title-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.mall-header-name {
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 0;
+    color: #111827;
+}
+
+.item-row-card {
+    width: 100%;
+    /* 카드가 부모 너비를 꽉 채우도록 설정 */
+    background: #fcfcfc;
+    border: 1px solid #f1f5f9;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item-row-left {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    flex: 1;
+}
+
+.item-thumb {
+    width: 10rem;
+    height: 10rem;
+    background: #f8fafc;
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    overflow: hidden;
+}
+
+.item-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    /* 텍스트 영역이 가로로 길게 늘어나 버튼을 오른쪽으로 밉니다 */
+}
+
+.order-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+}
+
+.item-name-lg {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+.order-item-actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.order-group-actions .btn-outline-sm {
+    font-size: 1.25rem !important;
+    padding: 0.8rem 1.6rem !important;
+}
+
+.order-item-action-btn {
+    font-size: 1.25rem !important;
+    padding: 0.8rem 1.6rem !important;
+}
+
+.order-item-deliver-btn {
+    font-size: 1.25rem !important;
+    padding: 0.8rem 1.6rem !important;
+}
+
+.order-item-deliver-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mp-sidebar-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 1.85rem;
+    width: 100%;
+    padding: 1.4rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+}
+
+.mp-sidebar-item.active {
+    color: #7c3aed;
+    background: white;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.mp-sidebar-item:not(.active) {
+    color: #9ca3af;
+    background: transparent;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.mp-sidebar-item .label {
+    font-size: inherit;
+}

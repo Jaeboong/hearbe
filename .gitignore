@@ -482,6 +482,8 @@ MCP/chrome_profile/
 MCP/.mcp_chrome_profile/
 MCP/user_data_dir/
 MCP/playwright-state/
+AI/.cdp_profile/
+AI/.venv_ocr311/
 
 # ============================================================================
 # Backup files
@@ -557,3 +559,4 @@ AI_next/
 Backend/src/main/resources/application.properties
 
 google-service-account.json
+docker

@@ -1,12 +1,18 @@
 # 긴 이미지 분할 및 OCR 처리
 import argparse
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from PIL import Image
+
+# decompression bomb 방지 (약 14000x14000px 상한)
+Image.MAX_IMAGE_PIXELS = 200_000_000
+
+logger = logging.getLogger(__name__)
 
 try:
     from . import korean_ocr
@@ -19,6 +25,7 @@ DEFAULT_MAX_HEIGHT = 2500
 DEFAULT_OVERLAP = 100
 DEFAULT_RESIZE_MAX_HEIGHT = 12000
 MIN_CHUNK_HEIGHT = 500
+MAX_IMAGE_FILE_SIZE = 50 * 1024 * 1024  # 이미지 파일 최대 50MB
 OUTPUT_DIR = "output"
 
 
@@ -78,17 +85,19 @@ def split_image_to_chunks(
 
 def process_chunk_ocr(chunk: Image.Image, ocr_instance) -> List[Dict]:
     """청크 이미지에 OCR 수행 (numpy 배열 직접 전달로 임시파일 생략)"""
-    # RGBA(4채널) -> RGB(3채널) 변환 (PNG 투명도 처리)
-    if chunk.mode == 'RGBA':
-        chunk = chunk.convert('RGB')
-    elif chunk.mode != 'RGB':
-        chunk = chunk.convert('RGB')
+    try:
+        # RGBA(4채널) -> RGB(3채널) 변환 (PNG 투명도 처리)
+        if chunk.mode != 'RGB':
+            chunk = chunk.convert('RGB')
 
-    # PIL Image -> numpy array (RGB -> BGR for OpenCV compatibility)
-    img_array = np.array(chunk)
-    if len(img_array.shape) == 3 and img_array.shape[2] == 3:
-        img_array = img_array[:, :, ::-1]  # RGB to BGR
-    return ocr_instance.predict(img_array)
+        # PIL Image -> numpy array (RGB -> BGR for OpenCV compatibility)
+        img_array = np.array(chunk)
+        if len(img_array.shape) == 3 and img_array.shape[2] == 3:
+            img_array = img_array[:, :, ::-1]  # RGB to BGR
+        return ocr_instance.predict(img_array)
+    except Exception as e:
+        logger.warning(f"Chunk OCR failed: {e}")
+        return []
 
 
 def adjust_coordinates(ocr_result: List[Dict], y_offset: int) -> List[Dict]:
@@ -175,6 +184,12 @@ def process_long_image(
     ocr_instance = None,
     save_chunks: bool = False
 ) -> Dict:
+    file_size = os.path.getsize(image_path)
+    if file_size > MAX_IMAGE_FILE_SIZE:
+        raise ValueError(
+            f"이미지 파일이 너무 큽니다: {file_size / 1024 / 1024:.1f}MB (최대 {MAX_IMAGE_FILE_SIZE // 1024 // 1024}MB)"
+        )
+
     width, height = get_image_size(image_path)
     
     if not should_split_image(image_path, max_height):
