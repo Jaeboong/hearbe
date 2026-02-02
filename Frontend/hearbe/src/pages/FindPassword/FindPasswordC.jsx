@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, User, AtSign, Mail, Lock, ShieldCheck } from 'lucide-react';
-import logoC from '../../assets/logoC.png'; // C형 로고로 변경
+import { User, AtSign, Mail, Lock, ShieldCheck } from 'lucide-react';
+import logoC from '../../assets/logoC.png';
 import './FindPasswordC.css';
 
 import { authAPI } from '../../services/authAPI';
+import { emailService } from '../../services/emailService';
 
 export default function FindPasswordPage({ onBack, micPermissionGranted }) {
     const [step, setStep] = useState(1);
@@ -32,21 +33,21 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
-            await authAPI.sendEmailVerification(email, username, name);
+            await emailService.sendVerificationCode(email, name);
             setIsSent(true);
-            alert('인증번호가 이메일로 전송되었습니다.');
+            alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
         } catch (error) {
             alert(error.message || '인증번호 전송에 실패했습니다.');
         }
     };
 
-    const handleVerifyCode = async () => {
+    const handleVerifyCode = () => {
         if (!verificationCode) {
             alert('인증번호를 입력해주세요.');
             return;
         }
         try {
-            await authAPI.verifyEmailCode(email, verificationCode);
+            emailService.verifyCode(email, verificationCode);
             setIsVerified(true);
             alert('본인 인증이 완료되었습니다. 하단의 버튼을 눌러 비밀번호를 재설정해주세요.');
         } catch (error) {
@@ -69,7 +70,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
-            await authAPI.resetPassword(username, newPassword);
+            await authAPI.resetPassword(email, newPassword);
             alert('비밀번호가 성공적으로 재설정되었습니다.');
             onBack();
         } catch (error) {

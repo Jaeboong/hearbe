@@ -5,6 +5,7 @@ import './FindIdC.css';
 import logoC from '../../assets/logoC.png';
 
 import { authAPI } from '../../services/authAPI';
+import { emailService } from '../../services/emailService';
 
 export default function FindIdPage({ onBack, micPermissionGranted }) {
     const navigate = useNavigate();
@@ -31,21 +32,21 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
-            await authAPI.sendEmailVerification(email);
+            await emailService.sendVerificationCode(email, name);
             setIsSent(true);
-            alert('인증번호가 이메일로 전송되었습니다.');
+            alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
         } catch (error) {
             alert(error.message || '인증번호 전송에 실패했습니다.');
         }
     };
 
-    const handleVerifyCode = async () => {
+    const handleVerifyCode = () => {
         if (!verificationCode) {
             alert('인증번호를 입력해주세요.');
             return;
         }
         try {
-            await authAPI.verifyEmailCode(email, verificationCode);
+            emailService.verifyCode(email, verificationCode);
             setIsVerified(true);
             alert('인증이 완료되었습니다.');
         } catch (error) {
