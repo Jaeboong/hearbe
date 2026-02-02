@@ -33,6 +33,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
+            // EmailJS로 인증번호 발송 (클라이언트 사이드)
             await emailService.sendVerificationCode(email, name);
             setIsSent(true);
             alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
@@ -47,6 +48,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
+            // EmailJS 인증번호 확인 (클라이언트 사이드)
             emailService.verifyCode(email, verificationCode);
             setIsVerified(true);
             alert('본인 인증이 완료되었습니다. 하단의 버튼을 눌러 비밀번호를 재설정해주세요.');
