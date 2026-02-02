@@ -58,6 +58,7 @@ body:has(.cardmgmt-container) {
 /* Sidebar */
 .cardmgmt-sidebar {
     flex: 0 0 clamp(200px, 25vw, 300px);
+    border: none;
 }
 
 .sidebar-title {
@@ -90,7 +91,8 @@ body:has(.cardmgmt-container) {
 }
 
 .sidebar-item.active {
-    background-color: #232A39;
+    background-color: #171C28;
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
 }
 
 /* Main Content */

@@ -101,8 +101,8 @@
 }
 
 .mall-square-box {
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    width: clamp(180px, 22vw, 340px);
+    height: clamp(260px, 32vw, 460px);
     background-color: #141C29;
     border: clamp(3px, 0.8vw, 8px) solid var(--color-accent);
     border-radius: clamp(16px, 4vw, 40px);
@@ -156,10 +156,22 @@
     border-color: var(--color-accent);
 }
 
+.mall-11st-box .mall-logo-img {
+    width: clamp(78px, 12vw, 170px);
+    height: clamp(78px, 12vw, 170px);
+}
+
+.mall-emart-box .mall-logo-img {
+    width: clamp(118px, 17vw, 236px);
+    height: clamp(118px, 17vw, 236px);
+}
+
 .mall-logo-img {
     width: clamp(110px, 16vw, 220px);
     height: clamp(110px, 16vw, 220px);
     object-fit: contain;
+    max-width: 70%;
+    max-height: 60%;
 }
 
 .mall-logo-placeholder {

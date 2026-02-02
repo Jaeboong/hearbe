@@ -15,7 +15,7 @@ const Mypage = () => {
         { id: 2, label: '주문내역', action: () => { } },
         { id: 3, label: '장바구니', action: () => navigate('/A/cart') },
         { id: 4, label: '찜한 상품', action: () => { } },
-        { id: 5, label: '장애인 복지카드 변경', action: () => { } },
+        { id: 5, label: <>장애인 복지카드<br />변경</>, action: () => { } },
     ];
 
     return (

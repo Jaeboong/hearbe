@@ -169,7 +169,8 @@ body:has(.mypage-container-a) {
 
 
 .menu-item.active {
-    background-color: #141C29;
+    background-color: #171C28;
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
     box-shadow: 0 0 12px rgba(255, 240, 100, 0.45);
 }
 .menu-item:hover {

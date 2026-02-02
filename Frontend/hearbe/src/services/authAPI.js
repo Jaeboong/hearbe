@@ -1,4 +1,4 @@
-// API Base URL Configuration
+﻿// API Base URL Configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 // API Service for Authentication
@@ -49,7 +49,7 @@ export const authAPI = {
     // ID 중복 확인 API (선택사항 - 해당 API가 있다면 사용)
     checkDuplicate: async (userId) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/check-duplicate`, {
+            const response = await fetch(`${API_BASE_URL}/auth/checkId`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,7 +57,12 @@ export const authAPI = {
                 body: JSON.stringify({ username: userId }),
             });
 
+            console.log('Check Duplicate Response status:', response.status);
+
             const data = await response.json();
+
+            console.log('Check Duplicate Response data:', data);
+            
             return data;
         } catch (error) {
             console.error('Check Duplicate API Error:', error);

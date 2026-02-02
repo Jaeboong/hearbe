@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, UserPlus } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
-import logoC from '../../assets/logoC.png'; // C형 로고로 변경
+import logoC from '../../assets/logoC.png';
 import './SignUpC.css';
 
 export default function SignUpC({ onBack }) {
@@ -56,7 +56,10 @@ export default function SignUpC({ onBack }) {
 
     try {
       const apiResponse = await authAPI.checkDuplicate(formData.username);
-      if (apiResponse.available) {
+      //const isDuplicate = apiResponse && apiResponse.success === true ? apiResponse.data === true : false;
+      const isDuplicate = apiResponse.data;
+
+      if (isDuplicate==false) {
         setIsUsernameChecked(true);
         setIsUsernameAvailable(true);
         alert('사용 가능한 아이디입니다.');
@@ -68,31 +71,19 @@ export default function SignUpC({ onBack }) {
     } catch (error) {
       console.error('Username check error:', error);
       alert('아이디 중복 확인에 실패했습니다.');
-      setIsUsernameChecked(false); // 에러 발생 시 중복확인 상태 초기화
-    }
-  };
-
-  const handleAgreementChange = (field, value) => {
-    if (field === 'all') {
-      setAgreements({ all: value, age: value, terms: value, privacy: value });
-    } else {
-      const newAgreements = { ...agreements, [field]: value };
-      newAgreements.all = newAgreements.age && newAgreements.terms && newAgreements.privacy;
-      setAgreements(newAgreements);
+      setIsUsernameChecked(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Validate Form
     const usernameError = validateUsername(formData.username);
     const passwordError = validatePassword(formData.password);
     const confirmPasswordError = validatePasswordConfirm(formData.password, confirmPassword);
     const emailError = validateEmail(formData.email);
     const nameError = validateName(formData.name);
 
-    // 아이디 중복확인 체크
     if (!isUsernameChecked || !isUsernameAvailable) {
       alert('아이디 중복확인을 해주세요.');
       return;
@@ -113,11 +104,10 @@ export default function SignUpC({ onBack }) {
     }
 
     if (!agreements.terms) {
-      alert('필수 이용약관에 동의해주세요.');
+      alert('필수 약관에 동의해주세요.');
       return;
     }
 
-    // --- Real API Call ---
     try {
       const payload = {
         username: formData.username,
@@ -126,7 +116,7 @@ export default function SignUpC({ onBack }) {
         name: formData.name,
         email: formData.email,
         phone_number: null,
-        user_type: "GENERAL", // C형 사용자
+        user_type: 'GENERAL',
         simple_password: null,
         welfare_card: null
       };
@@ -147,7 +137,7 @@ export default function SignUpC({ onBack }) {
     <div className="signup-c-container">
       <main className="signup-c-main">
         <div className="signup-card-c">
-          <div className="signup-header-c"> {/* 로고 이미지 사용 */}
+          <div className="signup-header-c">
             <img
               src={logoC}
               alt="HearBe Logo"
@@ -161,7 +151,9 @@ export default function SignUpC({ onBack }) {
               </div>
               <h1>회원가입</h1>
             </div>
-            <p className="signup-subtitle-c" style={{ display: 'none' }}>HearBe 서비스 이용을 위한 회원가입을 진행합니다</p>
+            <p className="signup-subtitle-c" style={{ display: 'none' }}>
+              HearBe 서비스 이용을 위한 회원가입을 진행합니다.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="signup-form-c">
@@ -180,20 +172,22 @@ export default function SignUpC({ onBack }) {
                     onClick={handleCheckUsername}
                     className={`check-duplicate-btn-c ${isUsernameChecked && isUsernameAvailable ? 'checked' : ''}`}
                   >
-                    {isUsernameChecked && isUsernameAvailable ? '✓ 확인완료' : '중복확인'}
+                    {isUsernameChecked && isUsernameAvailable ? '확인완료' : '중복확인'}
                   </button>
                 </div>
                 {errors.username && <span className="error-text-c">{errors.username}</span>}
-                {isUsernameChecked && !isUsernameAvailable && <span className="error-text-c">이미 사용 중인 아이디입니다.</span>}
+                {isUsernameChecked && !isUsernameAvailable && (
+                  <span className="error-text-c">이미 사용 중인 아이디입니다.</span>
+                )}
               </div>
 
               <div className={`input-c-group ${errors.password ? 'error' : ''}`}>
                 <div className="password-wrapper-c">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => handleChange('password', e.target.value)}
-                    placeholder="비밀번호 (8~20자 이내, 영문 + 숫자 조합)"
+                    placeholder="비밀번호(숫자 6자리)"
                     className="signup-input-c gray-bg-c"
                   />
                   <button
@@ -212,7 +206,7 @@ export default function SignUpC({ onBack }) {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-                  placeholder="비밀번호 재확인"
+                  placeholder="비밀번호 확인"
                   className="signup-input-c gray-bg-c"
                 />
                 {errors.confirmPassword && <span className="error-text-c">{errors.confirmPassword}</span>}
@@ -237,7 +231,7 @@ export default function SignUpC({ onBack }) {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
-                  placeholder="이메일 (example@gmail.com)"
+                  placeholder="이메일(example@gmail.com)"
                   className="signup-input-c"
                 />
                 {errors.email && <span className="error-text-c">{errors.email}</span>}
@@ -257,7 +251,7 @@ export default function SignUpC({ onBack }) {
             </div>
 
             <button type="submit" className="signup-submit-btn-c">
-              가입하기
+              회원가입하기
             </button>
           </form>
         </div>
@@ -272,10 +266,10 @@ export default function SignUpC({ onBack }) {
               exit={{ scale: 0.9, opacity: 0 }}
               className="modal-content-c"
             >
-              <div className="modal-icon-c">🎉</div>
-              <h2 className="modal-title-c">가입 완료!</h2>
+              <div className="modal-icon-c">✔</div>
+              <h2 className="modal-title-c">가입완료!</h2>
               <p className="modal-desc-c">
-                HearBe의 회원이 되신 것을 축하드립니다.
+                HearBe 회원이 되신 것을 축하드립니다.
               </p>
               <button onClick={() => { setIsModalOpen(false); if (onBack) onBack(); else navigate('/C/login'); }} className="modal-btn-c">
                 확인

@@ -4,8 +4,8 @@ import { ShoppingCart, User, LogOut } from 'lucide-react';
 import './SelectMallA.css';
 import iconNaver from '../../assets/naver.png';
 import iconCoupang from '../../assets/coupang.png';
-import icon11st from '../../assets/11.png';
-import iconEmart from '../../assets/emartMall.png';
+import icon11st from '../../assets/11st_logo.png';
+import iconEmart from '../../assets/SSG_logo.png';
 import logoA from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 
@@ -110,3 +110,4 @@ const SelectMall = () => {
 };
 
 export default SelectMall;
+

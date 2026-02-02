@@ -1,9 +1,6 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import iconUser from '../../assets/icon-user.png';
-import iconLock from '../../assets/icon-lock.png';
 import iconCard from '../../assets/icon-card.png';
-import iconPhone from '../../assets/icon-phone.png';
 import iconCamera from '../../assets/icon-camera.png';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
@@ -160,12 +157,17 @@ const SignUp = () => {
 
         try {
             const result = await authAPI.checkDuplicate(formData.id);
-            if (result.available !== false) {
+            
+            console.log("서버에서 온 진짜 값:", result);
+
+            const isDuplicate = result.data; // 서버에서 중복 여부를 나타내는 필드명에 맞게 수정 필요
+            if (isDuplicate === false) { // 중복이 아니라면 (사용 가능)
                 setIsIdChecked(true);
                 alert("사용 가능한 아이디입니다.");
-            } else {
+            } else { // 중복이 맞다면 (true)
                 setErrorMessage("이미 존재하는 아이디입니다.");
                 setShowError(true);
+                setIsIdChecked(false);
             }
         } catch (error) {
             // authAPI.checkDuplicate에서 던져진 에러를 여기서 처리

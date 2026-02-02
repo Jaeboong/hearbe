@@ -1,4 +1,4 @@
-import { ArrowLeft, User, Mail, Check } from 'lucide-react';
+﻿import { ArrowLeft, User, Mail, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './FindIdC.css';
@@ -6,7 +6,7 @@ import logoC from '../../assets/logoC.png';
 
 import { authAPI } from '../../services/authAPI';
 
-export default function FindIdPage({ onBack, micPermissionGranted }) {
+export default function FindIdPage({ micPermissionGranted }) {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -73,8 +73,6 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
 
     return (
         <div className="find-id-container">
-
-
             <main className="find-id-main">
                 <div className="find-id-card">
                     <div className="card-header">
@@ -98,7 +96,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="성함을 입력하세요"
+                                    placeholder="이름을 입력하세요"
                                 />
                             </div>
                         </div>
@@ -116,7 +114,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                                     />
                                 </div>
                                 <button onClick={handleSendVerification} className="secondary-btn">
-                                    {isSent ? '재발송' : '인증요청'}
+                                    {isSent ? '재전송' : '인증요청'}
                                 </button>
                             </div>
                         </div>
@@ -164,7 +162,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                             <span className="result-label-c">회원님의 아이디는</span>
                             <strong className="result-value-c">{foundUserId}</strong>
                         </div>
-                        <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c"> {/* 로그인 페이지로 이동 */}
+                        <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c">
                             확인 및 로그인하기
                         </button>
                     </div>
