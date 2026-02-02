@@ -1,11 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
 // [페이지 컴포넌트]
 import MainLanding from '../pages/MainLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 
-// [A형 페이지 임포트]
+// [A형 페이지 컴포넌트]
 import LoginA from '../pages/Login/LoginA';
 import SignUpA from '../pages/SignUp/SignUpA';
 import SelectMallA from '../pages/SelectMall/SelectMallA';
@@ -16,7 +16,7 @@ import OrderHistoryA from '../pages/OrderHistory/OrderHistoryA';
 import WishlistA from '../pages/Wishlist_A/WishlistA';
 import CardManagementA from '../pages/CardManagement_A/CardManagementA';
 
-// [C형 페이지 임포트]
+// [C형 페이지 컴포넌트]
 import LoginC from '../pages/Login/LoginC';
 import SignUpC from '../pages/SignUp/SignUpC';
 import SelectMallC from '../pages/SelectMall/SelectMallC';
@@ -28,8 +28,10 @@ import WishlistC from '../pages/Wishlist_C/WishlistC';
 import FindIdC from '../pages/FindId/FindIdC';
 import FindPasswordC from '../pages/FindPassword/FindPasswordC';
 
-// [S형 페이지 임포트]
+// [S형 페이지 컴포넌트]
 import LoginS from '../pages/Login/LoginS';
+import GuardianViewS from '../pages/GuardianView/GuardianViewS';
+
 
 /**
  * AppContent - BrowserRouter 내부에서 실행되는 컴포넌트
@@ -44,11 +46,6 @@ function AppContent() {
   });
   const modeSelectionRef = useRef(null);
 
-  const handleSetupComplete = (micGranted) => {
-    setMicPermissionGranted(micGranted);
-    setShowInitialSetup(false);
-  };
-
   const handleModeSelect = (mode, label) => {
     if (micPermissionGranted || mode === 'audio') {
       const utterance = new SpeechSynthesisUtterance(`${label} 모드를 선택하셨습니다.`);
@@ -57,7 +54,7 @@ function AppContent() {
     }
     setSelectedMode(mode);
 
-    // 모드에 따라 분기 처리
+    // 紐⑤뱶???곕씪 遺꾧린 泥섎━
     if (mode === 'common') {
       navigate('/C/login');
     } else {
@@ -282,12 +279,15 @@ function AppContent() {
       <Route path="/store-c" element={<Navigate to="/C/store" replace />} />
       <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
       <Route path="/login-s" element={<LoginS />} />
+      <Route path="/S/guardian-view" element={<GuardianViewS />} />
 
       {/* Fallback */}
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
+
 
 /**
  * AppRouter - 애플리케이션의 최상위 라우터 컴포넌트

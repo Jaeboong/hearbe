@@ -1,58 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import hLogo from '../../assets/h-logo.png';
+import GuardianJoinModal from '../../components/ShareCode/GuardianJoinModal';
 import './LoginS.css';
 
 const LoginS = () => {
   const navigate = useNavigate();
-  const [inviteCode, setInviteCode] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
-  const handleEntry = (e) => {
-    e.preventDefault();
-    if (inviteCode.length === 4) {
-      navigate('/store-c');
-    } else {
-      alert('초대코드 4자리를 입력해주세요.');
-    }
+  const handleJoin = (code) => {
+    // 코드 검증은 GuardianViewS 내부에서 하거나 여기서 API 호출
+    // 일단 바로 이동
+    navigate('/S/guardian-view', { state: { code } });
   };
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    navigate('/'); // 메인으로 돌아가기
+  };
+
+  // 모달이 닫히면 다시 메인으로 돌아가는 것이 자연스러움
+  if (!isModalOpen) return null;
 
   return (
     <div className="login-s-container">
-      <div className="login-s-card">
+      {/* 배경용 (기존 디자인 유지) */}
+      <div className="login-s-card" style={{ opacity: 0.5 }}>
         <div className="logo-wrapper">
           <img src={hLogo} alt="HearBe 로고" className="s-logo" />
         </div>
-
         <h1 className="login-s-title">공유 쇼핑 입장</h1>
-        <p className="login-s-desc">초대코드를 입력해주세요</p>
-
-        <form onSubmit={handleEntry} className="login-s-form">
-          <input
-            type="text"
-            maxLength={4}
-            value={inviteCode}
-            onChange={(e) => setInviteCode(e.target.value.replace(/[^0-9]/g, ''))}
-            placeholder="초대코드 입력 (4자리)"
-            className="invite-input"
-          />
-
-          <div className="login-s-btns">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="btn-cancel"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              className="btn-submit"
-            >
-              입장하기
-            </button>
-          </div>
-        </form>
       </div>
+
+      {/* 실제 기능 모달 */}
+      <GuardianJoinModal
+        isOpen={isModalOpen}
+        onClose={handleClose}
+        onJoin={handleJoin}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './StoreBrowserA.css';
 import iconUser from '../../assets/icon-user.png';
@@ -7,8 +7,13 @@ import iconShare from '../../assets/icon-share.png';
 import iconCard from '../../assets/icon-cart.png';
 import logo from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
+import { shareCodeService } from '../../services/shareCodeService';
 
 import BackButton from '../common/BackButtonA';
+import FloatingMenu from '../../components/FloatingMenu/FloatingMenu';
+import ShareCodeModal from '../../components/ShareCode/ShareCodeModal';
+import { usePeerShare } from '../../hooks/peerjs/usePeerShare';
+
 
 const StoreBrowser = () => {
     const navigate = useNavigate();
@@ -28,17 +33,29 @@ const StoreBrowser = () => {
 
     const url = location.state?.url || getMallUrl(mallId);
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    // PeerJS Hooks
+    const { shareCode, isSharing, startSharing, stopSharing, error: peerError } = usePeerShare();
+
+    // UI States
     const [showShareModal, setShowShareModal] = useState(false);
-    const [isSharing, setIsSharing] = useState(false);
-    const [inviteCode, setInviteCode] = useState('0000');
+    const [isLoadingCode, setIsLoadingCode] = useState(false);
+    const [tempCode, setTempCode] = useState(null);
     const [showAddCartModal, setShowAddCartModal] = useState(false);
+
+    // Product Info State
     const [productInfo, setProductInfo] = useState({
         name: '',
         price: '',
         url: '',
         img_url: ''
     });
+
+    // Error handling
+    useEffect(() => {
+        if (peerError) {
+            alert(`화면 공유 에러: ${peerError}`);
+        }
+    }, [peerError]);
 
     // Platform Checks
     const isNaver = url.includes('naver');
@@ -82,33 +99,41 @@ const StoreBrowser = () => {
         }
     };
 
-    const handleToggleMenu = () => {
-        if (!isSharing) {
-            setIsMenuOpen(!isMenuOpen);
+    // --- Handlers ---
+
+    const handleShareClick = async () => {
+        setIsLoadingCode(true);
+        setShowShareModal(true);
+
+        try {
+            // Call backend API to generate code
+            const code = await shareCodeService.createCode();
+            setTempCode(code);
+        } catch (error) {
+            console.error('Create code error:', error);
+            alert('공유 코드를 생성할 수 없습니다. (백엔드 연결 확인)');
+            setShowShareModal(false);
+        } finally {
+            setIsLoadingCode(false);
         }
     };
 
-    const handleShareClick = () => {
-        setIsMenuOpen(false); // Close menu
-        // Generate random 4-digit code
-        const code = Math.floor(1000 + Math.random() * 9000).toString();
-        setInviteCode(code);
-        setShowShareModal(true);
-    };
-
-    const handleEnterShare = () => {
-        setShowShareModal(false);
-        setIsSharing(true);
+    const handleEnterShare = async () => {
+        try {
+            await startSharing(tempCode);
+            setShowShareModal(false);
+        } catch (err) {
+            console.error('Failed to start sharing:', err);
+        }
     };
 
     const handleEndShare = () => {
-        setIsSharing(false);
+        stopSharing();
     };
 
-    const handleCart = () => {
-        setIsMenuOpen(false);
-        navigate('/cart');
-    };
+    const handleCart = () => navigate('/A/cart');
+
+    const handleMyPage = () => navigate('/A/mypage');
 
     const handlePlatformCart = () => {
         const cartUrl = getPlatformCartUrl();
@@ -187,7 +212,7 @@ const StoreBrowser = () => {
                 <>
                     {/* Top Sharing Banner */}
                     <div className="sharing-header">
-                        <div className="sharing-pill">화면 공유 중 (코드: {inviteCode})</div>
+                        <div className="sharing-pill">화면 공유 중 (코드: {shareCode})</div>
                         <div className="participant-pill">
                             <img src={logo} alt="User" className="p-icon" />
                             <span>참가자 (1명)</span>
@@ -225,68 +250,21 @@ const StoreBrowser = () => {
 
             {/* --- Normal Mode UI (Hidden when sharing) --- */}
             {!isSharing && (
-                <>
-                    {/* Menu Bubble */}
-                    {isMenuOpen && (
-                        <div className="menu-bubble">
-                            <div className="menu-item" onClick={() => navigate('/A/mypage')}>
-                                <img src={iconUser} alt="My Page" className="menu-icon" />
-                                <span className="menu-text">마이페이지</span>
-                            </div>
-                            <div className="menu-item" onClick={handleAddToMyCart}>
-                                <img src={iconCart} alt="Add to Cart" className="menu-icon" />
-                                <span className="menu-text">내 장바구니에 담기</span>
-                            </div>
-                            <div className="menu-item" onClick={handlePlatformCart}>
-                                <img src={iconCart} alt="Platform Cart" className="menu-icon" />
-                                <span className="menu-text">쇼핑몰 장바구니</span>
-                            </div>
-                            <div className="menu-item" onClick={handleCart}>
-                                <img src={iconCart} alt="My Cart" className="menu-icon" />
-                                <span className="menu-text">내 장바구니 보기</span>
-                            </div>
-                            <div className="menu-item" onClick={handleShareClick}>
-                                <img src={iconShare} alt="Share" className="menu-icon" />
-                                <span className="menu-text">공유</span>
-                            </div>
-                            {isNaver && (
-                                <div className="menu-item" onClick={handleSimulateAddCart} style={{ color: '#03C75A' }}>
-                                    <img src={iconCart} alt="Simulate" className="menu-icon" />
-                                    <span className="menu-text">네이버 담기 시뮬레이션</span>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Hamburger Button */}
-                    <div className={`hamburger-overlay ${isMenuOpen ? 'open' : ''}`} onClick={handleToggleMenu}>
-                        {isMenuOpen ? (
-                            <div className="close-x">X</div>
-                        ) : (
-                            <>
-                                <div className="hamburger-line"></div>
-                                <div className="hamburger-line"></div>
-                                <div className="hamburger-line"></div>
-                            </>
-                        )}
-                    </div>
-                </>
+                <FloatingMenu
+                    onShare={handleShareClick}
+                    onMyPage={handleMyPage}
+                    onCart={handleCart}
+                />
             )}
 
-            {/* Share Modal (Popup) */}
-            {showShareModal && (
-                <div className="share-modal-overlay">
-                    <div className="share-modal-content">
-                        <div className="share-modal-title">초대 코드</div>
-                        <div className="share-code-box">{inviteCode.split('').join(' ')}</div>
-                        <div className="share-modal-desc">이 코드를 상대방에게 알려주세요</div>
-                        <div className="share-modal-btns">
-                            <button className="sm-btn cancel" onClick={() => setShowShareModal(false)}>취소</button>
-                            <button className="sm-btn confirm" onClick={handleEnterShare}>입장</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Share Modal */}
+            <ShareCodeModal
+                isOpen={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                onStart={handleEnterShare}
+                shareCode={tempCode}
+                isLoading={isLoadingCode}
+            />
 
             {/* Add to Cart Modal */}
             {showAddCartModal && (
