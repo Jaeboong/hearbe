@@ -1,0 +1,234 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, Home, ShoppingCart, Heart } from 'lucide-react'; // CheckSquare 제거
+import { wishlistAPI } from '../../services/wishlistAPI';
+import '../MyPage/MyPageC.css';
+import './WishlistC.css';
+
+export default function WishlistC({ onHome }) {
+    const navigate = useNavigate();
+
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
+    });
+
+    // localStorage에서 사용자 정보 로드
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const parsed = JSON.parse(storedUser);
+                setUserData({
+                    name: parsed.name || parsed.username || '회원',
+                    email: parsed.email || '',
+                });
+            } catch (e) {
+                console.error('Failed to parse user data:', e);
+            }
+        }
+    }, []);
+
+    // 사이드바 아이템
+    const sidebarItems = [
+        { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
+        { id: 'order-history', label: '주문 내역', path: '/C/order-history' },
+        { id: 'wishlist', label: '찜한 상품', path: '/C/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/C/cart' },
+    ];
+
+    // Wishlist state
+    const [wishlists, setWishlists] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // platformName 매핑 (영문 -> 한글)
+    const platformDisplayNames = {
+        'coupang': '쿠팡',
+        'naver': '네이버',
+        '11st': '11번가',
+        'ssg': 'SSG',
+        'gmarket': 'G마켓'
+    };
+
+    useEffect(() => {
+        fetchWishlist();
+    }, []);
+
+    const fetchWishlist = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const response = await wishlistAPI.getWishlist();
+
+            if (response.items && response.items.length > 0) {
+                const wishlistByMall = {};
+                response.items.forEach(item => {
+                    const mallName = platformDisplayNames[item.platform_name] || item.platform_name;
+                    if (!wishlistByMall[mallName]) {
+                        wishlistByMall[mallName] = {
+                            mall: mallName,
+                            count: 0,
+                            items: [],
+                            wishlistUrl: item.wishlist_url // API에서 위시리스트 URL 연동
+                        };
+                    }
+                    wishlistByMall[mallName].items.push({
+                        id: item.wishlist_item_id,
+                        name: item.product_name,
+                        price: item.price || 0,
+                        imgUrl: item.img_url,
+                        tag: '',
+                        icon: '❤️'
+                    });
+                    wishlistByMall[mallName].count++;
+                });
+                setWishlists(Object.values(wishlistByMall));
+            } else {
+                setWishlists([]);
+            }
+        } catch (err) {
+            console.error('Failed to fetch wishlist:', err);
+            setError(err.message);
+            if (err.message === '로그인이 필요합니다.') {
+                navigate('/C/login');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="mypage-container">
+            {/* Header */}
+            <header className="mall-header-c">
+                <div className="header-left-c">
+                    <div className="title-area-c" style={{ marginLeft: 0 }}>
+                        <div className="title-icon-box-c">
+                            <User size={24} />
+                        </div>
+                        <div className="title-text-c">
+                            <h1>마이페이지</h1>
+                            <span className="subtitle-c">My Page</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="header-right-c">
+                    <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
+                        <div className="nav-icon-c"><Home size={24} /></div>
+                        <span>홈</span>
+                    </button>
+                    <button className="nav-item-c" onClick={() => navigate('/C/cart')}>
+                        <div className="nav-icon-c"><ShoppingCart size={24} /></div>
+                        <span>장바구니</span>
+                    </button>
+                    <button className="nav-item-c active">
+                        <div className="nav-icon-c"><User size={24} /></div>
+                        <span>마이페이지</span>
+                    </button>
+                </div>
+            </header>
+
+            <div className="mypage-layout">
+                {/* Sidebar */}
+                <aside className="mypage-sidebar">
+                    <div className="sidebar-profile-card">
+                        <div className="sidebar-avatar">
+                            <User size={40} color="#7c3aed" />
+                        </div>
+                        <div className="sidebar-profile-info">
+                            <h2 className="sidebar-name">{userData.name}님</h2>
+                            <span className="sidebar-badge">hearbe 회원</span>
+                        </div>
+                        <p className="sidebar-welcome">오늘도 즐거운 쇼핑 되세요!</p>
+                    </div>
+
+                    <div className="sidebar-menu-list">
+                        {sidebarItems.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => navigate(item.path)}
+                                className={`mp-sidebar-item ${item.id === 'wishlist' ? 'active' : ''}`}
+                            >
+                                <span className="label">{item.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </aside>
+
+                {/* Main Content */}
+                <main className="mypage-content">
+                    <section className="dashboard-card full-height">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                            <div style={{
+                                width: '50px', height: '50px', borderRadius: '1rem',
+                                backgroundColor: '#f3e8ff', color: '#7c3aed',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <Heart size={28} />
+                            </div>
+                            <h2 className="card-title-lg" style={{ marginBottom: 0 }}>찜한 상품</h2>
+                        </div>
+                        <div className="wishlist-content">
+                            {isLoading ? (
+                                <div className="wishlist-status-message">
+                                    찜한 상품을 불러오는 중...
+                                </div>
+                            ) : error ? (
+                                <div className="wishlist-error-message">
+                                    {error}
+                                </div>
+                            ) : wishlists.length === 0 ? (
+                                <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
+                                    찜한 상품이 없습니다.
+                                </div>
+                            ) : (
+                                wishlists.map((group, idx) => (
+                                    <div key={idx} className="mall-wish-group">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <div className="mall-order-indicator"></div>
+                                                <h3 className="mall-header-name" style={{ marginBottom: 0 }}>{group.mall} <span className="count-badge" style={{ marginLeft: '1rem' }}>{group.count}개</span></h3>
+                                            </div>
+                                            <button
+                                                className="btn-outline-sm wishlist-detail-btn"
+                                                onClick={() => group.wishlistUrl && window.open(group.wishlistUrl, '_blank')}
+                                            >
+                                                상세 조회
+                                            </button>
+                                        </div>
+
+                                        <div className="group-items">
+                                            {group.items.map((item) => (
+                                                <div key={item.id} className="item-row-card">
+                                                    <div className="item-row-left">
+                                                        <div className="item-thumb">
+                                                            {item.imgUrl ? (
+                                                                <img src={item.imgUrl} alt={item.name} className="wishlist-item-image" />
+                                                            ) : (
+                                                                item.icon
+                                                            )}
+                                                        </div>
+                                                        <div className="item-info-text">
+                                                            <div className="item-name-lg">{item.name}</div>
+                                                            <div className="item-price-lg">{item.price.toLocaleString()}원</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </section>
+                </main>
+            </div>
+
+            <footer className="landing-footer">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
+        </div>
+    );
+}

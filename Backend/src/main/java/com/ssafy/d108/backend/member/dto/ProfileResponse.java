@@ -17,6 +17,7 @@ public class ProfileResponse {
 
     private Long userId;
     private String username;
+    private String email;
     private UserType userType;
     private String phoneNumber;
 
@@ -39,6 +40,7 @@ public class ProfileResponse {
         ProfileResponse response = new ProfileResponse();
         response.setUserId(Long.valueOf(user.getId()));
         response.setUsername(user.getName());
+        response.setEmail(user.getEmail());
         response.setUserType(user.getUserType());
         response.setPhoneNumber(user.getPhoneNumber());
 

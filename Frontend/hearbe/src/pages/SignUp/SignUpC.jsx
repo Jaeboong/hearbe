@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, UserPlus } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
-import logoImage from '../../assets/HearBe_logo_.png';
+import logoC from '../../assets/logoC.png'; // C형 로고로 변경
 import './SignUpC.css';
 
 export default function SignUpC({ onBack }) {
@@ -55,8 +55,8 @@ export default function SignUpC({ onBack }) {
     }
 
     try {
-      const response = await authAPI.checkDuplicate(formData.username);
-      if (response.available) {
+      const apiResponse = await authAPI.checkDuplicate(formData.username);
+      if (apiResponse.available) {
         setIsUsernameChecked(true);
         setIsUsernameAvailable(true);
         alert('사용 가능한 아이디입니다.');
@@ -68,6 +68,7 @@ export default function SignUpC({ onBack }) {
     } catch (error) {
       console.error('Username check error:', error);
       alert('아이디 중복 확인에 실패했습니다.');
+      setIsUsernameChecked(false); // 에러 발생 시 중복확인 상태 초기화
     }
   };
 
@@ -124,14 +125,18 @@ export default function SignUpC({ onBack }) {
         password_check: confirmPassword,
         name: formData.name,
         email: formData.email,
-        phone_number: null, // 휴대폰 번호 제외됨
+        phone_number: null,
         user_type: "GENERAL", // C형 사용자
         simple_password: null,
         welfare_card: null
       };
 
-      await authAPI.register(payload);
-      setIsModalOpen(true);
+      const apiResponse = await authAPI.register(payload);
+      if (apiResponse.success) {
+        setIsModalOpen(true);
+      } else {
+        alert(apiResponse.message || '회원가입에 실패했습니다.');
+      }
     } catch (error) {
       console.error('Signup error:', error);
       alert(error.message || '회원가입 중 오류가 발생했습니다.');
@@ -142,8 +147,8 @@ export default function SignUpC({ onBack }) {
     <div className="signup-c-container">
       <main className="signup-c-main">
         <div className="signup-card-c">
-          <div className="signup-header-c">
-            <img src={logoImage} alt="HearBe Logo" className="signup-logo-c" style={{ marginBottom: '20px' }} />
+          <div className="signup-header-c"> {/* 로고 이미지 사용 */}
+            <img src={logoC} alt="HearBe Logo" className="signup-logo-c" style={{ marginBottom: '20px' }} />
             <div className="header-title-group-c" style={{ display: 'none' }}>
               <div className="title-icon-c">
                 <UserPlus size={32} />
