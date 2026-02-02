@@ -8,7 +8,6 @@ import iconCamera from '../../assets/icon-camera.png';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './SignUpA.css';
-import BackButton from '../common/BackButtonA';
 
 // Utility Functions
 const formatPhoneNumber = (value) => {
@@ -66,6 +65,18 @@ const SignUp = () => {
     // Camera Logic
     const videoRef = useRef(null);
     const [stream, setStream] = useState(null);
+
+    const maskCardNumber = (value) => {
+        if (!value) return '';
+        const digits = value.replace(/[^0-9]/g, '');
+        if (digits.length <= 4) return digits;
+        return `${'*'.repeat(digits.length - 4)}${digits.slice(-4)}`;
+    };
+
+    const maskCvc = (value) => {
+        if (!value) return '';
+        return '*'.repeat(value.length);
+    };
 
     const startCamera = async () => {
         try {
@@ -157,9 +168,12 @@ const SignUp = () => {
                 setShowError(true);
             }
         } catch (error) {
-            // API가 없거나 네트워크 오류 시 기본적으로 통과
-            setIsIdChecked(true);
-            alert("사용 가능한 아이디입니다.");
+            // authAPI.checkDuplicate에서 던져진 에러를 여기서 처리
+            // 에러 발생 시 아이디 중복 확인이 완료되지 않았으므로 isIdChecked는 false
+            // 사용자에게는 실패 메시지를 보여줍니다.
+            setErrorMessage(error.message || "아이디 중복 확인에 실패했습니다.");
+            setShowError(true);
+            setIsIdChecked(false); // 에러 발생 시 중복확인 상태 초기화
         }
     };
 
@@ -210,6 +224,12 @@ const SignUp = () => {
         });
         setShowCamera(false);
         setModalStep('camera'); // 다음 번을 위해 초기화
+    };
+
+    const handleRetakeCard = () => {
+        setCardData(null);
+        setModalStep('camera');
+        setShowCamera(true);
     };
 
     // 3. 모달 닫기
@@ -301,11 +321,17 @@ const SignUp = () => {
                 }
             };
 
-            console.log('📤 전송할 데이터:', JSON.stringify(userData, null, 2));
+            console.log('전송할 데이터:', JSON.stringify(userData, null, 2));
 
             const response = await authAPI.register(userData);
 
-            if (response.code === 201) {
+            if (response.success) {
+                if (cardData?.number) {
+                    localStorage.setItem('member_card_number', cardData.number);
+                }
+                if (formData.id) {
+                    localStorage.setItem('member_username', formData.id);
+                }
                 setShowSuccess(true);
             } else {
                 throw new Error(response.message || '회원가입에 실패했습니다.');
@@ -325,12 +351,16 @@ const SignUp = () => {
 
     return (
         <div className="signup-container">
-            {/* 뒤로가기 버튼 */}
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
             <div className="signup-box">
                 {/* Logo Section */}
                 <div className="signup-logo-area">
-                    <img src={logo} alt="Logo" className="signup-logo-image" />
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        className="signup-logo-image"
+                        onClick={() => navigate('/')}
+                        style={{ cursor: 'pointer' }}
+                    />
                 </div>
 
                 {/* ID Section */}
@@ -392,26 +422,33 @@ const SignUp = () => {
 
                     {/* 카드가 등록되었으면 정보 표시, 아니면 카메라 아이콘 표시 */}
                     {cardData ? (
-                        <div className="card-info-display">
-                            <div className="info-row">
-                                <span className="info-label-main">카드사</span>
-                                <span className="info-val-main">{cardData.company}</span>
-                            </div>
-                            <div className="info-row">
-                                <span className="info-label-main">복지카드 번호</span>
-                                <span className="info-val-main">{cardData.number}</span>
-                            </div>
-                            <div className="info-row-flex">
-                                <div className="info-col">
-                                    <span className="info-label-main">유효기간</span>
-                                    <span className="info-val-main">{cardData.expiry}</span>
+                        <>
+                            <div className="card-info-display">
+                                <div className="info-row">
+                                    <span className="info-label-main">카드사</span>
+                                    <span className="info-val-main">{cardData.company}</span>
                                 </div>
-                                <div className="info-col">
-                                    <span className="info-label-main">CVC</span>
-                                    <span className="info-val-main">{cardData.cvc}</span>
+                                <div className="info-row">
+                                    <span className="info-label-main">복지카드 번호</span>
+                                    <span className="info-val-main">{maskCardNumber(cardData.number)}</span>
+                                </div>
+                                <div className="info-row-flex">
+                                    <div className="info-col">
+                                        <span className="info-label-main">유효기간</span>
+                                        <span className="info-val-main">{cardData.expiry}</span>
+                                    </div>
+                                    <div className="info-col">
+                                        <span className="info-label-main">CVC</span>
+                                        <span className="info-val-main">{maskCvc(cardData.cvc)}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            <div className="card-retake-wrap">
+                                <button type="button" className="card-retake-btn" onClick={handleRetakeCard}>
+                                    다시 촬영하기
+                                </button>
+                            </div>
+                        </>
                     ) : (
                         // 이 부분을 클릭하면 모달이 뜹니다!
                         <div className="camera-area" onClick={() => setShowCamera(true)} style={{ cursor: 'pointer' }}>

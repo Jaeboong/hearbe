@@ -1,12 +1,13 @@
 ﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart, User, LogOut } from 'lucide-react';
 import './SelectMallA.css';
 import iconNaver from '../../assets/naver.png';
 import iconCoupang from '../../assets/coupang.png';
 import icon11st from '../../assets/11.png';
 import iconEmart from '../../assets/emartMall.png';
-import BackButton from '../common/BackButtonA';
+import logoA from '../../assets/logoA.png';
+import { authAPI } from '../../services/authAPI';
 
 const SelectMall = () => {
     const navigate = useNavigate();
@@ -25,23 +26,45 @@ const SelectMall = () => {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch (err) {
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('savedLoginId');
+            localStorage.removeItem('savedLoginPassword');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
+        }
+    };
+
     return (
         <div className="mall-container">
-            <BackButton onClick={() => navigate('/A/login')} variant="arrow-only" />
+            <img
+                src={logoA}
+                alt="Logo"
+                className="mall-logo-left"
+                onClick={() => window.location.assign('/')}
+            />
             {/* Header */}
             <div className="mypage-topbar">
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/')}>
-                        <Home size={72} />
-                        <span>홈</span>
-                    </button>
                     <button className="topbar-action" onClick={() => handleSelectMall('cart')}>
                         <ShoppingCart size={72} />
                         <span>카트</span>
                     </button>
-                    <button className="topbar-action" onClick={() => navigate('/A/mypage')}>
+                    <button className="topbar-action" onClick={() => navigate('/A/member-info')}>
                         <User size={72} />
                         <span>마이</span>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
                     </button>
                 </div>
             </div>

@@ -1,6 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BackButton from '../common/BackButtonA';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './LoginA.css';
@@ -10,45 +9,86 @@ const Login = () => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [rememberId, setRememberId] = useState(true);
+    const [rememberLogin, setRememberLogin] = useState(true);
 
     useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            navigate('/A/mall');
+            return;
+        }
         const savedId = localStorage.getItem('savedLoginId');
+        const savedPassword = localStorage.getItem('savedLoginPassword');
         if (savedId) {
             setId(savedId);
-            setRememberId(true);
+            setRememberLogin(true);
         }
-    }, []);
+        if (savedPassword) {
+            setPassword(savedPassword);
+            setRememberLogin(true);
+        }
+        if (savedId && savedPassword) {
+            handleLogin(savedId, savedPassword, true);
+        }
+    }, [navigate]);
 
-    const handleLogin = async () => {
-        if (!id || !password) {
+    const handleLogin = async (loginId = id, loginPassword = password, isAuto = false) => {
+        if (!loginId || !loginPassword) {
             alert('아이디와 비밀번호를 입력해주세요.');
             return;
         }
         setIsLoading(true);
         try {
-            const response = await authAPI.login(id, password);
+            const response = await authAPI.login(loginId, loginPassword);
 
-            if (response.code === 200) {
-                if (response.data && response.data.accessToken) {
-                    localStorage.setItem('accessToken', response.data.accessToken);
-                }
-                if (response.data && response.data.refreshToken) {
-                    localStorage.setItem('refreshToken', response.data.refreshToken);
-                }
-                if (rememberId) {
-                    localStorage.setItem('savedLoginId', id);
+            const accessToken =
+                response?.data?.accessToken ||
+                response?.data?.access_token ||
+                response?.accessToken ||
+                response?.access_token;
+            const refreshToken =
+                response?.data?.refreshToken ||
+                response?.data?.refresh_token ||
+                response?.refreshToken ||
+                response?.refresh_token;
+
+            if (accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+            }
+            if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+            }
+
+            const isSuccess = response?.code === 200 || !!accessToken;
+
+            if (isSuccess) {
+                if (rememberLogin) {
+                    localStorage.setItem('savedLoginId', loginId);
+                    localStorage.setItem('savedLoginPassword', loginPassword);
                 } else {
                     localStorage.removeItem('savedLoginId');
+                    localStorage.removeItem('savedLoginPassword');
                 }
                 // 로그인 성공
                 navigate('/A/mall');
-            } else {
-                alert(response.message || '로그인에 실패했습니다.');
+            } else if (!isAuto) {
+                const message = response?.message || '';
+                if (message.includes('존재') || message.includes('없')) {
+                    alert('회원가입이 필요합니다.');
+                } else {
+                    alert(message || '로그인에 실패했습니다.');
+                }
             }
         } catch (error) {
             console.error('Login Error:', error);
-            alert(error.message || '아이디 또는 비밀번호가 일치하지 않습니다.');
+            if (!isAuto) {
+                const errorMessage = error?.message || '';
+                if (errorMessage.includes('존재') || errorMessage.includes('없')) {
+                    alert('회원가입이 필요합니다.');
+                } else {
+                    alert(errorMessage || '아이디 또는 비밀번호가 일치하지 않습니다.');
+                }
+            }
         } finally {
             setIsLoading(false);
         }
@@ -56,11 +96,16 @@ const Login = () => {
 
     return (
         <div className="login-container">
-            <BackButton onClick={() => navigate('/')} variant="arrow-only" />
             <div className="login-box">
                 {/* Logo Section */}
                 <div className="logo-area">
-                    <img src={logo} alt="Logo" className="logo-image" />
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        className="logo-image"
+                        onClick={() => navigate('/')}
+                        style={{ cursor: 'pointer' }}
+                    />
                 </div>
 
                 {/* Input Section */}
@@ -78,12 +123,13 @@ const Login = () => {
                         className="login-input"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        maxLength={6}
                     />
                 </div>
 
                 {/* Login Button */}
-                <button className="login-button" onClick={handleLogin} disabled={isLoading}>
-                    {isLoading ? '로그인 중...' : '로그인'}
+                <button className="login-button" onClick={() => handleLogin()} disabled={isLoading}>
+                    로그인
                 </button>
 
                 {/* Features (Save ID) */}
@@ -91,19 +137,19 @@ const Login = () => {
                     <label className="checkbox-container">
                         <input
                             type="checkbox"
-                            checked={rememberId}
-                            onChange={(e) => setRememberId(e.target.checked)}
-                        />
-                        <span className="checkmark"></span>
-                        아이디 저장
-                    </label>
-                </div>
+                        checked={rememberLogin}
+                        onChange={(e) => setRememberLogin(e.target.checked)}
+                    />
+                    <span className="checkmark"></span>
+                    자동 로그인
+                </label>
+            </div>
 
                 {/* Footer Links */}
                 <div className="login-footer">
-                    <span>아이디 찾기</span>
+                    <span onClick={() => navigate('/A/findId')} style={{ cursor: 'pointer' }}>아이디 찾기</span>
                     <span className="login-separator">|</span>
-                    <span>비밀번호 찾기</span>
+                    <span onClick={() => navigate('/A/findPassword')} style={{ cursor: 'pointer' }}>비밀번호 변경</span>
                     <span className="login-separator">|</span>
                     <span className="signup-link" onClick={() => navigate('/A/signup')} style={{ cursor: 'pointer' }}>
                         회원가입

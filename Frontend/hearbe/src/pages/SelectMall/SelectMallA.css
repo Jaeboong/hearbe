@@ -25,6 +25,17 @@
     margin: 0;
 }
 
+.mall-logo-left {
+    position: absolute;
+    top: clamp(12px, 3vw, 24px);
+    left: clamp(12px, 3vw, 24px);
+    width: clamp(210px, 35vw, 380px);
+    height: auto;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
+}
+
 /* --- Header Section --- */
 .mypage-topbar {
     position: relative;
@@ -68,60 +79,25 @@
     justify-content: center;
     width: 100%;
     padding: clamp(10px, 2vw, 20px) 0;
+    min-width: 680px;
 }
 
 .mall-scroll-container {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 18vw, 260px), 1fr));
+    justify-items: center;
     align-items: center;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: clamp(20px, 4vw, 60px);
-    padding: clamp(30px, 8vh, 80px) clamp(16px, 4vw, 40px) clamp(20px, 5vw, 40px);
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-accent) transparent;
-}
-
-@media (min-width: 768px) {
-    .mall-scroll-container {
-        justify-content: flex-start;
-    }
-}
-
-@media (min-width: 1024px) {
-    .mall-scroll-container {
-        justify-content: center;
-        flex-wrap: wrap;
-        overflow-x: visible;
-    }
-}
-
-.mall-scroll-container::-webkit-scrollbar {
-    display: none;
+    gap: clamp(16px, 3vw, 40px);
+    padding: clamp(20px, 6vh, 60px) clamp(12px, 3vw, 32px);
 }
 
 .mall-card-wrapper {
-    flex: 0 0 clamp(140px, 40vw, 280px);
+    width: min(100%, clamp(180px, 22vw, 340px));
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
     cursor: pointer;
-    scroll-snap-align: center;
-}
-
-@media (min-width: 768px) {
-    .mall-card-wrapper {
-        flex: 0 0 clamp(200px, 30vw, 320px);
-    }
-}
-
-@media (min-width: 1024px) {
-    .mall-card-wrapper {
-        flex: 0 0 280px;
-        scroll-snap-align: none;
-    }
 }
 
 .mall-square-box {
@@ -181,8 +157,8 @@
 }
 
 .mall-logo-img {
-    width: clamp(90px, 22vw, 180px);
-    height: clamp(90px, 22vw, 180px);
+    width: clamp(110px, 16vw, 220px);
+    height: clamp(110px, 16vw, 220px);
     object-fit: contain;
 }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import hLogo from '../../assets/h-logo.png';
+import hLogo from '../../assets/logoA.png';
 import './LoginS.css';
 
 const LoginS = () => {
@@ -20,7 +20,13 @@ const LoginS = () => {
     <div className="login-s-container">
       <div className="login-s-card">
         <div className="logo-wrapper">
-          <img src={hLogo} alt="HearBe 로고" className="s-logo" />
+          <img
+            src={hLogo}
+            alt="HearBe 로고"
+            className="s-logo"
+            onClick={() => window.location.assign('/')}
+            style={{ cursor: 'pointer' }}
+          />
         </div>
 
         <h1 className="login-s-title">공유 쇼핑 입장</h1>

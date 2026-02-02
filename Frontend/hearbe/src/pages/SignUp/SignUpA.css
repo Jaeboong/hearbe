@@ -54,7 +54,7 @@ body {
 /* 공통 Input 스타일 */
 .signup-input,
 .modal-input {
-    background: transparent;
+    background: #141C29;
     color: var(--accent-yellow);
     font-family: var(--font-main);
     font-weight: bold;
@@ -91,7 +91,7 @@ body {
 }
 
 .signup-box {
-    width: clamp(300px, 80vw, 700px);
+    width: clamp(320px, 86vw, 760px);
     padding: clamp(8px, 2vw, 16px);
     display: flex;
     flex-direction: column;
@@ -214,6 +214,8 @@ body {
     background-position: left clamp(8px, 2vw, 16px) center;
     background-size: clamp(28px, 6vw, 48px);
     padding-left: clamp(48px, 10vw, 72px);
+    font-size: clamp(26px, 7.5vw, 46px);
+    white-space: nowrap;
 }
 
 /* =========================================
@@ -258,6 +260,19 @@ body {
     border: clamp(2px, 0.4vw, 4px) solid var(--accent-yellow);
     border-radius: clamp(8px, 2vw, 16px);
     margin: 0 clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px);
+}
+
+.card-retake-wrap {
+    margin: 0 clamp(8px, 1.5vw, 16px) clamp(8px, 2vw, 16px);
+}
+
+.card-section .card-retake-btn {
+    width: 100%;
+    min-height: 44px;
+    background-color: var(--accent-yellow);
+    color: var(--bg-dark);
+    font-size: clamp(22px, 7.5vw, 44px);
+    border: none;
 }
 
 .info-row {
@@ -406,18 +421,31 @@ body:has(.modal-overlay) .global-back-button {
 .modal-box {
     width: clamp(300px, 98vw, 900px);
     max-width: 98vw;
-    max-height: 92vh;
+    max-height: 88vh;
     overflow-y: auto;
     border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
     border-radius: clamp(8px, 2vw, 16px);
-    padding: clamp(12px, 4vw, 32px) clamp(16px, 5vw, 40px);
+    padding: clamp(10px, 3vw, 24px) clamp(12px, 4vw, 28px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(8px, 2vw, 16px);
+    gap: clamp(6px, 1.6vw, 12px);
     box-sizing: border-box;
     background-color: #141C29;
     position: relative;
+}
+
+.modal-box::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal-box::-webkit-scrollbar-thumb {
+    background-color: var(--accent-yellow);
+    border-radius: 999px;
+}
+
+.modal-box::-webkit-scrollbar-track {
+    background-color: rgba(255, 240, 100, 0.15);
 }
 
 /* 닫기 버튼 (X) */
@@ -468,7 +496,7 @@ body:has(.modal-overlay) .global-back-button {
     align-items: center;
     justify-content: center;
     background-color: #000;
-    height: 40vh;
+    height: clamp(200px, 28vh, 320px);
     position: relative;
     overflow: hidden;
 }
@@ -523,13 +551,13 @@ body:has(.modal-overlay) .global-back-button {
    ========================================= */
 .card-form-box {
     width: 100%;
-    border: clamp(3px, 0.6vw, 6px) solid var(--accent-yellow);
+    border: none;
     border-radius: clamp(8px, 2vw, 20px);
-    padding: clamp(16px, 3vw, 30px);
+    padding: clamp(12px, 2.5vw, 22px);
     background-color: transparent;
     display: flex;
     flex-direction: column;
-    gap: clamp(10px, 2vw, 20px);
+    gap: clamp(8px, 1.6vw, 14px);
     box-sizing: border-box;
     max-width: 600px;
     /* Safety cap */

@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut, Store } from 'lucide-react';
-import BackButton from '../common/BackButtonA';
+import { Home, LogOut } from 'lucide-react';
+import logoA from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
 import './CartA.css';
@@ -95,19 +95,19 @@ const CartA = () => {
 
     return (
         <div className="cart-container">
-            <BackButton onClick={() => navigate('/A/mall')} variant="arrow-only" />
+            <img
+                src={logoA}
+                alt="Logo"
+                className="cart-logo-left"
+                onClick={() => window.location.assign('/')}
+            />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/')}
-                    >
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
                         <Home size={72} />
                         <span>홈</span>
-                    </button>
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
-                        <Store size={72} />
-                        <span>쇼핑몰</span>
                     </button>
                     <button className="topbar-action" onClick={handleLogout}>
                         <LogOut size={72} />

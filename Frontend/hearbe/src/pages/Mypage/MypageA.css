@@ -64,6 +64,15 @@ body:has(.mypage-container-a) {
     padding-left: clamp(60px, 15vw, 120px);
 }
 
+.mypage-logo-left {
+    width: clamp(210px, 35vw, 380px);
+    height: auto;
+    cursor: pointer;
+    flex-shrink: 0;
+    z-index: 10;
+    pointer-events: auto;
+}
+
 /* User Greeting (인사말 내부) */
 .user-greeting {
     display: flex;
@@ -126,11 +135,12 @@ body:has(.mypage-container-a) {
 
 /* Page Title */
 .page-title {
-    font-size: clamp(50px, 8vw, 100px);
+    font-size: clamp(58px, 9vw, 110px);
     font-weight: 900;
     color: var(--color-text-yellow);
-    text-align: center;
-    margin-bottom: clamp(30px, 8vw, 60px);
+    text-align: left;
+    margin: 0;
+    white-space: nowrap;
 }
 
 /* Menu List (Grid 3 Rows, 2 Cols) */
@@ -139,12 +149,14 @@ body:has(.mypage-container-a) {
     grid-template-columns: 1fr 1fr;
     width: 100%;
     margin: 0 auto;
+    gap: clamp(16px, 3vw, 28px);
+    min-width: 680px;
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    background-color: var(--color-bg-dark-navy);
+    background-color: #141C29;
     border: clamp(3px, 0.8vw, 8px) solid var(--color-text-yellow);
     border-radius: clamp(12px, 3vw, 24px);
     padding: clamp(0px, 3vw, 0px) clamp(16px, 4vw, 32px);
@@ -155,6 +167,11 @@ body:has(.mypage-container-a) {
     min-height: clamp(80px, 20vw, 160px);
 }
 
+
+.menu-item.active {
+    background-color: #141C29;
+    box-shadow: 0 0 12px rgba(255, 240, 100, 0.45);
+}
 .menu-item:hover {
     transform: scale(1.02);
     box-shadow: 0 0 10px rgba(255, 240, 100, 0.3);
@@ -198,5 +215,9 @@ body:has(.mypage-container-a) {
     .menu-list {
         grid-template-columns: 1fr;
         gap: 16px;
+    }
+
+    .menu-list {
+        min-width: 0;
     }
 }

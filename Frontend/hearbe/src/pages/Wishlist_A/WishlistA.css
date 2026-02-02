@@ -22,6 +22,17 @@ body:has(.wishlist-container) {
     position: relative;
 }
 
+.wishlist-logo-left {
+    position: absolute;
+    top: clamp(12px, 3vw, 24px);
+    left: clamp(12px, 3vw, 24px);
+    width: clamp(210px, 35vw, 380px);
+    height: auto;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
+}
+
 /* Back Button Override */
 .wishlist-container .global-back-button.arrow-only {
     left: clamp(20px, 5vw, 40px);
@@ -41,6 +52,7 @@ body:has(.wishlist-container) {
     margin: 0;
     padding: 64px 48px;
     box-sizing: border-box;
+    min-width: 680px;
 }
 
 /* Sidebar */
@@ -338,7 +350,11 @@ body:has(.wishlist-container) {
 @media (max-width: 768px) {
     .wishlist-container .wishlist-content {
         flex-direction: column;
+    
+    .wishlist-container .wishlist-content {
+        min-width: 0;
     }
+}
 
     .wishlist-sidebar {
         flex: none;
@@ -366,6 +382,10 @@ body:has(.wishlist-container) {
 
     .delete-all-btn {
         width: 100%;
+    }
+
+    .wishlist-container .wishlist-content {
+        min-width: 0;
     }
 }
 /* MyPage Top Bar */

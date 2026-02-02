@@ -1,0 +1,362 @@
+:root {
+    --findid-bg: #262A38;
+    --findid-accent: #FFF064;
+    --findid-font: 'KoddiUD OnGothic', sans-serif;
+}
+
+body:has(.findid-container) {
+    background-color: #262A38;
+}
+
+.findid-container {
+    min-height: 100vh;
+    width: 100%;
+    background-color: #262A38;
+    color: var(--findid-accent);
+    font-family: var(--findid-font);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.findid-logo {
+    position: relative;
+    width: clamp(180px, 26vw, 320px);
+    height: auto;
+    cursor: pointer;
+    margin-bottom: clamp(12px, 3vw, 24px);
+}
+
+.findid-box {
+    width: min(720px, 92vw);
+    border: clamp(2px, 0.5vw, 4px) solid var(--findid-accent);
+    border-radius: clamp(16px, 4vw, 32px);
+    padding: clamp(24px, 5vw, 48px);
+    text-align: center;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.findid-title {
+    font-size: clamp(32px, 8vw, 64px);
+    font-weight: 900;
+    margin: 0 0 clamp(12px, 3vw, 24px);
+}
+
+.findid-desc {
+    font-size: clamp(18px, 4.5vw, 32px);
+    font-weight: 800;
+    margin: 0 0 clamp(20px, 4vw, 32px);
+    line-height: 1.4;
+}
+
+.findid-card {
+    border: clamp(2px, 0.5vw, 4px) solid var(--findid-accent);
+    border-radius: clamp(16px, 4vw, 28px);
+    padding: clamp(20px, 4vw, 36px);
+    background-color: #101522;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(16px, 4vw, 28px);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.findid-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.25);
+}
+
+.findid-card-title {
+    font-size: clamp(22px, 6vw, 42px);
+    font-weight: 900;
+}
+
+.findid-camera-icon {
+    width: clamp(120px, 30vw, 220px);
+    height: auto;
+}
+
+.findid-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #232A39;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(20px, 4vw, 40px);
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.findid-modal-box {
+    width: clamp(400px, 90vw, 800px);
+    max-height: 92vh;
+    overflow: hidden;
+    border: clamp(3px, 0.6vw, 6px) solid var(--findid-accent);
+    border-radius: clamp(16px, 3vw, 24px);
+    background-color: var(--findid-bg);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.findid-modal-scroll {
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: clamp(16px, 3vw, 28px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(10px, 2vw, 16px);
+}
+
+.findid-modal-scroll::-webkit-scrollbar {
+    width: 10px;
+}
+
+.findid-modal-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--findid-accent);
+    border-radius: 999px;
+}
+
+.findid-modal-scroll::-webkit-scrollbar-track {
+    background-color: rgba(255, 240, 100, 0.15);
+}
+
+.findid-modal-close {
+    position: absolute;
+    top: clamp(8px, 2vw, 16px);
+    right: clamp(8px, 2vw, 16px);
+    font-size: clamp(28px, 8vw, 48px);
+    font-weight: 900;
+    color: var(--findid-accent);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.findid-modal-title {
+    font-size: clamp(28px, 7vw, 52px);
+    font-weight: 900;
+}
+
+.findid-modal-desc {
+    font-size: clamp(16px, 4vw, 28px);
+    font-weight: 800;
+    text-align: center;
+}
+
+.findid-modal-camera-area {
+    width: 85%;
+    max-width: 600px;
+    height: 40vh;
+    border: clamp(2px, 0.4vw, 3px) solid var(--findid-accent);
+    border-radius: clamp(12px, 3vw, 20px);
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.findid-modal-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.findid-modal-camera-text {
+    font-size: clamp(16px, 4vw, 28px);
+    font-weight: 800;
+    color: var(--findid-accent);
+    margin-bottom: clamp(8px, 2vw, 16px);
+}
+
+.findid-modal-camera-icon {
+    width: clamp(80px, 20vw, 160px);
+    height: auto;
+}
+
+.findid-ocr-loading {
+    width: 100%;
+    height: 100%;
+    background-color: #101522;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2.5vw, 18px);
+    color: var(--findid-accent);
+    text-align: center;
+}
+
+.findid-spinner {
+    width: clamp(36px, 8vw, 64px);
+    height: clamp(36px, 8vw, 64px);
+    border: clamp(3px, 0.6vw, 5px) solid rgba(255, 240, 100, 0.2);
+    border-top-color: var(--findid-accent);
+    border-radius: 50%;
+    animation: findid-spin 0.9s linear infinite;
+}
+
+.findid-ocr-text {
+    font-size: clamp(18px, 4.5vw, 30px);
+    font-weight: 900;
+}
+
+.findid-ocr-subtext {
+    font-size: clamp(16px, 4vw, 26px);
+    font-weight: 800;
+}
+
+@keyframes findid-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.findid-shutter-button {
+    width: clamp(52px, 12vw, 100px);
+    height: clamp(52px, 12vw, 100px);
+    border-radius: 50%;
+    border: clamp(2px, 0.5vw, 4px) solid var(--findid-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+}
+
+.findid-shutter-inner {
+    width: clamp(34px, 9vw, 74px);
+    height: clamp(34px, 9vw, 74px);
+    border-radius: 50%;
+    background-color: var(--findid-accent);
+    aspect-ratio: 1 / 1;
+}
+
+.findid-card-form-box {
+    width: 100%;
+    max-width: 600px;
+    border: none;
+    border-radius: clamp(12px, 3vw, 20px);
+    padding: clamp(16px, 3vw, 28px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2.5vw, 18px);
+    box-sizing: border-box;
+}
+
+.findid-card-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2vw, 16px);
+    font-size: clamp(28px, 7vw, 52px);
+    font-weight: 900;
+    text-align: center;
+}
+
+.findid-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.5vw, 12px);
+}
+
+.findid-form-field label {
+    font-size: clamp(16px, 4vw, 24px);
+    font-weight: 800;
+}
+
+.findid-modal-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: clamp(10px, 2.5vw, 18px);
+    border: clamp(2px, 0.4vw, 3px) solid var(--findid-accent);
+    border-radius: clamp(8px, 2vw, 12px);
+    background-color: #171C28;
+    color: var(--findid-accent);
+    font-size: clamp(16px, 4vw, 26px);
+    font-weight: 800;
+}
+
+.findid-form-row {
+    display: flex;
+    gap: clamp(12px, 2.5vw, 20px);
+    width: 100%;
+}
+
+.findid-form-field.half {
+    flex: 1;
+    min-width: 0;
+}
+
+.findid-card-btns {
+    display: flex;
+    gap: clamp(10px, 2.5vw, 18px);
+    margin-top: clamp(8px, 2vw, 14px);
+}
+
+.findid-retake-btn,
+.findid-confirm-btn,
+.findid-result-btn {
+    flex: 1;
+    padding: clamp(10px, 2.5vw, 16px);
+    border-radius: clamp(8px, 2vw, 12px);
+    font-size: clamp(16px, 4vw, 26px);
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+}
+
+.findid-retake-btn {
+    background-color: transparent;
+    border: clamp(2px, 0.4vw, 3px) solid var(--findid-accent);
+    color: var(--findid-accent);
+}
+
+.findid-confirm-btn,
+.findid-result-btn {
+    background-color: var(--findid-accent);
+    color: var(--findid-bg);
+}
+
+.findid-result-box {
+    width: min(520px, 92vw);
+    border: clamp(2px, 0.5vw, 4px) solid var(--findid-accent);
+    border-radius: clamp(12px, 3vw, 20px);
+    background-color: #141C29;
+    padding: clamp(18px, 4vw, 32px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 3vw, 20px);
+}
+
+.findid-result-title {
+    font-size: clamp(22px, 6vw, 36px);
+    font-weight: 900;
+}
+
+.findid-result-desc {
+    font-size: clamp(18px, 5vw, 30px);
+    font-weight: 800;
+}
+
+.findid-result-actions {
+    display: flex;
+    gap: clamp(10px, 2.5vw, 18px);
+}

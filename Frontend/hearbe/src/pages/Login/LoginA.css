@@ -157,8 +157,8 @@
 
 /* 가짜 체크박스 (네모) */
 .checkmark {
-  height: clamp(16px, 4vw, 24px);
-  width: clamp(16px, 4vw, 24px);
+  height: clamp(20px, 5.2vw, 32px);
+  width: clamp(20px, 5.2vw, 32px);
   background-color: transparent;
   border: clamp(2px, 0.4vw, 3px) solid var(--main-yellow);
   border-radius: clamp(3px, 0.8vw, 6px);
@@ -180,13 +180,13 @@
   content: "";
   position: absolute;
   display: none;
-  left: clamp(5px, 1.2vw, 8px);
-  top: clamp(2px, 0.4vw, 3px);
-  width: clamp(4px, 1vw, 6px);
-  height: clamp(8px, 2vw, 12px);
+  left: 50%;
+  top: 50%;
+  width: clamp(6px, 1.5vw, 10px);
+  height: clamp(12px, 3vw, 18px);
   border: solid var(--bg-dark);
   border-width: 0 clamp(2px, 0.5vw, 3px) clamp(2px, 0.5vw, 3px) 0;
-  transform: rotate(45deg);
+  transform: translate(-50%, -60%) rotate(45deg);
 }
 
 /* 체크되면 V 표시 보이기 */

@@ -1,6 +1,7 @@
 .mypage-container {
     width: 100%;
     min-height: 100vh;
+    height: auto;
     background-color: #f8f9fb;
     font-family: 'Pretendard', sans-serif;
     color: #1f2937;
@@ -289,7 +290,7 @@
 .card-title-lg {
     font-size: 2.4rem;
     /* 1.75rem -> 2.4rem */
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem;
 }
 
 .card-header-row {
@@ -325,12 +326,12 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    padding: 0.5rem 0;
+    padding: 1.2rem 0;
 }
 
 .row-icon-circle {
-    width: 3rem;
-    height: 3rem;
+    width: 4rem;
+    height: 4rem;
     background-color: #f9fafb;
     border-radius: 1rem;
     display: flex;
@@ -343,19 +344,17 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.5rem;
 }
 
 .row-label {
-    font-size: 0.95rem;
-    /* 0.75rem -> 0.95rem */
+    font-size: 1.2rem;
     font-weight: 800;
     color: #9ca3af;
 }
 
 .row-value {
-    font-size: 1.35rem;
-    /* 1.1rem -> 1.35rem */
+    font-size: 1.8rem;
     font-weight: 700;
     color: #374151;
 }
@@ -364,10 +363,10 @@
     background: #f5f3ff;
     color: #7c3aed;
     border: none;
-    padding: 0.6rem 1.25rem;
+    padding: 0.8rem 1.5rem;
     border-radius: 1rem;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     cursor: pointer;
 }
 
@@ -378,8 +377,10 @@
     text-decoration: underline;
     color: #9ca3af;
     font-weight: 600;
+    font-size: 1.3rem;
     cursor: pointer;
     margin-top: 1rem;
+    padding: 0.5rem;
 }
 
 /* .mypage-footer removed to use global .landing-footer */

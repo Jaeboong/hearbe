@@ -8,7 +8,6 @@ import iconCard from '../../assets/icon-cart.png';
 import logo from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 
-import BackButton from '../common/BackButtonA';
 
 const StoreBrowser = () => {
     const navigate = useNavigate();
@@ -160,7 +159,6 @@ const StoreBrowser = () => {
 
     return (
         <div className="store-container">
-            <BackButton onClick={() => navigate('/mall')} variant="navy" />
 
             {/* Iframe or Alternate View for Coupang */}
             {isCoupang ? (

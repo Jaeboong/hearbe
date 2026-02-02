@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
-import { Volume2, RefreshCw, Download, ArrowRight, Share2, Layout, Zap, Mic, Eye, ShoppingBag, Command } from 'lucide-react';
-import logoImage from '../assets/HearBe_logo_.png';
+import { Volume2, Download, ArrowRight, Share2, Layout, Zap, Mic, Eye, ShoppingBag, Command } from 'lucide-react';
+import '../App.css';
+import '../index.css'
+import logoC from '../assets/logoC.png'; // C형 로고로 변경
 
 // 모드 선택 카드 컴포넌트
 const ModeCard = ({ mode, onSelect }) => (
@@ -42,21 +44,23 @@ const ModeCard = ({ mode, onSelect }) => (
  * MainLanding - 메인 랜딩 페이지 컴포넌트
  *
  * @param {Object} props
- * @param {Function} props.handleReset - 초기화 핸들러
  * @param {Function} props.handleModeSelect - 모드 선택 핸들러
  * @param {React.RefObject} props.modeSelectionRef - 모드 선택 영역 ref
  */
-const MainLanding = ({ handleReset, handleModeSelect, modeSelectionRef }) => (
+const MainLanding = ({ handleModeSelect, modeSelectionRef }) => (
   <div className="landing-container">
     <header className="landing-header">
       <div className="header-inner">
-        <img src={logoImage} alt="HearBe" className="main-logo" />
+        <img
+          src={logoC}
+          alt="HearBe"
+          className="main-logo"
+          onClick={() => window.location.assign('/')}
+          style={{ cursor: 'pointer' }}
+        />
         <div className="header-actions">
-          <button onClick={handleReset} className="btn-reset">
-            <RefreshCw size={16} /> 테스트 초기화
-          </button>
-          <button className="btn-download">
-            <Download size={16} /> MCP 다운로드
+          <button className="btn-download" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)', color: '#fff', border: 'none' }}>
+            <Download size={16} /> 보조 프로그램 다운로드
           </button>
         </div>
       </div>
@@ -85,6 +89,34 @@ const MainLanding = ({ handleReset, handleModeSelect, modeSelectionRef }) => (
             지금 시작하기
           </button>
         </div>
+
+        {/* Floating Sound Wave Animation */}
+        <div className="absolute right-20 bottom-0 top-0 flex items-center justify-center pointer-events-none pr-12">
+          <div className="flex items-center gap-2 h-48 group-hover:gap-3 transition-all duration-500">
+            {[...Array(16)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="w-2.5 rounded-full bg-gradient-to-t from-[#7C3AED] via-[#A78BFA] to-white/40"
+                animate={{
+                  height: [
+                    20 + Math.random() * 40,
+                    100 + Math.random() * 120,
+                    20 + Math.random() * 40
+                  ]
+                }}
+                transition={{
+                  duration: 0.6 + Math.random() * 0.8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.08
+                }}
+                style={{
+                  opacity: 0.1 + (1 - Math.abs(8 - i) / 8) * 0.8
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </section>
 
       <div ref={modeSelectionRef} className="mode-selection-area">
@@ -103,8 +135,8 @@ const MainLanding = ({ handleReset, handleModeSelect, modeSelectionRef }) => (
 
       <div className="how-to-use-section">
         <div className="how-to-use-container">
-          <div className="how-to-label">
-            <h3>이용방법</h3>
+          <div className="how-to-label"> 
+            <h3 style={{ fontSize: '3rem' }}>이용방법</h3> 
             <p>간단한 3단계 프로세스</p>
           </div>
           <div className="steps-wrapper">

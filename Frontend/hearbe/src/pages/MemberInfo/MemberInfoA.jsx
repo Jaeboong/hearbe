@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut, Store } from 'lucide-react';
-import BackButton from '../common/BackButtonA';
+import { Home, LogOut } from 'lucide-react';
+import logoA from '../../assets/logoA.png';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
 import './MemberInfoA.css';
@@ -91,18 +91,19 @@ const MemberInfoA = () => {
 
     return (
         <div className="memberinfo-container">
-            <BackButton onClick={() => navigate('/A/mall')} variant="arrow-only" />
+            <img
+                src={logoA}
+                alt="Logo"
+                className="memberinfo-logo-left"
+                onClick={() => window.location.assign('/')}
+            />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/')}>
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
                         <Home size={72} />
                         <span>홈</span>
-                    </button>
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
-                        <Store size={72} />
-                        <span>쇼핑몰</span>
                     </button>
                     <button className="topbar-action" onClick={handleLogout}>
                         <LogOut size={72} />
@@ -157,13 +158,16 @@ const MemberInfoA = () => {
                                 </div>
                                 <div className="table-row">
                                     <div className="table-label">비밀번호</div>
-                                    <div className="table-value">{userData.password}</div>
+                                    <div className="table-value password-value">
+                                        {userData.password}
+                                        <button className="password-change-btn">변경하기</button>
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="logout-section">
                                 <span className="logout-link" onClick={handleLogout}>
-                                    로그아웃
+                                    회원탈퇴
                                 </span>
                             </div>
                         </>
