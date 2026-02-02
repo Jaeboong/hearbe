@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Home, ShoppingCart, Heart } from 'lucide-react'; // CheckSquare 제거
+import { User, Home, Heart, LogOut } from 'lucide-react'; // CheckSquare 제거
 import { wishlistAPI } from '../../services/wishlistAPI';
+import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
 import './WishlistC.css';
 import logoC from '../../assets/logoC.png';
@@ -49,12 +50,26 @@ export default function WishlistC({ onHome }) {
         'naver': '네이버',
         '11st': '11번가',
         'ssg': 'SSG',
-        'gmarket': 'G마켓'
+        'gmarket': 'G마켓',
+        'kurly': '컬리'
     };
 
     useEffect(() => {
         fetchWishlist();
     }, []);
+
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
+        }
+    };
 
     const fetchWishlist = async () => {
         try {
@@ -65,7 +80,9 @@ export default function WishlistC({ onHome }) {
             if (response.items && response.items.length > 0) {
                 const wishlistByMall = {};
                 response.items.forEach(item => {
-                    const mallName = platformDisplayNames[item.platform_name] || item.platform_name;
+                    const rawName = item.platform_name || '';
+                    const mallName = platformDisplayNames[rawName.toLowerCase()] || rawName;
+
                     if (!wishlistByMall[mallName]) {
                         wishlistByMall[mallName] = {
                             mall: mallName,
@@ -114,13 +131,9 @@ export default function WishlistC({ onHome }) {
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>
-                    <button className="nav-item-c" onClick={() => navigate('/C/cart')}>
-                        <div className="nav-icon-c"><ShoppingCart size={24} /></div>
-                        <span>장바구니</span>
-                    </button>
-                    <button className="nav-item-c active">
-                        <div className="nav-icon-c"><User size={24} /></div>
-                        <span>마이페이지</span>
+                    <button className="nav-item-c" onClick={handleLogout}>
+                        <div className="nav-icon-c"><LogOut size={24} /></div>
+                        <span>로그아웃</span>
                     </button>
                 </div>
             </header>

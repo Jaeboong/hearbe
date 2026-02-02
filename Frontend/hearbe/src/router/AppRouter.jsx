@@ -54,7 +54,7 @@ function AppContent() {
     }
     setSelectedMode(mode);
 
-    // 紐⑤뱶???곕씪 遺꾧린 泥섎━
+    // 모드에 따라 분기 처리
     if (mode === 'common') {
       navigate('/C/login');
     } else {

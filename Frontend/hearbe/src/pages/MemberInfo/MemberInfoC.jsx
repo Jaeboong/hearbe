@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Home, ShoppingCart, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, Home, ShieldCheck, LogOut } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
@@ -103,19 +103,17 @@ export default function MemberInfoC({ onHome }) {
     };
 
     const handleLogout = async () => {
-        if (window.confirm('로그아웃 하시겠습니까?')) {
-            try {
-                await authAPI.logout();
-            } catch (error) {
-                console.error('Logout failed:', error);
-            } finally {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('user');
-                localStorage.removeItem('user_id');
-                localStorage.removeItem('username');
-                navigate('/C/login');
-            }
+        try {
+            await authAPI.logout();
+        } catch (error) {
+            console.error('Logout failed:', error);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
         }
     };
 
@@ -134,13 +132,9 @@ export default function MemberInfoC({ onHome }) {
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>
-                    <button className="nav-item-c" onClick={() => navigate('/C/cart')}>
-                        <div className="nav-icon-c"><ShoppingCart size={24} /></div>
-                        <span>장바구니</span>
-                    </button>
-                    <button className="nav-item-c active">
-                        <div className="nav-icon-c"><User size={24} /></div>
-                        <span>마이페이지</span>
+                    <button className="nav-item-c" onClick={handleLogout}>
+                        <div className="nav-icon-c"><LogOut size={24} /></div>
+                        <span>로그아웃</span>
                     </button>
                 </div>
             </header>
@@ -203,9 +197,6 @@ export default function MemberInfoC({ onHome }) {
                                     </div>
                                     <h2 className="card-title-lg" style={{ marginBottom: 0 }}>회원 정보</h2>
                                 </div>
-                                <button className="withdraw-link" onClick={handleLogout} style={{ marginTop: 0 }}>
-                                    로그아웃
-                                </button>
                             </div>
                             {isLoading ? (
                                 <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
@@ -217,33 +208,33 @@ export default function MemberInfoC({ onHome }) {
                                 </div>
                             ) : (
                                 <div className="info-list-full">
-                                    <div className="info-row-full">
+                                    <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><User size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label">아이디</span>
-                                            <span className="row-value">{userData.userId || '-'}</span>
+                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>아이디</span>
+                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>{userData.userId || '-'}</span>
                                         </div>
                                     </div>
-                                    <div className="info-row-full">
+                                    <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><Lock size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label">비밀번호</span>
-                                            <span className="row-value">********</span>
+                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>비밀번호</span>
+                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>********</span>
                                         </div>
                                         <button className="small-action-btn" onClick={handlePasswordReset}>재설정하기</button>
                                     </div>
-                                    <div className="info-row-full">
+                                    <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><User size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label">이름</span>
-                                            <span className="row-value">{userData.userName || '-'}</span>
+                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>이름</span>
+                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>{userData.userName || '-'}</span>
                                         </div>
                                     </div>
-                                    <div className="info-row-full">
+                                    <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><Mail size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label">이메일</span>
-                                            <span className="row-value">{userData.email || '-'}</span>
+                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>이메일</span>
+                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>{userData.email || '-'}</span>
                                         </div>
                                     </div>
                                 </div>
