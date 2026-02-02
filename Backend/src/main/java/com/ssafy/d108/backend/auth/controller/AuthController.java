@@ -1,10 +1,12 @@
 package com.ssafy.d108.backend.auth.controller;
 
 import com.ssafy.d108.backend.auth.dto.FindIdRequest;
+import com.ssafy.d108.backend.auth.dto.FindIdByEmailRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.CheckIdRequest;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordRequest;
 import com.ssafy.d108.backend.auth.dto.SignupRequest;
 import com.ssafy.d108.backend.auth.service.AuthService;
 import com.ssafy.d108.backend.global.response.ApiResponse;
@@ -79,5 +81,25 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
         return ResponseEntity.ok(ApiResponse.success(null, "로그아웃 되었습니다."));
+    }
+
+    /**
+     * 아이디 찾기 (C형 - 이메일 인증)
+     */
+    @Operation(summary = "아이디 찾기 (이메일)", description = "이름과 이메일로 아이디 찾기 (C형 전용)")
+    @PostMapping("/findIdByEmail")
+    public ResponseEntity<ApiResponse<FindIdResponse>> findIdByEmail(@Valid @RequestBody FindIdByEmailRequest request) {
+        FindIdResponse response = authService.findIdByEmail(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 비밀번호 재설정 (C형 - 이메일 인증)
+     */
+    @Operation(summary = "비밀번호 재설정", description = "이메일 인증 후 비밀번호 재설정 (C형 전용)")
+    @PostMapping("/resetPassword")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success(null, "비밀번호가 재설정되었습니다."));
     }
 }
