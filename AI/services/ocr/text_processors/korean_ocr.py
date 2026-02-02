@@ -1,5 +1,8 @@
 # PaddleOCR 기반 한글 OCR 실행
+import os
+
 from paddleocr import PaddleOCR
+from PIL import Image
 from typing import List, Dict, Any, Optional
 
 try:
@@ -7,7 +10,11 @@ try:
 except ImportError:
     from utils import get_image_size
 
+# decompression bomb 방지 (약 14000x14000px 상한)
+Image.MAX_IMAGE_PIXELS = 200_000_000
+
 DEFAULT_MODEL_NAME = "korean_PP-OCRv5_mobile_rec"
+MAX_IMAGE_FILE_SIZE = 50 * 1024 * 1024  # 이미지 파일 최대 50MB
 DEFAULT_DEVICE = "gpu:0"
 
 
@@ -85,10 +92,15 @@ def process_image(
     output_dir: str = "output",
     ocr_instance: Optional[PaddleOCR] = None
 ) -> Dict[str, Any]:
-    import os
     import json
     from pathlib import Path
-    
+
+    file_size = os.path.getsize(image_path)
+    if file_size > MAX_IMAGE_FILE_SIZE:
+        raise ValueError(
+            f"이미지 파일이 너무 큽니다: {file_size / 1024 / 1024:.1f}MB (최대 {MAX_IMAGE_FILE_SIZE // 1024 // 1024}MB)"
+        )
+
     width, height = get_image_size(image_path)
     
     if ocr_instance is None:
@@ -111,12 +123,9 @@ def process_image(
     else:
 
         # RGBA(PNG 투명도) 처리를 위해 이미지를 RGB로 변환 후 numpy 배열로 전달
-        from PIL import Image
         import numpy as np
         img = Image.open(image_path)
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
-        elif img.mode != 'RGB':
+        if img.mode != 'RGB':
             img = img.convert('RGB')
         img_array = np.array(img)
         img_array = img_array[:, :, ::-1]  # RGB to BGR
@@ -157,20 +166,21 @@ def process_images_parallel(
     save_results: bool = False,
     save_vis: bool = True,
     save_ocr_json: bool = True,
-    output_dir: str = "output"
+    output_dir: str = "output",
+    device: str = DEFAULT_DEVICE
 ) -> List[Dict[str, Any]]:
     from concurrent.futures import ThreadPoolExecutor, as_completed
     from pathlib import Path
     import threading
     import os
-    
+
     os.makedirs(output_dir, exist_ok=True)
     thread_local = threading.local()
-    
+
     def process_single(image_path: str) -> Dict[str, Any]:
         try:
             if not hasattr(thread_local, "ocr_instance"):
-                thread_local.ocr_instance = create_ocr_instance()
+                thread_local.ocr_instance = create_ocr_instance(device=device)
             result = process_image(
                 image_path,
                 max_height=max_height,
@@ -192,9 +202,9 @@ def process_images_parallel(
                 "source": Path(image_path).name,
                 "error": str(e)
             }
-    
+
     results = []
-    if isinstance(DEFAULT_DEVICE, str) and DEFAULT_DEVICE.startswith("gpu"):
+    if isinstance(device, str) and device.startswith("gpu"):
         max_workers = 1  # GPU에서는 메모리 경합 방지를 위해 순차 처리
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:

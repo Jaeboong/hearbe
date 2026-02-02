@@ -41,6 +41,8 @@ SITE_CONFIGS: Dict[str, Dict] = {
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
 
+MAX_DOWNLOAD_SIZE = 20 * 1024 * 1024  # 이미지 1장당 최대 다운로드 크기 20MB
+
 # 내부/비공개 네트워크 접근 차단 (SSRF 방어)
 _BLOCKED_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
 _BLOCKED_IP_PREFIXES = ("10.", "172.16.", "172.17.", "172.18.", "172.19.",
@@ -173,20 +175,44 @@ def download_image(
             "Referer": url,
         }
         
-        response = requests.get(url, headers=headers, timeout=timeout, stream=True)
+        response = requests.get(
+            url, headers=headers, timeout=timeout,
+            stream=True, allow_redirects=False,
+        )
+
+        # 리다이렉트 시 대상 URL의 안전성 재검증 (SSRF 방어)
+        if response.status_code in (301, 302, 303, 307, 308):
+            redirect_url = response.headers.get("Location", "")
+            if not redirect_url or not _is_safe_url(redirect_url):
+                return None
+            response = requests.get(
+                redirect_url, headers=headers, timeout=timeout,
+                stream=True, allow_redirects=False,
+            )
+
         response.raise_for_status()
-        
+
         content_type = response.headers.get("Content-Type", "")
         if not content_type.startswith("image/"):
             return None
-        
+
+        downloaded = 0
         with open(local_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
+                downloaded += len(chunk)
+                if downloaded > MAX_DOWNLOAD_SIZE:
+                    break
                 f.write(chunk)
-        
+
+        if downloaded > MAX_DOWNLOAD_SIZE:
+            os.remove(local_path)
+            return None
+
         return local_path
-        
+
     except requests.RequestException:
+        if os.path.exists(local_path):
+            os.remove(local_path)
         return None
 
 

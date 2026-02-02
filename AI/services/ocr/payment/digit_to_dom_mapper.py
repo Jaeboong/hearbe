@@ -55,8 +55,14 @@ def format_mapping_for_tts(mapping: Dict[str, str]) -> str:
     Returns:
         TTS용 문자열 (예: "0은 key 3. 1은 key 0. ...")
     """
+    def _safe_int(s):
+        try:
+            return int(s)
+        except (ValueError, TypeError):
+            return float('inf')
+
     lines = []
-    for digit in sorted(mapping.keys(), key=int):
+    for digit in sorted(mapping.keys(), key=_safe_int):
         lines.append(f"{digit}은 key {mapping[digit]}")
     return ". ".join(lines)
 
