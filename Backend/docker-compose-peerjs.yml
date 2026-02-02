@@ -1,0 +1,14 @@
+services:
+  peerjs:
+    image: peerjs/peerjs-server
+    container_name: hearbe-peer
+    ports:
+      - "9000:9000"
+    restart: always
+    command: ["--port", "9000", "--path", "/hearbe-peer"]
+    networks:
+      - hearbe-network
+
+networks:
+  hearbe-network:
+    driver: bridge

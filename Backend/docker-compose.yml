@@ -1,22 +1,22 @@
 services:
   mariadb:
     image: mariadb:latest
-    container_name: herewego
+    container_name: hearbe-mariadb
     environment:
       MYSQL_ROOT_PASSWORD: here0119
-      MYSQL_DATABASE: herewepick
-      MYSQL_USER: herewepick
+      MYSQL_DATABASE: hearbe
+      MYSQL_USER: hearbe
       MYSQL_PASSWORD: 1234
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
   phpmyadmin:
     image: phpmyadmin:latest
-    container_name: herewepick-phpmyadmin
+    container_name: hearbe-phpmyadmin
     environment:
       PMA_HOST: mariadb # 기본적으로 mariadb에 연결
-      PMA_USER: herewepick
+      PMA_USER: hearbe
       PMA_PASSWORD: 1234
       MYSQL_ROOT_PASSWORD: here0119 # MariaDB root 비밀번호
     ports:
@@ -27,7 +27,7 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
-    container_name: herewepick-redis
+    container_name: hearbe-redis
     volumes:
       - redis_data:/data
     command: ["redis-server", "--requirepass", "1234"]
