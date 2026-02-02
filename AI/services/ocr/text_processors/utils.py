@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import tempfile
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, Tuple, List
 
@@ -9,10 +10,18 @@ from PIL import Image
 
 
 def save_json(data: Dict[str, Any], output_path: str, indent: int = 2) -> None:
-    """JSON 파일 저장 (공통 함수)"""
-    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=indent)
+    """JSON 파일 저장 (원자적 쓰기: 임시파일에 쓴 뒤 교체하여 동시성 안전)"""
+    dir_name = os.path.dirname(output_path) or "."
+    os.makedirs(dir_name, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(dir=dir_name, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=indent)
+        os.replace(tmp_path, output_path)
+    except Exception:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise
 
 
 def load_json(input_path: str) -> Dict[str, Any]:
@@ -39,13 +48,16 @@ DEFAULT_CACHE_TTL_DAYS = 30
 
 
 def compute_image_hash(image_path: str) -> str:
-    """이미지 파일의 SHA256 해시 계산 (처음 1MB만 읽어서 성능 최적화)"""
+    """이미지 파일의 SHA256 해시 계산 (파일 전체를 읽어 정확한 캐시 키 생성)"""
     hash_sha256 = hashlib.sha256()
-    chunk_size = 1024 * 1024  # 1MB
+    chunk_size = 1024 * 1024  # 1MB 단위로 읽기
 
     with open(image_path, "rb") as f:
-        chunk = f.read(chunk_size)
-        hash_sha256.update(chunk)
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                break
+            hash_sha256.update(chunk)
 
     return hash_sha256.hexdigest()
 

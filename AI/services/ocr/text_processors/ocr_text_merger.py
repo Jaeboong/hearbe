@@ -19,6 +19,8 @@ def _merge_entries(
     similarity_threshold: float,
 ) -> List[Dict]:
     merged: List[Dict] = []
+    norm_to_idx: Dict[str, int] = {}  # 정확 일치 O(1) 조회용 해시맵
+
     for entry in entries:
         text = entry.get("text", "")
         score = float(entry.get("score", 1.0))
@@ -29,17 +31,20 @@ def _merge_entries(
             continue
 
         match_idx = None
-        for idx, existing in enumerate(merged):
-            if norm == existing["norm"]:
-                match_idx = idx
-                break
-            if similarity_threshold > 0:
+
+        # 1단계: 정확 일치를 해시맵으로 O(1) 조회
+        if norm in norm_to_idx:
+            match_idx = norm_to_idx[norm]
+        elif similarity_threshold > 0:
+            # 2단계: 유사 매칭 (정확 일치가 없을 때만 순회)
+            for idx, existing in enumerate(merged):
                 ratio = SequenceMatcher(None, norm, existing["norm"]).ratio()
                 if ratio >= similarity_threshold:
                     match_idx = idx
                     break
 
         if match_idx is None:
+            norm_to_idx[norm] = len(merged)
             merged.append(
                 {
                     "text": text,

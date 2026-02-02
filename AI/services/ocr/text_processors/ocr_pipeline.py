@@ -140,7 +140,7 @@ def process_product_image(
         else:
             update_cache_metadata(hit=False)
 
-    ocr_result = process_image(image_path, output_dir=output_dir, save_vis=False)
+    ocr_result = process_image(image_path, output_dir=output_dir, save_vis=False, save_ocr_json=False)
     ocr_count = ocr_result.get("total_count", len(ocr_result.get("rec_texts", [])))
 
     raw_texts = ocr_result.get("rec_texts", [])
@@ -212,7 +212,8 @@ def process_multiple_images(
         image_paths,
         max_workers=max_workers,
         output_dir=output_dir,
-        save_vis=False
+        save_vis=False,
+        save_ocr_json=False
     )
     total_ocr = sum(r.get("total_count", 0) for r in ocr_results)
 
@@ -239,7 +240,8 @@ def process_multiple_images(
             "허리", "엉덩이", "총장", "밑위", "허벅지", "바지길이", "힙둘레", "밑단",
             "어깨", "가슴", "소매", "기장",
             "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
-            "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
+            "참고사이즈", "남성사이즈", "여성사이즈", "길이단위",
+            "사이즈", "신발",
         ]
         size_image_result = None
         best_header_count = 0
@@ -340,6 +342,11 @@ def process_product_from_urls(
         use_cache=use_cache
     )
 
+    # 다운로드된 중간 이미지 정리
+    import shutil
+    if os.path.exists(download_dir):
+        shutil.rmtree(download_dir, ignore_errors=True)
+
     elapsed_time = time.time() - start_time
     result["source_urls"] = filtered_urls
     result["site"] = site if site != "auto" else detect_site(filtered_urls[0]) if filtered_urls else "unknown"
@@ -406,6 +413,8 @@ def main() -> int:
         return 0
 
     except Exception:
+        import traceback
+        traceback.print_exc()
         return 1
 
 
