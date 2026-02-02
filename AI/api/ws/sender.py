@@ -74,10 +74,8 @@ class WSSender:
             },
             session_id=session_id
         )
-        # TODO: [TEMP] Broadcasting to all clients for testing
-        # In production, send only to the originating session
-        logger.info(f"[BROADCAST] Sending {len(commands)} tool calls to all clients")
-        await self._connections.broadcast(msg)
+        logger.info(f"Sending {len(commands)} tool calls to session {session_id}")
+        await self._connections.send_message(session_id, msg)
 
     async def send_flow_step(self, session_id: str, step):
         msg = WSMessage(
