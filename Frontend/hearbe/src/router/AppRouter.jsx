@@ -1,9 +1,10 @@
-﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
 // [페이지 컴포넌트]
 import MainLanding from '../pages/MainLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
+import Intro from '../pages/Intro/Intro';
 
 // [A형 페이지 컴포넌트]
 import LoginA from '../pages/Login/LoginA';
@@ -39,6 +40,7 @@ import GuardianViewS from '../pages/GuardianView/GuardianViewS';
  */
 function AppContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedMode, setSelectedMode] = useState('audio');
   const [micPermissionGranted, setMicPermissionGranted] = useState(false);
   const [showInitialSetup, setShowInitialSetup] = useState(() => {
@@ -57,25 +59,48 @@ function AppContent() {
     // 모드에 따라 분기 처리
     if (mode === 'common') {
       navigate('/C/login');
-    } else {
+    } else if (mode === 'audio' || mode === 'big') {
       navigate('/A/login');
+    } else if (mode === 'sharing') {
+      navigate('/login-s');
     }
   };
 
-  // 초기 설정이 완료되지 않았으면 InitialSetup을 먼저 보여줌
+  const handleSetupComplete = (granted) => {
+    setShowInitialSetup(false);
+    setMicPermissionGranted(granted);
+    localStorage.setItem('hearbe_mcp_setup_completed', 'true');
+    // 설정 완료 후 인트로 페이지로 이동
+    navigate('/intro');
+  };
+
+  const handleOpenSetup = () => {
+    // 설정 도우미 다시 열기 (기존 설정 리셋)
+    localStorage.removeItem('hearbe_mcp_setup_completed');
+    setShowInitialSetup(true);
+  };
+
+  // 초기 설정이 완료되지 않았으면 InitialSetup을 '가장 먼저' 보여줌 (모든 페이지 진입 차단)
   if (showInitialSetup) {
     return <InitialSetup onComplete={handleSetupComplete} />;
   }
 
   return (
     <Routes>
+      {/* 기본 경로 접속 시 Intro 페이지 직접 렌더링 (리다이렉트 제거) */}
+      <Route path="/" element={<Intro />} />
+
+      {/* Intro 페이지 별도 경로 유지 */}
+      <Route path="/intro" element={<Intro />} />
+
       {/* 메인 랜딩 페이지 */}
       <Route
-        path="/"
+        path="/main"
         element={
           <MainLanding
             handleModeSelect={handleModeSelect}
             modeSelectionRef={modeSelectionRef}
+            onOpenSetup={handleOpenSetup}
           />
         }
       />
@@ -119,7 +144,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate('/A/mall')}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
             onCart={() => navigate('/A/cart')}
             onMyPage={() => navigate('/A/member-info')}
           />
@@ -132,7 +157,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -143,7 +168,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -154,7 +179,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -165,7 +190,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -176,7 +201,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -247,16 +272,15 @@ function AppContent() {
       <Route
         path="/C/member-info"
         element={
-          <MemberInfoC // MemberInfoC는 이제 /C/member-info 경로에서 직접 렌더링
-            onBack={() => navigate('/C/mypage')} // 뒤로가기 시 /C/mypage (리다이렉트될 경로)로 이동
+          <MemberInfoC
+            onBack={() => navigate('/C/mypage')}
             onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
-            onMyPage={() => navigate('/C/member-info')} // 마이페이지 링크를 /C/member-info로 변경
+            onMyPage={() => navigate('/C/member-info')}
           />
         }
       />
 
-      {/* /C/mypage는 이제 /C/member-info로 리다이렉트 */}
       <Route path="/C/mypage" element={<Navigate to="/C/member-info" replace />} />
       <Route
         path="/C/cart"
@@ -283,7 +307,7 @@ function AppContent() {
 
       {/* Fallback */}
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/intro" replace />} />
     </Routes>
   );
 }

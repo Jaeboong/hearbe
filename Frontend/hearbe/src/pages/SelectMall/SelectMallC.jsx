@@ -47,7 +47,7 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
             {/* Header 섹션 (디자인 통일) */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
                         <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>

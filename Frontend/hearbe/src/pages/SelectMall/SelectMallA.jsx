@@ -33,7 +33,7 @@ const SelectMall = () => {
             <div className="mall-header">
                 <div className="header-title">쇼핑몰 선택</div>
                 <div className="header-nav">
-                    <div className="nav-item" onClick={() => navigate('/')}>
+                    <div className="nav-item" onClick={() => navigate('/main')}>
                         <img src={iconHome} alt="Home" className="nav-icon" />
                         <span>홈</span>
                     </div>

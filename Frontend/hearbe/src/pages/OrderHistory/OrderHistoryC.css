@@ -141,3 +141,17 @@
 .mp-sidebar-item .label {
     font-size: inherit;
 }
+
+/* Ensure explicit transparency for Header */
+.mall-header-c {
+    background: transparent !important;
+    border-bottom: none !important;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    backdrop-filter: blur(10px);
+}

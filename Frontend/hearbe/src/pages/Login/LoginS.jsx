@@ -16,7 +16,7 @@ const LoginS = () => {
 
   const handleClose = () => {
     setIsModalOpen(false);
-    navigate('/'); // 메인으로 돌아가기
+    navigate('/main'); // 메인으로 돌아가기
   };
 
   // 모달이 닫히면 다시 메인으로 돌아가는 것이 자연스러움
