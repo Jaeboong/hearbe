@@ -184,13 +184,13 @@ export const authAPI = {
         }
     },
 
-    // 비밀번호 재설정 API
-    resetPassword: async (username, newPassword) => {
+    // 비밀번호 재설정 API (C형 - 이메일 인증)
+    resetPassword: async (email, newPassword) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/findPassword`, {
+            const response = await fetch(`${API_BASE_URL}/auth/resetPassword`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, newPassword }),
+                body: JSON.stringify({ email, newPassword }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || '비밀번호 재설정 실패');
@@ -218,10 +218,10 @@ export const authAPI = {
         }
     },
 
-    // 아이디 찾기 API
+    // 아이디 찾기 API (C형 - 이메일 인증)
     findId: async (name, email) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/findId`, {
+            const response = await fetch(`${API_BASE_URL}/auth/findIdByEmail`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email }),

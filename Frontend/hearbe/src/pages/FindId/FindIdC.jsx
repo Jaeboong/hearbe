@@ -5,6 +5,7 @@ import './FindIdC.css';
 import logoC from '../../assets/logoC.png';
 
 import { authAPI } from '../../services/authAPI';
+import { emailService } from '../../services/emailService';
 
 export default function FindIdPage({ onBack, micPermissionGranted }) {
     const navigate = useNavigate();
@@ -31,21 +32,23 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
-            await authAPI.sendEmailVerification(email);
+            // EmailJS로 인증번호 발송 (클라이언트 사이드)
+            await emailService.sendVerificationCode(email, name);
             setIsSent(true);
-            alert('인증번호가 이메일로 전송되었습니다.');
+            alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
         } catch (error) {
             alert(error.message || '인증번호 전송에 실패했습니다.');
         }
     };
 
-    const handleVerifyCode = async () => {
+    const handleVerifyCode = () => {
         if (!verificationCode) {
             alert('인증번호를 입력해주세요.');
             return;
         }
         try {
-            await authAPI.verifyEmailCode(email, verificationCode);
+            // EmailJS 인증번호 확인 (클라이언트 사이드)
+            emailService.verifyCode(email, verificationCode);
             setIsVerified(true);
             alert('인증이 완료되었습니다.');
         } catch (error) {
@@ -60,8 +63,9 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
         }
         try {
             const response = await authAPI.findId(name, email);
-            if (response.data) {
-                setFoundUserId(response.data);
+            // 백엔드 응답: { code, message, data: { username, message } }
+            if (response.data && response.data.username) {
+                setFoundUserId(response.data.username);
                 setShowIdPopup(true);
             } else {
                 alert('해당 정보로 가입된 아이디를 찾을 수 없습니다.');
