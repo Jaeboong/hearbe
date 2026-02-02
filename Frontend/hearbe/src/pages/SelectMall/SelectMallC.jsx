@@ -8,6 +8,7 @@ import gmarketLogo from '../../assets/C/Gmarket_logo.png';
 import kurlyLogo from '../../assets/C/Kurly_logo.png';
 import st11Logo from '../../assets/C/11st_logo.png';
 import ssgLogo from '../../assets/C/ssg_logo.png';
+import logoC from '../../assets/logoC.png';
 
 const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
@@ -31,19 +32,13 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
             {/* Header 섹션 (디자인 통일) */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0 }}>
-                        <div className="title-icon-box-c">
-                            <Layout size={24} />
-                        </div>
-                        <div className="title-text-c">
-                            <h1>쇼핑몰 선택</h1>
-                            <span className="subtitle-c">Select Shopping Mall</span>
-                        </div>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
+                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>

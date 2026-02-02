@@ -4,6 +4,7 @@ import { User, Home, ShoppingCart, Heart } from 'lucide-react'; // CheckSquare �
 import { wishlistAPI } from '../../services/wishlistAPI';
 import '../MyPage/MyPageC.css';
 import './WishlistC.css';
+import logoC from '../../assets/logoC.png';
 
 export default function WishlistC({ onHome }) {
     const navigate = useNavigate();
@@ -103,19 +104,13 @@ export default function WishlistC({ onHome }) {
             {/* Header */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0 }}>
-                        <div className="title-icon-box-c">
-                            <User size={24} />
-                        </div>
-                        <div className="title-text-c">
-                            <h1>마이페이지</h1>
-                            <span className="subtitle-c">My Page</span>
-                        </div>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
+                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>

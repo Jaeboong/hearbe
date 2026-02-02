@@ -4,12 +4,14 @@ import { User, Mail, Lock, Home, ShoppingCart, ShieldCheck } from 'lucide-react'
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
+import logoC from '../../assets/logoC.png';
 
 export default function MemberInfoC({ onHome }) {
     const navigate = useNavigate();
 
     const [userData, setUserData] = useState({
-        name: '',
+        userId: '',   // 아이디 (username)
+        userName: '', // 이름 (name)
         email: '',
         phone: '',
     });
@@ -33,8 +35,10 @@ export default function MemberInfoC({ onHome }) {
 
                 // 데이터 매핑
                 const profileData = response.data || response;
+
                 setUserData({
-                    name: profileData.username || profileData.name || '',
+                    userId: localStorage.getItem('username') || '', // ID from storage (backend does not send it)
+                    userName: profileData.username || profileData.name || '',   // Name (backend puts name in 'username' field)
                     email: profileData.email || '',
                     phone: profileData.phoneNumber || profileData.phone || '',
                 });
@@ -46,24 +50,36 @@ export default function MemberInfoC({ onHome }) {
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
                     localStorage.removeItem('user');
+                    localStorage.removeItem('username');
                     navigate('/C/login');
                     return;
                 }
 
                 // API 실패 시 localStorage에서 백업 데이터 로드
-                const storedUser = localStorage.getItem('user');
+                // authAPI stores 'username' directly in localStorage
+                const storedUsername = localStorage.getItem('username');
+                const storedUser = localStorage.getItem('user'); // Legacy or other source
+
+                let fallbackData = {
+                    userId: storedUsername || '',
+                    userName: '',
+                    email: '',
+                    phone: ''
+                };
+
                 if (storedUser) {
                     try {
                         const parsed = JSON.parse(storedUser);
-                        setUserData({
-                            name: parsed.name || '',
-                            email: parsed.email || '',
-                            phone: parsed.phone || '',
-                        });
+                        fallbackData.userId = fallbackData.userId || parsed.username || parsed.id || '';
+                        fallbackData.userName = parsed.name || parsed.realName || '';
+                        fallbackData.email = parsed.email || '';
+                        fallbackData.phone = parsed.phone || '';
                     } catch (e) {
                         console.error('Failed to parse stored user data:', e);
                     }
                 }
+
+                setUserData(fallbackData);
             } finally {
                 setIsLoading(false);
             }
@@ -108,19 +124,13 @@ export default function MemberInfoC({ onHome }) {
             {/* Header - MyPageC와 동일한 구조 */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0 }}>
-                        <div className="title-icon-box-c">
-                            <User size={24} />
-                        </div>
-                        <div className="title-text-c">
-                            <h1>마이페이지</h1>
-                            <span className="subtitle-c">My Page</span>
-                        </div>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
+                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>
@@ -143,7 +153,7 @@ export default function MemberInfoC({ onHome }) {
                             <User size={40} color="#7c3aed" />
                         </div>
                         <div className="sidebar-profile-info">
-                            <h2 className="sidebar-name">{userData.name}님</h2>
+                            <h2 className="sidebar-name">{userData.userName || userData.userId}님</h2>
                             <span className="sidebar-badge">hearbe 회원</span>
                         </div>
                         <p className="sidebar-welcome">오늘도 즐거운 쇼핑 되세요!</p>
@@ -183,9 +193,15 @@ export default function MemberInfoC({ onHome }) {
                         {/* Profile Section */}
                         <section className="dashboard-card">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                                <div className="card-header-row" style={{ marginBottom: 0 }}>
-                                    <ShieldCheck size={24} className="purple-text" />
-                                    <h3 className="card-title" style={{ margin: 0 }}>회원 정보</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{
+                                        width: '50px', height: '50px', borderRadius: '1rem',
+                                        backgroundColor: '#f3e8ff', color: '#7c3aed',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <ShieldCheck size={28} />
+                                    </div>
+                                    <h2 className="card-title-lg" style={{ marginBottom: 0 }}>회원 정보</h2>
                                 </div>
                                 <button className="withdraw-link" onClick={handleLogout} style={{ marginTop: 0 }}>
                                     로그아웃
@@ -204,15 +220,8 @@ export default function MemberInfoC({ onHome }) {
                                     <div className="info-row-full">
                                         <div className="row-icon-circle"><User size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label">이름</span>
-                                            <span className="row-value">{userData.name || '-'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="info-row-full">
-                                        <div className="row-icon-circle"><Mail size={20} /></div>
-                                        <div className="row-content">
-                                            <span className="row-label">이메일</span>
-                                            <span className="row-value">{userData.email || '-'}</span>
+                                            <span className="row-label">아이디</span>
+                                            <span className="row-value">{userData.userId || '-'}</span>
                                         </div>
                                     </div>
                                     <div className="info-row-full">
@@ -222,6 +231,20 @@ export default function MemberInfoC({ onHome }) {
                                             <span className="row-value">********</span>
                                         </div>
                                         <button className="small-action-btn" onClick={handlePasswordReset}>재설정하기</button>
+                                    </div>
+                                    <div className="info-row-full">
+                                        <div className="row-icon-circle"><User size={20} /></div>
+                                        <div className="row-content">
+                                            <span className="row-label">이름</span>
+                                            <span className="row-value">{userData.userName || '-'}</span>
+                                        </div>
+                                    </div>
+                                    <div className="info-row-full">
+                                        <div className="row-icon-circle"><Mail size={20} /></div>
+                                        <div className="row-content">
+                                            <span className="row-label">이메일</span>
+                                            <span className="row-value">{userData.email || '-'}</span>
+                                        </div>
                                     </div>
                                 </div>
                             )}

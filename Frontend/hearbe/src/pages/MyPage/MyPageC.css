@@ -280,8 +280,7 @@
 /* Cards & Lists */
 .card-title,
 .card-title-lg {
-    font-size: 1.5rem;
-    /* 1.25rem -> 1.5rem */
+    font-size: 2rem;
     font-weight: 800;
     color: #1f2937;
     margin: 0 0 2rem 0;
@@ -348,7 +347,7 @@
 }
 
 .row-label {
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     font-weight: 800;
     color: #9ca3af;
 }

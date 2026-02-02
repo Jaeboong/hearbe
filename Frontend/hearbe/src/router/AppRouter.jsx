@@ -213,7 +213,7 @@ function AppContent() {
         element={
           <SelectMallC
             onBack={() => navigate('/C/login')}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
             onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
@@ -225,7 +225,7 @@ function AppContent() {
         element={
           <StoreBrowserC
             onBack={() => navigate('/C/mall')}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
           />
@@ -235,7 +235,7 @@ function AppContent() {
         path="/C/order-history"
         element={
           <OrderHistoryC
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
@@ -243,7 +243,7 @@ function AppContent() {
         path="/C/wishlist"
         element={
           <WishlistC
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
@@ -252,7 +252,7 @@ function AppContent() {
         element={
           <MemberInfoC // MemberInfoC는 이제 /C/member-info 경로에서 직접 렌더링
             onBack={() => navigate('/C/mypage')} // 뒤로가기 시 /C/mypage (리다이렉트될 경로)로 이동
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')} // 마이페이지 링크를 /C/member-info로 변경
           />
@@ -265,7 +265,7 @@ function AppContent() {
         path="/C/cart"
         element={
           <CartC
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
