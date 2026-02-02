@@ -2,6 +2,7 @@
 import argparse
 import os
 import re
+import shutil
 import time
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -277,7 +278,7 @@ def process_multiple_images(
     summary["filtered_count"] = len(filtered_texts)
     summary["processing_time"] = round(elapsed_time, 2)
 
-    if save_result:
+    if save_result and image_paths:
         first_name = Path(image_paths[0]).stem
         output_path = os.path.join(output_dir, f"{first_name}_merged_summary.json")
         save_json(_summary_only(summary), output_path)
@@ -343,7 +344,6 @@ def process_product_from_urls(
     )
 
     # 다운로드된 중간 이미지 정리
-    import shutil
     if os.path.exists(download_dir):
         shutil.rmtree(download_dir, ignore_errors=True)
 
