@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -213,9 +214,10 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
             if not output_text:
                 raise RuntimeError("LLM 응답 내용이 비어있습니다.")
 
-            if output_text.strip().startswith("```"):
-                lines = output_text.strip().split("\n")
-                output_text = "\n".join(lines[1:-1])
+            # JSON 객체 추출: 코드블록 감싸기, 전후 텍스트 등 다양한 LLM 출력 대응
+            json_match = re.search(r'\{[\s\S]*\}', output_text)
+            if json_match:
+                output_text = json_match.group()
 
             try:
                 return json.loads(output_text)

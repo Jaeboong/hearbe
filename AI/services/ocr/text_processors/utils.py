@@ -1,12 +1,20 @@
 # OCR 공통 유틸과 캐시 처리
 import hashlib
 import json
+import logging
 import os
 import tempfile
+import threading
+from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, Tuple, List
 
+import numpy as np
 from PIL import Image
+
+logger = logging.getLogger(__name__)
+
+# ==================== 이미지 유틸 ====================
 
 
 def save_json(data: Dict[str, Any], output_path: str, indent: int = 2) -> None:
@@ -36,15 +44,28 @@ def get_image_size(image_path: str) -> Tuple[int, int]:
         return img.size
 
 
+def prepare_image_for_ocr(img: Image.Image) -> np.ndarray:
+    """PIL Image를 OCR용 BGR numpy 배열로 변환 (RGBA/기타 모드 → RGB → BGR)"""
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+    arr = np.array(img)
+    return arr[:, :, ::-1]  # RGB → BGR
+
+
 # ==================== 캐싱 함수 ====================
 
-CACHE_DIR = "cache"
+# 캐시 디렉토리를 모듈 위치 기준 절대 경로로 설정 (실행 디렉토리에 무관)
+_MODULE_DIR = Path(__file__).resolve().parent
+CACHE_DIR = str(_MODULE_DIR / "cache")
 CACHE_SUMMARIES_DIR = os.path.join(CACHE_DIR, "summaries")
 CACHE_LLM_SUMMARIES_DIR = os.path.join(CACHE_DIR, "llm_summaries")
 CACHE_PIPELINE_RESULTS_DIR = os.path.join(CACHE_DIR, "pipeline_results")
 CACHE_METADATA_PATH = os.path.join(CACHE_DIR, "metadata.json")
 CACHE_VERSION = "1.0"
 DEFAULT_CACHE_TTL_DAYS = 30
+
+# 캐시 메타데이터 동시 쓰기 보호
+_metadata_lock = threading.Lock()
 
 
 def compute_image_hash(image_path: str) -> str:
@@ -174,10 +195,11 @@ def save_summary_cache(summary_hash: str, summary: Dict[str, Any]) -> None:
 
 
 def compute_imageset_hash(image_paths: List[str]) -> str:
-    """Compute a stable hash for a list of local image paths"""
+    """파일 메타데이터(경로, 크기, 수정시간) 기반 빠른 해시 계산"""
     parts: List[str] = []
     for path in image_paths:
-        parts.append(compute_image_hash(path))
+        stat = os.stat(path)
+        parts.append(f"{os.path.abspath(path)}:{stat.st_size}:{stat.st_mtime}")
     raw = "|".join(parts)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
@@ -224,28 +246,38 @@ def save_pipeline_cache(pipeline_hash: str, result: Dict[str, Any]) -> None:
 
 
 def update_cache_metadata(hit: bool = False) -> None:
-    """캐시 메타데이터 업데이트 (히트율 추적)"""
-    os.makedirs(CACHE_DIR, exist_ok=True)
+    """캐시 메타데이터 업데이트 (히트율 추적, 스레드 안전)"""
+    with _metadata_lock:
+        os.makedirs(CACHE_DIR, exist_ok=True)
 
-    if os.path.exists(CACHE_METADATA_PATH):
-        metadata = load_json(CACHE_METADATA_PATH)
-    else:
-        metadata = {
-            "total_requests": 0,
-            "cache_hits": 0,
-            "cache_misses": 0,
-            "hit_rate": 0.0
-        }
+        if os.path.exists(CACHE_METADATA_PATH):
+            try:
+                metadata = load_json(CACHE_METADATA_PATH)
+            except Exception:
+                metadata = {
+                    "total_requests": 0,
+                    "cache_hits": 0,
+                    "cache_misses": 0,
+                    "hit_rate": 0.0
+                }
+        else:
+            metadata = {
+                "total_requests": 0,
+                "cache_hits": 0,
+                "cache_misses": 0,
+                "hit_rate": 0.0
+            }
 
-    metadata["total_requests"] += 1
-    if hit:
-        metadata["cache_hits"] += 1
-    else:
-        metadata["cache_misses"] += 1
+        metadata["total_requests"] += 1
+        if hit:
+            metadata["cache_hits"] += 1
+        else:
+            metadata["cache_misses"] += 1
 
-    metadata["hit_rate"] = metadata["cache_hits"] / metadata["total_requests"] if metadata["total_requests"] > 0 else 0.0
+        total = metadata["total_requests"]
+        metadata["hit_rate"] = metadata["cache_hits"] / total if total > 0 else 0.0
 
-    save_json(metadata, CACHE_METADATA_PATH)
+        save_json(metadata, CACHE_METADATA_PATH)
 
 
 def get_cache_stats() -> Dict[str, Any]:
@@ -258,3 +290,23 @@ def get_cache_stats() -> Dict[str, Any]:
             "hit_rate": 0.0
         }
     return load_json(CACHE_METADATA_PATH)
+
+
+def cleanup_expired_caches(ttl_days: int = DEFAULT_CACHE_TTL_DAYS) -> int:
+    """만료된 캐시 파일을 일괄 삭제하고 삭제된 파일 수를 반환"""
+    removed = 0
+    for cache_dir in [CACHE_SUMMARIES_DIR, CACHE_LLM_SUMMARIES_DIR, CACHE_PIPELINE_RESULTS_DIR]:
+        if not os.path.exists(cache_dir):
+            continue
+        for fname in os.listdir(cache_dir):
+            if not fname.endswith(".json"):
+                continue
+            fpath = os.path.join(cache_dir, fname)
+            try:
+                data = load_json(fpath)
+                if not is_cache_valid(data, ttl_days):
+                    os.remove(fpath)
+                    removed += 1
+            except Exception:
+                pass
+    return removed
