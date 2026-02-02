@@ -1,0 +1,118 @@
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { usePeerView } from '../../hooks/peerjs/usePeerView';
+import GuardianJoinModal from '../../components/ShareCode/GuardianJoinModal';
+import './GuardianViewS.css';
+
+/**
+ * S형 보호자 화면 보기 페이지
+ * A형 사용자의 화면을 실시간으로 보여줍니다.
+ */
+const GuardianViewS = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const videoRef = useRef(null);
+    const [activeCode, setActiveCode] = useState(null);
+    const [showJoinModal, setShowJoinModal] = useState(false);
+
+    const { remoteStream, isConnected, error, joinSession, leave } = usePeerView();
+
+    useEffect(() => {
+        // 1. state 또는 URL 쿼리 파라미터에서 코드 확인
+        const stateCode = location.state?.code;
+        const searchParams = new URLSearchParams(location.search);
+        const queryCode = searchParams.get('code');
+        const code = stateCode || queryCode;
+
+        if (code) {
+            handleJoinSession(code);
+        } else {
+            // 코드가 없으면 모달 띄우기
+            setShowJoinModal(true);
+        }
+
+        return () => {
+            leave();
+        };
+    }, []);
+
+    const handleJoinSession = (code) => {
+        setActiveCode(code);
+        setShowJoinModal(false);
+
+        // 세션 입장
+        joinSession(code).catch((err) => {
+            console.error('세션 입장 실패:', err);
+            // alert(`연결 실패: ${err.message}`);
+        });
+    };
+
+    const handleManualJoin = (code) => {
+        handleJoinSession(code);
+    };
+
+    // 비디오 스트림 연결
+    useEffect(() => {
+        if (remoteStream && videoRef.current) {
+            videoRef.current.srcObject = remoteStream;
+        }
+    }, [remoteStream]);
+
+    const handleLeave = () => {
+        leave();
+        navigate('/');
+    };
+
+    return (
+        <div className="guardian-view-container">
+            {/* 헤더 */}
+            <div className="guardian-header">
+                <h1>🛡️ 공유 쇼핑</h1>
+                <button className="leave-button" onClick={handleLeave}>
+                    나가기
+                </button>
+            </div>
+
+            {/* 비디오 */}
+            <div className="video-container">
+                {!isConnected && (
+                    <div className="loading-overlay">
+                        <div className="loading-spinner"></div>
+                        <p>{activeCode ? '사용자 화면 연결 중...' : '코드를 입력해주세요'}</p>
+                    </div>
+                )}
+                <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    className="remote-video"
+                />
+            </div>
+
+            {/* 에러 표시 */}
+            {error && (
+                <div className="error-banner">
+                    ⚠️ {error}
+                </div>
+            )}
+
+            {/* 상태 표시 */}
+            <div className="status-bar">
+                <span className={`status-indicator ${isConnected ? 'connected' : 'connecting'}`}></span>
+                <span className="status-text">
+                    {isConnected ? '연결됨' : '연결 중...'}
+                </span>
+                <span className="code-badge">코드: {activeCode || '----'}</span>
+            </div>
+
+            {/* 코드 입력 모달 (직접 접속 시) */}
+            <GuardianJoinModal
+                isOpen={showJoinModal}
+                onClose={() => navigate('/')}
+                onJoin={handleManualJoin}
+            />
+        </div>
+    );
+};
+
+export default GuardianViewS;
