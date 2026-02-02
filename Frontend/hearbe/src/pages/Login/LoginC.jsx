@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import hLogo from '../../assets/HearBe_logo_.png';
+import logoC from '../../assets/logoC.png'; // C형 로고로 변경
 import { authAPI } from '../../services/authAPI';
 import './LoginC.css';
 
@@ -10,6 +10,16 @@ export default function LoginC() {
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
+    const [rememberId, setRememberId] = useState(false);
+
+    useEffect(() => {
+        const savedUsername = localStorage.getItem('rememberedUsername');
+        if (savedUsername) {
+            setId(savedUsername);
+            setRememberId(true);
+        }
+    }, []);
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -19,20 +29,21 @@ export default function LoginC() {
         }
 
         try {
-            // LoginRequest DTO requires 'username' and 'password'
             const response = await authAPI.login(id, password);
 
-            // Assuming response.data contains tokens or user info
-            // API Response format: ApiResponse<LoginResponse> -> data: LoginResponse
-            // LoginResponse fields needs to be checked. Usually it has accessToken/refreshToken/user info.
-            console.log("Login Success:", response);
-
-            // Save token if available (adjust based on actual response structure)
+            // 토큰 저장
             if (response.data && response.data.accessToken) {
                 localStorage.setItem('accessToken', response.data.accessToken);
             }
             if (response.data && response.data.refreshToken) {
                 localStorage.setItem('refreshToken', response.data.refreshToken);
+            }
+
+            // 아이디 저장 여부에 따라 localStorage에 저장/삭제
+            if (rememberId) {
+                localStorage.setItem('rememberedUsername', id);
+            } else {
+                localStorage.removeItem('rememberedUsername');
             }
 
             // Save user info basics
@@ -54,7 +65,7 @@ export default function LoginC() {
             <main className="login-c-content">
                 <div className="login-c-card">
                     <div className="logo-area-c">
-                        <img src={hLogo} alt="HearBe Logo" className="logo-image-c" />
+                        <img src={logoC} alt="HearBe Logo" className="logo-image-c" />
                     </div>
 
                     <form className="login-c-form" onSubmit={handleLogin}>
@@ -82,8 +93,13 @@ export default function LoginC() {
                         <button type="submit" className="login-submit-btn-c">로그인</button>
 
                         <div className="login-keep-c">
-                            <input type="checkbox" id="keep" />
-                            <label htmlFor="keep">로그인 유지</label>
+                            <input
+                                type="checkbox"
+                                id="rememberId"
+                                checked={rememberId}
+                                onChange={(e) => setRememberId(e.target.checked)}
+                            />
+                            <label htmlFor="rememberId">아이디 저장</label>
                         </div>
 
                         <div className="login-links-c">

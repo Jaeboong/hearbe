@@ -2,17 +2,23 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Home, ShoppingCart, User, ArrowUpRight, Layout } from 'lucide-react';
 import './SelectMallC.css';
+import coupangLogo from '../../assets/coupang_logo.png';
+import naverPlusLogo from '../../assets/C/naver_plus_logo.png';
+import gmarketLogo from '../../assets/C/Gmarket_logo.png';
+import kurlyLogo from '../../assets/C/Kurly_logo.png';
+import st11Logo from '../../assets/C/11st_logo.png';
+import ssgLogo from '../../assets/C/ssg_logo.png';
 
 const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
 
     const malls = [
-        { id: 'naver', name: '네이버 쇼핑', desc: '국내 최대 규모의 쇼핑 플랫폼', color: '#03C75A', initial: 'N', url: 'https://shopping.naver.com/ns/home' },
-        { id: 'coupang', name: '쿠팡', desc: '"로켓배송"으로 만나는 내일', color: '#E2211C', initial: 'C', url: 'https://www.coupang.com' },
-        { id: 'gmarket', name: 'G마켓', desc: '다양한 혜택과 빅세일', color: '#0055ff', initial: 'G', url: 'https://www.gmarket.co.kr' },
-        { id: 'kurly', name: '마켓컬리', desc: '신선한 아침을 여는 샛별배송', color: '#5f0080', initial: 'K', url: 'https://www.kurly.com' },
-        { id: '11st', name: '11번가', desc: '세상 모든 쇼핑의 시작', color: '#FF4B4B', initial: '1', url: 'https://www.11st.co.kr' },
-        { id: 'emart', name: '이마트몰', desc: '이마트의 신선함을 그대로', color: '#ffb100', initial: 'E', url: 'https://emart.ssg.com' },
+        { id: 'coupang', name: '쿠팡', desc: '', color: '#E2211C', initial: 'C', logo: coupangLogo, logoSize: 300, url: 'https://www.coupang.com' },
+        { id: 'naver', name: '네이버 쇼핑', desc: '', color: '#03C75A', initial: 'N', logo: naverPlusLogo, logoSize: 240, url: 'https://shopping.naver.com/ns/home' },
+        { id: 'gmarket', name: 'G마켓', desc: '', color: '#0055ff', initial: 'G', logo: gmarketLogo, logoSize: 240, url: 'https://www.gmarket.co.kr' },
+        { id: 'kurly', name: '마켓컬리', desc: '', color: '#5f0080', initial: 'K', logo: kurlyLogo, logoSize: 200, url: 'https://www.kurly.com' },
+        { id: '11st', name: '11번가', desc: '', color: '#FF4B4B', initial: '1', logo: st11Logo, logoSize: 200, url: 'https://www.11st.co.kr' },
+        { id: 'ssg', name: 'SSG.COM', desc: '', color: '#ffb100', initial: 'S', logo: ssgLogo, logoSize: 240, url: 'https://www.ssg.com' },
     ];
 
     const handleSelect = (mall) => {
@@ -41,11 +47,11 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>
-                    <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage', { state: { activeTab: 'cart' } }))}>
+                    <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
-                    <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/mypage'))}>
+                    <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
                     </button>
@@ -69,16 +75,18 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                             onClick={() => handleSelect(mall)}
                         >
                             <div className="card-top-row-c">
-                                <div className="card-num-badge-c" style={{ backgroundColor: mall.color }}>
-                                    {index + 1}
+                                <div className="card-title-row-c">
+                                    <div className="card-num-badge-c" style={{ backgroundColor: mall.color }}>
+                                        {index + 1}
+                                    </div>
+                                    <h3 className="mall-card-name-c">{mall.name}</h3>
                                 </div>
                                 <ArrowUpRight className="card-link-icon-c" size={20} />
                             </div>
 
-                            <div className="card-watermark-c">{mall.initial}</div>
+                            <img src={mall.logo} alt={mall.name} className="card-watermark-logo-c" style={mall.logoSize ? { width: `${mall.logoSize}px` } : {}} />
 
                             <div className="card-content-c">
-                                <h3 className="mall-card-name-c">{mall.name}</h3>
                                 <p className="mall-card-desc-c">{mall.desc}</p>
                             </div>
 
