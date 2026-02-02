@@ -241,8 +241,7 @@ def is_header_row(row: List[Dict[str, Any]]) -> bool:
         # 신발 측정 헤더 (룸은 발볼 오인식)
         "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
         # 신발 사이즈 변환표
-        "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
-    ]
+        "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"    ]
     row_text = " ".join(item["text"] for item in row)
     return any(kw in row_text for kw in header_keywords)
 
@@ -506,6 +505,18 @@ def find_size_table_region(rows: List[List[Dict[str, Any]]]) -> Optional[Tuple[i
     start_index = size_row_index
     end_index = size_row_index
     max_lookahead = 3  # 비매칭 시 앞으로 몇 행까지 확인할지
+
+    # 뒤쪽(backward)으로도 확장: size_row_index 이전 행에 사이즈 라벨/헤더가 있으면 포함
+    for j in range(size_row_index - 1, -1, -1):
+        r = rows[j]
+        r_joined = " ".join(item["text"] for item in r)
+        has_h = any(kw in r_joined for kw in header_keywords)
+        has_s = any(contains_size_label(item["text"]) for item in r)
+        has_m = any(contains_measurement(item["text"]) for item in r)
+        if has_h or has_s or has_m:
+            start_index = j
+        else:
+            break
 
     def is_size_related_row(row_idx: int) -> bool:
         """해당 행이 사이즈 관련 행인지 확인"""

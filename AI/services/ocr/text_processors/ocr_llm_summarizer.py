@@ -9,13 +9,22 @@ from pathlib import Path
 import requests
 from typing import Dict, List, Tuple
 
-from product_type_detector import (
-    ProductType,
-    detect_product_type,
-    get_keywords_for_type,
-    get_type_description,
-    is_keyword_valid_for_type
-)
+try:
+    from .product_type_detector import (
+        ProductType,
+        detect_product_type,
+        get_keywords_for_type,
+        get_type_description,
+        is_keyword_valid_for_type
+    )
+except ImportError:
+    from product_type_detector import (
+        ProductType,
+        detect_product_type,
+        get_keywords_for_type,
+        get_type_description,
+        is_keyword_valid_for_type
+    )
 
 try:
     from .utils import compute_summary_hash, load_summary_cache, save_summary_cache
@@ -33,10 +42,14 @@ DEFAULT_INPUT = os.path.join("output", "샴푸_res_texts.json")
 DEFAULT_OUTPUT = os.path.join("output", "샴푸_texts_summary.json")
 
 try:
-    from ocr_text_preprocessor import load_and_preprocess_ocr_json
+    from .ocr_text_preprocessor import load_and_preprocess_ocr_json
     PREPROCESSOR_AVAILABLE = True
 except ImportError:
-    PREPROCESSOR_AVAILABLE = False
+    try:
+        from ocr_text_preprocessor import load_and_preprocess_ocr_json
+        PREPROCESSOR_AVAILABLE = True
+    except ImportError:
+        PREPROCESSOR_AVAILABLE = False
 
 
 def _load_ocr_texts(path: str, preprocess: bool = True) -> Tuple[List[str], Dict]:
@@ -206,8 +219,13 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
 
             try:
                 return json.loads(output_text)
-            except json.JSONDecodeError as exc:
-                raise RuntimeError(f"LLM 응답이 유효한 JSON이 아닙니다: {exc}") from exc
+            except json.JSONDecodeError:
+                last_error = ValueError(f"LLM 응답이 유효한 JSON이 아닙니다: {output_text[:200]}")
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** attempt
+                    time.sleep(wait_time)
+                    continue
+                raise RuntimeError(f"LLM이 {max_retries}회 시도 후에도 유효한 JSON을 반환하지 않았습니다.") from last_error
 
         except requests.exceptions.RequestException as e:
             last_error = e
@@ -238,7 +256,8 @@ def summarize_texts(
     
     if product_type is None:
         product_type = detect_product_type(texts)
-    
+
+    summary_hash = None
     model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     if use_cache:
         summary_hash = compute_summary_hash(
@@ -254,7 +273,7 @@ def summarize_texts(
     prompt = _build_prompt(texts, product_type, size_table)
 
     summary = _call_openai(prompt)
-    if use_cache:
+    if use_cache and summary_hash:
         save_summary_cache(summary_hash, summary)
     
     return summary

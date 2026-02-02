@@ -81,6 +81,7 @@ def process_image(
     max_height: int = DEFAULT_MAX_HEIGHT,
     save_chunks: bool = False,
     save_vis: bool = True,
+    save_ocr_json: bool = True,
     output_dir: str = "output",
     ocr_instance: Optional[PaddleOCR] = None
 ) -> Dict[str, Any]:
@@ -138,16 +139,14 @@ def process_image(
             "image_size": {"width": int(width), "height": int(height)}
         }
     
-    os.makedirs(output_dir, exist_ok=True)
-    base_name = Path(image_path).stem
-    output_path = os.path.join(output_dir, f"{base_name}_ocr_result.json")
+    if save_ocr_json:
+        os.makedirs(output_dir, exist_ok=True)
+        base_name = Path(image_path).stem
+        output_path = os.path.join(output_dir, f"{base_name}_ocr_result.json")
 
-    try:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
-    except Exception:
-        raise
-    
+
     return result
 
 
@@ -157,6 +156,7 @@ def process_images_parallel(
     max_height: int = DEFAULT_MAX_HEIGHT,
     save_results: bool = False,
     save_vis: bool = True,
+    save_ocr_json: bool = True,
     output_dir: str = "output"
 ) -> List[Dict[str, Any]]:
     from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -176,6 +176,7 @@ def process_images_parallel(
                 max_height=max_height,
                 save_chunks=save_results,
                 save_vis=save_vis,
+                save_ocr_json=save_ocr_json,
                 output_dir=output_dir,
                 ocr_instance=thread_local.ocr_instance
             )
@@ -194,7 +195,7 @@ def process_images_parallel(
     
     results = []
     if isinstance(DEFAULT_DEVICE, str) and DEFAULT_DEVICE.startswith("gpu"):
-        max_workers = min(max_workers, 2)
+        max_workers = 1  # GPU에서는 메모리 경합 방지를 위해 순차 처리
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_path = {
