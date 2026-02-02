@@ -557,3 +557,4 @@ AI_next/
 Backend/src/main/resources/application.properties
 
 google-service-account.json
+docker
