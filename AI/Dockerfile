@@ -33,6 +33,11 @@ RUN pip install --no-cache-dir \
     "onnxruntime>=1.14,<2" \
     "av>=11"
 
+# Qwen3-ASR (선택적 ASR 백엔드)
+# blinker 충돌 해결: distutils 설치된 패키지 강제 제거 후 설치
+RUN rm -rf /usr/lib/python3/dist-packages/blinker* && \
+    pip install --no-cache-dir "qwen-asr"
+
 # PaddlePaddle 3.0.0 GPU (CUDA 12.x - 중국 미러)
 RUN pip install --no-cache-dir \
     paddlepaddle-gpu==3.0.0 \

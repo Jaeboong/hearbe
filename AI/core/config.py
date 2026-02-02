@@ -19,11 +19,20 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ASRConfig:
     """ASR (음성 인식) 설정"""
-    model_name: str = "large-v3-turbo"
+    # 공통 설정
+    provider: str = "whisper"  # "whisper" | "qwen3"
     device: str = "cuda"
-    compute_type: str = "float16"
     language: str = "ko"
+
+    # Whisper 전용 설정
+    model_name: str = "large-v3-turbo"
+    compute_type: str = "float16"
     beam_size: int = 5
+
+    # Qwen3 전용 설정
+    qwen3_model_name: str = "Qwen/Qwen3-ASR-0.6B"
+    qwen3_max_batch_size: int = 32
+    qwen3_max_new_tokens: int = 256
 
 
 @dataclass
@@ -208,11 +217,18 @@ class ConfigManager:
         """환경 변수를 기반으로 설정 생성"""
         # ASR 설정
         asr = ASRConfig(
-            model_name=self._get_env("ASR_MODEL_NAME", "large-v3-turbo"),
+            # 공통
+            provider=self._get_env("ASR_PROVIDER", "whisper"),
             device=self._get_env("ASR_DEVICE", "cuda"),
-            compute_type=self._get_env("ASR_COMPUTE_TYPE", "float16"),
             language=self._get_env("ASR_LANGUAGE", "ko"),
-            beam_size=self._get_env_int("ASR_BEAM_SIZE", 5)
+            # Whisper 전용
+            model_name=self._get_env("ASR_MODEL_NAME", "large-v3-turbo"),
+            compute_type=self._get_env("ASR_COMPUTE_TYPE", "float16"),
+            beam_size=self._get_env_int("ASR_BEAM_SIZE", 5),
+            # Qwen3 전용
+            qwen3_model_name=self._get_env("ASR_QWEN3_MODEL_NAME", "Qwen/Qwen3-ASR-0.6B"),
+            qwen3_max_batch_size=self._get_env_int("ASR_QWEN3_MAX_BATCH_SIZE", 32),
+            qwen3_max_new_tokens=self._get_env_int("ASR_QWEN3_MAX_NEW_TOKENS", 256),
         )
 
         # NLU 설정
