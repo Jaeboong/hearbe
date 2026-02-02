@@ -28,6 +28,15 @@ _OPTION_KEYWORDS = (
     "수정",
 )
 
+_PURCHASE_KEYWORDS = (
+    "구매",
+    "주문",
+    "담기",
+    "결제",
+    "장바구니",
+    "카트",
+)
+
 
 def select_option_from_detail(
     user_text: str,
@@ -80,6 +89,8 @@ def select_option_from_detail(
 
 def _is_option_request(text: str) -> bool:
     lowered = text.lower()
+    if any(keyword in lowered for keyword in _PURCHASE_KEYWORDS):
+        return False
     return any(keyword in lowered for keyword in _OPTION_KEYWORDS)
 
 
