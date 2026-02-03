@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { User, Mail, Lock, Home, ShieldCheck, LogOut, X } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
@@ -124,7 +125,13 @@ export default function MemberInfoC({ onHome }) {
 
         try {
             await authAPI.deleteAccount(withdrawPassword);
-            alert('회원탈퇴가 완료되었습니다.');
+            await Swal.fire({
+                icon: 'success',
+                title: '탈퇴 완료',
+                text: '회원탈퇴가 완료되었습니다.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
 
             // Local Storage 정리
             localStorage.removeItem('accessToken');

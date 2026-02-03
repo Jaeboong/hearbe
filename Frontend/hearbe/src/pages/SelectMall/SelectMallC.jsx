@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { ArrowLeft, Home, ShoppingCart, User, ArrowUpRight, Layout, LogOut } from 'lucide-react';
 import './SelectMallC.css';
 import coupangLogo from '../../assets/coupang_logo.png';
@@ -15,12 +16,30 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('username');
-        localStorage.removeItem('user_name');
-        navigate('/main');
+        Swal.fire({
+            title: '로그아웃 하시겠습니까?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#7c3aed',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '로그아웃',
+            cancelButtonText: '취소'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await authAPI.logout();
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                } finally {
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('user_id');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('user_name');
+                    navigate('/main');
+                }
+            }
+        });
     };
 
     const malls = [

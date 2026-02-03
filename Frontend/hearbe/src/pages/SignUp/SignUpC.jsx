@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2 } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
+import Swal from 'sweetalert2';
 import logoC from '../../assets/logoC.png'; // C형 로고로 변경
 import './SignUpC.css';
 
@@ -91,7 +92,12 @@ ${termContents.privacy}`;
   const handleCheckUsername = async () => {
     const usernameError = validateUsername(formData.username);
     if (usernameError) {
-      alert(usernameError);
+      Swal.fire({
+        icon: 'warning',
+        text: usernameError,
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
       return;
     }
 
@@ -102,15 +108,30 @@ ${termContents.privacy}`;
       if (!isDuplicate) {
         setIsUsernameChecked(true);
         setIsUsernameAvailable(true);
-        alert('사용 가능한 아이디입니다.');
+        Swal.fire({
+          icon: 'success',
+          text: '사용 가능한 아이디입니다.',
+          confirmButtonColor: '#7c3aed',
+          confirmButtonText: '확인'
+        });
       } else {
         setIsUsernameChecked(true);
         setIsUsernameAvailable(false);
-        alert('이미 사용 중인 아이디입니다.');
+        Swal.fire({
+          icon: 'error',
+          text: '이미 사용 중인 아이디입니다.',
+          confirmButtonColor: '#7c3aed',
+          confirmButtonText: '확인'
+        });
       }
     } catch (error) {
       console.error('Username check error:', error);
-      alert('아이디 중복 확인에 실패했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: '아이디 중복 확인에 실패했습니다.',
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
       setIsUsernameChecked(false); // 에러 발생 시 중복확인 상태 초기화
     }
   };
@@ -130,13 +151,25 @@ ${termContents.privacy}`;
     const nameError = validateName(formData.name);
 
     if (!isUsernameChecked || !isUsernameAvailable) {
-      alert('아이디 중복확인을 해주세요.');
+      Swal.fire({
+        icon: 'warning',
+        text: '아이디 중복확인을 해주세요.',
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
       return;
     }
 
     if (usernameError || passwordError || confirmPasswordError || emailError || nameError) {
       const errorMsg = [usernameError, passwordError, confirmPasswordError, emailError, nameError].filter(Boolean).join('\n');
-      alert('필수 입력 정보를 확인해주세요.\n\n' + errorMsg);
+
+      Swal.fire({
+        icon: 'warning',
+        title: '입력 정보 확인',
+        html: errorMsg.replace(/\n/g, '<br/>'), // 줄바꿈 처리를 위해 html 사용
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
 
       setErrors({
         username: usernameError,
@@ -149,7 +182,12 @@ ${termContents.privacy}`;
     }
 
     if (!agreements) {
-      alert('필수 이용약관 및 개인정보 수집에 동의해주세요.');
+      Swal.fire({
+        icon: 'warning',
+        text: '필수 이용약관 및 개인정보 수집에 동의해주세요.',
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
       return;
     }
 
@@ -170,11 +208,21 @@ ${termContents.privacy}`;
       if (apiResponse.success) {
         setIsModalOpen(true);
       } else {
-        alert(apiResponse.message || '회원가입에 실패했습니다.');
+        Swal.fire({
+          icon: 'error',
+          text: apiResponse.message || '회원가입에 실패했습니다.',
+          confirmButtonColor: '#7c3aed',
+          confirmButtonText: '확인'
+        });
       }
     } catch (error) {
       console.error('Signup error:', error);
-      alert(error.message || '회원가입 중 오류가 발생했습니다.');
+      Swal.fire({
+        icon: 'error',
+        text: error.message || '회원가입 중 오류가 발생했습니다.',
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
     }
   };
 
