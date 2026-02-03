@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import hLogo from '../../assets/logoA.png';
-=======
 import hLogo from '../../assets/h-logo.png';
 import GuardianJoinModal from '../../components/ShareCode/GuardianJoinModal';
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
 import './LoginS.css';
 
 const LoginS = () => {

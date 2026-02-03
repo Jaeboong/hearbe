@@ -65,15 +65,6 @@ export default function LoginC() {
             <main className="login-c-content">
                 <div className="login-c-card">
                     <div className="logo-area-c">
-<<<<<<< HEAD
-                        <img
-                            src={logoC}
-                            alt="HearBe Logo"
-                            className="logo-image-c"
-                            onClick={() => navigate('/')}
-                            style={{ cursor: 'pointer' }}
-                        />
-=======
                         <img src={logoC} alt="HearBe Logo" className="logo-image-c" />
                     </div>
 

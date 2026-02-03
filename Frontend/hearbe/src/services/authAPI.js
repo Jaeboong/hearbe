@@ -56,19 +56,10 @@ export const authAPI = {
             console.log('Check Duplicate Response status:', response.status);
 
             const data = await response.json();
-<<<<<<< HEAD
 
             console.log('Check Duplicate Response data:', data);
             
             return data;
-=======
-            // 백엔드 응답: { code: 200, message: "...", data: true/false }
-            // 여기서 data: true는 중복, data: false는 사용 가능을 의미
-            // 프론트엔드는 { available: true/false } 형태를 기대하며, available: true가 사용 가능
-            // 따라서 백엔드의 data 값을 반전시켜 available로 반환
-            // response.ok가 false인 경우 (4xx, 5xx)는 catch 블록에서 처리
-            return { available: !data.data };
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         } catch (error) {
             console.error('Check Duplicate API Error:', error);
             throw new Error(error.message || '아이디 중복 확인 중 네트워크 오류가 발생했습니다.'); // 에러를 다시 던짐
@@ -172,8 +163,6 @@ export const authAPI = {
             throw error;
         }
     },
-<<<<<<< HEAD
-=======
     // 이메일 인증번호 발송 API
     sendEmailVerification: async (email, username = null, name = null) => {
         try {
@@ -245,7 +234,6 @@ export const authAPI = {
             throw error;
         }
     },
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
 
     // 로그아웃 API
     logout: async () => {
@@ -284,7 +272,6 @@ export const authAPI = {
         } catch (error) {
             console.error('Logout API Error:', error);
             throw error;
-<<<<<<< HEAD
         } finally {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
@@ -447,8 +434,6 @@ export const authAPI = {
         } catch (error) {
             console.error('Verify Welfare Card API Error:', error);
             throw error;
-=======
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         }
     }
 };

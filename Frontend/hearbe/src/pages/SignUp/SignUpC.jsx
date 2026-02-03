@@ -4,11 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, UserPlus } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
-<<<<<<< HEAD
-import logoC from '../../assets/logoC.png';
-=======
 import logoC from '../../assets/logoC.png'; // C형 로고로 변경
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
 import './SignUpC.css';
 
 export default function SignUpC({ onBack }) {
@@ -60,14 +56,7 @@ export default function SignUpC({ onBack }) {
 
     try {
       const apiResponse = await authAPI.checkDuplicate(formData.username);
-<<<<<<< HEAD
-      //const isDuplicate = apiResponse && apiResponse.success === true ? apiResponse.data === true : false;
-      const isDuplicate = apiResponse.data;
-
-      if (isDuplicate==false) {
-=======
       if (apiResponse.available) {
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         setIsUsernameChecked(true);
         setIsUsernameAvailable(true);
         alert('사용 가능한 아이디입니다.');
@@ -79,9 +68,6 @@ export default function SignUpC({ onBack }) {
     } catch (error) {
       console.error('Username check error:', error);
       alert('아이디 중복 확인에 실패했습니다.');
-<<<<<<< HEAD
-      setIsUsernameChecked(false);
-=======
       setIsUsernameChecked(false); // 에러 발생 시 중복확인 상태 초기화
     }
   };
@@ -93,7 +79,6 @@ export default function SignUpC({ onBack }) {
       const newAgreements = { ...agreements, [field]: value };
       newAgreements.all = newAgreements.age && newAgreements.terms && newAgreements.privacy;
       setAgreements(newAgreements);
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
     }
   };
 
@@ -138,11 +123,7 @@ export default function SignUpC({ onBack }) {
         name: formData.name,
         email: formData.email,
         phone_number: null,
-<<<<<<< HEAD
-        user_type: 'GENERAL',
-=======
         user_type: "GENERAL", // C형 사용자
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         simple_password: null,
         welfare_card: null
       };
@@ -163,19 +144,8 @@ export default function SignUpC({ onBack }) {
     <div className="signup-c-container">
       <main className="signup-c-main">
         <div className="signup-card-c">
-<<<<<<< HEAD
-          <div className="signup-header-c">
-            <img
-              src={logoC}
-              alt="HearBe Logo"
-              className="signup-logo-c"
-              style={{ marginBottom: '20px', cursor: 'pointer' }}
-              onClick={() => window.location.assign('/')}
-            />
-=======
           <div className="signup-header-c"> {/* 로고 이미지 사용 */}
             <img src={logoC} alt="HearBe Logo" className="signup-logo-c" style={{ marginBottom: '20px' }} />
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
             <div className="header-title-group-c" style={{ display: 'none' }}>
               <div className="title-icon-c">
                 <UserPlus size={32} />

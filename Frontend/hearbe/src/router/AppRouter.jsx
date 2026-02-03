@@ -188,7 +188,6 @@ function AppContent() {
           />
         }
       />
-<<<<<<< HEAD
       <Route
         path="/A/findId"
         element={<FindIdA />}
@@ -201,8 +200,6 @@ function AppContent() {
         path="/A/changePassword"
         element={<ChangePasswordA />}
       />
-=======
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
 
       {/* Type C Routes */}
       <Route

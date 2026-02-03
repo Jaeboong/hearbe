@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import { ArrowLeft, User, AtSign, Mail, Lock, ShieldCheck } from 'lucide-react';
-import logoC from '../../assets/logoC.png'; // C형 로고로 변경
-import './FindPasswordC.css';
-
-import { authAPI } from '../../services/authAPI';
-=======
 import { User, AtSign, Mail, Lock, ShieldCheck } from 'lucide-react';
 import logoC from '../../assets/logoC.png';
 import './FindPasswordC.css';
 
 import { authAPI } from '../../services/authAPI';
 import { emailService } from '../../services/emailService';
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
 
 export default function FindPasswordPage({ onBack, micPermissionGranted }) {
     const [step, setStep] = useState(1);
@@ -41,37 +33,23 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
-<<<<<<< HEAD
-            await authAPI.sendEmailVerification(email, username, name);
-            setIsSent(true);
-            alert('인증번호가 이메일로 전송되었습니다.');
-=======
             // EmailJS로 인증번호 발송 (클라이언트 사이드)
             await emailService.sendVerificationCode(email, name);
             setIsSent(true);
             alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         } catch (error) {
             alert(error.message || '인증번호 전송에 실패했습니다.');
         }
     };
 
-<<<<<<< HEAD
-    const handleVerifyCode = async () => {
-=======
     const handleVerifyCode = () => {
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         if (!verificationCode) {
             alert('인증번호를 입력해주세요.');
             return;
         }
         try {
-<<<<<<< HEAD
-            await authAPI.verifyEmailCode(email, verificationCode);
-=======
             // EmailJS 인증번호 확인 (클라이언트 사이드)
             emailService.verifyCode(email, verificationCode);
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
             setIsVerified(true);
             alert('본인 인증이 완료되었습니다. 하단의 버튼을 눌러 비밀번호를 재설정해주세요.');
         } catch (error) {
@@ -94,11 +72,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             return;
         }
         try {
-<<<<<<< HEAD
-            await authAPI.resetPassword(username, newPassword);
-=======
             await authAPI.resetPassword(email, newPassword);
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
             alert('비밀번호가 성공적으로 재설정되었습니다.');
             onBack();
         } catch (error) {
@@ -113,17 +87,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             <main className="find-pw-main-c">
                 <div className="pw-form-card-c">
                     <div className="pw-card-header-c">
-<<<<<<< HEAD
-                        <img
-                            src={logoC}
-                            alt="HearBe"
-                            className="pw-logo-c"
-                            onClick={() => navigate('/')}
-                            style={{ cursor: 'pointer' }}
-                        />
-=======
                         <img src={logoC} alt="HearBe" className="pw-logo-c" />
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                         <h1>비밀번호 재설정</h1>
                         <p className="pw-desc-c">안전한 서비스 이용을 위해 본인 확인이 필요합니다.</p>
                     </div>

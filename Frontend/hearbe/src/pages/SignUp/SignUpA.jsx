@@ -167,6 +167,7 @@ const SignUp = () => {
             console.log("서버에서 온 진짜 값:", result);
 
             const isDuplicate = result.data; // 서버에서 중복 여부를 나타내는 필드명에 맞게 수정 필요
+            
             if (isDuplicate === false) { // 중복이 아니라면 (사용 가능)
                 setIsIdChecked(true);
                 alert("사용 가능한 아이디입니다.");
@@ -369,15 +370,12 @@ const SignUp = () => {
             const response = await authAPI.register(userData);
 
             if (response.success) {
-<<<<<<< HEAD
                 if (cardData?.number) {
                     localStorage.setItem('member_card_number', cardData.number);
                 }
                 if (formData.id) {
                     localStorage.setItem('member_username', formData.id);
                 }
-=======
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                 setShowSuccess(true);
             } else {
                 throw new Error(response.message || '회원가입에 실패했습니다.');
