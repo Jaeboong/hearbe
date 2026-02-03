@@ -51,261 +51,262 @@ function AppContent() {
   });
   const modeSelectionRef = useRef(null);
 
-  const handleSetupComplete = (micGranted) => {
-    setMicPermissionGranted(micGranted);
+  const handleModeSelect = (mode) => {
+    setSelectedMode(mode);
+    // 모드에 따라 분기 처리
+    if (mode === 'common') {
+      navigate('/C/login');
+    } else {
+      navigate('/A/login');
+    }
+  };
+
+  const handleSetupComplete = () => {
     setShowInitialSetup(false);
   };
 
-  // 모드에 따라 분기 처리
-  if (mode === 'common') {
-    navigate('/C/login');
-  } else {
-    navigate('/A/login');
+  // 초기 설정이 완료되지 않았으면 InitialSetup을 보여줌
+  if (showInitialSetup) {
+    return <InitialSetup onComplete={handleSetupComplete} />;
   }
-};
 
-// 초기 설정이 완료되지 않았으면 InitialSetup을 보여줌
-if (showInitialSetup) {
-  return <InitialSetup onComplete={handleSetupComplete} />;
+  return (
+    <Routes>
+      {/* 기본 경로 접속 시 Intro 페이지로 리다이렉트 */}
+      <Route path="/" element={<Navigate to="/intro" replace />} />
+
+      {/* Intro 페이지 별도 경로 유지 */}
+      <Route path="/intro" element={<Intro />} />
+
+      {/* 메인 랜딩 페이지 */}
+      <Route
+        path="/main"
+        element={
+          <MainLanding
+            handleModeSelect={handleModeSelect}
+            modeSelectionRef={modeSelectionRef}
+            onOpenSetup={() => setShowInitialSetup(true)}
+          />
+        }
+      />
+
+      {/* Type A Routes */}
+      <Route
+        path="/A/login"
+        element={
+          <LoginA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onLoginSuccess={() => navigate('/A/mall')}
+            onSignup={() => navigate('/A/signup')}
+          />
+        }
+      />
+
+      <Route
+        path="/A/signup"
+        element={
+          <SignUpA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate('/A/login')}
+          />
+        }
+      />
+      <Route
+        path="/A/mall"
+        element={
+          <SelectMallA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+          />
+        }
+      />
+      <Route
+        path="/A/store"
+        element={
+          <StoreBrowserA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate('/A/mall')}
+            onHome={() => navigate('/main')}
+            onCart={() => navigate('/A/cart')}
+            onMyPage={() => navigate('/A/member-info')}
+          />
+        }
+      />
+      <Route
+        path="/A/cart"
+        element={
+          <CartA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/A/member-info"
+        element={
+          <MemberInfoA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/A/order-history"
+        element={
+          <OrderHistoryA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/A/wishlist"
+        element={
+          <WishlistA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/A/card-management"
+        element={
+          <CardManagementA
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/A/findId"
+        element={<FindIdA />}
+      />
+      <Route
+        path="/A/findPassword"
+        element={<FindPasswordA />}
+      />
+      <Route
+        path="/A/changePassword"
+        element={<ChangePasswordA />}
+      />
+
+      {/* Type C Routes */}
+      <Route
+        path="/C/login"
+        element={
+          <LoginC
+            onLoginSuccess={() => navigate('/C/mall')}
+            onSignup={() => navigate('/C/signup')}
+            onFindId={() => navigate('/C/findId')}
+            onFindPassword={() => navigate('/C/findPassword')}
+          />
+        }
+      />
+      <Route
+        path="/C/signup"
+        element={<SignUpC onBack={() => navigate(-1)} />}
+      />
+      <Route
+        path="/C/findId"
+        element={<FindIdC mode="common" onBack={() => navigate(-1)} />}
+      />
+      <Route
+        path="/C/findPassword"
+        element={<FindPasswordC mode="common" onBack={() => navigate(-1)} />}
+      />
+      <Route
+        path="/C/mall"
+        element={
+          <SelectMallC
+            onBack={() => navigate('/C/login')}
+            onCart={() => navigate('/C/cart')}
+            onMyPage={() => navigate('/C/member-info')}
+            onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
+          />
+        }
+      />
+      <Route
+        path="/C/store"
+        element={
+          <StoreBrowserC
+            onBack={() => navigate('/C/mall')}
+            onHome={() => navigate('/C/mall')}
+            onCart={() => navigate('/C/cart')}
+            onMyPage={() => navigate('/C/member-info')}
+          />
+        }
+      />
+      <Route
+        path="/C/order-history"
+        element={
+          <OrderHistoryC
+            onHome={() => navigate('/C/mall')}
+          />
+        }
+      />
+      <Route
+        path="/C/wishlist"
+        element={
+          <WishlistC
+            onHome={() => navigate('/C/mall')}
+          />
+        }
+      />
+      <Route
+        path="/C/member-info"
+        element={
+          <MemberInfoC // MemberInfoC는 이제 /C/member-info 경로에서 직접 렌더링
+            onBack={() => navigate('/C/mypage')} // 뒤로가기 시 /C/mypage (리다이렉트될 경로)로 이동
+            onHome={() => navigate('/C/mall')}
+            onCart={() => navigate('/C/cart')}
+            onMyPage={() => navigate('/C/member-info')}
+          />
+        }
+      />
+
+      <Route path="/C/mypage" element={<Navigate to="/C/member-info" replace />} />
+      <Route
+        path="/C/cart"
+        element={
+          <CartC
+            onHome={() => navigate('/C/mall')}
+          />
+        }
+      />
+
+      {/* Flat Routes for compatibility */}
+      <Route path="/login" element={<Navigate to="/A/login" replace />} />
+      <Route path="/signup" element={<Navigate to="/C/signup" replace />} />
+      <Route path="/mall" element={<Navigate to="/C/mall" replace />} />
+      <Route path="/store" element={<Navigate to="/C/store" replace />} />
+      <Route path="/cart" element={<Navigate to="/C/cart" replace />} />
+      <Route path="/login-c" element={<Navigate to="/C/login" replace />} />
+      <Route path="/signup-c" element={<Navigate to="/C/signup" replace />} />
+      <Route path="/mall-c" element={<Navigate to="/C/mall" replace />} />
+      <Route path="/store-c" element={<Navigate to="/C/store" replace />} />
+      <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
+      <Route path="/login-s" element={<LoginS />} />
+      <Route path="/S/guardian-view" element={<GuardianViewS />} />
+
+      {/* Fallback */}
+
+      <Route path="*" element={<Navigate to="/intro" replace />} />
+    </Routes>
+  );
 }
-
-return (
-  <Routes>
-    {/* 기본 경로 접속 시 Intro 페이지로 리다이렉트 */}
-    <Route path="/" element={<Navigate to="/intro" replace />} />
-
-    {/* Intro 페이지 별도 경로 유지 */}
-    <Route path="/intro" element={<Intro />} />
-
-    {/* 메인 랜딩 페이지 */}
-    <Route
-      path="/main"
-      element={
-        <MainLanding
-          handleModeSelect={handleModeSelect}
-          modeSelectionRef={modeSelectionRef}
-        />
-      }
-    />
-
-    {/* Type A Routes */}
-    <Route
-      path="/A/login"
-      element={
-        <LoginA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onLoginSuccess={() => navigate('/A/mall')}
-          onSignup={() => navigate('/A/signup')}
-        />
-      }
-    />
-
-    <Route
-      path="/A/signup"
-      element={
-        <SignUpA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onBack={() => navigate('/A/login')}
-        />
-      }
-    />
-    <Route
-      path="/A/mall"
-      element={
-        <SelectMallA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-        />
-      }
-    />
-    <Route
-      path="/A/store"
-      element={
-        <StoreBrowserA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onBack={() => navigate('/A/mall')}
-          onHome={() => navigate('/main')}
-          onCart={() => navigate('/A/cart')}
-          onMyPage={() => navigate('/A/member-info')}
-        />
-      }
-    />
-    <Route
-      path="/A/cart"
-      element={
-        <CartA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onBack={() => navigate(-1)}
-          onHome={() => navigate('/main')}
-        />
-      }
-    />
-    <Route
-      path="/A/member-info"
-      element={
-        <MemberInfoA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onBack={() => navigate(-1)}
-          onHome={() => navigate('/main')}
-        />
-      }
-    />
-    <Route
-      path="/A/order-history"
-      element={
-        <OrderHistoryA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onBack={() => navigate(-1)}
-          onHome={() => navigate('/main')}
-        />
-      }
-    />
-    <Route
-      path="/A/wishlist"
-      element={
-        <WishlistA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onBack={() => navigate(-1)}
-          onHome={() => navigate('/main')}
-        />
-      }
-    />
-    <Route
-      path="/A/card-management"
-      element={
-        <CardManagementA
-          mode={selectedMode}
-          micPermissionGranted={micPermissionGranted}
-          onBack={() => navigate(-1)}
-          onHome={() => navigate('/main')}
-        />
-      }
-    />
-    <Route
-      path="/A/findId"
-      element={<FindIdA />}
-    />
-    <Route
-      path="/A/findPassword"
-      element={<FindPasswordA />}
-    />
-    <Route
-      path="/A/changePassword"
-      element={<ChangePasswordA />}
-    />
-
-    {/* Type C Routes */}
-    <Route
-      path="/C/login"
-      element={
-        <LoginC
-          onLoginSuccess={() => navigate('/C/mall')}
-          onSignup={() => navigate('/C/signup')}
-          onFindId={() => navigate('/C/findId')}
-          onFindPassword={() => navigate('/C/findPassword')}
-        />
-      }
-    />
-    <Route
-      path="/C/signup"
-      element={<SignUpC onBack={() => navigate(-1)} />}
-    />
-    <Route
-      path="/C/findId"
-      element={<FindIdC mode="common" onBack={() => navigate(-1)} />}
-    />
-    <Route
-      path="/C/findPassword"
-      element={<FindPasswordC mode="common" onBack={() => navigate(-1)} />}
-    />
-    <Route
-      path="/C/mall"
-      element={
-        <SelectMallC
-          onBack={() => navigate('/C/login')}
-          onCart={() => navigate('/C/cart')}
-          onMyPage={() => navigate('/C/member-info')}
-          onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
-        />
-      }
-    />
-    <Route
-      path="/C/store"
-      element={
-        <StoreBrowserC
-          onBack={() => navigate('/C/mall')}
-          onHome={() => navigate('/C/mall')}
-          onCart={() => navigate('/C/cart')}
-          onMyPage={() => navigate('/C/member-info')}
-        />
-      }
-    />
-    <Route
-      path="/C/order-history"
-      element={
-        <OrderHistoryC
-          onHome={() => navigate('/C/mall')}
-        />
-      }
-    />
-    <Route
-      path="/C/wishlist"
-      element={
-        <WishlistC
-          onHome={() => navigate('/C/mall')}
-        />
-      }
-    />
-    <Route
-      path="/C/member-info"
-      element={
-        <MemberInfoC // MemberInfoC는 이제 /C/member-info 경로에서 직접 렌더링
-          onBack={() => navigate('/C/mypage')} // 뒤로가기 시 /C/mypage (리다이렉트될 경로)로 이동
-          onHome={() => navigate('/C/mall')}
-          onCart={() => navigate('/C/cart')}
-          onMyPage={() => navigate('/C/member-info')}
-        />
-      }
-    />
-
-    <Route path="/C/mypage" element={<Navigate to="/C/member-info" replace />} />
-    <Route
-      path="/C/cart"
-      element={
-        <CartC
-          onHome={() => navigate('/C/mall')}
-        />
-      }
-    />
-
-    {/* Flat Routes for compatibility */}
-    <Route path="/login" element={<Navigate to="/A/login" replace />} />
-    <Route path="/signup" element={<Navigate to="/C/signup" replace />} />
-    <Route path="/mall" element={<Navigate to="/C/mall" replace />} />
-    <Route path="/store" element={<Navigate to="/C/store" replace />} />
-    <Route path="/cart" element={<Navigate to="/C/cart" replace />} />
-    <Route path="/login-c" element={<Navigate to="/C/login" replace />} />
-    <Route path="/signup-c" element={<Navigate to="/C/signup" replace />} />
-    <Route path="/mall-c" element={<Navigate to="/C/mall" replace />} />
-    <Route path="/store-c" element={<Navigate to="/C/store" replace />} />
-    <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
-    <Route path="/login-s" element={<LoginS />} />
-    <Route path="/S/guardian-view" element={<GuardianViewS />} />
-
-    {/* Fallback */}
-
-    <Route path="*" element={<Navigate to="/intro" replace />} />
-  </Routes>
-);
-
-
 
 /**
  * AppRouter - 애플리케이션의 최상위 라우터 컴포넌트

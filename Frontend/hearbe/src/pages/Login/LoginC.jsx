@@ -10,7 +10,7 @@ export default function LoginC() {
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberLogin, setRememberLogin] = useState(false);
+    const [rememberLogin, setRememberLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -96,7 +96,7 @@ export default function LoginC() {
                             src={logoC}
                             alt="HearBe Logo"
                             className="logo-image-c"
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/main')}
                             style={{ cursor: 'pointer' }}
                         />
                     </div>
@@ -119,7 +119,7 @@ export default function LoginC() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                             <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showPassword ? <EyeOff size={32} /> : <Eye size={32} />}
                             </button>
                         </div>
 

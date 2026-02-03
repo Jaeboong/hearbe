@@ -125,6 +125,17 @@ export default function MemberInfoC({ onHome }) {
         try {
             await authAPI.deleteAccount(withdrawPassword);
             alert('회원탈퇴가 완료되었습니다.');
+
+            // Local Storage 정리
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('username');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('savedLoginId_C');
+            localStorage.removeItem('savedLoginPassword_C');
+
             navigate('/');
         } catch (error) {
             console.error('Delete account failed:', error);

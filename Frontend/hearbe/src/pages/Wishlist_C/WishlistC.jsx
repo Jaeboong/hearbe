@@ -93,6 +93,19 @@ export default function WishlistC({ onHome }) {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
+        }
+    };
+
     return (
         <div className="mypage-container">
             {/* Header */}

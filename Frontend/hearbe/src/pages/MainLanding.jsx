@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Volume2, Download, ArrowRight, Share2, Layout, Zap, Mic, Eye, ShoppingBag, Command, ChevronDown } from 'lucide-react';
 import '../App.css';
 import '../index.css'
@@ -55,6 +56,7 @@ const ModeCard = ({ mode, onSelect }) => (
 );
 
 const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
+  const navigate = useNavigate();
 
   // Auto-scroll effect after a delay
   useEffect(() => {

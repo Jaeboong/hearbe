@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Spline from '@splinetool/react-spline';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import './Intro.css';
-import introAudio from '../../assets/Intro/intro1.wav';
+import introAudio1 from '../../assets/Intro/intro1.wav';
+import introAudio2 from '../../assets/Intro/intro2.wav';
+import introAudio3 from '../../assets/Intro/intro3.wav';
+import introAudio4 from '../../assets/Intro/intro4.wav';
 
 // Error Boundary to catch WebGL context failures
 class SplineErrorBoundary extends React.Component {
@@ -32,14 +35,22 @@ const STEPS = [
     {
         title: "목소리만으로 완성하는 새로운 쇼핑 경험",
         desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.",
+        audioSrc: introAudio1
     },
     {
-        title: "눈이 아닌 귀로 만나는 상품 정보",
-        desc: "이미지 속 작은 글자까지 HearBe가 다정하게 읽어드려요.",
+        title: "보이지 않아도, 스스로 선택하는 쇼핑",
+        desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.",
+        audioSrc: introAudio2
     },
     {
-        title: "장벽 없는 쇼핑, HearBe와 함께",
-        desc: "쇼핑의 즐거움에서 누구도 소외되지 않도록.",
+        title: "검색부터 결제까지, 당신의 목소리로",
+        desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.",
+        audioSrc: introAudio3
+    },
+    {
+        title: "HearBe와 함께, 지금 바로 시작해보세요",
+        desc: "누구나 즐거운 쇼핑, HearBe가 함께합니다.",
+        audioSrc: introAudio4
     }
 ];
 
@@ -47,10 +58,16 @@ export default function Intro() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const navigate = useNavigate();
+    const audioRef = useRef(null);
 
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
+
+        // 오디오 정지
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
 
         // 보라색 확산 애니메이션 후 /main으로 이동
         setTimeout(() => {
@@ -58,9 +75,11 @@ export default function Intro() {
         }, 850);
     };
 
+    // Step Timer Logic
     useEffect(() => {
         if (isTransitioning) return;
 
+        // 4초마다 다음 스텝으로 자동 이동
         const timer = setInterval(() => {
             if (currentStep < STEPS.length - 1) {
                 setCurrentStep((prev) => prev + 1);
@@ -72,44 +91,44 @@ export default function Intro() {
         return () => clearInterval(timer);
     }, [currentStep, isTransitioning]);
 
-    // Intro Voice Logic
+    // Audio Playback Logic per Step
     useEffect(() => {
-        const audio = new Audio(introAudio);
+        // 이전 오디오 정지 및 초기화
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
 
-        // Try to play immediately
-        const playPromise = audio.play();
+        // 현재 단계의 오디오 설정 및 재생
+        const currentAudioSrc = STEPS[currentStep].audioSrc;
+        const newAudio = new Audio(currentAudioSrc);
+        audioRef.current = newAudio;
 
+        const playPromise = newAudio.play();
         if (playPromise !== undefined) {
             playPromise.catch((error) => {
-                console.log("Autoplay prevented. Audio will play on first click.", error);
-
-                // Fallback: Play on first user interaction (click)
-                const playOnInteraction = () => {
-                    audio.play();
-                    document.removeEventListener('click', playOnInteraction);
-                };
-                document.addEventListener('click', playOnInteraction);
+                console.log(`Step ${currentStep + 1} autoplay prevented:`, error);
+                // 자동 재생 정책에 의해 막히면 인터랙션 대기
             });
         }
 
-        // Stop after 4 seconds (Sync with slide transition)
-        const stopTimer = setTimeout(() => {
-            audio.pause();
-            audio.currentTime = 0;
-        }, 4000);
-
         return () => {
-            clearTimeout(stopTimer);
-            audio.pause();
+            // cleanup
+            newAudio.pause();
         };
-    }, []);
+    }, [currentStep]);
 
-
+    // 사용자 인터랙션 발생 시 오디오 재생 시도 (자동재생 실패 대응)
+    const handleUserInteraction = () => {
+        if (audioRef.current && audioRef.current.paused) {
+            audioRef.current.play().catch(e => console.log("Manual play failed:", e));
+        }
+    };
 
     return (
-        <div className="intro-container">
+        <div className="intro-container" onClick={handleUserInteraction}>
             {!isTransitioning && (
-                <button className="skip-btn" onClick={goToMain}>Skip</button>
+                <button className="skip-btn" onClick={(e) => { e.stopPropagation(); goToMain(); }}>Skip</button>
             )}
 
             <AnimatePresence>

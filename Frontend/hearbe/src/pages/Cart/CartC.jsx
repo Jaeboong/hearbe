@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, Home, User, LogOut } from 'lucide-react';
-import { ArrowLeft, ShoppingCart, Home, User, LogOut } from 'lucide-react';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
@@ -119,6 +118,19 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
+        }
+    };
 
     // 임베디드 모드 - 기존 동작 유지
     if (isEmbedded) {
