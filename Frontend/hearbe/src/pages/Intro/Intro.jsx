@@ -3,10 +3,34 @@ import Spline from '@splinetool/react-spline';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import './Intro.css';
+import introAudio from '../../assets/Intro/intro1.wav';
+
+// Error Boundary to catch WebGL context failures
+class SplineErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error("Spline Error Boundary Caught:", error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return <div className="abstract-orb" />;
+        }
+        return this.props.children;
+    }
+}
 
 const STEPS = [
     {
-        title: "모두를 위한, 목소리로 소통하는 쇼핑",
+        title: "목소리만으로 완성하는 새로운 쇼핑 경험",
         desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.",
     },
     {
@@ -48,6 +72,40 @@ export default function Intro() {
         return () => clearInterval(timer);
     }, [currentStep, isTransitioning]);
 
+    // Intro Voice Logic
+    useEffect(() => {
+        const audio = new Audio(introAudio);
+
+        // Try to play immediately
+        const playPromise = audio.play();
+
+        if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+                console.log("Autoplay prevented. Audio will play on first click.", error);
+
+                // Fallback: Play on first user interaction (click)
+                const playOnInteraction = () => {
+                    audio.play();
+                    document.removeEventListener('click', playOnInteraction);
+                };
+                document.addEventListener('click', playOnInteraction);
+            });
+        }
+
+        // Stop after 4 seconds (Sync with slide transition)
+        const stopTimer = setTimeout(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }, 4000);
+
+        return () => {
+            clearTimeout(stopTimer);
+            audio.pause();
+        };
+    }, []);
+
+
+
     return (
         <div className="intro-container">
             {!isTransitioning && (
@@ -85,8 +143,9 @@ export default function Intro() {
             </div>
 
             <div className="object-section">
-                {/* User Requested: Keep Spline */}
-                <Spline scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode" />
+                <SplineErrorBoundary>
+                    <Spline scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode" />
+                </SplineErrorBoundary>
             </div>
 
             <div className="action-section">

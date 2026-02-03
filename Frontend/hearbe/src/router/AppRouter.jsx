@@ -81,14 +81,17 @@ function AppContent() {
   };
 
   // 초기 설정이 완료되지 않았으면 InitialSetup을 '가장 먼저' 보여줌 (모든 페이지 진입 차단)
+  // DEBUG: Intro 페이지 테스트를 위해 잠시 주석 처리
+  /*
   if (showInitialSetup) {
     return <InitialSetup onComplete={handleSetupComplete} />;
   }
+  */
 
   return (
     <Routes>
-      {/* 기본 경로 접속 시 Intro 페이지 직접 렌더링 (리다이렉트 제거) */}
-      <Route path="/" element={<Intro />} />
+      {/* 기본 경로 접속 시 Intro 페이지로 리다이렉트 */}
+      <Route path="/" element={<Navigate to="/intro" replace />} />
 
       {/* Intro 페이지 별도 경로 유지 */}
       <Route path="/intro" element={<Intro />} />
