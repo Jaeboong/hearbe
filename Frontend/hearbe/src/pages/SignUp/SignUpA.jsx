@@ -369,12 +369,15 @@ const SignUp = () => {
             const response = await authAPI.register(userData);
 
             if (response.success) {
+<<<<<<< HEAD
                 if (cardData?.number) {
                     localStorage.setItem('member_card_number', cardData.number);
                 }
                 if (formData.id) {
                     localStorage.setItem('member_username', formData.id);
                 }
+=======
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                 setShowSuccess(true);
             } else {
                 throw new Error(response.message || '회원가입에 실패했습니다.');

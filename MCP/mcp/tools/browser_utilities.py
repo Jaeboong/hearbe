@@ -7,7 +7,9 @@
 import asyncio
 import base64
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +90,55 @@ class BrowserUtilitiesMixin:
 
         except Exception as e:
             logger.error(f"Screenshot failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def screenshot_element(
+        self,
+        selector: str,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        특정 요소 스크린샷 캡처
+
+        Args:
+            selector: CSS selector
+            frame_selector: iframe CSS selector (optional)
+            frame_name: iframe name attribute (optional)
+            frame_url: iframe URL match (optional)
+            frame_index: iframe index (optional)
+
+        Returns:
+            {"success": bool, "screenshot_base64": str}
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            context_type, context, error = resolve_frame_context(
+                page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error}
+
+            locator = context.locator(selector) if context_type == "frame_locator" else context.locator(selector)
+            if await locator.count() == 0:
+                return {"success": False, "error": "Element not found"}
+
+            element = locator.first
+            screenshot_bytes = await element.screenshot()
+            screenshot_base64 = base64.b64encode(screenshot_bytes).decode("utf-8")
+            logger.info(f"Element screenshot taken: {selector}")
+            return {"success": True, "screenshot_base64": screenshot_base64}
+        except Exception as e:
+            logger.error(f"Element screenshot failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def handle_captcha_modal(self) -> Dict[str, Any]:

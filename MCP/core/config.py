@@ -35,6 +35,7 @@ class BrowserConfig:
     headless: bool = False
     window_width: int = 1280
     window_height: int = 720
+    extension_path: Optional[str] = None
 
 
 @dataclass
@@ -166,6 +167,32 @@ class ConfigManager:
         value = self._get_env(key, str(default)).lower()
         return value in ("true", "1", "yes", "on")
 
+    def _get_extension_path(self) -> Optional[str]:
+        """Chrome Extension 경로 자동 탐지 (개발/배포 환경 대응)"""
+        # 1. 환경변수 우선 사용
+        env_path = self._get_env("CHROME_EXTENSION_PATH")
+        if env_path and Path(env_path).exists():
+            return env_path
+        
+        # 2. PyInstaller 번들 환경 (_internal/hearbe-extension)
+        if getattr(sys, 'frozen', False):
+            # PyInstaller로 빌드된 실행 파일
+            exe_dir = Path(sys.executable).parent
+            bundled_path = exe_dir / "_internal" / "hearbe-extension"
+            if bundled_path.exists():
+                logger.info(f"Found bundled extension at: {bundled_path}")
+                return str(bundled_path)
+        
+        # 3. 개발 환경 (../Frontend/hearbe-extension)
+        current_dir = Path(__file__).parent.parent
+        dev_path = current_dir.parent / "Frontend" / "hearbe-extension"
+        if dev_path.exists():
+            logger.info(f"Found development extension at: {dev_path}")
+            return str(dev_path)
+        
+        logger.warning("Chrome extension not found in any expected location")
+        return None
+
     def _create_config(self) -> AppConfig:
         """환경 변수를 기반으로 설정 생성"""
         # Audio 설정
@@ -184,7 +211,8 @@ class ConfigManager:
             debugging_port=self._get_env_int("BROWSER_CDP_PORT", 9222),
             headless=self._get_env_bool("BROWSER_HEADLESS", False),
             window_width=self._get_env_int("BROWSER_WINDOW_WIDTH", 1280),
-            window_height=self._get_env_int("BROWSER_WINDOW_HEIGHT", 720)
+            window_height=self._get_env_int("BROWSER_WINDOW_HEIGHT", 720),
+            extension_path=self._get_extension_path()
         )
 
         # MCP 설정

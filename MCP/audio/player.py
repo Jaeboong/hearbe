@@ -8,6 +8,7 @@ Publishes TTS_PLAYBACK_FINISHED when playback completes.
 import logging
 import threading
 import queue
+import time
 from typing import Optional
 
 try:
@@ -27,6 +28,7 @@ TTS_FORMAT = pyaudio.paInt16 if pyaudio else None
 TTS_CHUNK_SIZE = 4096
 _STOP_SENTINEL = object()
 _FLUSH_SENTINEL = object()
+_BARGE_IN_SUPPRESS_SEC = 3.0
 
 
 class AudioPlayer(IAudioPlayer):
@@ -50,6 +52,7 @@ class AudioPlayer(IAudioPlayer):
         self.stream = None
         self._playing = False
         self._stop_requested = False
+        self._suppress_until = 0.0
 
         # Audio queue for streaming playback
         self._audio_queue: queue.Queue = queue.Queue()
@@ -157,6 +160,9 @@ class AudioPlayer(IAudioPlayer):
         if not data:
             return
 
+        if time.time() < self._suppress_until:
+            return
+
         audio_bytes = data.get("audio")
         is_final = data.get("is_final", False)
 
@@ -187,6 +193,7 @@ class AudioPlayer(IAudioPlayer):
         """Stop TTS playback on barge-in hotkey"""
         if self.is_playing():
             logger.info("Hotkey pressed - stopping TTS playback")
+            self._suppress_until = time.time() + _BARGE_IN_SUPPRESS_SEC
             self._request_stop_playback()
 
     def play(self, audio_data: bytes) -> None:

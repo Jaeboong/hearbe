@@ -15,7 +15,7 @@ public class ShareCodeService {
 
     private final StringRedisTemplate redisTemplate;
     private static final String CODE_PREFIX = "share:";
-    private static final long CODE_EXPIRATION_MINUTES = 30;
+    private static final long CODE_EXPIRATION_MINUTES = 3;
 
     public String generateShareCode(String sessionId) {
         String code = generateRandomCode();
@@ -24,12 +24,11 @@ public class ShareCodeService {
             code = generateRandomCode();
         }
 
-        // Save Code -> SessionId
-        if (sessionId != null) {
-            redisTemplate.opsForValue().set(CODE_PREFIX + code, sessionId, Duration.ofMinutes(CODE_EXPIRATION_MINUTES));
-        }
+        // Save Code -> SessionId (or "valid")
+        String value = (sessionId != null) ? sessionId : "valid";
+        redisTemplate.opsForValue().set(CODE_PREFIX + code, value, Duration.ofMinutes(CODE_EXPIRATION_MINUTES));
 
-        log.info("Generated Share Code: {} for Session: {}", code, sessionId);
+        log.info("Generated Share Code: {} (valid for {} mins)", code, CODE_EXPIRATION_MINUTES);
         return code;
     }
 
@@ -41,7 +40,7 @@ public class ShareCodeService {
 
     private String generateRandomCode() {
         Random random = new Random();
-        int number = random.nextInt(999999);
-        return String.format("%06d", number);
+        int number = 1000 + random.nextInt(9000); // 1000 ~ 9999 (4 digits)
+        return String.valueOf(number);
     }
 }

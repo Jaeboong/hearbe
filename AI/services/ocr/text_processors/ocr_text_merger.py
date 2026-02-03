@@ -19,6 +19,8 @@ def _merge_entries(
     similarity_threshold: float,
 ) -> List[Dict]:
     merged: List[Dict] = []
+    norm_to_idx: Dict[str, int] = {}  # 정확 일치 O(1) 조회용 해시맵
+
     for entry in entries:
         text = entry.get("text", "")
         score = float(entry.get("score", 1.0))
@@ -29,17 +31,27 @@ def _merge_entries(
             continue
 
         match_idx = None
-        for idx, existing in enumerate(merged):
-            if norm == existing["norm"]:
-                match_idx = idx
-                break
-            if similarity_threshold > 0:
-                ratio = SequenceMatcher(None, norm, existing["norm"]).ratio()
+
+        # 1단계: 정확 일치를 해시맵으로 O(1) 조회
+        if norm in norm_to_idx:
+            match_idx = norm_to_idx[norm]
+        elif similarity_threshold > 0:
+            # 2단계: 유사 매칭 (정확 일치가 없을 때만 순회)
+            norm_len = len(norm)
+            for idx, existing in enumerate(merged):
+                existing_norm = existing["norm"]
+                # 길이 사전 필터링: 길이 차이가 크면 유사도가 threshold 미달이므로 건너뜀
+                len_diff = abs(norm_len - len(existing_norm))
+                max_len = max(norm_len, len(existing_norm))
+                if max_len > 0 and (1 - len_diff / max_len) < similarity_threshold:
+                    continue
+                ratio = SequenceMatcher(None, norm, existing_norm).ratio()
                 if ratio >= similarity_threshold:
                     match_idx = idx
                     break
 
         if match_idx is None:
+            norm_to_idx[norm] = len(merged)
             merged.append(
                 {
                     "text": text,
@@ -83,15 +95,18 @@ def merge_ocr_results(
 
         filtered = filter_texts(texts, scores, min_score, min_length)
 
-        # 필터링된 인덱스를 추적하여 해당하는 box도 함께 가져옴
-        text_to_box = {}
-        for i, (text, score) in enumerate(zip(texts, scores)):
-            if i < len(boxes):
-                text_to_box[text] = boxes[i]
-
-        for text, score in filtered:
-            box = text_to_box.get(text, [])
-            entries.append({"text": text, "score": score, "box": box, "source": source})
+        # 필터링된 (text, score) 쌍을 인덱스 기반으로 box와 매칭
+        # 동일 텍스트가 여러 위치에 있을 때 box 덮어쓰기 방지
+        filtered_set = list(filtered)  # 순서 보존
+        used_indices = set()
+        for f_text, f_score in filtered_set:
+            matched_box = []
+            for i, (text, score) in enumerate(zip(texts, scores)):
+                if i not in used_indices and text == f_text and score == f_score:
+                    matched_box = boxes[i] if i < len(boxes) else []
+                    used_indices.add(i)
+                    break
+            entries.append({"text": f_text, "score": f_score, "box": matched_box, "source": source})
 
     merged = _merge_entries(entries, similarity_threshold)
 

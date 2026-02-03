@@ -9,15 +9,17 @@ import logging
 from typing import Dict, Any, Optional, List
 
 from core.event_bus import EventType, publish
-from ..search.search_reader import build_search_read_tts
-from ..cart.cart_reader import build_cart_read_tts
+from services.llm.sites.site_manager import get_page_type
+from ..presenter.pages.search import build_search_list_tts, MORE_PROMPT_COUNT
+from ..presenter.pages.cart import build_cart_summary_tts
+from ..presenter.pages.login import build_captcha_prompt_tts
+from ..presenter.pages.product import build_product_summary_tts, build_ocr_summary_tts
 from ..utils.temp_file_manager import TempFileManager
 
 # Summarizer imports (HTML parser + OCR integrator)
 try:
     from services.summarizer import (
         parse_product_html,
-        format_for_tts,
         detect_site,
         get_ocr_integrator,
     )
@@ -64,7 +66,10 @@ class MCPHandler:
         page_data = data.get("page_data") or {}
         tool_name = data.get("tool_name")
         arguments = data.get("arguments") or {}
+        request_id = data.get("request_id")
         products = page_data.get("products") if isinstance(page_data, dict) else None
+        if not products and isinstance(result, dict):
+            products = result.get("products")
         cart_items = None
         cart_summary = None
 
@@ -94,7 +99,44 @@ class MCPHandler:
             session_id=session_id
         )
 
-        if tool_name == "get_dom_snapshot" and self._dom_fallback:
+        session = self._session.get_session(session_id) if self._session else None
+        request_ts = _extract_request_ts(request_id)
+        if session and tool_name == "wait_for_new_page":
+            nav_ok = bool(result.get("new_page") or result.get("url_changed"))
+            self._session.set_context(session_id, "nav_wait_ok", nav_ok)
+            if request_ts:
+                self._session.set_context(session_id, "nav_wait_ts", request_ts)
+        interrupt_ts = None
+        if self._session:
+            interrupt_ts = self._session.get_context(session_id, "interrupt_ts")
+        pre_interrupt = bool(interrupt_ts and request_ts and request_ts <= interrupt_ts)
+        is_extract = bool(tool_name and tool_name.startswith("extract"))
+
+        if pre_interrupt and not is_extract:
+            logger.info(
+                "Skipping MCP result due to interrupt: session=%s tool=%s request_id=%s",
+                session_id,
+                tool_name,
+                request_id
+            )
+            return
+
+        suppress_outputs = pre_interrupt
+
+        if session and tool_name == "extract_detail":
+            nav_wait_ok = self._session.get_context(session_id, "nav_wait_ok")
+            nav_wait_ts = self._session.get_context(session_id, "nav_wait_ts")
+            page_type = get_page_type(page_url or session.current_url or "")
+            if nav_wait_ts and request_ts and request_ts >= nav_wait_ts:
+                if not nav_wait_ok and page_type != "product":
+                    logger.info(
+                        "Skipping extract_detail (no navigation detected): session=%s url=%s",
+                        session_id,
+                        page_url or session.current_url or ""
+                    )
+                    return
+
+        if not suppress_outputs and tool_name == "get_dom_snapshot" and self._dom_fallback:
             handled = await self._dom_fallback.handle_dom_snapshot(
                 session_id=session_id,
                 result=result if isinstance(result, dict) else {},
@@ -103,34 +145,34 @@ class MCPHandler:
             if handled:
                 return
 
-        handled = await self._action_feedback.handle_mcp_result(
-            session_id=session_id,
-            tool_name=tool_name,
-            arguments=arguments,
-            success=success,
-            result=result
-        )
-        if self._failure_notifier:
-            if self._dom_fallback:
-                triggered = await self._dom_fallback.maybe_trigger(
-                    session_id=session_id,
-                    tool_name=tool_name,
-                    arguments=arguments,
-                    error=error,
-                    current_url=page_url or (session.current_url if session else ""),
-                    success=success,
-                )
-                if triggered:
-                    return
-            await self._failure_notifier.handle_mcp_result(
+        handled = False
+        if not suppress_outputs:
+            handled = await self._action_feedback.handle_mcp_result(
                 session_id=session_id,
                 tool_name=tool_name,
                 arguments=arguments,
                 success=success,
-                handled=handled
+                result=result
             )
-
-        session = self._session.get_session(session_id) if self._session else None
+            if self._failure_notifier:
+                if self._dom_fallback:
+                    triggered = await self._dom_fallback.maybe_trigger(
+                        session_id=session_id,
+                        tool_name=tool_name,
+                        arguments=arguments,
+                        error=error,
+                        current_url=page_url or (session.current_url if session else ""),
+                        success=success,
+                    )
+                    if triggered:
+                        return
+                await self._failure_notifier.handle_mcp_result(
+                    session_id=session_id,
+                    tool_name=tool_name,
+                    arguments=arguments,
+                    success=success,
+                    handled=handled
+                )
         if session and self._session:
             self._session.set_context(session_id, "mcp_result", result)
             if isinstance(result, dict):
@@ -151,15 +193,16 @@ class MCPHandler:
                 if previous_url and previous_url != page_url:
                     self._session.set_context(session_id, "previous_url", previous_url)
                 session.current_url = page_url
-                if self._login_feedback:
+                if self._login_feedback and not suppress_outputs:
                     await self._login_feedback.maybe_announce_login_success(
                         session_id,
                         previous_url,
                         page_url
                     )
             if cart_items is not None:
-                tts_text = build_cart_read_tts(cart_items, cart_summary or {})
-                await self._sender.send_tts_response(session_id, tts_text)
+                if not suppress_outputs:
+                    tts_text = build_cart_summary_tts(cart_items, cart_summary or {})
+                    await self._sender.send_tts_response(session_id, tts_text)
                 return
 
             if products:
@@ -187,23 +230,27 @@ class MCPHandler:
                     self._session.set_context(session_id, "search_results_signature", signature)
 
                 start_index = self._session.get_context(session_id, "search_read_index", 0)
-                tts_text, next_index, has_more = build_search_read_tts(
-                    products,
-                    start_index=start_index,
-                    count=4,
-                    include_total=True
-                )
+                tts_text = ""
+                next_index = start_index
+                has_more = False
+                if not suppress_outputs:
+                    tts_text, next_index, has_more = build_search_list_tts(
+                        products,
+                        start_index=start_index,
+                        count=4,
+                        include_total=True,
+                        more_prompt=MORE_PROMPT_COUNT
+                    )
                 self._session.set_context(session_id, "search_read_index", next_index)
                 if next_index > 0:
                     last_item = products[next_index - 1]
                     name = last_item.get("name") or last_item.get("title") or last_item.get("product_name")
                     if name:
                         self._session.set_context(session_id, "last_mentioned_product", name)
-                if has_more:
-                    tts_text += " 더 읽어드릴까요? '몇 개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
-                await self._sender.send_tts_response(session_id, tts_text)
+                if not suppress_outputs:
+                    await self._sender.send_tts_response(session_id, tts_text)
 
-        if tool_name == "check_login_status" and self._login_guard:
+        if not suppress_outputs and tool_name == "check_login_status" and self._login_guard:
             handled = await self._login_guard.handle_login_check_result(
                 session_id,
                 result if isinstance(result, dict) else {},
@@ -212,25 +259,25 @@ class MCPHandler:
             if handled:
                 return
 
-        if tool_name == "handle_captcha_modal":
+        if not suppress_outputs and tool_name == "handle_captcha_modal":
             if isinstance(result, dict) and result.get("captcha_found"):
                 await self._sender.send_tts_response(
                     session_id,
-                    "보안 캡차 인증이 떴습니다. 음성으로 듣기 버튼을 눌렀어요. "
-                    "들리는 보안문자를 입력해 주세요."
+                    build_captcha_prompt_tts()
                 )
                 return
 
-        if SUMMARIZER_AVAILABLE and html_content:
+        if not suppress_outputs and SUMMARIZER_AVAILABLE and html_content:
             try:
                 site = detect_site(page_url or "")
                 product_info = parse_product_html(html_content, site=site, url=page_url or "")
 
                 if product_info.is_valid():
-                    html_summary = format_for_tts(product_info, include_details=True)
+                    html_summary = build_product_summary_tts(product_info)
                     logger.info(f"HTML 파싱 완료: {product_info.product_name}")
 
-                    await self._sender.send_tts_response(session_id, html_summary)
+                    if html_summary:
+                        await self._sender.send_tts_response(session_id, html_summary)
 
                     if product_info.detail_images:
                         detail_images = product_info.detail_images
@@ -238,7 +285,7 @@ class MCPHandler:
             except Exception as e:
                 logger.error(f"HTML 파싱 실패: {e}")
 
-        if SUMMARIZER_AVAILABLE and detail_images:
+        if not suppress_outputs and SUMMARIZER_AVAILABLE and detail_images:
             asyncio.create_task(
                 self._process_ocr_batch(session_id, detail_images, page_url)
             )
@@ -286,8 +333,9 @@ class MCPHandler:
                 return
 
             if ocr_result.summary:
-                tts_text = ocr_result.format_for_tts()
-                await self._sender.send_tts_response(session_id, tts_text)
+                tts_text = build_ocr_summary_tts(ocr_result)
+                if tts_text:
+                    await self._sender.send_tts_response(session_id, tts_text)
 
             session = self._session.get_session(session_id) if self._session else None
             if session and self._session:
@@ -336,3 +384,15 @@ class MCPHandler:
 
     def cleanup_session(self, session_id: str):
         self._file_manager.cleanup_session(session_id)
+
+
+def _extract_request_ts(request_id: Optional[str]) -> Optional[float]:
+    if not request_id:
+        return None
+    parts = request_id.split("_")
+    if len(parts) < 3:
+        return None
+    try:
+        return float(parts[-2])
+    except ValueError:
+        return None

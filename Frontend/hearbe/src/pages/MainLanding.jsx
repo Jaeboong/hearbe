@@ -51,6 +51,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef }) => (
   <div className="landing-container">
     <header className="landing-header">
       <div className="header-inner">
+<<<<<<< HEAD
         <img
           src={logoC}
           alt="HearBe"
@@ -58,6 +59,9 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef }) => (
           onClick={() => window.location.assign('/')}
           style={{ cursor: 'pointer' }}
         />
+=======
+        <img src={logoC} alt="HearBe" className="main-logo" />
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         <div className="header-actions">
           <button className="btn-download" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)', color: '#fff', border: 'none' }}>
             <Download size={16} /> 보조 프로그램 다운로드

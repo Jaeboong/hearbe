@@ -18,14 +18,22 @@ class PageContext:
     selectors: Dict[str, str]
 
 
-PAGE_ACTIONS = {
-    "home": ["search", "login", "navigate", "go_to_cart"],
-    "search": ["select_product", "scroll", "next_page", "filter", "sort"],
-    "product": ["add_to_cart", "buy_now", "view_reviews", "scroll"],
+COMMON_ACTIONS = ["navigate", "scroll", "click", "go_to_cart"]
+
+PAGE_SPECIFIC_ACTIONS = {
+    "home": ["search", "login"],
+    "search": ["select_product", "next_page", "filter", "sort"],
+    "product": ["add_to_cart", "buy_now", "view_reviews"],
     "cart": ["checkout", "remove_item", "change_quantity", "continue_shopping"],
     "login": ["submit_login", "find_id", "find_password", "signup"],
-    "unknown": ["navigate", "scroll", "click"],
+    "unknown": [],
 }
+
+
+def get_available_actions(page_type: str) -> List[str]:
+    """Get available actions for a page type (common + page-specific)."""
+    specific = PAGE_SPECIFIC_ACTIONS.get(page_type, [])
+    return COMMON_ACTIONS + specific
 
 
 def detect_page_type(url: str) -> str:
@@ -59,7 +67,7 @@ def get_page_context(url: str, site: Optional[SiteConfig] = None) -> PageContext
         if page_selectors:
             selectors = page_selectors.selectors
 
-    available_actions = PAGE_ACTIONS.get(page_type, PAGE_ACTIONS["unknown"])
+    available_actions = get_available_actions(page_type)
 
     return PageContext(
         site_name=site_name,

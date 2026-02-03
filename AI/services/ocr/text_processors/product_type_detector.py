@@ -485,7 +485,7 @@ _TYPE_OVERRIDE_RULES = {
 }
 
 
-def _find_type_by_description(fragment: str) -> ProductType:
+def _find_type_by_description(fragment: str) -> Optional[ProductType]:
     """설명에 특정 문자열이 포함된 ProductType 찾기"""
     for pt in ProductType:
         if fragment in get_type_description(pt):

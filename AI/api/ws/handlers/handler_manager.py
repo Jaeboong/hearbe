@@ -5,13 +5,17 @@ Handler manager: orchestrates WS handlers and session lifecycle.
 
 import base64
 import logging
+import time
 
 from services.llm.sites.site_manager import get_current_site, get_page_type
+from ..presenter.pages.login import build_login_guidance_tts
 
 from .audio_handler import AudioHandler
 from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
 from .dom_fallback import DomFallbackManager
+from .payment_keypad import PaymentKeypadManager
+from .page_extract_manager import PageExtractManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
 from ..feedback.login_feedback import LoginFeedbackManager
@@ -47,6 +51,14 @@ class HandlerManager:
             login_guard=self._login_guard,
             login_feedback=self._login_feedback,
         )
+        self._payment_keypad = PaymentKeypadManager(
+            sender=sender,
+            session_manager=session_manager,
+        )
+        self._page_extract = PageExtractManager(
+            sender=sender,
+            session_manager=session_manager,
+        )
 
         self._text_handler = TextHandler(
             nlu_service=nlu_service,
@@ -56,7 +68,9 @@ class HandlerManager:
             sender=sender,
             action_feedback=self._action_feedback,
             login_guard=self._login_guard,
-            login_feedback=self._login_feedback
+            login_feedback=self._login_feedback,
+            payment_keypad=self._payment_keypad,
+            page_extract=self._page_extract,
         )
         self._audio_handler = AudioHandler(
             asr_service=asr_service,
@@ -85,6 +99,7 @@ class HandlerManager:
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._mcp_handler.cleanup_session(session_id)
+        self._payment_keypad.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
         audio_data = base64.b64decode(data.get("audio", ""))
@@ -108,21 +123,29 @@ class HandlerManager:
         self._login_guard.clear_pending(session_id)
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
+        self._payment_keypad.cleanup_session(session_id)
 
     async def handle_interrupt(self, session_id: str):
         await self._audio_handler.clear_audio(session_id)
         await self._text_handler.interrupt(session_id)
+        if self._session:
+            self._session.set_context(session_id, "interrupt_ts", time.time())
         self._action_feedback.clear_pending(session_id)
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
+        self._payment_keypad.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
 
     async def handle_mcp_result(self, session_id: str, data: dict):
+        handled = await self._payment_keypad.handle_mcp_result(session_id, data)
+        if handled:
+            return
         await self._mcp_handler.handle_mcp_result(session_id, data)
 
     async def handle_page_update(self, session_id: str, data: dict):
         url = data.get("url") or data.get("page_url") or data.get("current_url")
+        page_id = data.get("page_id")
         if not url:
             return
         session = self._session.get_session(session_id) if self._session else None
@@ -135,6 +158,8 @@ class HandlerManager:
         site = get_current_site(url)
         if site:
             session.current_site = site.name
+        await self._payment_keypad.handle_page_update(session_id, url)
+        await self._page_extract.handle_page_update(session_id, url, page_id)
 
         # One-time login page guidance after redirect
         if not previous_url or previous_url == url:
@@ -148,7 +173,7 @@ class HandlerManager:
         if self._sender:
             await self._sender.send_tts_response(
                 session_id,
-                "로그인 페이지입니다. 이메일+비밀번호 또는 휴대폰 번호 중 어떤 방식으로 진행할까요?"
+                build_login_guidance_tts()
             )
         self._session.set_context(session_id, "login_guidance_shown", True)
 

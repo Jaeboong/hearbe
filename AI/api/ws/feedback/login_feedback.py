@@ -7,7 +7,8 @@ Tracks login submit attempts and announces successful navigation after login.
 
 from typing import Optional
 
-from services.llm.sites.site_manager import get_page_type, get_selector, get_site_manager
+from services.llm.sites.site_manager import get_page_type, get_selector
+from ..presenter.pages.login import build_login_success_tts
 
 
 class LoginFeedbackManager:
@@ -74,24 +75,7 @@ class LoginFeedbackManager:
         if not self._session.get_context(session_id, "login_submit_pending", False):
             return
 
-        tts = self._build_login_success_tts(current_url)
+        tts = build_login_success_tts(current_url)
         if tts:
             await self._sender.send_tts_response(session_id, tts)
         self._session.set_context(session_id, "login_submit_pending", False)
-
-    def _build_login_success_tts(self, current_url: str) -> str:
-        site = get_site_manager().get_site_by_url(current_url)
-        site_name = site.name if site and site.name else ""
-        page_type = get_page_type(current_url)
-        page_label = {
-            "home": "홈",
-            "search": "검색",
-            "product": "상품",
-            "cart": "장바구니",
-            "checkout": "결제",
-            "order": "주문",
-        }.get(page_type)
-        if page_label:
-            prefix = f"{site_name} " if site_name else ""
-            return f"로그인 완료되었습니다. {prefix}{page_label} 페이지로 이동했습니다."
-        return "로그인 완료되었습니다. 페이지가 이동되었습니다."

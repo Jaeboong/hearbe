@@ -14,6 +14,7 @@
     "order_steps": "[class*='order']",
     "other_payment_method": "[class*='order']:has-text('다른 결제 수단')",
     "default_payment": "[class*='checkout']:has-text('기본 결제 수단으로 사용')",
+    "keypad_frame": "iframe[src*='payment.coupang.com/v4/payments/payment']",
     "keypad_container": ".pad",
     "keypad_key_0": "a.pad-key[data-key='0']",
     "keypad_key_1": "a.pad-key[data-key='1']",

@@ -41,6 +41,26 @@ SITE_CONFIGS: Dict[str, Dict] = {
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
 
+MAX_DOWNLOAD_SIZE = 20 * 1024 * 1024  # 이미지 1장당 최대 다운로드 크기 20MB
+
+# 내부/비공개 네트워크 접근 차단 (SSRF 방어)
+_BLOCKED_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+_BLOCKED_IP_PREFIXES = ("10.", "172.16.", "172.17.", "172.18.", "172.19.",
+                        "172.20.", "172.21.", "172.22.", "172.23.", "172.24.",
+                        "172.25.", "172.26.", "172.27.", "172.28.", "172.29.",
+                        "172.30.", "172.31.", "192.168.", "169.254.")
+
+
+def _is_safe_url(url: str) -> bool:
+    """내부 네트워크 URL 차단"""
+    parsed = urlparse(url)
+    hostname = (parsed.hostname or "").lower()
+    if hostname in _BLOCKED_HOSTS:
+        return False
+    if hostname.startswith(_BLOCKED_IP_PREFIXES):
+        return False
+    return True
+
 
 def detect_site(url: str) -> Optional[str]:
     url_lower = url.lower()
@@ -61,16 +81,21 @@ def _matches_pattern(url: str, patterns: List[str]) -> bool:
 def _is_valid_image_url(url: str) -> bool:
     if not url or not url.startswith(("http://", "https://")):
         return False
-    
+
+    if not _is_safe_url(url):
+        return False
+
     parsed = urlparse(url)
     path_lower = parsed.path.lower()
-    
+
     _, ext = os.path.splitext(path_lower)
-    if ext and ext not in SUPPORTED_EXTENSIONS:
-        if ext not in {".html", ".htm", ".js", ".css"}:
-            return True
-        return False
-    
+    if ext:
+        # 명백한 비이미지 확장자는 제외
+        if ext in {".html", ".htm", ".js", ".css"}:
+            return False
+        # 확장자가 있지만 이미지가 아닌 경우도 CDN URL일 수 있으므로 통과
+        # (최종 검증은 download_image에서 Content-Type으로 수행)
+
     return True
 
 
@@ -110,7 +135,7 @@ def filter_product_images(
 
 
 def _generate_filename(url: str) -> str:
-    url_hash = hashlib.md5(url.encode()).hexdigest()[:12]
+    url_hash = hashlib.sha256(url.encode()).hexdigest()[:16]
     
     parsed = urlparse(url)
     path = parsed.path
@@ -150,20 +175,44 @@ def download_image(
             "Referer": url,
         }
         
-        response = requests.get(url, headers=headers, timeout=timeout, stream=True)
+        response = requests.get(
+            url, headers=headers, timeout=timeout,
+            stream=True, allow_redirects=False,
+        )
+
+        # 리다이렉트 시 대상 URL의 안전성 재검증 (SSRF 방어)
+        if response.status_code in (301, 302, 303, 307, 308):
+            redirect_url = response.headers.get("Location", "")
+            if not redirect_url or not _is_safe_url(redirect_url):
+                return None
+            response = requests.get(
+                redirect_url, headers=headers, timeout=timeout,
+                stream=True, allow_redirects=False,
+            )
+
         response.raise_for_status()
-        
+
         content_type = response.headers.get("Content-Type", "")
         if not content_type.startswith("image/"):
             return None
-        
+
+        downloaded = 0
         with open(local_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
+                downloaded += len(chunk)
+                if downloaded > MAX_DOWNLOAD_SIZE:
+                    break
                 f.write(chunk)
-        
+
+        if downloaded > MAX_DOWNLOAD_SIZE:
+            os.remove(local_path)
+            return None
+
         return local_path
-        
+
     except requests.RequestException:
+        if os.path.exists(local_path):
+            os.remove(local_path)
         return None
 
 
@@ -175,30 +224,33 @@ def download_images(
 ) -> List[str]:
     if not urls:
         return []
-    
+
     if save_dir is None:
         save_dir = tempfile.mkdtemp(prefix="ocr_images_")
-    
+
     os.makedirs(save_dir, exist_ok=True)
-    
-    local_paths = []
-    
+
+    # 입력 순서를 보존하기 위해 인덱스 기반 결과 수집
+    url_to_idx = {url: i for i, url in enumerate(urls)}
+    results = [None] * len(urls)
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_url = {
             executor.submit(download_image, url, save_dir, timeout): url
             for url in urls
         }
-        
+
         for future in as_completed(future_to_url):
             url = future_to_url[future]
             try:
                 local_path = future.result()
                 if local_path:
-                    local_paths.append(local_path)
+                    results[url_to_idx[url]] = local_path
             except Exception:
                 pass
-    
-    return local_paths
+
+    # None 제거하여 성공한 경로만 반환 (입력 순서 유지)
+    return [p for p in results if p is not None]
 
 
 def get_site_config(site: str) -> Optional[Dict]:

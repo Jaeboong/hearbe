@@ -65,6 +65,7 @@ export default function LoginC() {
             <main className="login-c-content">
                 <div className="login-c-card">
                     <div className="logo-area-c">
+<<<<<<< HEAD
                         <img
                             src={logoC}
                             alt="HearBe Logo"
@@ -72,6 +73,9 @@ export default function LoginC() {
                             onClick={() => navigate('/')}
                             style={{ cursor: 'pointer' }}
                         />
+=======
+                        <img src={logoC} alt="HearBe Logo" className="logo-image-c" />
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                     </div>
 
                     <form className="login-c-form" onSubmit={handleLogin}>

@@ -14,39 +14,35 @@ export const authAPI = {
                 body: JSON.stringify(userData),
             });
 
-            // 응답 상태 확인
             console.log('Response status:', response.status);
             console.log('Response ok:', response.ok);
 
-            // 응답이 비어있거나 204 No Content인 경우
-            if (response.status === 204) {
-                return { success: true, message: '회원가입이 완료되었습니다' };
-            }
-
-            // JSON 파싱 전에 응답 텍스트를 확인
             const text = await response.text();
             console.log('Response text:', text);
 
-            let data;
-            try {
-                data = text ? JSON.parse(text) : {};
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            let data = {};
+            if (text) { // 응답 본문이 있을 경우에만 JSON 파싱 시도
+                try { // 백엔드는 201 Created와 함께 ApiResponse 객체를 반환합니다.
+                    // data는 { code: 201, message: "회원가입 완료", data: userId } 형태
+                    data = text ? JSON.parse(text) : {};
+                } catch (e) {
+                    console.error('JSON parse error for response text:', e);
+                    throw new Error('서버 응답 형식이 올바르지 않습니다. 응답: ' + text);
+                }
             }
 
-            if (!response.ok) {
-                throw new Error(data.message || '회원가입에 실패했습니다.');
+            if (response.status === 201) { // 백엔드는 201 Created를 반환합니다.
+                return { success: true, message: data.message || '회원가입이 완료되었습니다', data: data.data };
+            } else { // 201이 아닌 모든 다른 상태 코드 (4xx, 5xx 또는 예상치 못한 2xx)는 실패로 처리
+                throw new Error(data.message || `회원가입에 실패했습니다. (상태: ${response.status})`);
             }
-
-            return data;
         } catch (error) {
             console.error('Register API Error:', error);
             throw error;
         }
     },
 
-    // ID 중복 확인 API (선택사항 - 해당 API가 있다면 사용)
+    // ID 중복 확인 API
     checkDuplicate: async (userId) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/checkId`, {
@@ -60,14 +56,22 @@ export const authAPI = {
             console.log('Check Duplicate Response status:', response.status);
 
             const data = await response.json();
+<<<<<<< HEAD
 
             console.log('Check Duplicate Response data:', data);
             
             return data;
+=======
+            // 백엔드 응답: { code: 200, message: "...", data: true/false }
+            // 여기서 data: true는 중복, data: false는 사용 가능을 의미
+            // 프론트엔드는 { available: true/false } 형태를 기대하며, available: true가 사용 가능
+            // 따라서 백엔드의 data 값을 반전시켜 available로 반환
+            // response.ok가 false인 경우 (4xx, 5xx)는 catch 블록에서 처리
+            return { available: !data.data };
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         } catch (error) {
             console.error('Check Duplicate API Error:', error);
-            // API가 없으면 기본적으로 사용 가능으로 처리
-            return { available: true };
+            throw new Error(error.message || '아이디 중복 확인 중 네트워크 오류가 발생했습니다.'); // 에러를 다시 던짐
         }
     },
 
@@ -115,7 +119,7 @@ export const authAPI = {
             // user_id 저장
             if (data.data && data.data.id) {
                 localStorage.setItem('user_id', data.data.id);
-                // 가입할때의 username도 저장(사람구분니 API 호출에서 사용)
+                // 가입할때의 username도 저장
                 localStorage.setItem('username', username);
             }
 
@@ -168,6 +172,80 @@ export const authAPI = {
             throw error;
         }
     },
+<<<<<<< HEAD
+=======
+    // 이메일 인증번호 발송 API
+    sendEmailVerification: async (email, username = null, name = null) => {
+        try {
+            const body = { email };
+            if (username) body.username = username;
+            if (name) body.name = name;
+
+            const response = await fetch(`${API_BASE_URL}/auth/email/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '인증번호 발송 실패');
+            return data;
+        } catch (error) {
+            console.error('Send Email Verification Error:', error);
+            throw error;
+        }
+    },
+
+    // 비밀번호 재설정 API (C형 - 이메일 인증)
+    resetPassword: async (email, newPassword) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/resetPassword`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, newPassword }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '비밀번호 재설정 실패');
+            return data;
+        } catch (error) {
+            console.error('Reset Password API Error:', error);
+            throw error;
+        }
+    },
+
+    // 이메일 인증번호 확인 API
+    verifyEmailCode: async (email, code) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/email/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '인증번호 확인 실패');
+            return data;
+        } catch (error) {
+            console.error('Verify Email Code Error:', error);
+            throw error;
+        }
+    },
+
+    // 아이디 찾기 API (C형 - 이메일 인증)
+    findId: async (name, email) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/findIdByEmail`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || '아이디 찾기 실패');
+            return data;
+        } catch (error) {
+            console.error('Find ID API Error:', error);
+            throw error;
+        }
+    },
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
 
     // 로그아웃 API
     logout: async () => {
@@ -206,6 +284,7 @@ export const authAPI = {
         } catch (error) {
             console.error('Logout API Error:', error);
             throw error;
+<<<<<<< HEAD
         } finally {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
@@ -368,6 +447,8 @@ export const authAPI = {
         } catch (error) {
             console.error('Verify Welfare Card API Error:', error);
             throw error;
+=======
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         }
     }
 };

@@ -12,17 +12,22 @@ import { authAPI } from '../../services/authAPI';
 const SelectMall = () => {
     const navigate = useNavigate();
 
+    const mallUrlMap = {
+        naver: 'https://shopping.naver.com/ns/home',
+        coupang: 'https://www.coupang.com',
+        '11st': 'https://m.11st.co.kr/',
+        emart: 'https://m.ssg.com/'
+    };
+
     const handleSelectMall = (mall) => {
-        if (mall === 'naver') {
-            window.open('https://shopping.naver.com/ns/home', '_blank');
-        } else if (mall === 'coupang') {
-            window.open('https://www.coupang.com', '_blank');
-        } else if (mall === '11st') {
-            window.open('https://m.11st.co.kr/', '_blank');
-        } else if (mall === 'emart') {
-            window.open('https://m.ssg.com/', '_blank');
-        } else if (mall === 'cart') {
+        if (mall === 'cart') {
             navigate('/A/cart');
+            return;
+        }
+
+        const targetUrl = mallUrlMap[mall];
+        if (targetUrl) {
+            navigate(`/A/store?url=${encodeURIComponent(targetUrl)}`);
         }
     };
 

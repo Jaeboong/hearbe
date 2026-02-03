@@ -73,6 +73,65 @@ class BrowserExtractionMixin:
             logger.error(f"Get text failed: {e}")
             return {"success": False, "error": str(e)}
 
+    async def get_attribute_list(
+        self,
+        selector: str,
+        attribute: str,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+        include_empty: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        요소 리스트에서 특정 attribute 값을 순서대로 추출
+
+        Args:
+            selector: CSS selector
+            attribute: attribute name
+            frame_selector: iframe CSS selector (optional)
+            frame_name: iframe name attribute (optional)
+            frame_url: iframe URL match (optional)
+            frame_index: iframe index (optional)
+            include_empty: 빈 값 포함 여부
+
+        Returns:
+            {"success": bool, "values": list, "count": int}
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser", "values": []}
+
+        try:
+            context_type, context, error = resolve_frame_context(
+                page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error, "values": []}
+
+            locator = context.locator(selector) if context_type == "frame_locator" else context.locator(selector)
+            count = await locator.count()
+            values = []
+            for i in range(count):
+                item = locator.nth(i)
+                value = await item.get_attribute(attribute)
+                if value is None:
+                    if include_empty:
+                        values.append("")
+                    continue
+                value = value.strip()
+                if value or include_empty:
+                    values.append(value)
+
+            return {"success": True, "values": values, "count": len(values)}
+        except Exception as e:
+            logger.error(f"Get attribute list failed: {e}")
+            return {"success": False, "error": str(e), "values": []}
+
     async def extract(
         self,
         selector: str,

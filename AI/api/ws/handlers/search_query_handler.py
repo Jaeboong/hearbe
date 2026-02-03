@@ -12,7 +12,16 @@ import logging
 import re
 from typing import Optional, Tuple
 
-from ..search.search_reader import build_search_read_tts
+from ..presenter.pages.search import (
+    build_search_list_tts,
+    MORE_PROMPT_NUMBER,
+    NO_DISCOUNT_INFO,
+    NO_PRICE_INFO,
+    NO_TOMORROW_ITEMS,
+    NO_FREE_SHIPPING,
+    format_highest_discount,
+    format_lowest_price,
+)
 from ..search.search_insights import (
     get_name,
     get_price_text,
@@ -107,16 +116,12 @@ class SearchQueryHandler:
         if self._is_highest_discount_request(normalized):
             item, discount = find_highest_discount_item(results)
             if not item or discount is None:
-                await self._sender.send_tts_response(session_id, "할인율 정보를 찾지 못했습니다.")
+                await self._sender.send_tts_response(session_id, NO_DISCOUNT_INFO)
                 return True
             name = get_name(item)
             price = get_price_text(item)
             discount_text = get_discount_text(item)
-            msg = f"가장 할인율이 높은 상품은 {name}입니다."
-            if discount_text:
-                msg += f" 할인율 {discount_text}."
-            if price:
-                msg += f" 가격 {price}."
+            msg = format_highest_discount(name, discount_text, price)
             await self._sender.send_tts_response(session_id, msg)
             return True
 
@@ -124,13 +129,11 @@ class SearchQueryHandler:
         if self._is_lowest_price_request(normalized):
             item, _ = find_lowest_price_item(results)
             if not item:
-                await self._sender.send_tts_response(session_id, "가격 정보를 찾지 못했습니다.")
+                await self._sender.send_tts_response(session_id, NO_PRICE_INFO)
                 return True
             name = get_name(item)
             price = get_price_text(item)
-            msg = f"가장 저렴한 상품은 {name}입니다."
-            if price:
-                msg += f" 가격 {price}."
+            msg = format_lowest_price(name, price)
             await self._sender.send_tts_response(session_id, msg)
             return True
 
@@ -138,21 +141,20 @@ class SearchQueryHandler:
         if self._is_tomorrow_delivery_request(normalized):
             filtered = filter_tomorrow_items(results)
             if not filtered:
-                await self._sender.send_tts_response(session_id, "내일 도착하는 상품을 찾지 못했습니다.")
+                await self._sender.send_tts_response(session_id, NO_TOMORROW_ITEMS)
                 return True
             self._session.set_context(session_id, "search_active_results", filtered)
             self._session.set_context(session_id, "search_active_label", "tomorrow")
             self._session.set_context(session_id, "search_read_index", 0)
-            tts_text, next_index, has_more = build_search_read_tts(
+            tts_text, next_index, has_more = build_search_list_tts(
                 filtered,
                 start_index=0,
                 count=min(4, len(filtered)),
-                include_total=True
+                include_total=True,
+                more_prompt=MORE_PROMPT_NUMBER
             )
             self._session.set_context(session_id, "search_read_index", next_index)
             self._set_last_mentioned_from_index(session_id, filtered, next_index - 1)
-            if has_more:
-                tts_text += " 더 읽어드릴까요? 'n개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
             await self._sender.send_tts_response(session_id, tts_text)
             return True
 
@@ -160,21 +162,20 @@ class SearchQueryHandler:
         if self._is_free_shipping_list_request(normalized):
             filtered = filter_free_shipping_items(results)
             if not filtered:
-                await self._sender.send_tts_response(session_id, "무료배송 상품을 찾지 못했습니다.")
+                await self._sender.send_tts_response(session_id, NO_FREE_SHIPPING)
                 return True
             self._session.set_context(session_id, "search_active_results", filtered)
             self._session.set_context(session_id, "search_active_label", "free_shipping")
             self._session.set_context(session_id, "search_read_index", 0)
-            tts_text, next_index, has_more = build_search_read_tts(
+            tts_text, next_index, has_more = build_search_list_tts(
                 filtered,
                 start_index=0,
                 count=min(4, len(filtered)),
-                include_total=True
+                include_total=True,
+                more_prompt=MORE_PROMPT_NUMBER
             )
             self._session.set_context(session_id, "search_read_index", next_index)
             self._set_last_mentioned_from_index(session_id, filtered, next_index - 1)
-            if has_more:
-                tts_text += " 더 읽어드릴까요? 'n개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
             await self._sender.send_tts_response(session_id, tts_text)
             return True
 
@@ -201,12 +202,14 @@ class SearchQueryHandler:
         if not normalized:
             return False
 
-        if not self._is_read_request(normalized):
-            return False
-
-        mode, count = self._parse_read_request(normalized)
-        if mode is None:
-            return False
+        if self._is_plain_results_request(normalized):
+            mode, count = "restart", 4
+        else:
+            if not self._is_read_request(normalized):
+                return False
+            mode, count = self._parse_read_request(normalized)
+            if mode is None:
+                return False
 
         total = len(results)
         start_index = self._session.get_context(session_id, "search_read_index", 0)
@@ -221,17 +224,15 @@ class SearchQueryHandler:
         else:
             return False
 
-        tts_text, next_index, has_more = build_search_read_tts(
+        tts_text, next_index, has_more = build_search_list_tts(
             results,
             start_index=start_index,
             count=count,
-            include_total=(mode == "all" and start_index == 0)
+            include_total=(mode == "all" and start_index == 0),
+            more_prompt=MORE_PROMPT_NUMBER
         )
         self._session.set_context(session_id, "search_read_index", next_index)
         self._set_last_mentioned_from_index(session_id, results, next_index - 1)
-
-        if has_more:
-            tts_text += " 더 읽어드릴까요? 'n개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
         await self._sender.send_tts_response(session_id, tts_text)
         return True
 
@@ -338,6 +339,10 @@ class SearchQueryHandler:
         if "더" in normalized or re.search(r"\d+\s*개", normalized):
             return True
         return False
+
+    def _is_plain_results_request(self, normalized: str) -> bool:
+        """Handle plain '검색 결과' requests without explicit read verbs."""
+        return "검색 결과" in normalized or "검색결과" in normalized
 
     def _parse_read_request(self, normalized: str) -> Tuple[Optional[str], Optional[int]]:
         """Parse read request mode and count."""

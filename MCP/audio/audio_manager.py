@@ -72,6 +72,7 @@ class AudioManager:
         self._has_partial_since_last_final = False
         self._pending_recording_start = False
         self._tts_playing = False
+        self._suppress_tts_until = 0.0
         
         logger.info(f"AudioManager initialized with hotkey: {hotkey}")
     
@@ -241,6 +242,7 @@ class AudioManager:
                 if self._tts_playing:
                     # Defer recording until TTS playback finishes
                     self._pending_recording_start = True
+                    self._suppress_tts_until = time.time() + 3.0
                     logger.info("TTS playing - deferring recording start")
                     return
                 if RECORDING_START_DELAY_SEC > 0:
@@ -322,10 +324,15 @@ class AudioManager:
         logger.info("AudioManager event handlers registered")
 
     async def _on_tts_audio_received(self, event):
+        # Ignore incoming TTS while user is barge-in recording
+        if self._pending_recording_start or self._hotkey_pressed:
+            if time.time() < self._suppress_tts_until:
+                return
         self._tts_playing = True
 
     async def _on_tts_playback_finished(self, event):
         self._tts_playing = False
+        self._suppress_tts_until = 0.0
         if self._pending_recording_start and self._hotkey_pressed and not self.recording:
             if RECORDING_START_DELAY_SEC > 0:
                 time.sleep(RECORDING_START_DELAY_SEC)

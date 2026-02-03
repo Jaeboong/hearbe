@@ -21,9 +21,17 @@ class CommandPipeline:
         self._login_guard = login_guard
         self._login_feedback = login_feedback
 
-    def prepare_commands(self, session_id: str, commands: List, current_url: str):
+    def prepare_commands(
+        self,
+        session_id: str,
+        commands: List,
+        current_url: str,
+        allow_extract: bool = True,
+    ):
         if not commands:
             return commands
+        if not allow_extract:
+            commands = _filter_extract_commands(commands)
         commands = normalize_login_phone_commands(commands, current_url)
         if current_url and "login" in current_url:
             commands = [
@@ -96,3 +104,17 @@ class CommandPipeline:
         logger.info(f"Sending TTS response: '{response_text[:80]}...'")
         await self._sender.send_tts_response(session_id, response_text)
         return response_text
+
+
+def _filter_extract_commands(commands: List) -> List:
+    filtered = []
+    removed = 0
+    for cmd in commands:
+        tool_name = getattr(cmd, "tool_name", "") or ""
+        if tool_name.startswith("extract"):
+            removed += 1
+            continue
+        filtered.append(cmd)
+    if removed:
+        logger.info("Filtered %d extract command(s) from LLM output", removed)
+    return filtered

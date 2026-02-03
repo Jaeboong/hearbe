@@ -3,10 +3,18 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './FindIdC.css';
 import logoC from '../../assets/logoC.png';
+<<<<<<< HEAD
 
 import { authAPI } from '../../services/authAPI';
 
 export default function FindIdPage({ micPermissionGranted }) {
+=======
+
+import { authAPI } from '../../services/authAPI';
+import { emailService } from '../../services/emailService';
+
+export default function FindIdPage({ onBack, micPermissionGranted }) {
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -31,21 +39,37 @@ export default function FindIdPage({ micPermissionGranted }) {
             return;
         }
         try {
+<<<<<<< HEAD
             await authAPI.sendEmailVerification(email);
             setIsSent(true);
             alert('인증번호가 이메일로 전송되었습니다.');
+=======
+            // EmailJS로 인증번호 발송 (클라이언트 사이드)
+            await emailService.sendVerificationCode(email, name);
+            setIsSent(true);
+            alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         } catch (error) {
             alert(error.message || '인증번호 전송에 실패했습니다.');
         }
     };
 
+<<<<<<< HEAD
     const handleVerifyCode = async () => {
+=======
+    const handleVerifyCode = () => {
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
         if (!verificationCode) {
             alert('인증번호를 입력해주세요.');
             return;
         }
         try {
+<<<<<<< HEAD
             await authAPI.verifyEmailCode(email, verificationCode);
+=======
+            // EmailJS 인증번호 확인 (클라이언트 사이드)
+            emailService.verifyCode(email, verificationCode);
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
             setIsVerified(true);
             alert('인증이 완료되었습니다.');
         } catch (error) {
@@ -60,8 +84,14 @@ export default function FindIdPage({ micPermissionGranted }) {
         }
         try {
             const response = await authAPI.findId(name, email);
+<<<<<<< HEAD
             if (response.data) {
                 setFoundUserId(response.data);
+=======
+            // 백엔드 응답: { code, message, data: { username, message } }
+            if (response.data && response.data.username) {
+                setFoundUserId(response.data.username);
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                 setShowIdPopup(true);
             } else {
                 alert('해당 정보로 가입된 아이디를 찾을 수 없습니다.');
@@ -73,6 +103,7 @@ export default function FindIdPage({ micPermissionGranted }) {
 
     return (
         <div className="find-id-container">
+<<<<<<< HEAD
             <main className="find-id-main">
                 <div className="find-id-card">
                     <div className="card-header">
@@ -83,6 +114,14 @@ export default function FindIdPage({ micPermissionGranted }) {
                             onClick={() => navigate('/')}
                             style={{ cursor: 'pointer' }}
                         />
+=======
+
+
+            <main className="find-id-main">
+                <div className="find-id-card">
+                    <div className="card-header">
+                        <img src={logoC} alt="HearBe" className="mini-logo" />
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                         <h1>아이디 찾기</h1>
                         <p>가입 시 등록한 정보로 아이디를 찾을 수 있습니다.</p>
                     </div>
@@ -162,7 +201,11 @@ export default function FindIdPage({ micPermissionGranted }) {
                             <span className="result-label-c">회원님의 아이디는</span>
                             <strong className="result-value-c">{foundUserId}</strong>
                         </div>
+<<<<<<< HEAD
                         <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c">
+=======
+                        <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c"> {/* 로그인 페이지로 이동 */}
+>>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                             확인 및 로그인하기
                         </button>
                     </div>
