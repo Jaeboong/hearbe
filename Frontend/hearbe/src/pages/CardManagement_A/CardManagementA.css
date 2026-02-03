@@ -92,7 +92,7 @@ body:has(.cardmgmt-container) {
 
 .sidebar-item.active {
     background-color: #171C28;
-    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border: none;
 }
 
 /* Main Content */
@@ -115,7 +115,7 @@ body:has(.cardmgmt-container) {
 .current-card-display {
     background-color: #141C29;
     padding: clamp(20px, 4vw, 40px);
-    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border: clamp(3px, 0.4vw, 6px) solid #FFF064;
     border-radius: clamp(12px, 2vw, 16px);
     display: flex;
     flex-direction: column;
@@ -425,7 +425,8 @@ body:has(.cardmgmt-container) {
 }
 
 /* Responsive */
-@media (max-width: 1024px), (max-height: 900px) {
+@media (max-width: 1024px),
+(max-height: 900px) {
     .cardmgmt-container .cardmgmt-content {
         width: 100%;
         height: auto;
@@ -441,11 +442,11 @@ body:has(.cardmgmt-container) {
 @media (max-width: 768px) {
     .cardmgmt-container .cardmgmt-content {
         flex-direction: column;
-    
-    .cardmgmt-container .cardmgmt-content {
-        min-width: 0;
+
+        .cardmgmt-container .cardmgmt-content {
+            min-width: 0;
+        }
     }
-}
 
     .cardmgmt-sidebar {
         flex: none;
@@ -455,6 +456,7 @@ body:has(.cardmgmt-container) {
         min-width: 0;
     }
 }
+
 /* MyPage Top Bar */
 .mypage-topbar {
     position: relative;

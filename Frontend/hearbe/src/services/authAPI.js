@@ -58,7 +58,7 @@ export const authAPI = {
             const data = await response.json();
 
             console.log('Check Duplicate Response data:', data);
-            
+
             return data;
         } catch (error) {
             console.error('Check Duplicate API Error:', error);
@@ -350,9 +350,15 @@ export const authAPI = {
     // 복지카드 조회 API
     getWelfareCard: async () => {
         try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
             const response = await fetch(`${API_BASE_URL}/welfare`, {
                 method: 'GET',
                 headers: {
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 }
             });
@@ -379,9 +385,15 @@ export const authAPI = {
     // 복지카드 등록/수정 API
     updateWelfareCard: async (welfareCard) => {
         try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
             const response = await fetch(`${API_BASE_URL}/welfare`, {
                 method: 'PUT',
                 headers: {
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(welfareCard),
