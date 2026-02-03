@@ -1,20 +1,21 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MypageA.css';
-import BackButton from '../common/BackButtonA';
 import iconHome from '../../assets/home.png';
 import iconCart from '../../assets/icon-cart.png';
 import iconUser from '../../assets/icon-user.png';
+import logoA from '../../assets/logoA.png';
 
 const Mypage = () => {
     const navigate = useNavigate();
+    const [activeMenuId, setActiveMenuId] = useState(null);
 
     const requestedMenuItems = [
         { id: 1, label: '회원정보', action: () => { } },
         { id: 2, label: '주문내역', action: () => { } },
         { id: 3, label: '장바구니', action: () => navigate('/A/cart') },
         { id: 4, label: '찜한 상품', action: () => { } },
-        { id: 5, label: '장애인 복지카드 변경', action: () => { } },
+        { id: 5, label: <>장애인 복지카드<br />변경</>, action: () => { } },
     ];
 
     return (
@@ -39,8 +40,14 @@ const Mypage = () => {
 
             {/* 2. 유저 정보 영역 (뒤로가기 화살표 + 김싸피님) */}
             <div className="user-info-area">
-                {/* 화살표 */}
-                <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
+                <img
+                    src={logoA}
+                    alt="Logo"
+                    className="mypage-logo-left"
+                    onClick={() => window.location.assign('/')}
+                />
+
+                <div className="page-title">마이페이지</div>
 
                 {/* 인사말 (화살표 오른쪽에 붙을 거야) */}
                 <div className="user-greeting">
@@ -51,13 +58,17 @@ const Mypage = () => {
                 </div>
             </div>
 
-            {/* 3. 페이지 제목 */}
-            <div className="page-title">마이페이지</div>
-
-            {/* 4. 메뉴 리스트 */}
+            {/* 3. 메뉴 리스트 */}
             <div className="menu-list">
                 {requestedMenuItems.map((item) => (
-                    <div key={item.id} className="menu-item" onClick={item.action}>
+                    <div
+                        key={item.id}
+                        className={`menu-item ${activeMenuId === item.id ? 'active' : ''}`}
+                        onClick={() => {
+                            setActiveMenuId(item.id);
+                            item.action();
+                        }}
+                    >
                         <div className="menu-number">{item.id}</div>
                         <div className="menu-label">{item.label}</div>
                     </div>

@@ -27,7 +27,13 @@ const LoginS = () => {
       {/* 배경용 (기존 디자인 유지) */}
       <div className="login-s-card" style={{ opacity: 0.5 }}>
         <div className="logo-wrapper">
-          <img src={hLogo} alt="HearBe 로고" className="s-logo" />
+          <img
+            src={hLogo}
+            alt="HearBe 로고"
+            className="s-logo"
+            onClick={() => window.location.assign('/')}
+            style={{ cursor: 'pointer' }}
+          />
         </div>
         <h1 className="login-s-title">공유 쇼핑 입장</h1>
       </div>

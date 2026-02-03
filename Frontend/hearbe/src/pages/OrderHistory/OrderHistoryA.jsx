@@ -1,7 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BackButton from '../common/BackButtonA';
+import { Home, LogOut } from 'lucide-react';
+import logoA from '../../assets/logoA.png';
 import { orderAPI } from '../../services/orderAPI';
+import { authAPI } from '../../services/authAPI';
 import './OrderHistoryA.css';
 
 const OrderHistoryA = () => {
@@ -13,8 +15,6 @@ const OrderHistoryA = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Collapsed state for each mall section
-    const [collapsedMalls, setCollapsedMalls] = useState({});
 
     // Platform ID to name mapping
     const platformNames = {
@@ -29,10 +29,24 @@ const OrderHistoryA = () => {
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: '결제카드 변경', path: '/A/card-management' }
+        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
+
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch (err) {
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = 'http://localhost:5173/';
+        }
+    };
 
     // API 호출
     useEffect(() => {
@@ -42,7 +56,7 @@ const OrderHistoryA = () => {
                 setError(null);
                 const response = await orderAPI.getOrders();
 
-                // 응답 데이터 변환: 플랫폼별로 그룹화
+                // 응답 데이터 변환 후 그룹핑
                 const groupedData = {};
 
                 if (response.data && response.data.orders) {
@@ -53,7 +67,7 @@ const OrderHistoryA = () => {
                             groupedData[platformName] = [];
                         }
 
-                        // 같은 날짜의 주문이 있는지 확인
+                        // 같은 날짜에 주문된 항목 그룹핑
                         const existingGroup = groupedData[platformName].find(
                             g => g.datetime === order.ordered_at
                         );
@@ -100,13 +114,6 @@ const OrderHistoryA = () => {
         fetchOrders();
     }, [navigate]);
 
-    const toggleMallSection = (mallName) => {
-        setCollapsedMalls(prev => ({
-            ...prev,
-            [mallName]: !prev[mallName]
-        }));
-    };
-
     const handleTrackDelivery = (deliverUrl) => {
         if (deliverUrl) {
             window.open(deliverUrl, '_blank', 'noopener,noreferrer');
@@ -115,28 +122,54 @@ const OrderHistoryA = () => {
         }
     };
 
+    const handleOrderDetail = (orderUrl) => {
+        if (orderUrl) {
+            window.open(orderUrl, '_blank', 'noopener,noreferrer');
+        } else {
+            alert('상세 조회 정보가 없습니다.');
+        }
+    };
+
     const handleRetry = () => {
         setError(null);
         setIsLoading(true);
-        // 재시도 트리거
+        // 다시 트리거
         window.location.reload();
     };
 
-    // 날짜 포맷팅
+    // 날짜 포맷
     const formatDate = (dateString) => {
         if (!dateString) return '';
-        // YYYY-MM-DD 형식을 YYYY.MM.DD 형식으로 변환
+        // YYYY-MM-DD -> YYYY.MM.DD 변환
         return dateString.replace(/-/g, '.');
     };
 
     return (
         <div className="orderhistory-container">
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
+            <img
+                src={logoA}
+                alt="Logo"
+                className="orderhistory-logo-left"
+                onClick={() => window.location.assign('/')}
+            />
+
+            <div className="mypage-topbar">
+                <h1 className="mypage-topbar-title">마이페이지</h1>
+                <div className="mypage-topbar-actions">
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                        <Home size={72} />
+                        <span>홈</span>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </div>
 
             <div className="orderhistory-content">
                 {/* Sidebar */}
                 <aside className="orderhistory-sidebar">
-                    <h1 className="sidebar-title">마이페이지</h1>
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <div
@@ -185,45 +218,46 @@ const OrderHistoryA = () => {
                         <>
                             {Object.entries(orderData).map(([mallName, orderGroups]) => (
                                 <div key={mallName} className="mall-section">
-                                    <div
-                                        className="mall-header"
-                                        onClick={() => toggleMallSection(mallName)}
-                                    >
+                                    <div className="mall-header">
                                         <h3 className="mall-name">{mallName}</h3>
-                                        <span className="toggle-icon">
-                                            {collapsedMalls[mallName] ? '▼' : '▲'}
-                                        </span>
                                     </div>
 
-                                    {!collapsedMalls[mallName] && (
-                                        <div className="orders-list">
-                                            {orderGroups.map((group, index) => (
-                                                <div key={`${group.orderId}-${index}`} className="order-group">
-                                                    <div className="order-date-header">
-                                                        {formatDate(group.datetime)}
-                                                    </div>
+                                    <div className="orders-list">
+                                        {orderGroups.map((group, index) => (
+                                            <div key={`${group.orderId}-${index}`} className="order-group">
+                                                <div className="order-date-header">
+                                                    {formatDate(group.datetime)}
+                                                </div>
 
-                                                    <div className="order-details">
-                                                        <div className="order-items">
-                                                            {group.orders.map((order, orderIndex) => (
-                                                                <div key={`${order.id}-${orderIndex}`} className="order-item">
-                                                                    <img
-                                                                        src={order.image}
-                                                                        alt={order.name}
-                                                                        className="order-item-image"
-                                                                        onError={(e) => {
-                                                                            e.target.src = 'https://via.placeholder.com/80';
-                                                                        }}
-                                                                    />
-                                                                    <div className="order-item-info">
-                                                                        <div className="order-item-name">{order.name}</div>
-                                                                        <div className="order-item-meta">
-                                                                            {order.price.toLocaleString()}원, {order.quantity}개
-                                                                        </div>
+                                                <div className="order-details">
+                                                    <div className="order-items">
+                                                        {group.orders.map((order, orderIndex) => (
+                                                            <div key={`${order.id}-${orderIndex}`} className="order-item">
+                                                                <img
+                                                                    src={order.image}
+                                                                    alt={order.name}
+                                                                    className="order-item-image"
+                                                                    onError={(e) => {
+                                                                        e.target.src = 'https://via.placeholder.com/80';
+                                                                    }}
+                                                                />
+                                                                <div className="order-item-info">
+                                                                    <div className="order-item-name">{order.name}</div>
+                                                                    <div className="order-item-meta">
+                                                                        {order.price.toLocaleString()}원, {order.quantity}개
                                                                     </div>
                                                                 </div>
-                                                            ))}
-                                                        </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div className="order-actions">
+                                                        <button
+                                                            className={`track-delivery-btn ${!group.orderUrl ? 'disabled' : ''}`}
+                                                            onClick={() => handleOrderDetail(group.orderUrl)}
+                                                            disabled={!group.orderUrl}
+                                                        >
+                                                            상세 조회
+                                                        </button>
                                                         <button
                                                             className={`track-delivery-btn ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
                                                             onClick={() => {
@@ -232,13 +266,13 @@ const OrderHistoryA = () => {
                                                             }}
                                                             disabled={!group.orders.some(o => o.deliverUrl)}
                                                         >
-                                                            배송 조회
+                                                            배송조회
                                                         </button>
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             ))}
                         </>
@@ -250,3 +284,12 @@ const OrderHistoryA = () => {
 };
 
 export default OrderHistoryA;
+
+
+
+
+
+
+
+
+

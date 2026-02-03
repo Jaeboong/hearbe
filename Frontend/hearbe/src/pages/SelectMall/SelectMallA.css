@@ -1,13 +1,13 @@
-:root {
+﻿:root {
     --color-bg-main: #1E2A3A;
     --color-bg-card: #141C29;
     --color-accent: #FFF064;
 
     /* 폰트 변수 */
-    --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    --font-main: 'KoddiUD OnGothic', sans-serif;
 }
 
-/* 기본 설정 및 레이아웃 */
+/* 기본 셋업 */
 .mall-container {
     display: flex;
     flex-direction: column;
@@ -20,67 +20,55 @@
     overflow-x: hidden;
     box-sizing: border-box;
     padding: 0;
+    padding-top: 10px;
+    padding-right: 10px;
     margin: 0;
 }
 
-/* --- 공통 유틸리티 (Flex 정렬 중복 제거) --- */
-.mall-header,
-.mall-content,
-.mic-center,
-.mall-icon-box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.mall-logo-left {
+    position: absolute;
+    top: clamp(12px, 3vw, 24px);
+    left: clamp(12px, 3vw, 24px);
+    width: clamp(210px, 35vw, 380px);
+    height: auto;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 /* --- Header Section --- */
-.mall-header {
-    padding: clamp(8px, 1.5vw, 12px);
-    margin-top: clamp(8px, 2vw, 16px);
+.mypage-topbar {
     position: relative;
-    min-height: clamp(60px, 15vw, 120px);
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    padding-left: clamp(150px, 20vw, 250px);
+    justify-content: flex-end;
+    padding: clamp(12px, 3vw, 32px);
 }
 
-.header-title {
-    font-size: clamp(32px, 8vw, 80px);
-    font-weight: 900;
-    letter-spacing: clamp(0.5px, 0.1vw, 1px);
-    color: var(--color-accent);
-    z-index: 10;
-    white-space: nowrap;
-}
-
-.header-nav {
-    position: absolute;
-    right: clamp(12px, 3vw, 32px);
-    top: 50%;
-    transform: translateY(-50%);
+.mypage-topbar-actions {
     display: flex;
     gap: clamp(12px, 3vw, 32px);
-    z-index: 20;
+    margin-left: auto;
 }
 
-.nav-icon {
-    width: clamp(48px, 13vw, 110px);
-    height: clamp(48px, 13vw, 110px);
-    object-fit: contain;
-}
-
-.nav-item span {
-    font-size: clamp(16px, 4vw, 40px);
-    font-weight: bold;
+.topbar-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
     color: var(--color-accent);
-    display: none;
+    padding: clamp(8px, 1.6vw, 14px);
+    border-radius: 0.75rem;
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: var(--font-main);
 }
 
-@media (min-width: 768px) {
-    .nav-item span {
-        display: inline;
-    }
+.topbar-action:hover {
+    background-color: rgba(255, 240, 100, 0.12);
 }
 
 /* --- Content Section --- */
@@ -91,69 +79,33 @@
     justify-content: center;
     width: 100%;
     padding: clamp(10px, 2vw, 20px) 0;
+    min-width: 680px;
 }
 
 .mall-scroll-container {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 18vw, 260px), 1fr));
+    justify-items: center;
     align-items: center;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: clamp(20px, 4vw, 60px);
-    padding: clamp(30px, 8vh, 80px) clamp(16px, 4vw, 40px) clamp(20px, 5vw, 40px);
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-accent) transparent;
-}
-
-@media (min-width: 768px) {
-    .mall-scroll-container {
-        justify-content: flex-start;
-    }
-}
-
-@media (min-width: 1024px) {
-    .mall-scroll-container {
-        justify-content: center;
-        flex-wrap: wrap;
-        overflow-x: visible;
-    }
-}
-
-.mall-scroll-container::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari, Opera */
+    gap: clamp(16px, 3vw, 40px);
+    padding: clamp(20px, 6vh, 60px) clamp(12px, 3vw, 32px);
 }
 
 .mall-card-wrapper {
-    flex: 0 0 clamp(140px, 40vw, 280px);
+    width: min(100%, clamp(180px, 22vw, 340px));
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
     cursor: pointer;
-    scroll-snap-align: center;
-}
-
-@media (min-width: 768px) {
-    .mall-card-wrapper {
-        flex: 0 0 clamp(200px, 30vw, 320px);
-    }
-}
-
-@media (min-width: 1024px) {
-    .mall-card-wrapper {
-        flex: 0 0 280px;
-        scroll-snap-align: none;
-    }
 }
 
 .mall-square-box {
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    width: clamp(180px, 22vw, 340px);
+    height: clamp(260px, 32vw, 460px);
     background-color: #141C29;
     border: clamp(3px, 0.8vw, 8px) solid var(--color-accent);
-    border-radius: clamp(32px, 8vw, 80px);
+    border-radius: clamp(16px, 4vw, 40px);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -181,20 +133,19 @@
     z-index: 10;
     line-height: 1;
     margin-bottom: clamp(10px, 2vw, 20px);
+    font-family: var(--font-main);
 }
 
 /* Naver Specific */
 .naver-box {
-    background-color: transparent;
-    border-color: var(--color-accent);
     background-color: var(--color-bg-card);
+    border-color: var(--color-accent);
 }
 
 /* Coupang Specific */
 .coupang-box {
-    background-color: transparent;
-    border-color: var(--color-accent);
     background-color: var(--color-bg-card);
+    border-color: var(--color-accent);
 }
 
 .mall-11st-box {
@@ -205,10 +156,22 @@
     border-color: var(--color-accent);
 }
 
+.mall-11st-box .mall-logo-img {
+    width: clamp(78px, 12vw, 170px);
+    height: clamp(78px, 12vw, 170px);
+}
+
+.mall-emart-box .mall-logo-img {
+    width: clamp(118px, 17vw, 236px);
+    height: clamp(118px, 17vw, 236px);
+}
+
 .mall-logo-img {
-    width: clamp(90px, 22vw, 180px);
-    height: clamp(90px, 22vw, 180px);
+    width: clamp(110px, 16vw, 220px);
+    height: clamp(110px, 16vw, 220px);
     object-fit: contain;
+    max-width: 70%;
+    max-height: 60%;
 }
 
 .mall-logo-placeholder {

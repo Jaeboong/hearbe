@@ -1,11 +1,28 @@
 /* Member Info Page Styles */
 
+body:has(.memberinfo-container) {
+    background-color: #1E2A3A;
+}
+
 .memberinfo-container {
     min-height: 100vh;
     background-color: #1E2A3A;
-    padding: clamp(20px, 5vw, 40px);
+    padding: 0;
+    padding-top: 10px;
+    padding-right: 10px;
     box-sizing: border-box;
     position: relative;
+}
+
+.memberinfo-logo-left {
+    position: absolute;
+    top: clamp(12px, 3vw, 24px);
+    left: clamp(12px, 3vw, 24px);
+    width: clamp(210px, 35vw, 380px);
+    height: auto;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 /* Back Button Override */
@@ -19,18 +36,22 @@
     height: clamp(40px, 10vw, 80px);
 }
 
-.memberinfo-content {
+.memberinfo-container .memberinfo-content {
     display: flex;
     gap: clamp(30px, 5vw, 60px);
-    max-width: 1400px;
-    margin: clamp(80px, 15vw, 120px) auto 0;
-    padding: 0 clamp(20px, 3vw, 40px);
+    width: min(772px, 90vw);
+    height: min(1030px, 90vh);
+    margin: 0;
+    padding: 64px 48px;
+    box-sizing: border-box;
+    min-width: 680px;
 }
 
 /* Sidebar Navigation */
 .memberinfo-sidebar {
     flex: 0 0 clamp(200px, 25vw, 300px);
     background-color: #1E2A3A;
+    border: none;
 }
 
 .sidebar-title {
@@ -38,7 +59,7 @@
     font-weight: 900;
     color: #FFF064;
     margin-bottom: clamp(30px, 5vw, 50px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .sidebar-nav {
@@ -55,7 +76,7 @@
     border-radius: clamp(8px, 2vw, 12px);
     cursor: pointer;
     transition: background-color 0.2s;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .sidebar-item:hover {
@@ -63,13 +84,30 @@
 }
 
 .sidebar-item.active {
-    background-color: #141C29;
+    background-color: #171C28;
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
 }
 
 /* Main Content */
 .memberinfo-main {
-    flex: 1;
+    flex: 1.3;
     background-color: #1E2A3A;
+    width: min(772px, 90vw);
+    height: min(1030px, 90vh);
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px), (max-height: 900px) {
+    .memberinfo-container .memberinfo-content {
+        width: 100%;
+        height: auto;
+        padding: 32px 100px;
+    }
+
+    .memberinfo-main {
+        width: 100%;
+        height: auto;
+    }
 }
 
 .content-title {
@@ -77,12 +115,12 @@
     font-weight: 900;
     color: #FFF064;
     margin-bottom: clamp(30px, 5vw, 50px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 /* Info Table */
 .info-table {
-    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border: clamp(3px, 0.6vw, 6px) solid #FFF064;
     border-radius: clamp(12px, 2vw, 16px);
     overflow: hidden;
 }
@@ -90,7 +128,7 @@
 .table-row {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    border-bottom: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border-bottom: clamp(3px, 0.6vw, 6px) solid #FFF064;
 }
 
 .table-row:last-child {
@@ -102,17 +140,17 @@
     padding: clamp(20px, 4vw, 35px) clamp(24px, 4vw, 40px);
     font-size: clamp(18px, 3vw, 28px);
     font-weight: bold;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .table-label {
-    background-color: #1E2A3A;
+    background-color: #171C28;
     color: #FFF064;
-    border-right: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border-right: clamp(3px, 0.6vw, 6px) solid #FFF064;
 }
 
 .table-value {
-    background-color: #1E2A3A;
+    background-color: #171C28;
     color: #FFF064;
 }
 
@@ -126,16 +164,37 @@
 .logout-link {
     font-size: clamp(16px, 2.5vw, 24px);
     font-weight: bold;
-    color: #F5F5F5;
+    color: #FFF064;
     text-decoration: underline;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
 }
 
 .logout-link:hover {
     opacity: 0.8;
 }
+
+.password-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(12px, 2vw, 20px);
+}
+
+.password-change-btn {
+    background-color: #FFF064;
+    color: #1E2A3A;
+    border: none;
+    border-radius: clamp(6px, 1.5vw, 12px);
+    padding: clamp(6px, 1.5vw, 12px) clamp(12px, 2.5vw, 20px);
+    font-size: clamp(14px, 2.5vw, 20px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+    white-space: nowrap;
+}
+
 
 /* Loading State */
 .loading-state {
@@ -163,7 +222,7 @@
 .loading-state p {
     font-size: clamp(18px, 3vw, 26px);
     font-weight: bold;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 /* Error State */
@@ -177,14 +236,14 @@
     font-size: clamp(20px, 3.5vw, 28px);
     font-weight: 900;
     margin-bottom: clamp(10px, 2vw, 16px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .error-detail {
     font-size: clamp(16px, 2.5vw, 22px);
-    color: #F5F5F5;
+    color: #FFF064;
     margin-bottom: clamp(20px, 4vw, 30px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 .retry-btn {
@@ -196,7 +255,7 @@
     font-size: clamp(16px, 3vw, 24px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
 }
 
@@ -206,9 +265,13 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .memberinfo-content {
+    .memberinfo-container .memberinfo-content {
         flex-direction: column;
+    
+    .memberinfo-container .memberinfo-content {
+        min-width: 0;
     }
+}
 
     .memberinfo-sidebar {
         flex: none;
@@ -220,6 +283,54 @@
 
     .table-label {
         border-right: none;
-        border-bottom: clamp(2px, 0.4vw, 4px) solid #FFF064;
+        border-bottom: clamp(3px, 0.6vw, 6px) solid #FFF064;
     }
+
+    .memberinfo-container .memberinfo-content {
+        min-width: 0;
+    }
+}
+/* MyPage Top Bar */
+.mypage-topbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: clamp(6px, 1vw, 12px) 0 clamp(12px, 2.5vw, 24px);
+}
+
+.mypage-topbar-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 900;
+    color: #FFF064;
+    margin: 0;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+}
+
+.mypage-topbar-actions {
+    display: flex;
+    gap: clamp(8px, 1.6vw, 14px);
+}
+
+.topbar-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    color: #FFF064;
+    padding: clamp(8px, 1.6vw, 14px);
+    border-radius: 0.75rem;
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+}
+
+.topbar-action:hover {
+    background-color: rgba(255, 240, 100, 0.12);
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
@@ -9,54 +9,87 @@ const Login = () => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [rememberLogin, setRememberLogin] = useState(true);
 
-    // TTS 기능 추가
-    React.useEffect(() => {
-        const message = "로그인 페이지입니다. 아이디와 비밀번호를 입력해주세요.";
-        const utterance = new SpeechSynthesisUtterance(message);
-        utterance.lang = 'ko-KR';
-        window.speechSynthesis.speak(utterance);
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            navigate('/A/mall');
+            return;
+        }
+        const savedId = localStorage.getItem('savedLoginId');
+        const savedPassword = localStorage.getItem('savedLoginPassword');
+        if (savedId) {
+            setId(savedId);
+            setRememberLogin(true);
+        }
+        if (savedPassword) {
+            setPassword(savedPassword);
+            setRememberLogin(true);
+        }
+        if (savedId && savedPassword) {
+            handleLogin(savedId, savedPassword, true);
+        }
+    }, [navigate]);
 
-        return () => {
-            window.speechSynthesis.cancel();
-        };
-    }, []);
-
-    const speak = (msg) => {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(msg);
-        utterance.lang = 'ko-KR';
-        window.speechSynthesis.speak(utterance);
-    };
-
-    const handleLogin = async () => {
-        if (!id || !password) {
-            speak("아이디와 비밀번호를 입력해주세요.");
-            alert("아이디와 비밀번호를 입력해주세요.");
+    const handleLogin = async (loginId = id, loginPassword = password, isAuto = false) => {
+        if (!loginId || !loginPassword) {
+            alert('아이디와 비밀번호를 입력해주세요.');
             return;
         }
         setIsLoading(true);
         try {
-            const response = await authAPI.login(id, password);
+            const response = await authAPI.login(loginId, loginPassword);
 
-            if (response.code === 200) {
-                if (response.data && response.data.accessToken) {
-                    localStorage.setItem('accessToken', response.data.accessToken);
-                }
-                if (response.data && response.data.refreshToken) {
-                    localStorage.setItem('refreshToken', response.data.refreshToken);
+            const accessToken =
+                response?.data?.accessToken ||
+                response?.data?.access_token ||
+                response?.accessToken ||
+                response?.access_token;
+            const refreshToken =
+                response?.data?.refreshToken ||
+                response?.data?.refresh_token ||
+                response?.refreshToken ||
+                response?.refresh_token;
+
+            if (accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+            }
+            if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+            }
+
+            const isSuccess = response?.code === 200 || !!accessToken;
+
+            if (isSuccess) {
+                if (rememberLogin) {
+                    localStorage.setItem('savedLoginId', loginId);
+                    localStorage.setItem('savedLoginPassword', loginPassword);
+                } else {
+                    localStorage.removeItem('savedLoginId');
+                    localStorage.removeItem('savedLoginPassword');
                 }
                 // 로그인 성공
                 speak("로그인되었습니다.");
                 navigate('/A/mall');
-            } else {
-                speak("로그인에 실패했습니다.");
-                alert(response.message || "로그인에 실패했습니다.");
+            } else if (!isAuto) {
+                const message = response?.message || '';
+                if (message.includes('존재') || message.includes('없')) {
+                    alert('회원가입이 필요합니다.');
+                } else {
+                    alert(message || '로그인에 실패했습니다.');
+                }
             }
         } catch (error) {
             console.error('Login Error:', error);
-            speak("아이디 또는 비밀번호가 일치하지 않습니다.");
-            alert(error.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
+            if (!isAuto) {
+                const errorMessage = error?.message || '';
+                if (errorMessage.includes('존재') || errorMessage.includes('없')) {
+                    alert('회원가입이 필요합니다.');
+                } else {
+                    alert(errorMessage || '아이디 또는 비밀번호가 일치하지 않습니다.');
+                }
+            }
         } finally {
             setIsLoading(false);
         }
@@ -67,48 +100,68 @@ const Login = () => {
             <div className="login-box">
                 {/* Logo Section */}
                 <div className="logo-area">
-                    <img src={logo} alt="Logo" className="logo-image" onClick={() => speak("히어비 로고입니다.")} />
-                </div>
-
-                {/* Input Section */}
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="아이디"
-                        className="login-input first-input"
-                        value={id}
-                        onChange={(e) => setId(e.target.value)}
-                        onFocus={() => speak("아이디를 입력하세요")}
-                    />
-                    <input
-                        type="password"
-                        placeholder="비밀번호"
-                        className="login-input"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onFocus={() => speak("비밀번호를 입력하세요")}
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        className="logo-image"
+                        onClick={() => navigate('/')}
+                        style={{ cursor: 'pointer' }}
                     />
                 </div>
 
-                {/* Login Button */}
-                <button className="login-button" onClick={handleLogin}>로그인</button>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleLogin();
+                    }}
+                >
+                    {/* Input Section */}
+                    <div className="input-group">
+                        <input
+                            type="text"
+                            placeholder="아이디"
+                            className="login-input first-input"
+                            value={id}
+                            onChange={(e) => setId(e.target.value)}
+                        />
+                        <input
+                            type="password"
+                            placeholder="비밀번호"
+                            className="login-input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            maxLength={6}
+                        />
+                    </div>
+
+                    {/* Login Button */}
+                    <button className="login-button" type="submit" disabled={isLoading}>
+                        로그인
+                    </button>
+                </form>
 
                 {/* Features (Save ID) */}
                 <div className="login-options">
                     <label className="checkbox-container">
-                        <input type="checkbox" defaultChecked />
+                        <input
+                            type="checkbox"
+                            checked={rememberLogin}
+                            onChange={(e) => setRememberLogin(e.target.checked)}
+                        />
                         <span className="checkmark"></span>
-                        아이디 저장
+                        자동 로그인
                     </label>
                 </div>
 
                 {/* Footer Links */}
                 <div className="login-footer">
-                    <span>아이디 찾기</span>
+                    <span onClick={() => navigate('/A/findId')} style={{ cursor: 'pointer' }}>아이디 찾기</span>
                     <span className="login-separator">|</span>
-                    <span>비밀번호 찾기</span>
+                    <span onClick={() => navigate('/A/findPassword')} style={{ cursor: 'pointer' }}>비밀번호 변경</span>
                     <span className="login-separator">|</span>
-                    <span className="signup-link" onClick={() => navigate('/A/signup')} style={{ cursor: 'pointer' }}>회원가입</span>
+                    <span className="signup-link" onClick={() => navigate('/A/signup')} style={{ cursor: 'pointer' }}>
+                        회원가입
+                    </span>
                 </div>
             </div>
         </div>
