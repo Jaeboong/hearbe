@@ -12,28 +12,40 @@
 }
 
 html {
-  height: auto;
-  min-height: 100%;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
   padding: 0;
   min-width: 320px;
-  min-height: 100vh;
-  height: auto;
-  background-color: #ffffff;
+  height: 100%;
+  background-color: #f8f9fb;
   color: #1f2937;
-  overflow-y: visible;
-  overflow-x: hidden;
+  overflow: hidden;
+}
+
+/* ===== A형 페이지 전용 어두운 배경 ===== */
+body:has(.login-container),
+body:has(.signup-container),
+body:has(.mypage-container-a),
+body:has(.memberinfo-container),
+body:has(.orderhistory-container),
+body:has(.wishlist-container),
+body:has(.cart-container),
+body:has(.cardmgmt-container),
+body:has(.findid-container),
+body:has(.findpw-container),
+body:has(.store-browser-a) {
+  background-color: #1E2A3A !important;
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
-  height: auto;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }

@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+﻿﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
 // [페이지 컴포넌트]
@@ -54,6 +54,13 @@ function AppContent() {
     setShowInitialSetup(false);
   };
 
+  // 메인 페이지에서 '보조 프로그램 다운로드' 버튼 클릭 시
+  const handleShowSetup = () => {
+    // 설정 완료 상태를 초기화하여 다시 설정 과정을 진행할 수 있도록 함
+    localStorage.removeItem('hearbe_mcp_setup_completed');
+    setShowInitialSetup(true);
+  };
+
   const handleModeSelect = (mode, label) => {
     if (micPermissionGranted || mode === 'audio') {
       const utterance = new SpeechSynthesisUtterance(`${label} 모드를 선택하셨습니다.`);
@@ -62,12 +69,13 @@ function AppContent() {
     }
     setSelectedMode(mode);
 
-    // 紐⑤뱶???곕씪 遺꾧린 泥섎━
+    // 모드에 따라 분기 처리
     if (mode === 'common') {
       navigate('/C/login');
-    } else {
+    } else if (mode === 'audio') {
       navigate('/A/login');
     }
+    // B형(big), S형(sharing) 등 다른 모드는 아직 구현되지 않았으므로 아무 동작도 하지 않음.
   };
 
   // 초기 설정이 완료되지 않았으면 InitialSetup을 먼저 보여줌
@@ -84,6 +92,7 @@ function AppContent() {
           <MainLanding
             handleModeSelect={handleModeSelect}
             modeSelectionRef={modeSelectionRef}
+            onShowSetup={handleShowSetup}
           />
         }
       />
@@ -230,7 +239,7 @@ function AppContent() {
         element={
           <SelectMallC
             onBack={() => navigate('/C/login')}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
             onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
@@ -242,7 +251,7 @@ function AppContent() {
         element={
           <StoreBrowserC
             onBack={() => navigate('/C/mall')}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
           />
@@ -252,7 +261,7 @@ function AppContent() {
         path="/C/order-history"
         element={
           <OrderHistoryC
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
@@ -260,7 +269,7 @@ function AppContent() {
         path="/C/wishlist"
         element={
           <WishlistC
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
@@ -269,7 +278,7 @@ function AppContent() {
         element={
           <MemberInfoC // MemberInfoC는 이제 /C/member-info 경로에서 직접 렌더링
             onBack={() => navigate('/C/mypage')} // 뒤로가기 시 /C/mypage (리다이렉트될 경로)로 이동
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')} // 마이페이지 링크를 /C/member-info로 변경
           />
@@ -282,7 +291,7 @@ function AppContent() {
         path="/C/cart"
         element={
           <CartC
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
@@ -315,7 +324,7 @@ function AppContent() {
  */
 export default function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AppContent />
     </BrowserRouter>
   );

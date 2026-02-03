@@ -46,14 +46,15 @@ const ModeCard = ({ mode, onSelect }) => (
  * @param {Object} props
  * @param {Function} props.handleModeSelect - 모드 선택 핸들러
  * @param {React.RefObject} props.modeSelectionRef - 모드 선택 영역 ref
+ * @param {Function} props.onShowSetup - 초기 설정 페이지 표시 핸들러
  */
-const MainLanding = ({ handleModeSelect, modeSelectionRef }) => (
+const MainLanding = ({ handleModeSelect, modeSelectionRef, onShowSetup }) => (
   <div className="landing-container">
     <header className="landing-header">
       <div className="header-inner">
         <img src={logoC} alt="HearBe" className="main-logo" />
         <div className="header-actions">
-          <button className="btn-download" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)', color: '#fff', border: 'none' }}>
+          <button className="btn-download" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)', color: '#fff', border: 'none' }} onClick={onShowSetup}>
             <Download size={16} /> 보조 프로그램 다운로드
           </button>
         </div>

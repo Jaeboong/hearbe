@@ -1,4 +1,4 @@
-# Frontend JIRA Task 목록 (서해령 담당)
+# Frontend 개발 할 일 목록 (서해령 담당)
 
 > **기반 문서**: Frontend/docs (A, B, C, FS, API FS)
 > **스토리 포인트**: 1 SP = 1시간

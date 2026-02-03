@@ -56,7 +56,7 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
     };
 
     const menuItems = [
-        { id: 1, icon: <Home size={24} />, label: '홈', onClick: onHome || (() => navigate('/')) }, // onHome은 그대로 유지
+        { id: 1, icon: <Home size={24} />, label: '홈', onClick: onHome || (() => navigate('/C/mall')) }, // onHome은 그대로 유지
         { id: 2, icon: <ShoppingCart size={24} />, label: '장바구니', onClick: () => navigate('/C/mypage/cart') }, // 장바구니 경로 변경
         { id: 3, icon: <User size={24} />, label: '마이페이지', onClick: onMyPage || (() => navigate('/C/mypage/orders')) }, // 마이페이지 링크를 /C/mypage/orders로 변경
         { id: 4, icon: <Share2 size={24} />, label: '공유하기', onClick: handleShareButtonClick, highlight: true },

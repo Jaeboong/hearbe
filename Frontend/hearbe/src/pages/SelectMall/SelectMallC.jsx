@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Home, ShoppingCart, User, ArrowUpRight, Layout } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, User, ArrowUpRight, LogOut } from 'lucide-react';
 import './SelectMallC.css';
 import coupangLogo from '../../assets/coupang_logo.png';
 import naverPlusLogo from '../../assets/C/naver_plus_logo.png';
@@ -8,9 +8,35 @@ import gmarketLogo from '../../assets/C/Gmarket_logo.png';
 import kurlyLogo from '../../assets/C/Kurly_logo.png';
 import st11Logo from '../../assets/C/11st_logo.png';
 import ssgLogo from '../../assets/C/ssg_logo.png';
+import logoC from '../../assets/logoC.png';
+import { authAPI } from '../../services/authAPI';
 
 const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        // 1. 선제적 토큰 삭제
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('username');
+
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('user_id');
+        sessionStorage.removeItem('username');
+
+        try {
+            await authAPI.logout();
+        } catch (error) {
+            console.error('Logout failed:', error);
+        } finally {
+            // 한번 더 정리 및 이동
+            navigate('/C/login');
+        }
+    };
 
     const malls = [
         { id: 'coupang', name: '쿠팡', desc: '', color: '#E2211C', initial: 'C', logo: coupangLogo, logoSize: 300, url: 'https://www.coupang.com' },
@@ -31,29 +57,23 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
             {/* Header 섹션 (디자인 통일) */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0 }}>
-                        <div className="title-icon-box-c">
-                            <Layout size={24} />
-                        </div>
-                        <div className="title-text-c">
-                            <h1>쇼핑몰 선택</h1>
-                            <span className="subtitle-c">Select Shopping Mall</span>
-                        </div>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
-                        <div className="nav-icon-c"><Home size={24} /></div>
-                        <span>홈</span>
-                    </button>
-                    <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
+                    <button className="nav-item-c" onClick={() => { console.log('Navigating to Cart'); navigate('/C/cart'); }}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
-                    <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
+                    <button className="nav-item-c" onClick={() => { console.log('Navigating to MyPage'); navigate('/C/member-info'); }}>
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
+                    </button>
+                    <button className="nav-item-c" onClick={handleLogout}>
+                        <div className="nav-icon-c"><LogOut size={24} /></div>
+                        <span>로그아웃</span>
                     </button>
                 </div>
             </header >
