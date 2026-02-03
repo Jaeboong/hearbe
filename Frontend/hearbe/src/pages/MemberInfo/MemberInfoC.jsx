@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Home, ShieldCheck, LogOut } from 'lucide-react';
+import { User, Mail, Lock, Home, ShieldCheck, LogOut, X } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
@@ -17,6 +17,12 @@ export default function MemberInfoC({ onHome }) {
     });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // 회원탈퇴 모달 상태
+    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+    const [withdrawPassword, setWithdrawPassword] = useState('');
+    const [withdrawError, setWithdrawError] = useState('');
+    const [isWithdrawing, setIsWithdrawing] = useState(false);
 
     // 사이드바 아이템 (A형과 동일한 URL 구조)
     const sidebarItems = [
@@ -92,15 +98,46 @@ export default function MemberInfoC({ onHome }) {
         navigate('/C/findPassword');
     };
 
+    // 회원탈퇴 모달 열기
     const handleWithdraw = () => {
-        if (window.confirm('정말로 회원탈퇴 하시겠습니까?')) {
+        setShowWithdrawModal(true);
+        setWithdrawPassword('');
+        setWithdrawError('');
+    };
+
+    // 회원탈퇴 모달 닫기
+    const handleCloseWithdrawModal = () => {
+        setShowWithdrawModal(false);
+        setWithdrawPassword('');
+        setWithdrawError('');
+    };
+
+    // 회원탈퇴 실행
+    const handleConfirmWithdraw = async () => {
+        if (!withdrawPassword) {
+            setWithdrawError('비밀번호를 입력해주세요.');
+            return;
+        }
+
+        setIsWithdrawing(true);
+        setWithdrawError('');
+
+        try {
+            await authAPI.deleteAccount(withdrawPassword);
             alert('회원탈퇴가 완료되었습니다.');
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('user');
             navigate('/');
+        } catch (error) {
+            console.error('Delete account failed:', error);
+            setWithdrawError(error.message || '회원탈퇴에 실패했습니다.');
+        } finally {
+            setIsWithdrawing(false);
         }
     };
+
+    // DEBUG: Mount log
+    useEffect(() => {
+        console.log('MemberInfoC Mounted');
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -248,6 +285,113 @@ export default function MemberInfoC({ onHome }) {
             <footer className="landing-footer">
                 <p>© 2026 HearBe. All rights reserved.</p>
             </footer>
+
+            {/* 회원탈퇴 모달 */}
+            {showWithdrawModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        borderRadius: '1.5rem',
+                        padding: '2.5rem',
+                        width: '90%',
+                        maxWidth: '400px',
+                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>회원탈퇴</h3>
+                            <button
+                                onClick={handleCloseWithdrawModal}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '0.5rem',
+                                    color: '#9ca3af'
+                                }}
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <p style={{ fontSize: '1.1rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+                            회원탈퇴를 진행하시려면 비밀번호를 입력해주세요.
+                        </p>
+
+                        <div style={{ marginBottom: '1rem' }}>
+                            <input
+                                type="password"
+                                placeholder="비밀번호 입력"
+                                value={withdrawPassword}
+                                onChange={(e) => setWithdrawPassword(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '1rem 1.2rem',
+                                    fontSize: '1.1rem',
+                                    border: '2px solid #e5e7eb',
+                                    borderRadius: '0.75rem',
+                                    outline: 'none',
+                                    boxSizing: 'border-box'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#7c3aed'}
+                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                            />
+                        </div>
+
+                        {withdrawError && (
+                            <p style={{ color: '#e53e3e', fontSize: '0.95rem', marginBottom: '1rem' }}>
+                                {withdrawError}
+                            </p>
+                        )}
+
+                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                            <button
+                                onClick={handleCloseWithdrawModal}
+                                style={{
+                                    flex: 1,
+                                    padding: '1rem',
+                                    fontSize: '1.1rem',
+                                    fontWeight: '600',
+                                    border: '2px solid #e5e7eb',
+                                    borderRadius: '0.75rem',
+                                    backgroundColor: 'white',
+                                    color: '#6b7280',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={handleConfirmWithdraw}
+                                disabled={isWithdrawing}
+                                style={{
+                                    flex: 1,
+                                    padding: '1rem',
+                                    fontSize: '1.1rem',
+                                    fontWeight: '600',
+                                    border: 'none',
+                                    borderRadius: '0.75rem',
+                                    backgroundColor: isWithdrawing ? '#d1d5db' : '#e53e3e',
+                                    color: 'white',
+                                    cursor: isWithdrawing ? 'not-allowed' : 'pointer'
+                                }}
+                            >
+                                {isWithdrawing ? '처리 중...' : '탈퇴하기'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

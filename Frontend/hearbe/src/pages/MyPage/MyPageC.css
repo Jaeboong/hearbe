@@ -7,6 +7,8 @@
     color: #1f2937;
     display: flex;
     flex-direction: column;
+    z-index: 10;
+    position: relative;
 }
 
 .mypage-layout {

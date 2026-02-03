@@ -2,6 +2,9 @@ package com.ssafy.d108.backend.auth.repository;
 
 import com.ssafy.d108.backend.entity.WelfareCard;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -20,5 +23,7 @@ public interface WelfareCardRepository extends JpaRepository<WelfareCard, Intege
     Optional<WelfareCard> findByCardNumberAndCardCompanyAndIssueDateAndExpirationDateAndCvc(
             String cardNumber, String cardCompany, LocalDate issueDate, String expirationDate, String cvc);
 
-    void deleteByUserId(Integer userId);
+    @Modifying
+    @Query("DELETE FROM WelfareCard w WHERE w.user.id = :userId")
+    void deleteByUserId(@Param("userId") Integer userId);
 }

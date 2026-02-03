@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, Home, User, LogOut } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Home, User, LogOut } from 'lucide-react';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
@@ -22,18 +23,11 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
 
     // localStorage에서 사용자 정보 로드
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try {
-                const parsed = JSON.parse(storedUser);
-                setUserData({
-                    name: parsed.name || parsed.username || '회원',
-                    email: parsed.email || '',
-                });
-            } catch (e) {
-                console.error('Failed to parse user data:', e);
-            }
-        }
+        const userName = localStorage.getItem('user_name');
+        setUserData({
+            name: userName || '회원',
+            email: '',
+        });
     }, []);
 
     // 사이드바 아이템
@@ -212,19 +206,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
     }
 
     // 독립 페이지 모드 - 사이드바 포함
-    const handleLogout = async () => {
-        try {
-            await authAPI.logout();
-            navigate('/');
-        } catch (error) {
-            console.error('Logout failed:', error);
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('username');
-            navigate('/');
-        }
-    };
-
     return (
         <div className="mypage-container">
             {/* Header */}

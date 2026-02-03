@@ -78,10 +78,14 @@ const CartA = () => {
             console.warn('Logout failed:', err);
         } finally {
             localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('savedLoginId');
+            localStorage.removeItem('savedLoginPassword');
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            window.location.href = 'http://localhost:5173/';
+            localStorage.removeItem('user_name');
+            navigate('/');
         }
     };
 
@@ -184,5 +188,3 @@ const CartA = () => {
 };
 
 export default CartA;
-
-

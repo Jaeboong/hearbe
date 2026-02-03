@@ -11,6 +11,7 @@ import { wishlistAPI } from '../../services/wishlistAPI';
 import { memberAPI } from '../../services/memberAPI';
 import './MyPageC.css';
 import logoC from '../../assets/logoC.png';
+import logoC from '../../assets/logoC.png';
 
 export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
     const navigate = useNavigate();
@@ -195,17 +196,18 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
 
                 <div className="header-right-c">
                     <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
-                        <div className="nav-icon-c"><Home size={24} /></div>
-                        <span>홈</span>
-                    </button>
-                    <button className="nav-item-c" onClick={() => setActiveTab('cart')} style={activeTab === 'cart' ? { background: '#f5f3ff', color: '#7c3aed', fontWeight: '800' } : {}}>
-                        <div className="nav-icon-c"><ShoppingCart size={24} /></div>
-                        <span>장바구니</span>
-                    </button>
-                    <button className="nav-item-c active" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
-                        <div className="nav-icon-c"><User size={24} /></div>
-                        <span>마이페이지</span>
-                    </button>
+                        <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
+                            <div className="nav-icon-c"><Home size={24} /></div>
+                            <span>홈</span>
+                        </button>
+                        <button className="nav-item-c" onClick={() => setActiveTab('cart')} style={activeTab === 'cart' ? { background: '#f5f3ff', color: '#7c3aed', fontWeight: '800' } : {}}>
+                            <div className="nav-icon-c"><ShoppingCart size={24} /></div>
+                            <span>장바구니</span>
+                        </button>
+                        <button className="nav-item-c active" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
+                            <div className="nav-icon-c"><User size={24} /></div>
+                            <span>마이페이지</span>
+                        </button>
                 </div>
             </header>
 

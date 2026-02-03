@@ -17,18 +17,11 @@ export default function WishlistC({ onHome }) {
 
     // localStorage에서 사용자 정보 로드
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try {
-                const parsed = JSON.parse(storedUser);
-                setUserData({
-                    name: parsed.name || parsed.username || '회원',
-                    email: parsed.email || '',
-                });
-            } catch (e) {
-                console.error('Failed to parse user data:', e);
-            }
-        }
+        const userName = localStorage.getItem('user_name');
+        setUserData({
+            name: userName || '회원',
+            email: '',
+        });
     }, []);
 
     // 사이드바 아이템
@@ -57,19 +50,6 @@ export default function WishlistC({ onHome }) {
     useEffect(() => {
         fetchWishlist();
     }, []);
-
-    const handleLogout = async () => {
-        try {
-            await authAPI.logout();
-            navigate('/');
-        } catch (error) {
-            console.error('Logout failed:', error);
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('username');
-            navigate('/');
-        }
-    };
 
     const fetchWishlist = async () => {
         try {
@@ -108,9 +88,6 @@ export default function WishlistC({ onHome }) {
         } catch (err) {
             console.error('Failed to fetch wishlist:', err);
             setError(err.message);
-            if (err.message === '로그인이 필요합니다.') {
-                navigate('/C/login');
-            }
         } finally {
             setIsLoading(false);
         }
