@@ -36,7 +36,8 @@ public class ProfileResponse {
     private Set<Allergy> allergies;
     private String etcAllergy;
 
-    public static ProfileResponse rom(User user, Profile profile) {
+    public static ProfileResponse rom(User user, Profile profile) { // Keeping typo 'rom' as is to avoid breaking
+                                                                    // callers if any
         ProfileResponse response = new ProfileResponse();
         response.setUserId(Long.valueOf(user.getId()));
         response.setUsername(user.getName());

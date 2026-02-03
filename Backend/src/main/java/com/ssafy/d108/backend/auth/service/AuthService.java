@@ -13,6 +13,12 @@ import com.ssafy.d108.backend.auth.dto.SignupRequest;
 import com.ssafy.d108.backend.auth.dto.WelfareCardRequest;
 import com.ssafy.d108.backend.auth.repository.UserRepository;
 import com.ssafy.d108.backend.auth.repository.WelfareCardRepository;
+import com.ssafy.d108.backend.auth.repository.SharingSessionLogRepository;
+import com.ssafy.d108.backend.cartItem.repository.CartItemRepository;
+import com.ssafy.d108.backend.member.repository.ProfileRepository;
+import com.ssafy.d108.backend.order.repository.OrderItemRepository;
+import com.ssafy.d108.backend.order.repository.OrderRepository;
+import com.ssafy.d108.backend.wishlist.repository.WishlistRepository;
 import com.ssafy.d108.backend.entity.User;
 import com.ssafy.d108.backend.entity.enums.UserType;
 import com.ssafy.d108.backend.entity.WelfareCard;
@@ -41,6 +47,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final WelfareCardRepository welfareCardRepository;
+    private final SharingSessionLogRepository sharingSessionLogRepository;
+    private final CartItemRepository cartItemRepository;
+    private final WishlistRepository wishlistRepository;
+    private final ProfileRepository profileRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final com.ssafy.d108.backend.global.util.AESUtil aesUtil;
@@ -267,7 +279,13 @@ public class AuthService {
             throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 복지카드 먼저 삭제
+        // 관련 데이터 삭제 (외래 키 제약 조건 해결)
+        orderItemRepository.deleteAllByUserId(userId);
+        orderRepository.deleteAllByUserId(userId);
+        cartItemRepository.deleteAllByUserId(userId);
+        wishlistRepository.deleteAllByUserId(userId);
+        sharingSessionLogRepository.deleteAllByHostUserId(userId);
+        profileRepository.deleteByUserId(userId);
         welfareCardRepository.deleteByUserId(userId);
 
         userRepository.delete(user);

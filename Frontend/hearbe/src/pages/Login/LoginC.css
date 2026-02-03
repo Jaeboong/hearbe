@@ -170,3 +170,69 @@
     letter-spacing: 2px;
     pointer-events: none;
 }
+
+/* Password Condition Check Styles (Reuse logic for Login) */
+.password-conditions-c {
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+    padding-left: 10px;
+    margin-bottom: 10px;
+    /* Space before submit button */
+}
+
+.condition-item-c {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    /* Slightly larger for LoginC scale */
+    color: #94a3b8;
+    transition: all 0.2s ease;
+}
+
+.condition-item-c .dot {
+    font-size: 10px;
+}
+
+.condition-item-c.satisfied {
+    color: #10b981;
+    /* Green */
+    font-weight: 600;
+}
+
+.condition-item-c.unsatisfied {
+    color: #ef4444;
+    /* Red */
+}
+
+/* Text-based Password Feedback Styles */
+.password-conditions-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    padding-left: 5px;
+    text-align: left;
+}
+
+.pw-condition-text {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+    /* Default Gray */
+    transition: color 0.2s;
+    font-weight: 500;
+}
+
+.pw-condition-text.satisfied {
+    color: #10b981;
+    /* Green */
+    font-weight: 600;
+}
+
+.pw-condition-text.unsatisfied {
+    color: #ef4444;
+    /* Red */
+}

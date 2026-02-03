@@ -58,7 +58,7 @@ export const authAPI = {
             const data = await response.json();
 
             console.log('Check Duplicate Response data:', data);
-            
+
             return data;
         } catch (error) {
             console.error('Check Duplicate API Error:', error);
@@ -112,6 +112,10 @@ export const authAPI = {
                 localStorage.setItem('user_id', data.data.id);
                 // 가입할때의 username도 저장
                 localStorage.setItem('username', username);
+            }
+            // 실제 이름(name) 저장
+            if (data.data && data.data.name) {
+                localStorage.setItem('user_name', data.data.name);
             }
 
             return data;
@@ -273,13 +277,49 @@ export const authAPI = {
             console.error('Logout API Error:', error);
             throw error;
         } finally {
+            // localStorage 정리
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('savedLoginId');
             localStorage.removeItem('savedLoginPassword');
+            localStorage.removeItem('savedLoginId_C');
+            localStorage.removeItem('savedLoginPassword_C');
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
+            localStorage.removeItem('user_name');
+            // sessionStorage 정리 (혹시 남아있을 경우)
+            sessionStorage.removeItem('accessToken');
+            sessionStorage.removeItem('refreshToken');
+            sessionStorage.removeItem('user');
+            sessionStorage.removeItem('user_id');
+            sessionStorage.removeItem('username');
+        }
+    },
+
+    // 회원탈퇴 API
+    deleteAccount: async (password) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${API_BASE_URL}/auth/delete-account`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || '회원탈퇴에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Delete Account API Error:', error);
+            throw error;
         }
     }
     ,

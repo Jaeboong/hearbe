@@ -1,4 +1,3 @@
-/* CartPage.css */
 .cart-page-container {
     width: 100%;
     min-height: 100vh;
@@ -14,7 +13,6 @@
     margin: 0;
 }
 
-/* Header Styles */
 /* Header Styles */
 .cart-header {
     position: sticky;

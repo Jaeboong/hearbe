@@ -1,17 +1,3 @@
-/* Card Management Page Styles */
-
-body:has(.cardmgmt-container) {
-    background-color: #232A39;
-}
-
-
-
-
-
-
-
-
-
 .cardmgmt-container {
     min-height: 100vh;
     background-color: #232A39;
@@ -47,10 +33,10 @@ body:has(.cardmgmt-container) {
 .cardmgmt-container .cardmgmt-content {
     display: flex;
     gap: clamp(30px, 5vw, 60px);
-    width: min(772px, 90vw);
-    height: min(1030px, 90vh);
-    margin: 0;
-    padding: 64px 48px;
+    width: min(90rem, 90vw);
+    min-height: 80vh;
+    margin: 0 auto;
+    padding: 40px;
     box-sizing: border-box;
     min-width: 680px;
 }
@@ -425,7 +411,8 @@ body:has(.cardmgmt-container) {
 }
 
 /* Responsive */
-@media (max-width: 1024px), (max-height: 900px) {
+@media (max-width: 1024px),
+(max-height: 900px) {
     .cardmgmt-container .cardmgmt-content {
         width: 100%;
         height: auto;
@@ -441,11 +428,11 @@ body:has(.cardmgmt-container) {
 @media (max-width: 768px) {
     .cardmgmt-container .cardmgmt-content {
         flex-direction: column;
-    
-    .cardmgmt-container .cardmgmt-content {
-        min-width: 0;
+
+        .cardmgmt-container .cardmgmt-content {
+            min-width: 0;
+        }
     }
-}
 
     .cardmgmt-sidebar {
         flex: none;
@@ -455,6 +442,7 @@ body:has(.cardmgmt-container) {
         min-width: 0;
     }
 }
+
 /* MyPage Top Bar */
 .mypage-topbar {
     position: relative;

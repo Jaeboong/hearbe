@@ -304,3 +304,172 @@
     letter-spacing: 2px;
     pointer-events: none;
 }
+
+/* Password Condition Check Styles */
+.password-conditions-c {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    padding-left: 5px;
+}
+
+.condition-item-c {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #94a3b8;
+    /* Default gray (before input) */
+    transition: all 0.2s ease;
+}
+
+.condition-item-c.satisfied {
+    color: #10b981;
+    /* Green when satisfied */
+    font-weight: 600;
+}
+
+.condition-item-c.unsatisfied {
+    color: #ef4444;
+    /* Red when input exists but not satisfied */
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2 !important;
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Terms Styles */
+.terms-list-c {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.terms-item-c {
+    justify-content: space-between;
+    /* Space out checkbox+label and View button */
+    padding: 2px 0;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.terms-view-btn-c {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0 5px;
+}
+
+.terms-view-btn-c:hover {
+    color: #8b5cf6;
+}
+
+/* Term Modal Specifics */
+.term-modal-c {
+    padding: 2.5rem !important;
+    /* Override default padding */
+    text-align: left !important;
+    max-width: 500px !important;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
+.term-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.term-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.close-btn-c {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.term-scroll-box {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.term-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4b5563;
+    margin: 0;
+    white-space: pre-wrap;
+    /* Preserve line breaks */
+}
+
+/* Text-based Password Feedback Styles */
+.password-conditions-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    padding-left: 5px;
+    text-align: left;
+}
+
+.pw-condition-text {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+    /* Default Gray */
+    transition: color 0.2s;
+    font-weight: 500;
+}
+
+.pw-condition-text.satisfied {
+    color: #10b981;
+    /* Green */
+    font-weight: 600;
+}
+
+.pw-condition-text.unsatisfied {
+    color: #ef4444;
+    /* Red */
+}
