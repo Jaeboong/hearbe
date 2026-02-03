@@ -5,22 +5,14 @@ services:
       dockerfile: Dockerfile
     container_name: hearbe-backend
     ports:
-      - "${HOST_PORT}:8080" # 변수화 (prod: 80, dev: 8080)
+      - "${COMPOSE_HOST_PORT}:8080"
     env_file:
       - .env
     environment:
-<<<<<<< Updated upstream
-      # Docker 내부에서는 컨테이너 이름으로 접속
-      - SPRING_DATASOURCE_URL=jdbc:mysql://hearbe-mariadb:3306/hearbe?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
-      - SPRING_DATA_REDIS_HOST=hearbe-redis
-=======
-      - SPRING_PROFILES_ACTIVE=${APP_PROFILE} # dev 또는 prod 주입
-      - SPRING_DATASOURCE_URL=jdbc:mysql://hearbe-mariadb:3306/hearbe?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
-      - SPRING_DATA_REDIS_HOST=hearbe-redis
-      - LOG_PATH=/logs # 컨테이너 내부 로그 경로
+      - SPRING_PROFILES_ACTIVE=${COMPOSE_APP_PROFILE:-dev}
+      - LOG_PATH=/logs
     volumes:
-      - ${HOST_LOG_PATH}:/logs # 호스트와 로그 폴더 연결
->>>>>>> Stashed changes
+      - ${COMPOSE_HOST_LOG_PATH:-./logs}:/logs
     depends_on:
       - hearbe-mariadb
       - hearbe-redis
@@ -49,14 +41,14 @@ services:
     container_name: hearbe-redis
     volumes:
       - redis_data:/data
-    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
   hearbe-peer:
     image: peerjs/peerjs-server
     container_name: hearbe-peer
     ports:
       - "9000:9000"
     restart: always
-    command: [ "--port", "9000", "--path", "/hearbe-peer" ]
+    command: ["--port", "9000", "--path", "/hearbe-peer"]
 volumes:
   mariadb_data:
   redis_data:
