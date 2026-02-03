@@ -41,6 +41,13 @@ services:
     volumes:
       - redis_data:/data
     command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+  hearbe-peer:
+    image: peerjs/peerjs-server
+    container_name: hearbe-peer
+    ports:
+      - "9000:9000"
+    restart: always
+    command: [ "--port", "9000", "--path", "/hearbe-peer" ]
 volumes:
   mariadb_data:
   redis_data:

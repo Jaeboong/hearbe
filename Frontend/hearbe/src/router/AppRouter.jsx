@@ -46,6 +46,11 @@ function AppContent() {
   });
   const modeSelectionRef = useRef(null);
 
+  const handleSetupComplete = (micGranted) => {
+    setMicPermissionGranted(micGranted);
+    setShowInitialSetup(false);
+  };
+
   const handleModeSelect = (mode, label) => {
     if (micPermissionGranted || mode === 'audio') {
       const utterance = new SpeechSynthesisUtterance(`${label} 모드를 선택하셨습니다.`);
