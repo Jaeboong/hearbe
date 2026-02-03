@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useCallback } from 'react';
 import './StoreBrowserA.css';
 import iconUser from '../../assets/icon-user.png';
 import iconCart from '../../assets/icon-cart.png';
@@ -31,7 +32,10 @@ const StoreBrowser = () => {
         return urlMap[id] || 'https://m.shopping.naver.com/';
     };
 
-    const url = location.state?.url || getMallUrl(mallId);
+    const searchParams = new URLSearchParams(location.search);
+    const queryUrl = searchParams.get('url');
+    const autoShare = searchParams.get('autoshare') === '1';
+    const url = queryUrl ? decodeURIComponent(queryUrl) : (location.state?.url || getMallUrl(mallId));
 
     // PeerJS Hooks
     const { shareCode, isSharing, startSharing, stopSharing, error: peerError } = usePeerShare();
@@ -59,7 +63,6 @@ const StoreBrowser = () => {
 
     // Platform Checks
     const isNaver = url.includes('naver');
-    const isCoupang = url.includes('coupang');
 
     // Platform cart URLs
     const getPlatformCartUrl = () => {
@@ -101,7 +104,7 @@ const StoreBrowser = () => {
 
     // --- Handlers ---
 
-    const handleShareClick = async () => {
+    const handleShareClick = useCallback(async () => {
         setIsLoadingCode(true);
         setShowShareModal(true);
 
@@ -116,7 +119,13 @@ const StoreBrowser = () => {
         } finally {
             setIsLoadingCode(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (autoShare) {
+            handleShareClick();
+        }
+    }, [autoShare, handleShareClick]);
 
     const handleEnterShare = async () => {
         try {
@@ -187,25 +196,20 @@ const StoreBrowser = () => {
         <div className="store-container">
             <BackButton onClick={() => navigate('/mall')} variant="navy" />
 
-            {/* Iframe or Alternate View for Coupang */}
-            {isCoupang ? (
-                <div className="iframe-blocked-message">
-                    <div className="blocked-content">
-                        <img src={logo} alt="Logo" className="blocked-logo" />
-                        <h2>쿠팡은 보안상 앱 내에서<br />바로 보기가 제한됩니다.</h2>
-                        <p>새 창에서 상품을 확인하고<br /><strong>[내 장바구니에 담기]</strong> 기능을 이용해주세요!</p>
-                        <button className="open-new-window-btn" onClick={() => window.open(url, '_blank')}>
-                            새 창에서 쿠팡 열기
-                        </button>
-                    </div>
+            {/* New tab guidance (iframe blocked by most shopping sites) */}
+            <div className="iframe-blocked-message">
+                <div className="blocked-content">
+                    <img src={logo} alt="Logo" className="blocked-logo" />
+                    <h2>보안상 앱 내에서<br />바로 보기가 제한됩니다.</h2>
+                    <p>아래 버튼으로 쇼핑몰을 새 탭에서 열고<br /><strong>[공유]</strong> 버튼으로 화면을 공유해주세요!</p>
+                    <button
+                        className="open-new-window-btn"
+                        onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+                    >
+                        새 탭에서 쇼핑몰 열기
+                    </button>
                 </div>
-            ) : (
-                <iframe
-                    src={url}
-                    title="Store"
-                    className="store-iframe"
-                />
-            )}
+            </div>
 
             {/* --- Sharing Mode UI --- */}
             {isSharing && (
