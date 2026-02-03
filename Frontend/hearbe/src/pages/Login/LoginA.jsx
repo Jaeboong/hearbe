@@ -70,7 +70,9 @@ const Login = () => {
                     localStorage.removeItem('savedLoginPassword');
                 }
                 // 로그인 성공
-                speak("로그인되었습니다.");
+                const utterance = new SpeechSynthesisUtterance("로그인되었습니다.");
+                utterance.lang = 'ko-KR';
+                window.speechSynthesis.speak(utterance);
                 navigate('/A/mall');
             } else if (!isAuto) {
                 const message = response?.message || '';

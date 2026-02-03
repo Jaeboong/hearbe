@@ -51,10 +51,7 @@ function AppContent() {
   });
   const modeSelectionRef = useRef(null);
 
-  const handleSetupComplete = (micGranted) => {
-    setMicPermissionGranted(micGranted);
-    setShowInitialSetup(false);
-  };
+
 
   const handleModeSelect = (mode, label) => {
     if (micPermissionGranted || mode === 'audio') {
@@ -88,13 +85,10 @@ function AppContent() {
     setShowInitialSetup(true);
   };
 
-  // 초기 설정이 완료되지 않았으면 InitialSetup을 '가장 먼저' 보여줌 (모든 페이지 진입 차단)
-  // DEBUG: Intro 페이지 테스트를 위해 잠시 주석 처리
-  /*
+  // 초기 설정이 완료되지 않았으면 InitialSetup을 보여줌
   if (showInitialSetup) {
     return <InitialSetup onComplete={handleSetupComplete} />;
   }
-  */
 
   return (
     <Routes>
