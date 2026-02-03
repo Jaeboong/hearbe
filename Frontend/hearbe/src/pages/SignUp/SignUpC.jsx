@@ -56,7 +56,9 @@ export default function SignUpC({ onBack }) {
 
     try {
       const apiResponse = await authAPI.checkDuplicate(formData.username);
-      if (apiResponse.available) {
+      const isDuplicate = apiResponse.data;
+
+      if (!isDuplicate) {
         setIsUsernameChecked(true);
         setIsUsernameAvailable(true);
         alert('사용 가능한 아이디입니다.');
