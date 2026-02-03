@@ -75,7 +75,6 @@ export default function LoginC() {
                         />
 =======
                         <img src={logoC} alt="HearBe Logo" className="logo-image-c" />
->>>>>>> 438f06fc602c619edbd98d1b7f7ce94b95068863
                     </div>
 
                     <form className="login-c-form" onSubmit={handleLogin}>
