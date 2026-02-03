@@ -11,7 +11,7 @@ const LoginS = () => {
   const handleJoin = (code) => {
     // 코드 검증은 GuardianViewS 내부에서 하거나 여기서 API 호출
     // 일단 바로 이동
-    navigate('/S/guardian-view', { state: { code } });
+    navigate('/S/join', { state: { code } });
   };
 
   const handleClose = () => {
