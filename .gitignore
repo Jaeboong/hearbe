@@ -560,3 +560,5 @@ Backend/src/main/resources/application.properties
 
 google-service-account.json
 docker
+
+MCP/temp_test_profile/**
