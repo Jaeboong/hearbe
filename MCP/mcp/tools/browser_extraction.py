@@ -416,12 +416,16 @@ class BrowserExtractionMixin:
         try:
             try:
                 await page.wait_for_selector(
-                    "#mainContent [id^='item_'] input[type='checkbox']",
+                    "#mainContent [id^='item_'] input[type='checkbox'], "
+                    "#mainContent .cart-product input[type='checkbox'], "
+                    ".cart-product input[type='checkbox']",
                     timeout=3000
                 )
             except Exception:
                 pass
             data = await extract_cart_dynamic(page)
+            if isinstance(data, dict) and data.get("is_cart_page") is False:
+                return {"success": False, "error": "Not on cart page", "page_url": page.url}
             items = data.get("items") if isinstance(data, dict) else []
             summary = data.get("summary") if isinstance(data, dict) else {}
             return {

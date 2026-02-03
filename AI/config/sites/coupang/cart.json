@@ -1,7 +1,7 @@
-{
+﻿{
   "page_type": "cart",
   "url_pattern": "cart\\.coupang\\.com/cartView",
-  "description": "쿠팡 장바구니 페이지",
+  "description": "荑좏뙜 ?λ컮援щ땲 ?섏씠吏",
   "selectors": {
     "checkout_button": "#btnPay",
     "select_all_checkbox": "input[type='checkbox']",
@@ -11,14 +11,19 @@
     "item_title": "a span.twc-text-custom-black, .product-name",
     "item_price": "[data-id='sale-price-ccid'], .price, [class*='twc-text-[20px]']",
     "quantity_input": "input.cart-quantity-input, input[type='text']",
-    "quantity_plus": "[data-component-id='quantity-input'] .twc-bg-plus-icon, button[aria-label*='증가'], button[aria-label*='더하기']",
-    "quantity_minus": "[data-component-id='quantity-input'] .twc-bg-minus-icon, button[aria-label*='감소'], button[aria-label*='빼기']",
-    "delete_button": ".btn-delete",
-    "delete_selected": "[class*='order']:has-text('선택삭제')",
-    "delete_soldout": "[class*='order']:has-text('품절/판매종료상품 전체삭제')",
-    "total_price": ".total-price",
+    "quantity_plus": "[data-component-id='quantity-input'] .twc-bg-plus-icon",
+    "quantity_minus": "[data-component-id='quantity-input'] .twc-bg-minus-icon",
+    "delete_button": "button:has-text(\"삭제\"), a:has-text(\"삭제\"), div:has-text(\"삭제\")",
+    "delete_selected": "button:has-text(\"선택 삭제\"), a:has-text(\"선택 삭제\"), div:has-text(\"선택 삭제\")",
+    "delete_soldout": "[class*='order']:has-text('?덉젅/?먮ℓ醫낅즺?곹뭹 ?꾩껜??젣')",
+    "order_estimate_block": "[data-component-id='total-price']",
+    "total_product_price": "[data-component-id='total-price'] div:has-text('총 상품 가격') em[translate='no']",
+    "total_instant_discount": "[data-component-id='total-price'] div:has-text('총 즉시할인') em[translate='no']",
+    "shipping_fee": "[data-component-id='total-price'] div:has-text('총 배송비') em[translate='no']",
+    "total_price": "#finalOrderPrice em[translate='no']",
+    "final_order_price": "#finalOrderPrice em[translate='no']",
     "order_steps": "[class*='order']",
-    "modal_add_rocket": "[class*='order']:has-text('로켓상품 추가하기')",
-    "modal_checkout_without_extra": "[class*='order']:has-text('추가금액 없이 구매하기')"
+    "modal_add_rocket": "[class*='order']:has-text('濡쒖폆?곹뭹 異붽??섍린')",
+    "modal_checkout_without_extra": "[class*='order']:has-text('異붽?湲덉븸 ?놁씠 援щℓ?섍린')"
   }
 }
