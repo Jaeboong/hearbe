@@ -80,14 +80,16 @@ class LLMPlanner(ILLMPlanner):
         conversation_history = session.conversation_history if session else None
         session_context = session.context if session else None
 
-        # 1. Rule-based pass
+        # 1. Selection from recent search results (prefer session-aware match)
+        selection = select_from_results(user_text, session)
+        if selection:
+            return selection
+
+        # 1.1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
 
-        # 1.5. Selection from recent search results (no trigger words)
+        # 1.5. Post-rule session-aware handlers
         if rule_result.matched_rule == "none":
-            selection = select_from_results(user_text, session)
-            if selection:
-                return selection
             option_selection = select_option_from_detail(user_text, session)
             if option_selection:
                 return option_selection

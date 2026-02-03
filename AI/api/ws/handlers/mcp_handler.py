@@ -171,7 +171,8 @@ class MCPHandler:
                     tool_name=tool_name,
                     arguments=arguments,
                     success=success,
-                    handled=handled
+                    handled=handled,
+                    current_url=page_url or (session.current_url if session else "")
                 )
         if session and self._session:
             self._session.set_context(session_id, "mcp_result", result)

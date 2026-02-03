@@ -45,6 +45,10 @@ _NATIVE_ONES = {
     "아홉": 9,
 }
 
+_ORDINAL_NATIVE = {
+    "첫": 1,
+}
+
 
 def extract_ordinal_index(text: str) -> Optional[int]:
     """
@@ -58,13 +62,13 @@ def extract_ordinal_index(text: str) -> Optional[int]:
     if not text:
         return None
 
-    match = re.search(r"(\\d+)\\s*(?:번째|번)", text)
+    match = re.search(r"(\d+)\s*(?:번째|번)", text)
     if match:
         idx = int(match.group(1)) - 1
         return idx if idx >= 0 else None
 
     # Prefer explicit ordinal markers
-    ordinal_match = re.search(r"([가-힣]+)\\s*(?:번째|번)", text)
+    ordinal_match = re.search(r"([가-힣]+)\s*(?:번째|번)", text)
     if ordinal_match:
         token = ordinal_match.group(1)
         value = _parse_number_token(token)
@@ -84,6 +88,20 @@ def _parse_number_token(token: str) -> Optional[int]:
     token = token.replace(" ", "")
     if not token:
         return None
+
+    if token in _ORDINAL_NATIVE:
+        return _ORDINAL_NATIVE[token]
+
+    if token.endswith("째") and len(token) > 1:
+        base = token[:-1]
+        if base in _ORDINAL_NATIVE:
+            return _ORDINAL_NATIVE[base]
+        value = _parse_native_korean(base)
+        if value is not None:
+            return value
+        value = _parse_sino_korean(base)
+        if value is not None:
+            return value
 
     value = _parse_native_korean(token)
     if value is not None:

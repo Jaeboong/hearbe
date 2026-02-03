@@ -111,7 +111,18 @@ class PaymentKeypadManager:
             if not self._get_context(session_id, CTX_ARMED):
                 return True
             if success and result.get("element_found"):
+                if not self._get_context(session_id, CTX_PROMPTED):
+                    await self._sender.send_tts_response(session_id, KEYPAD_PROMPT)
+                    self._set_context(session_id, CTX_PROMPTED, True)
+                self._set_context(session_id, CTX_AWAITING, True)
                 await self._request_keypad_assets(session_id, wait_args)
+                return True
+
+            self._reset_session(session_id, keep_armed=False)
+            await self._sender.send_tts_response(
+                session_id,
+                "키패드를 찾지 못했습니다. 결제하기 버튼을 다시 눌러주세요.",
+            )
             return True
 
         dom_args = self._get_context(session_id, CTX_DOMKEYS_ARGS)
@@ -136,6 +147,10 @@ class PaymentKeypadManager:
 
     async def handle_user_text(self, session_id: str, text: str) -> bool:
         """Consume PIN input if keypad is awaiting digits."""
+        current_url = ""
+        if self._session:
+            session = self._session.get_session(session_id)
+            current_url = session.current_url if session else ""
         stage = bool(
             self._get_context(session_id, CTX_ARMED)
             or self._get_context(session_id, CTX_WAIT_ARGS)
@@ -147,10 +162,16 @@ class PaymentKeypadManager:
             or self._get_context(session_id, CTX_MAPPING)
             or self._get_context(session_id, CTX_PENDING_DIGITS)
         )
+        digits = _extract_digits(text)
         if not stage:
+            if digits and current_url and get_page_type(current_url) == "checkout":
+                self._set_context(session_id, CTX_ARMED, True)
+                self._set_context(session_id, CTX_PENDING_DIGITS, digits)
+                self._set_context(session_id, CTX_LAST_URL, current_url)
+                await self._maybe_trigger_detection(session_id, current_url)
+                return True
             return False
 
-        digits = _extract_digits(text)
         if not digits:
             if self._get_context(session_id, CTX_AWAITING):
                 await self._sender.send_tts_response(session_id, KEYPAD_RETRY)
@@ -159,7 +180,7 @@ class PaymentKeypadManager:
         mapping = self._get_context(session_id, CTX_MAPPING) or {}
         if not mapping:
             self._set_context(session_id, CTX_PENDING_DIGITS, digits)
-            if self._get_context(session_id, CTX_AWAITING):
+            if self._get_context(session_id, CTX_AWAITING) and not self._get_context(session_id, CTX_PROMPTED):
                 await self._sender.send_tts_response(session_id, KEYPAD_NOT_READY)
             return True
 
@@ -279,6 +300,12 @@ class PaymentKeypadManager:
         self._set_context(session_id, CTX_MAPPING, mapping)
         self._set_context(session_id, CTX_ARMED, False)
         self._set_context(session_id, CTX_READY, True)
+        logger.info(
+            "Keypad OCR mapping ready: digits=%s dom_keys=%s mapping=%s",
+            result.get("digits"),
+            result.get("dom_keys"),
+            mapping,
+        )
         pending_digits = self._get_context(session_id, CTX_PENDING_DIGITS)
         if pending_digits:
             await self._send_keypad_clicks(session_id, pending_digits, mapping)
@@ -406,6 +433,7 @@ def _extract_digits(text: str) -> List[str]:
         return digits
     tokens = re.split(r"\s+", re.sub(r"[^\w가-힣]", " ", text))
     results: List[str] = []
+    kor_keys = sorted(_KOR_DIGIT_MAP.keys(), key=len, reverse=True)
     for token in tokens:
         token = token.strip()
         if not token:
@@ -416,6 +444,19 @@ def _extract_digits(text: str) -> List[str]:
         embedded = re.findall(r"\d", token)
         if embedded:
             results.extend(embedded)
+            continue
+        # Parse continuous Korean digit sequences (e.g., "육구칠일공공")
+        idx = 0
+        while idx < len(token):
+            matched = False
+            for key in kor_keys:
+                if token.startswith(key, idx):
+                    results.append(_KOR_DIGIT_MAP[key])
+                    idx += len(key)
+                    matched = True
+                    break
+            if not matched:
+                idx += 1
     return results
 
 

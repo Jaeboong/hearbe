@@ -7,6 +7,8 @@ Emits user-facing TTS feedback when tool execution fails.
 
 from typing import Optional, Dict, Any
 
+from services.llm.sites.site_manager import get_page_type
+
 
 class ToolFailureNotifier:
     """Sends minimal failure feedback for failed tool calls."""
@@ -20,7 +22,8 @@ class ToolFailureNotifier:
         tool_name: Optional[str],
         arguments: Optional[Dict[str, Any]],
         success: bool,
-        handled: bool = False
+        handled: bool = False,
+        current_url: Optional[str] = None,
     ):
         if success or handled:
             return
@@ -35,9 +38,15 @@ class ToolFailureNotifier:
             elif tool_name in ("click", "click_element"):
                 target = (arguments.get("selector") or "").strip()
 
+        is_selector_like = any(token in target for token in ("[", "]", ".", "#", ">", "pad-key", "data-key"))
+        is_checkout = bool(current_url and get_page_type(current_url) == "checkout")
+
         if target and target not in ("그거", "이거", "저거", "그것", "이것", "저것"):
-            msg = f"'{target}'을 찾지 못했습니다. 다시 말씀해 주세요."
+            if is_selector_like or is_checkout:
+                msg = "오류가 발생했습니다. 다시 말씀해 주세요."
+            else:
+                msg = f"'{target}'을 찾지 못했습니다. 다시 말씀해 주세요."
         else:
-            msg = "요청하신 항목을 찾지 못했습니다. 다시 말씀해 주세요."
+            msg = "오류가 발생했습니다. 다시 말씀해 주세요."
 
         await self._sender.send_tts_response(session_id, msg)
