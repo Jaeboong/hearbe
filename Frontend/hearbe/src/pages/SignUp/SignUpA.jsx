@@ -1,14 +1,10 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import iconUser from '../../assets/icon-user.png';
-import iconLock from '../../assets/icon-lock.png';
 import iconCard from '../../assets/icon-card.png';
-import iconPhone from '../../assets/icon-phone.png';
 import iconCamera from '../../assets/icon-camera.png';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './SignUpA.css';
-import BackButton from '../common/BackButtonA';
 
 // Utility Functions
 const formatPhoneNumber = (value) => {
@@ -62,10 +58,28 @@ const SignUp = () => {
     // Card Recognition State
     const [modalStep, setModalStep] = useState('camera'); // 'camera' or 'form'
     const [cardData, setCardData] = useState(null); // { company, number, expiry, cvc }
+    const [cardForm, setCardForm] = useState({
+        company: '',
+        number: '',
+        expiry: '',
+        cvc: ''
+    });
 
     // Camera Logic
     const videoRef = useRef(null);
     const [stream, setStream] = useState(null);
+
+    const maskCardNumber = (value) => {
+        if (!value) return '';
+        const digits = value.replace(/[^0-9]/g, '');
+        if (digits.length <= 4) return digits;
+        return `${'*'.repeat(digits.length - 4)}${digits.slice(-4)}`;
+    };
+
+    const maskCvc = (value) => {
+        if (!value) return '';
+        return '*'.repeat(value.length);
+    };
 
     const startCamera = async () => {
         try {
@@ -149,12 +163,18 @@ const SignUp = () => {
 
         try {
             const result = await authAPI.checkDuplicate(formData.id);
-            if (result.available !== false) {
+            
+            console.log("서버에서 온 진짜 값:", result);
+
+            const isDuplicate = result.data; // 서버에서 중복 여부를 나타내는 필드명에 맞게 수정 필요
+            
+            if (isDuplicate === false) { // 중복이 아니라면 (사용 가능)
                 setIsIdChecked(true);
                 alert("사용 가능한 아이디입니다.");
-            } else {
+            } else { // 중복이 맞다면 (true)
                 setErrorMessage("이미 존재하는 아이디입니다.");
                 setShowError(true);
+                setIsIdChecked(false);
             }
         } catch (error) {
             // authAPI.checkDuplicate에서 던져진 에러를 여기서 처리
@@ -192,7 +212,45 @@ const SignUp = () => {
 
     // 1. 카메라 셔터 누름 -> 폼 확인 단계로 이동 (팝업 유지)
     const handleSnap = () => {
+        setCardForm({
+            company: '신한카드',
+            number: '0000-0000-0000-0000',
+            expiry: '01/21',
+            cvc: '123'
+        });
         setModalStep('form');
+    };
+
+    const formatCardNumber = (value) => {
+        const digits = value.replace(/[^0-9]/g, '').slice(0, 16);
+        if (digits.length <= 4) return digits;
+        if (digits.length <= 8) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+        if (digits.length <= 12) return `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8)}`;
+        return `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8, 12)}-${digits.slice(12)}`;
+    };
+
+    const formatExpiry = (value) => {
+        const digits = value.replace(/[^0-9]/g, '').slice(0, 4);
+        if (digits.length <= 2) return digits;
+        return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    };
+
+    const handleCardFormChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'number') {
+            setCardForm((prev) => ({ ...prev, number: formatCardNumber(value) }));
+            return;
+        }
+        if (name === 'expiry') {
+            setCardForm((prev) => ({ ...prev, expiry: formatExpiry(value) }));
+            return;
+        }
+        if (name === 'cvc') {
+            const digits = value.replace(/[^0-9]/g, '').slice(0, 3);
+            setCardForm((prev) => ({ ...prev, cvc: digits }));
+            return;
+        }
+        setCardForm((prev) => ({ ...prev, [name]: value }));
     };
 
     // 2. 최종 카드 등록 -> 데이터 저장 후 팝업 닫기
@@ -201,18 +259,21 @@ const SignUp = () => {
         const today = new Date();
         const issueDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-        // expiry '01/21' -> 서버 요구형식 'MM/YY'로 전송 (예: 12/30)
-        const expiryDate = '12/30'; // 하드코딩된 만료일 (MM/YY 형식)
-
         setCardData({
-            company: '신한카드',
-            number: '0000-0000-0000-0000',
+            company: cardForm.company,
+            number: cardForm.number,
             issueDate: issueDate,
-            expiry: expiryDate,
-            cvc: '123'
+            expiry: cardForm.expiry,
+            cvc: cardForm.cvc
         });
         setShowCamera(false);
         setModalStep('camera'); // 다음 번을 위해 초기화
+    };
+
+    const handleRetakeCard = () => {
+        setCardData(null);
+        setModalStep('camera');
+        setShowCamera(true);
     };
 
     // 3. 모달 닫기
@@ -309,6 +370,12 @@ const SignUp = () => {
             const response = await authAPI.register(userData);
 
             if (response.success) {
+                if (cardData?.number) {
+                    localStorage.setItem('member_card_number', cardData.number);
+                }
+                if (formData.id) {
+                    localStorage.setItem('member_username', formData.id);
+                }
                 setShowSuccess(true);
             } else {
                 throw new Error(response.message || '회원가입에 실패했습니다.');
@@ -328,35 +395,37 @@ const SignUp = () => {
 
     return (
         <div className="signup-container">
-            {/* 뒤로가기 버튼 */}
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
             <div className="signup-box">
                 {/* Logo Section */}
                 <div className="signup-logo-area">
-                    <img src={logo} alt="Logo" className="signup-logo-image" />
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        className="signup-logo-image"
+                        onClick={() => navigate('/')}
+                        style={{ cursor: 'pointer' }}
+                    />
                 </div>
 
                 {/* ID Section */}
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
-                        <img src={iconUser} alt="User" className="input-icon" />
                         <input
                             type="text"
                             name="id"
                             placeholder="아이디"
-                            className="signup-input"
+                            className="signup-input input-id"
                             value={formData.id}
                             onChange={handleInputChange}
                         />
                         <button className="check-btn" onClick={handleDuplicateCheck}>중복확인</button>
                     </div>
                     <div className="input-row">
-                        <img src={iconLock} alt="Lock" className="input-icon" />
                         <input
                             type="password"
                             name="password"
                             placeholder="비밀번호(숫자 6자리)"
-                            className="signup-input"
+                            className="signup-input input-password"
                             value={formData.password}
                             onChange={handleInputChange}
                             maxLength={6}
@@ -367,23 +436,21 @@ const SignUp = () => {
                 {/* Name/Phone Section */}
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
-                        <img src={iconUser} alt="User" className="input-icon" />
                         <input
                             type="text"
                             name="name"
                             placeholder="이름"
-                            className="signup-input"
+                            className="signup-input input-name"
                             value={formData.name}
                             onChange={handleInputChange}
                         />
                     </div>
                     <div className="input-row">
-                        <img src={iconPhone} alt="Phone" className="input-icon" />
                         <input
                             type="tel"
                             name="phone"
                             placeholder="휴대전화번호"
-                            className="signup-input"
+                            className="signup-input input-phone"
                             value={formData.phone}
                             onChange={handleInputChange}
                             maxLength={13}
@@ -394,32 +461,38 @@ const SignUp = () => {
                 {/* Disability Card Section (메인 화면) */}
                 <div className="form-group-outline card-section">
                     <div className="input-row header-row">
-                        <img src={iconCard} alt="Card" className="input-icon" />
-                        <span className="label">장애인 복지카드 등록</span>
+                        <span className="label card-label">장애인 복지카드 등록</span>
                     </div>
 
                     {/* 카드가 등록되었으면 정보 표시, 아니면 카메라 아이콘 표시 */}
                     {cardData ? (
-                        <div className="card-info-display">
-                            <div className="info-row">
-                                <span className="info-label-main">카드사</span>
-                                <span className="info-val-main">{cardData.company}</span>
-                            </div>
-                            <div className="info-row">
-                                <span className="info-label-main">복지카드 번호</span>
-                                <span className="info-val-main">{cardData.number}</span>
-                            </div>
-                            <div className="info-row-flex">
-                                <div className="info-col">
-                                    <span className="info-label-main">유효기간</span>
-                                    <span className="info-val-main">{cardData.expiry}</span>
+                        <>
+                            <div className="card-info-display">
+                                <div className="info-row">
+                                    <span className="info-label-main">카드사</span>
+                                    <span className="info-val-main">{cardData.company}</span>
                                 </div>
-                                <div className="info-col">
-                                    <span className="info-label-main">CVC</span>
-                                    <span className="info-val-main">{cardData.cvc}</span>
+                                <div className="info-row">
+                                    <span className="info-label-main">복지카드 번호</span>
+                                    <span className="info-val-main">{maskCardNumber(cardData.number)}</span>
+                                </div>
+                                <div className="info-row-flex">
+                                    <div className="info-col">
+                                        <span className="info-label-main">유효기간</span>
+                                        <span className="info-val-main">{cardData.expiry}</span>
+                                    </div>
+                                    <div className="info-col">
+                                        <span className="info-label-main">CVC</span>
+                                        <span className="info-val-main">{maskCvc(cardData.cvc)}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            <div className="card-retake-wrap">
+                                <button type="button" className="card-retake-btn" onClick={handleRetakeCard}>
+                                    다시 촬영하기
+                                </button>
+                            </div>
+                        </>
                     ) : (
                         // 이 부분을 클릭하면 모달이 뜹니다!
                         <div className="camera-area" onClick={() => setShowCamera(true)} style={{ cursor: 'pointer' }}>
@@ -505,22 +578,48 @@ const SignUp = () => {
 
                                     <div className="form-field-group">
                                         <label>카드사</label>
-                                        <input type="text" value="신한카드" readOnly className="modal-input" />
+                                        <input
+                                            type="text"
+                                            name="company"
+                                            value={cardForm.company}
+                                            onChange={handleCardFormChange}
+                                            className="modal-input"
+                                        />
                                     </div>
 
                                     <div className="form-field-group">
                                         <label>복지카드 번호</label>
-                                        <input type="text" value="0000-0000-0000-0000" readOnly className="modal-input" />
+                                        <input
+                                            type="text"
+                                            name="number"
+                                            value={cardForm.number}
+                                            onChange={handleCardFormChange}
+                                            className="modal-input"
+                                        />
                                     </div>
 
                                     <div className="form-row-group">
                                         <div className="form-field-group half">
                                             <label>유효기간</label>
-                                            <input type="text" value="01/21" readOnly className="modal-input" />
+                                            <input
+                                                type="text"
+                                                name="expiry"
+                                                value={cardForm.expiry}
+                                                onChange={handleCardFormChange}
+                                                className="modal-input"
+                                                placeholder="MM/YY"
+                                            />
                                         </div>
                                         <div className="form-field-group half">
                                             <label>CVC</label>
-                                            <input type="text" value="123" readOnly className="modal-input" />
+                                            <input
+                                                type="text"
+                                                name="cvc"
+                                                value={cardForm.cvc}
+                                                onChange={handleCardFormChange}
+                                                className="modal-input"
+                                                placeholder="000"
+                                            />
                                         </div>
                                     </div>
 
@@ -556,7 +655,12 @@ const SignUp = () => {
                         <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
                             <div className="success-icon">🎉</div>
                             <div className="error-message">회원가입이 완료되었습니다!</div>
-                            <button className="error-confirm-btn" onClick={() => navigate('/login')}>로그인하러 가기</button>
+                            <button
+                                className="error-confirm-btn"
+                                onClick={() => navigate('/A/login')}
+                            >
+                                로그인하러 가기
+                            </button>
                         </div>
                     </div>
                 )

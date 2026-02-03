@@ -1,4 +1,4 @@
-import { ArrowLeft, User, Mail, Check } from 'lucide-react';
+﻿import { ArrowLeft, User, Mail, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './FindIdC.css';
@@ -96,7 +96,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="성함을 입력하세요"
+                                    placeholder="이름을 입력하세요"
                                 />
                             </div>
                         </div>
@@ -114,7 +114,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                                     />
                                 </div>
                                 <button onClick={handleSendVerification} className="secondary-btn">
-                                    {isSent ? '재발송' : '인증요청'}
+                                    {isSent ? '재전송' : '인증요청'}
                                 </button>
                             </div>
                         </div>

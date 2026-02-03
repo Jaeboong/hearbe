@@ -2,15 +2,12 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCallback } from 'react';
 import './StoreBrowserA.css';
-import iconUser from '../../assets/icon-user.png';
 import iconCart from '../../assets/icon-cart.png';
 import iconShare from '../../assets/icon-share.png';
 import iconCard from '../../assets/icon-cart.png';
 import logo from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 import { shareCodeService } from '../../services/shareCodeService';
-
-import BackButton from '../common/BackButtonA';
 import FloatingMenu from '../../components/FloatingMenu/FloatingMenu';
 import ShareCodeModal from '../../components/ShareCode/ShareCodeModal';
 import { usePeerShare } from '../../hooks/peerjs/usePeerShare';
@@ -153,10 +150,10 @@ const StoreBrowser = () => {
         }
     };
 
-    const handleAddToMyCart = () => {
-        setIsMenuOpen(false);
-        setShowAddCartModal(true);
-    };
+    // const handleAddToMyCart = () => {
+    //     setIsMenuOpen(false);
+    //     setShowAddCartModal(true);
+    // };
 
     const handleProductInfoChange = (field, value) => {
         setProductInfo(prev => ({ ...prev, [field]: value }));
@@ -194,7 +191,6 @@ const StoreBrowser = () => {
 
     return (
         <div className="store-container">
-            <BackButton onClick={() => navigate('/mall')} variant="navy" />
 
             {/* New tab guidance (iframe blocked by most shopping sites) */}
             <div className="iframe-blocked-message">

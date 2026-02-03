@@ -1,13 +1,13 @@
 ﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ShoppingCart, User, LogOut } from 'lucide-react';
 import './SelectMallA.css';
-import iconUser from '../../assets/icon-user.png';
-import iconMic from '../../assets/mike.png';
-import iconHome from '../../assets/home.png';
-import iconCart from '../../assets/icon-cart.png'; // Use cart.png
 import iconNaver from '../../assets/naver.png';
 import iconCoupang from '../../assets/coupang.png';
-import BackButton from '../common/BackButtonA';
+import icon11st from '../../assets/11st_logo.png';
+import iconEmart from '../../assets/SSG_logo.png';
+import logoA from '../../assets/logoA.png';
+import { authAPI } from '../../services/authAPI';
 
 const SelectMall = () => {
     const navigate = useNavigate();
@@ -31,25 +31,46 @@ const SelectMall = () => {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch (err) {
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('savedLoginId');
+            localStorage.removeItem('savedLoginPassword');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
+        }
+    };
+
     return (
         <div className="mall-container">
-            <BackButton onClick={() => navigate('/login')} variant="arrow-only" />
+            <img
+                src={logoA}
+                alt="Logo"
+                className="mall-logo-left"
+                onClick={() => window.location.assign('/')}
+            />
             {/* Header */}
-            <div className="mall-header">
-                <div className="header-title">쇼핑몰 선택</div>
-                <div className="header-nav">
-                    <div className="nav-item" onClick={() => navigate('/')}>
-                        <img src={iconHome} alt="Home" className="nav-icon" />
-                        <span>홈</span>
-                    </div>
-                    <div className="nav-item" onClick={() => handleSelectMall('cart')}>
-                        <img src={iconCart} alt="Cart" className="nav-icon" />
+            <div className="mypage-topbar">
+                <div className="mypage-topbar-actions">
+                    <button className="topbar-action" onClick={() => handleSelectMall('cart')}>
+                        <ShoppingCart size={72} />
                         <span>카트</span>
-                    </div>
-                    <div className="nav-item" onClick={() => navigate('/A/mypage')}>
-                        <img src={iconUser} alt="My" className="nav-icon" />
+                    </button>
+                    <button className="topbar-action" onClick={() => navigate('/A/member-info')}>
+                        <User size={72} />
                         <span>마이</span>
-                    </div>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
+                    </button>
                 </div>
             </div>
 
@@ -76,7 +97,7 @@ const SelectMall = () => {
                     <div className="mall-card-wrapper" onClick={() => handleSelectMall('11st')}>
                         <div className="mall-square-box mall-11st-box">
                             <span className="mall-number">3</span>
-                            <div className="mall-logo-placeholder">11st</div>
+                            <img src={icon11st} alt="11st" className="mall-logo-img" />
                         </div>
                     </div>
 
@@ -84,7 +105,7 @@ const SelectMall = () => {
                     <div className="mall-card-wrapper" onClick={() => handleSelectMall('emart')}>
                         <div className="mall-square-box mall-emart-box">
                             <span className="mall-number">4</span>
-                            <div className="mall-logo-placeholder">SSG</div>
+                            <img src={iconEmart} alt="Emart" className="mall-logo-img" />
                         </div>
                     </div>
                 </div>
@@ -94,3 +115,4 @@ const SelectMall = () => {
 };
 
 export default SelectMall;
+

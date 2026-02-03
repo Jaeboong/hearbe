@@ -1,7 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BackButton from '../common/BackButtonA';
+import { Home, LogOut } from 'lucide-react';
+import logoA from '../../assets/logoA.png';
 import { memberAPI } from '../../services/memberAPI';
+import { authAPI } from '../../services/authAPI';
 import './MemberInfoA.css';
 
 const MemberInfoA = () => {
@@ -17,7 +19,7 @@ const MemberInfoA = () => {
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: '장애인 복지카드 변경', path: '/A/card-management' }
+        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -66,10 +68,18 @@ const MemberInfoA = () => {
         fetchUserProfile();
     }, [navigate]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('userData');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+        } catch (err) {
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = 'http://localhost:5173/';
+        }
     };
 
     const handleRetry = () => {
@@ -81,12 +91,30 @@ const MemberInfoA = () => {
 
     return (
         <div className="memberinfo-container">
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
+            <img
+                src={logoA}
+                alt="Logo"
+                className="memberinfo-logo-left"
+                onClick={() => window.location.assign('/')}
+            />
+
+            <div className="mypage-topbar">
+                <h1 className="mypage-topbar-title">마이페이지</h1>
+                <div className="mypage-topbar-actions">
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                        <Home size={72} />
+                        <span>홈</span>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </div>
 
             <div className="memberinfo-content">
                 {/* Sidebar Navigation */}
                 <aside className="memberinfo-sidebar">
-                    <h1 className="sidebar-title">마이페이지</h1>
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <div
@@ -130,13 +158,16 @@ const MemberInfoA = () => {
                                 </div>
                                 <div className="table-row">
                                     <div className="table-label">비밀번호</div>
-                                    <div className="table-value">{userData.password}</div>
+                                    <div className="table-value password-value">
+                                        {userData.password}
+                                        <button className="password-change-btn">변경하기</button>
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="logout-section">
                                 <span className="logout-link" onClick={handleLogout}>
-                                    로그아웃
+                                    회원탈퇴
                                 </span>
                             </div>
                         </>
@@ -148,3 +179,7 @@ const MemberInfoA = () => {
 };
 
 export default MemberInfoA;
+
+
+
+

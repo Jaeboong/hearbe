@@ -15,6 +15,9 @@ import MemberInfoA from '../pages/MemberInfo/MemberInfoA';
 import OrderHistoryA from '../pages/OrderHistory/OrderHistoryA';
 import WishlistA from '../pages/Wishlist_A/WishlistA';
 import CardManagementA from '../pages/CardManagement_A/CardManagementA';
+import FindIdA from '../pages/FindId/FindIdA';
+import FindPasswordA from '../pages/FindPassword/FindPasswordA';
+import ChangePasswordA from '../pages/FindPassword/ChangePasswordA';
 
 // [C형 페이지 컴포넌트]
 import LoginC from '../pages/Login/LoginC';
@@ -184,6 +187,18 @@ function AppContent() {
             onHome={() => navigate('/')}
           />
         }
+      />
+      <Route
+        path="/A/findId"
+        element={<FindIdA />}
+      />
+      <Route
+        path="/A/findPassword"
+        element={<FindPasswordA />}
+      />
+      <Route
+        path="/A/changePassword"
+        element={<ChangePasswordA />}
       />
 
       {/* Type C Routes */}

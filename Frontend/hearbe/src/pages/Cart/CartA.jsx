@@ -1,7 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import BackButton from '../common/BackButtonA';
+import { Home, LogOut } from 'lucide-react';
+import logoA from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
+import { authAPI } from '../../services/authAPI';
 import './CartA.css';
 
 const CartA = () => {
@@ -12,9 +14,6 @@ const CartA = () => {
     const [cartData, setCartData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Checkbox selection state
-    const [selectedItems, setSelectedItems] = useState({});
 
     // Platform ID to name mapping
     const platformNames = {
@@ -67,59 +66,59 @@ const CartA = () => {
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: '장애인 복지카드 변경', path: '/A/card-management' }
+        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
 
-    const handleCheckboxChange = (mallName, itemId) => {
-        setSelectedItems(prev => ({
-            ...prev,
-            [mallName]: {
-                ...prev[mallName],
-                [itemId]: !prev[mallName]?.[itemId]
-            }
-        }));
-    };
-
-    const handleDeleteItem = async (mallName, itemId) => {
+    const handleLogout = async () => {
         try {
-            await cartAPI.deleteCart(itemId);
-            // API 호출 성공 시 로컬 상태 업데이트
-            setCartData(prev => ({
-                ...prev,
-                [mallName]: prev[mallName].filter(item => item.id !== itemId)
-            }));
+            await authAPI.logout();
         } catch (err) {
-            console.error('Failed to delete cart item:', err);
-            alert(err.message || '상품 삭제에 실패했습니다.');
+            console.warn('Logout failed:', err);
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = 'http://localhost:5173/';
         }
     };
 
-    const calculateSelectedTotal = (mallName, items) => {
-        return items
-            .filter(item => selectedItems[mallName]?.[item.id])
-            .reduce((sum, item) => sum + item.price, 0);
-    };
-
-    const handleCheckout = (mallName, items) => {
-        const selectedCount = items.filter(item => selectedItems[mallName]?.[item.id]).length;
-        if (selectedCount === 0) {
-            alert('결제할 상품을 선택해주세요.');
+    const handleItemCheckout = item => {
+        if (item.url) {
+            window.open(item.url, '_blank', 'noopener,noreferrer');
             return;
         }
-        const total = calculateSelectedTotal(mallName, items);
-        alert(`${mallName}에서 ${selectedCount}개 상품 ${total.toLocaleString()}원 결제를 진행합니다.`);
+        alert('결제할 링크가 없습니다.');
     };
 
     return (
         <div className="cart-container">
-            <BackButton onClick={() => navigate(-1)} variant="arrow-only" />
+            <img
+                src={logoA}
+                alt="Logo"
+                className="cart-logo-left"
+                onClick={() => window.location.assign('/')}
+            />
+
+            <div className="mypage-topbar">
+                <h1 className="mypage-topbar-title">마이페이지</h1>
+                <div className="mypage-topbar-actions">
+                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                        <Home size={72} />
+                        <span>홈</span>
+                    </button>
+                    <button className="topbar-action" onClick={handleLogout}>
+                        <LogOut size={72} />
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </div>
 
             <div className="cart-content">
                 {/* Sidebar */}
                 <aside className="cart-sidebar">
-                    <h1 className="sidebar-title">마이페이지</h1>
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <div
@@ -137,51 +136,43 @@ const CartA = () => {
                 <main className="cart-main">
                     <h2 className="content-title">장바구니</h2>
 
+                    {isLoading && <div className="empty-cart">장바구니를 불러오는 중입니다.</div>}
+                    {!isLoading && error && (
+                        <div className="empty-cart">{error}</div>
+                    )}
+
                     {/* Cart by Mall */}
                     {Object.entries(cartData).map(([mallName, items]) => (
                         items.length > 0 && (
                             <div key={mallName} className="cart-mall-section">
                                 <div className="cart-mall-header">
                                     <h3 className="cart-mall-name">{mallName}</h3>
-                                    <button
-                                        className="checkout-btn"
-                                        onClick={() => handleCheckout(mallName, items)}
-                                    >
-                                        선택상품 결제하기
-                                    </button>
                                 </div>
 
                                 <div className="cart-items-list">
                                     {items.map(item => (
                                         <div key={item.id} className="cart-item">
-                                            <input
-                                                type="checkbox"
-                                                className="cart-item-checkbox"
-                                                checked={selectedItems[mallName]?.[item.id] || false}
-                                                onChange={() => handleCheckboxChange(mallName, item.id)}
-                                            />
                                             <img src={item.image} alt={item.name} className="cart-item-image" />
                                             <div className="cart-item-details">
                                                 <div className="cart-item-name">{item.name}</div>
                                                 <div className="cart-item-price">{item.price.toLocaleString()}원</div>
                                             </div>
-                                            <div className="cart-item-controls">
+                                            <div className="cart-item-actions">
                                                 <button
-                                                    className="cart-delete-btn"
-                                                    onClick={() => handleDeleteItem(mallName, item.id)}
+                                                    className="cart-item-pay-btn"
+                                                    onClick={() => handleItemCheckout(item)}
                                                 >
+                                                    결제하기
                                                 </button>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-
-
                             </div>
                         )
                     ))}
 
-                    {Object.values(cartData).every(items => items.length === 0) && (
+                    {!isLoading && Object.values(cartData).every(items => items.length === 0) && (
                         <div className="empty-cart">
                             장바구니가 비어있습니다.
                         </div>
@@ -193,3 +184,5 @@ const CartA = () => {
 };
 
 export default CartA;
+
+
