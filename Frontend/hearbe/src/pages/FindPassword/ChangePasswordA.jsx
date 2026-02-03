@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoA from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
@@ -22,18 +22,23 @@ const ChangePasswordA = () => {
             alert('비밀번호가 일치하지 않습니다.');
             return;
         }
-        const userId =
-            localStorage.getItem('user_id') ||
-            localStorage.getItem('username') ||
-            localStorage.getItem('member_username');
-        if (!userId) {
-            alert('사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
-            return;
-        }
         try {
-            await authAPI.updatePassword(userId, 'oldPassword123!', password);
-            alert('비밀번호가 변경되었습니다.');
-            navigate('/A/login');
+            const welfareVerified = localStorage.getItem('welfare_verified') === 'true';
+            const storedCard = localStorage.getItem('welfare_card');
+            if (!welfareVerified || !storedCard) {
+                alert('복지카드 인증이 필요합니다.');
+                return;
+            }
+            const welfareCard = JSON.parse(storedCard);
+            const response = await authAPI.resetPasswordBlind(welfareCard, password);
+            if (response?.result === 'success') {
+                localStorage.removeItem('welfare_verified');
+                localStorage.removeItem('welfare_card');
+                alert('비밀번호가 변경되었습니다.');
+                navigate('/A/login');
+                return;
+            }
+            alert(response?.message || '비밀번호 변경에 실패했습니다.');
         } catch (error) {
             alert(error.message || '비밀번호 변경에 실패했습니다.');
         }

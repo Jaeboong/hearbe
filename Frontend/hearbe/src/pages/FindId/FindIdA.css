@@ -103,7 +103,7 @@ body:has(.findid-container) {
     overflow: hidden;
     border: clamp(3px, 0.6vw, 6px) solid var(--findid-accent);
     border-radius: clamp(16px, 3vw, 24px);
-    background-color: var(--findid-bg);
+    background-color: #171C28;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -161,6 +161,7 @@ body:has(.findid-container) {
     width: 85%;
     max-width: 600px;
     height: 40vh;
+    margin: 0 auto;
     border: clamp(2px, 0.4vw, 3px) solid var(--findid-accent);
     border-radius: clamp(12px, 3vw, 20px);
     background-color: #000;

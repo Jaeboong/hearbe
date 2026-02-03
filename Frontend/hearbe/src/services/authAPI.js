@@ -247,4 +247,127 @@ export const authAPI = {
             throw error;
         }
     }
+    ,
+    // 비밀번호 변경(복지카드) API
+    resetPasswordBlind: async (welfareCard, newPassword) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/resetPasswordBlind`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    welfare_card: welfareCard,
+                    new_password: newPassword
+                }),
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '비밀번호 변경에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Reset Password Blind API Error:', error);
+            throw error;
+        }
+    },
+    // 복지카드 조회 API
+    getWelfareCard: async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/welfare`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '복지카드 조회에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Get Welfare Card API Error:', error);
+            throw error;
+        }
+    },
+    // 복지카드 등록/수정 API
+    updateWelfareCard: async (welfareCard) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/welfare`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(welfareCard),
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '복지카드 저장에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Update Welfare Card API Error:', error);
+            throw error;
+        }
+    },
+    // 복지카드 인증 확인 API
+    verifyWelfareCard: async (welfareCard) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/welfare/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(welfareCard),
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '복지카드 인증에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Verify Welfare Card API Error:', error);
+            throw error;
+        }
+    }
 };

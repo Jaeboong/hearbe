@@ -58,6 +58,12 @@ const SignUp = () => {
     // Card Recognition State
     const [modalStep, setModalStep] = useState('camera'); // 'camera' or 'form'
     const [cardData, setCardData] = useState(null); // { company, number, expiry, cvc }
+    const [cardForm, setCardForm] = useState({
+        company: '',
+        number: '',
+        expiry: '',
+        cvc: ''
+    });
 
     // Camera Logic
     const videoRef = useRef(null);
@@ -205,7 +211,45 @@ const SignUp = () => {
 
     // 1. 카메라 셔터 누름 -> 폼 확인 단계로 이동 (팝업 유지)
     const handleSnap = () => {
+        setCardForm({
+            company: '신한카드',
+            number: '0000-0000-0000-0000',
+            expiry: '01/21',
+            cvc: '123'
+        });
         setModalStep('form');
+    };
+
+    const formatCardNumber = (value) => {
+        const digits = value.replace(/[^0-9]/g, '').slice(0, 16);
+        if (digits.length <= 4) return digits;
+        if (digits.length <= 8) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+        if (digits.length <= 12) return `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8)}`;
+        return `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8, 12)}-${digits.slice(12)}`;
+    };
+
+    const formatExpiry = (value) => {
+        const digits = value.replace(/[^0-9]/g, '').slice(0, 4);
+        if (digits.length <= 2) return digits;
+        return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    };
+
+    const handleCardFormChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'number') {
+            setCardForm((prev) => ({ ...prev, number: formatCardNumber(value) }));
+            return;
+        }
+        if (name === 'expiry') {
+            setCardForm((prev) => ({ ...prev, expiry: formatExpiry(value) }));
+            return;
+        }
+        if (name === 'cvc') {
+            const digits = value.replace(/[^0-9]/g, '').slice(0, 3);
+            setCardForm((prev) => ({ ...prev, cvc: digits }));
+            return;
+        }
+        setCardForm((prev) => ({ ...prev, [name]: value }));
     };
 
     // 2. 최종 카드 등록 -> 데이터 저장 후 팝업 닫기
@@ -214,15 +258,12 @@ const SignUp = () => {
         const today = new Date();
         const issueDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
-        // expiry '01/21' -> 서버 요구형식 'MM/YY'로 전송 (예: 12/30)
-        const expiryDate = '12/30'; // 하드코딩된 만료일 (MM/YY 형식)
-
         setCardData({
-            company: '신한카드',
-            number: '0000-0000-0000-0000',
+            company: cardForm.company,
+            number: cardForm.number,
             issueDate: issueDate,
-            expiry: expiryDate,
-            cvc: '123'
+            expiry: cardForm.expiry,
+            cvc: cardForm.cvc
         });
         setShowCamera(false);
         setModalStep('camera'); // 다음 번을 위해 초기화
@@ -536,22 +577,48 @@ const SignUp = () => {
 
                                     <div className="form-field-group">
                                         <label>카드사</label>
-                                        <input type="text" value="신한카드" readOnly className="modal-input" />
+                                        <input
+                                            type="text"
+                                            name="company"
+                                            value={cardForm.company}
+                                            onChange={handleCardFormChange}
+                                            className="modal-input"
+                                        />
                                     </div>
 
                                     <div className="form-field-group">
                                         <label>복지카드 번호</label>
-                                        <input type="text" value="0000-0000-0000-0000" readOnly className="modal-input" />
+                                        <input
+                                            type="text"
+                                            name="number"
+                                            value={cardForm.number}
+                                            onChange={handleCardFormChange}
+                                            className="modal-input"
+                                        />
                                     </div>
 
                                     <div className="form-row-group">
                                         <div className="form-field-group half">
                                             <label>유효기간</label>
-                                            <input type="text" value="01/21" readOnly className="modal-input" />
+                                            <input
+                                                type="text"
+                                                name="expiry"
+                                                value={cardForm.expiry}
+                                                onChange={handleCardFormChange}
+                                                className="modal-input"
+                                                placeholder="MM/YY"
+                                            />
                                         </div>
                                         <div className="form-field-group half">
                                             <label>CVC</label>
-                                            <input type="text" value="123" readOnly className="modal-input" />
+                                            <input
+                                                type="text"
+                                                name="cvc"
+                                                value={cardForm.cvc}
+                                                onChange={handleCardFormChange}
+                                                className="modal-input"
+                                                placeholder="000"
+                                            />
                                         </div>
                                     </div>
 
@@ -587,7 +654,12 @@ const SignUp = () => {
                         <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
                             <div className="success-icon">🎉</div>
                             <div className="error-message">회원가입이 완료되었습니다!</div>
-                            <button className="error-confirm-btn" onClick={() => navigate('/login')}>로그인하러 가기</button>
+                            <button
+                                className="error-confirm-btn"
+                                onClick={() => navigate('/A/login')}
+                            >
+                                로그인하러 가기
+                            </button>
                         </div>
                     </div>
                 )
