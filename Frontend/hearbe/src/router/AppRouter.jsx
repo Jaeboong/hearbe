@@ -304,7 +304,7 @@ return (
     <Route path="*" element={<Navigate to="/intro" replace />} />
   </Routes>
 );
-}
+
 
 
 /**
