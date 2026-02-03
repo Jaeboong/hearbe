@@ -1,12 +1,18 @@
 package com.ssafy.d108.backend.auth.controller;
 
+import com.ssafy.d108.backend.auth.dto.DeleteAccountRequest;
+import com.ssafy.d108.backend.auth.dto.DeleteAccountResponse;
 import com.ssafy.d108.backend.auth.dto.FindIdRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdByEmailRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.CheckIdRequest;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordBlindRequest;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordByWelfareRequest;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordRequest;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordResponse;
+import com.ssafy.d108.backend.global.util.SecurityUtil;
 import com.ssafy.d108.backend.auth.dto.SignupRequest;
 import com.ssafy.d108.backend.auth.service.AuthService;
 import com.ssafy.d108.backend.global.response.ApiResponse;
@@ -98,8 +104,40 @@ public class AuthController {
      */
     @Operation(summary = "비밀번호 재설정", description = "이메일 인증 후 비밀번호 재설정 (C형 전용)")
     @PostMapping("/resetPassword")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<ResetPasswordResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
-        return ResponseEntity.ok(ApiResponse.success(null, "비밀번호가 재설정되었습니다."));
+        return ResponseEntity.ok(ResetPasswordResponse.success());
+    }
+
+    /**
+     * 비밀번호 재설정 (Blind - 로그인 사용자)
+     */
+    @Operation(summary = "비밀번호 재설정 (Blind)", description = "로그인된 사용자의 비밀번호 재설정")
+    @PostMapping("/resetPasswordBlind")
+    public ResponseEntity<ResetPasswordResponse> resetPasswordBlind(@Valid @RequestBody ResetPasswordBlindRequest request) {
+        Integer userId = SecurityUtil.getCurrentUserId();
+        authService.resetPasswordBlind(request, userId);
+        return ResponseEntity.ok(ResetPasswordResponse.success());
+    }
+
+    /**
+     * 회원탈퇴
+     */
+    @Operation(summary = "회원탈퇴", description = "비밀번호 확인 후 회원탈퇴 처리")
+    @PostMapping("/delete-account")
+    public ResponseEntity<ApiResponse<DeleteAccountResponse>> deleteAccount(@Valid @RequestBody DeleteAccountRequest request) {
+        Integer userId = SecurityUtil.getCurrentUserId();
+        Integer deletedUserId = authService.deleteAccount(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(DeleteAccountResponse.of(deletedUserId), "회원탈퇴 완료"));
+    }
+
+    /**
+     * 비밀번호 찾기 (A형 - 복지카드 인증)
+     */
+    @Operation(summary = "비밀번호 찾기 (복지카드)", description = "복지카드 인증 후 비밀번호 재설정 (A형 전용)")
+    @PostMapping("/findPassword")
+    public ResponseEntity<ResetPasswordResponse> findPassword(@Valid @RequestBody ResetPasswordByWelfareRequest request) {
+        authService.resetPasswordByWelfare(request);
+        return ResponseEntity.ok(ResetPasswordResponse.success());
     }
 }

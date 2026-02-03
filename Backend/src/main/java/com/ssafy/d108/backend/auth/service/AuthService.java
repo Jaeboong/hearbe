@@ -5,6 +5,9 @@ import com.ssafy.d108.backend.auth.dto.FindIdByEmailRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.DeleteAccountRequest;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordBlindRequest;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordByWelfareRequest;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordRequest;
 import com.ssafy.d108.backend.auth.dto.SignupRequest;
 import com.ssafy.d108.backend.auth.dto.WelfareCardRequest;
@@ -233,6 +236,65 @@ public class AuthService {
                 .orElseThrow(() -> new UserNotFoundException("해당 이메일로 가입된 회원이 없습니다."));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    /**
+     * 비밀번호 재설정 (Blind - 로그인 사용자)
+     */
+    @Transactional
+    public void resetPasswordBlind(ResetPasswordBlindRequest request, Integer userId) {
+        if (!request.getNewPassword().equals(request.getNewPasswordCheck())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    /**
+     * 회원탈퇴
+     */
+    @Transactional
+    public Integer deleteAccount(DeleteAccountRequest request, Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 복지카드 먼저 삭제
+        welfareCardRepository.deleteByUserId(userId);
+
+        userRepository.delete(user);
+        return userId;
+    }
+
+    /**
+     * 비밀번호 재설정 (A형 - 복지카드 인증)
+     */
+    @Transactional
+    public void resetPasswordByWelfare(ResetPasswordByWelfareRequest request) {
+        String rawCardNumber = request.getWelfareCard().getCardNumber().replaceAll("[^0-9]", "");
+        String encryptedCardNumber = aesUtil.encrypt(rawCardNumber);
+        String encryptedCvc = aesUtil.encrypt(request.getWelfareCard().getCvc());
+
+        WelfareCard welfareCard = welfareCardRepository
+                .findByCardNumberAndCardCompanyAndIssueDateAndExpirationDateAndCvc(
+                        encryptedCardNumber,
+                        request.getWelfareCard().getCardCompany(),
+                        request.getWelfareCard().getIssueDate(),
+                        request.getWelfareCard().getExpirationDate(),
+                        encryptedCvc)
+                .orElseThrow(() -> new UserNotFoundException("해당 장애인 복지 카드로 가입된 회원이 없습니다."));
+
+        User user = welfareCard.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setSimplePassword(request.getNewPassword());
         userRepository.save(user);
     }
 }
