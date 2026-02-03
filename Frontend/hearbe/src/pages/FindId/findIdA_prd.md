@@ -16,13 +16,13 @@
 5. 서버 조회 결과에 따라 아이디 표시 또는 실패 메시지 표시
 
 ## API 명세
-- Path: /auth/find-id
+- Path: /auth/findId
 - Method: POST
 - Request Body:
   {
     "welfare_card": {
       "card_company": "신한카드",
-      "card_number": "1234-5678-9012-3456",
+      "card_number": "1234567890123456",
       "issue_date": "2023-01-01",
       "expiration_date": "2028-01-01",
       "cvc": "123"

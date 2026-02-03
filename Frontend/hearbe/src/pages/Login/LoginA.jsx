@@ -108,29 +108,36 @@ const Login = () => {
                     />
                 </div>
 
-                {/* Input Section */}
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="아이디"
-                        className="login-input first-input"
-                        value={id}
-                        onChange={(e) => setId(e.target.value)}
-                    />
-                    <input
-                        type="password"
-                        placeholder="비밀번호"
-                        className="login-input"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        maxLength={6}
-                    />
-                </div>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleLogin();
+                    }}
+                >
+                    {/* Input Section */}
+                    <div className="input-group">
+                        <input
+                            type="text"
+                            placeholder="아이디"
+                            className="login-input first-input"
+                            value={id}
+                            onChange={(e) => setId(e.target.value)}
+                        />
+                        <input
+                            type="password"
+                            placeholder="비밀번호"
+                            className="login-input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            maxLength={6}
+                        />
+                    </div>
 
-                {/* Login Button */}
-                <button className="login-button" onClick={() => handleLogin()} disabled={isLoading}>
-                    로그인
-                </button>
+                    {/* Login Button */}
+                    <button className="login-button" type="submit" disabled={isLoading}>
+                        로그인
+                    </button>
+                </form>
 
                 {/* Features (Save ID) */}
                 <div className="login-options">

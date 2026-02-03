@@ -206,6 +206,45 @@ export const authAPI = {
         } catch (error) {
             console.error('Logout API Error:', error);
             throw error;
+        } finally {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('savedLoginId');
+            localStorage.removeItem('savedLoginPassword');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+        }
+    }
+    ,
+    // 아이디 찾기 (복지카드) API
+    findIdByWelfareCard: async (welfareCard) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/findId`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ welfare_card: welfareCard }),
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('서버 응답 형식이 올바르지 않습니다.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || '아이디 찾기에 실패했습니다.');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Find ID By Welfare Card API Error:', error);
+            throw error;
         }
     }
 };

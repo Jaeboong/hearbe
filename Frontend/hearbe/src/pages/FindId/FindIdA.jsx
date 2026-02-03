@@ -89,10 +89,9 @@ const FindIdA = () => {
             setRecognizedCardNumber(recognized.card_number.replace(/[^0-9]/g, ''));
             setWelfareCard(recognized);
             setIsOcrLoading(false);
-            setShowCamera(false);
-            setModalStep('camera');
+            setShowCamera(true);
+            setModalStep('form');
             setResultModal(null);
-            navigate('/A/changePassword');
         }, 1200);
     };
 
@@ -100,7 +99,15 @@ const FindIdA = () => {
         const { name, value } = e.target;
         if (name === 'card_number') {
             const digits = value.replace(/[^0-9]/g, '').slice(0, 16);
-            setWelfareCard((prev) => ({ ...prev, [name]: digits }));
+            const formatted =
+                digits.length <= 4
+                    ? digits
+                    : digits.length <= 8
+                        ? `${digits.slice(0, 4)}-${digits.slice(4)}`
+                        : digits.length <= 12
+                            ? `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8)}`
+                            : `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8, 12)}-${digits.slice(12)}`;
+            setWelfareCard((prev) => ({ ...prev, [name]: formatted }));
             return;
         }
         if (name === 'expiration_date') {
@@ -128,9 +135,9 @@ const FindIdA = () => {
             setFormError('유효기간은 MM/YY 형식으로 입력해주세요.');
             return;
         }
-        const cardPattern = /^\d{16}$/;
+        const cardPattern = /^\d{4}-\d{4}-\d{4}-\d{4}$/;
         if (!cardPattern.test(card_number)) {
-            setFormError('카드번호는 숫자 16자리로 입력해주세요.');
+            setFormError('카드번호는 0000-0000-0000-0000 형식으로 입력해주세요.');
             return;
         }
         const cvcPattern = /^\d{3}$/;
@@ -152,7 +159,7 @@ const FindIdA = () => {
         try {
             const response = await authAPI.findIdByWelfareCard({
                 card_company: normalizedCompany,
-                card_number: normalizedCardDigits,
+                card_number: normalizedCardNumber,
                 expiration_date,
                 cvc: normalizedCvc
             });
@@ -321,7 +328,15 @@ const FindIdA = () => {
                     <div className="findid-result-box" onClick={(e) => e.stopPropagation()}>
                         <div className="findid-result-title">카드 정보가 확인되었습니다</div>
                         <div className="findid-result-desc">아이디 : {foundId}</div>
-                        <button className="findid-result-btn" onClick={() => setResultModal(null)}>확인</button>
+                        <button
+                            className="findid-result-btn"
+                            onClick={() => {
+                                setResultModal(null);
+                                navigate('/A/login');
+                            }}
+                        >
+                            확인
+                        </button>
                     </div>
                 </div>
             )}

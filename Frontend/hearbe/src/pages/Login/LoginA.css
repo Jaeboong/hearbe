@@ -1,11 +1,11 @@
-﻿/* 1. ?됱긽 蹂???ㅼ젙 */
+﻿/* 1. 색상 변수 설정 */
 :root {
   --main-yellow: #FFF064;
   --bg-dark: #141C29;
   --input-radius: clamp(8px, 1.5vw, 12px);
 }
 
-/* 2. ?꾩껜 ?덉씠?꾩썐 */
+/* 2. 전체 레이아웃 */
 .login-container {
   display: flex;
   flex-direction: column;
@@ -35,7 +35,7 @@
   height: clamp(24px, 8vw, 48px);
 }
 
-/* 3. 濡쒓렇??諛뺤뒪 */
+/* 3. 로그인 박스 */
 .login-box {
   width: clamp(280px, 90vw, 600px);
   max-width: 90vw;
@@ -50,14 +50,14 @@
   box-sizing: border-box;
 }
 
-/* 4. 濡쒓퀬 */
+/* 4. 로고 */
 .logo-image {
   width: clamp(140px, 30vw, 280px);
   height: auto;
   object-fit: contain;
 }
 
-/* 5. ???곸뿭 */
+/* 5. 폼 영역 */
 .login-form {
   width: 100%;
   display: flex;
@@ -70,7 +70,11 @@
 .input-group {
   display: flex;
   flex-direction: column;
-  width: 85%;
+  width: 130%;
+  margin: 0 auto;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
   border: clamp(2px, 0.5vw, 4px) solid var(--main-yellow);
   border-radius: var(--input-radius);
   background-color: var(--bg-dark);
@@ -97,14 +101,19 @@
   opacity: 0.9;
 }
 
-/* 泥?踰덉㎏ ?낅젰李??꾩씠?? 諛묒쨪 */
+/* 첫 번째 입력창(아이디) 구분선 */
 .first-input {
   border-bottom: clamp(2px, 0.5vw, 4px) solid var(--main-yellow);
 }
 
-/* 6. 濡쒓렇??踰꾪듉 */
+/* 6. 로그인 버튼 */
 .login-button {
-  width: 85%;
+  width: 130%;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: var(--main-yellow);
   color: var(--bg-dark);
   font-family: 'KoddiUD OnGothic', sans-serif;
@@ -123,19 +132,23 @@
   opacity: 0.9;
 }
 
-/* 7. ?듭뀡 (泥댄겕諛뺤뒪 ?? */
+/* 7. 옵션(체크박스) */
 .login-options {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 85%;
+  width: 130%;
+  margin-left: 7%;
+  margin-right: auto;
+  position: static;
+  transform: none;
   margin-top: clamp(8px, 2vw, 16px);
   color: var(--main-yellow);
   font-weight: bold;
   font-size: clamp(14px, 4.5vw, 24px);
 }
 
-/* --- 而ㅼ뒪? 泥댄겕諛뺤뒪 ?쒖옉 --- */
+/* --- 커스텀 체크박스 시작 --- */
 .checkbox-container {
   display: flex;
   align-items: center;
@@ -144,9 +157,12 @@
   position: relative;
   user-select: none;
   white-space: nowrap;
+  justify-content: flex-start;
+  margin-left: 0;
+  width: 100%;
 }
 
-/* 湲곕낯 泥댄겕諛뺤뒪 ?④? */
+/* 기본 체크박스 숨김 */
 .checkbox-container input {
   position: absolute;
   opacity: 0;
@@ -155,10 +171,10 @@
   width: 0;
 }
 
-/* 媛吏?泥댄겕諛뺤뒪 (?ㅻえ) */
+/* 커스텀 체크박스(박스) */
 .checkmark {
-  height: clamp(20px, 5.2vw, 32px);
-  width: clamp(20px, 5.2vw, 32px);
+  height: clamp(22px, 5.8vw, 36px);
+  width: clamp(22px, 5.8vw, 36px);
   background-color: transparent;
   border: clamp(2px, 0.4vw, 3px) solid var(--main-yellow);
   border-radius: clamp(3px, 0.8vw, 6px);
@@ -170,33 +186,33 @@
   transition: background-color 0.2s;
 }
 
-/* 泥댄겕?섏뿀????諛곌꼍 梨꾩슦湲?*/
+/* 체크했을 때 배경 채우기 */
 .checkbox-container input:checked~.checkmark {
   background-color: var(--main-yellow);
 }
 
-/* 泥댄겕 ?쒖떆 (V 紐⑥뼇 留뚮뱾湲? */
+/* 체크 표시(V 모양) 만들기 */
 .checkmark:after {
   content: "";
   position: absolute;
   display: none;
   left: 50%;
   top: 50%;
-  width: clamp(6px, 1.5vw, 10px);
-  height: clamp(12px, 3vw, 18px);
+  width: clamp(7px, 1.6vw, 11px);
+  height: clamp(13px, 3.2vw, 20px);
   border: solid var(--bg-dark);
-  border-width: 0 clamp(4px, 1vw, 6px) clamp(4px, 1vw, 6px) 0;
+  border-width: 0 clamp(4px, 1.1vw, 7px) clamp(4px, 1.1vw, 7px) 0;
   transform: translate(-50%, -60%) rotate(45deg);
 }
 
-/* 泥댄겕?섎㈃ V ?쒖떆 蹂댁씠湲?*/
+/* 체크하면 V 표시 보이기 */
 .checkbox-container input:checked~.checkmark:after {
   display: block;
 }
 
-/* --- 而ㅼ뒪? 泥댄겕諛뺤뒪 ??--- */
+/* --- 커스텀 체크박스 끝 --- */
 
-/* 9. ?섎떒 留곹겕 (?꾩씠??李얘린/鍮꾨?踰덊샇 李얘린/?뚯썝媛?? */
+/* 9. 하단 링크(아이디 찾기/비밀번호 변경/회원가입) */
 .login-footer {
   margin-top: clamp(16px, 4vw, 32px);
   display: flex;
@@ -212,4 +228,5 @@
 .login-separator {
   opacity: 0.5;
 }
+
 
