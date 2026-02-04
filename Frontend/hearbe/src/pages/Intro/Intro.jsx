@@ -1,181 +1,132 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Spline from '@splinetool/react-spline';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import './Intro.css';
+
 import introAudio1 from '../../assets/Intro/intro1.wav';
 import introAudio2 from '../../assets/Intro/intro2.wav';
 import introAudio3 from '../../assets/Intro/intro3.wav';
-import introAudio4 from '../../assets/Intro/intro4.wav';
-
-// Error Boundary to catch WebGL context failures
-class SplineErrorBoundary extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { hasError: false };
-    }
-
-    static getDerivedStateFromError(error) {
-        return { hasError: true };
-    }
-
-    componentDidCatch(error, errorInfo) {
-        console.error("Spline Error Boundary Caught:", error, errorInfo);
-    }
-
-    render() {
-        if (this.state.hasError) {
-            return <div className="abstract-orb" />;
-        }
-        return this.props.children;
-    }
-}
 
 const STEPS = [
-    {
-        title: "목소리만으로 완성하는 새로운 쇼핑 경험",
-        desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.",
-        audioSrc: introAudio1
-    },
-    {
-        title: "보이지 않아도, 스스로 선택하는 쇼핑",
-        desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.",
-        audioSrc: introAudio2
-    },
-    {
-        title: "검색부터 결제까지, 당신의 목소리로",
-        desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.",
-        audioSrc: introAudio3
-    },
-    {
-        title: "HearBe와 함께, 지금 바로 시작해보세요",
-        desc: "누구나 즐거운 쇼핑, HearBe가 함께합니다.",
-        audioSrc: introAudio4
-    }
+    { title: "목소리만으로 완성하는 새로운 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1 },
+    { title: "보이지 않아도, 스스로 선택하는 쇼핑", desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.", audioSrc: introAudio2 },
+    { title: "검색부터 결제까지, HearBe와 함께 시작해보세요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3 },
 ];
 
 export default function Intro() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [isReady, setIsReady] = useState(false); // 마운트 후 잠시 대기
     const navigate = useNavigate();
-    const audioRef = useRef(null);
+
+    // 오디오와 타이머 객체 관리 (중복 실행 방지)
+    const audioRef = React.useRef(null);
+    const timerRef = React.useRef(null);
+    const isMountedRef = React.useRef(true);
 
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-
-        // 오디오 정지
-        if (audioRef.current) {
-            audioRef.current.pause();
-        }
-
-        // 보라색 확산 애니메이션 후 /main으로 이동
-        setTimeout(() => {
-            navigate('/main');
-        }, 850);
+        setTimeout(() => navigate('/welcome'), 850);
     };
 
-    // Step Timer Logic
+    // 1. 초기 로딩 딜레이 (급발진 방지)
     useEffect(() => {
-        if (isTransitioning) return;
+        const t = setTimeout(() => setIsReady(true), 100);
+        return () => clearTimeout(t);
+    }, []);
 
-        // 4초마다 다음 스텝으로 자동 이동
-        const timer = setInterval(() => {
+    // 2. 스텝 변경 및 오디오 재생 로직
+    useEffect(() => {
+        if (!isReady || isTransitioning) return;
+
+        // Strict Mode 중복 실행 방지
+        if (timerRef.current) {
+            return; // 이미 타이머가 돌고 있으면 추가 실행 안 함
+        }
+
+        const handleNext = () => {
+            if (!isMountedRef.current) return; // 언마운트됐으면 무시
+
             if (currentStep < STEPS.length - 1) {
-                setCurrentStep((prev) => prev + 1);
+                setCurrentStep(prev => prev + 1);
             } else {
                 goToMain();
             }
-        }, 4000);
+        };
 
-        return () => clearInterval(timer);
-    }, [currentStep, isTransitioning]);
+        // 새 오디오 설정
+        const audio = new Audio(STEPS[currentStep].audioSrc);
+        audioRef.current = audio;
 
-    // Audio Playback Logic per Step
-    useEffect(() => {
-        // 이전 오디오 정지 및 초기화
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-        }
-
-        // 현재 단계의 오디오 설정 및 재생
-        const currentAudioSrc = STEPS[currentStep].audioSrc;
-        const newAudio = new Audio(currentAudioSrc);
-        audioRef.current = newAudio;
-
-        const playPromise = newAudio.play();
+        const playPromise = audio.play();
         if (playPromise !== undefined) {
-            playPromise.catch((error) => {
-                console.log(`Step ${currentStep + 1} autoplay prevented:`, error);
-                // 자동 재생 정책에 의해 막히면 인터랙션 대기
+            playPromise.catch(error => {
+                console.warn(`Audio Auto-play blocked.`);
             });
         }
 
+        // 페이지 4초 유지 후 다음으로 이동
+        timerRef.current = setTimeout(() => {
+            timerRef.current = null;
+            handleNext();
+        }, 4000);
+
         return () => {
             // cleanup
-            newAudio.pause();
-        };
-    }, [currentStep]);
+            isMountedRef.current = false;
 
-    // 사용자 인터랙션 발생 시 오디오 재생 시도 (자동재생 실패 대응)
-    const handleUserInteraction = () => {
-        if (audioRef.current && audioRef.current.paused) {
-            audioRef.current.play().catch(e => console.log("Manual play failed:", e));
-        }
-    };
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+            }
+
+            // cleanup 후 다시 mounted 상태로
+            setTimeout(() => {
+                isMountedRef.current = true;
+            }, 0);
+        };
+    }, [currentStep, isReady, isTransitioning]);
 
     return (
-        <div className="intro-container" onClick={handleUserInteraction}>
-            {!isTransitioning && (
-                <button className="skip-btn" onClick={(e) => { e.stopPropagation(); goToMain(); }}>Skip</button>
-            )}
+        <div className="intro-container">
+            <button className="skip-btn" onClick={() => navigate('/welcome')}>Skip</button>
 
             <AnimatePresence>
                 {isTransitioning && (
-                    <motion.div
-                        className="transition-overlay"
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 4, opacity: 1 }}
-                        transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-                    />
+                    <motion.div className="transition-overlay" initial={{ scale: 0 }} animate={{ scale: 4 }} transition={{ duration: 0.8 }} />
                 )}
             </AnimatePresence>
 
-            <div className="bg-watermark">HEARBE</div>
-
             <div className="text-section">
                 <AnimatePresence mode="wait">
-                    {!isTransitioning && (
-                        <motion.div
-                            key={currentStep}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 1.05 }}
-                            transition={{ duration: 0.8 }}
-                        >
-                            <h1 className="main-copy">{STEPS[currentStep].title}</h1>
-                            <p className="sub-copy">{STEPS[currentStep].desc}</p>
-                        </motion.div>
-                    )}
+                    <motion.div
+                        key={currentStep}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h1 className="main-copy">{STEPS[currentStep].title}</h1>
+                        <p className="sub-copy">{STEPS[currentStep].desc}</p>
+                    </motion.div>
                 </AnimatePresence>
             </div>
 
             <div className="object-section">
-                <SplineErrorBoundary>
-                    <Spline scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode" />
-                </SplineErrorBoundary>
+                <Spline scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode" />
             </div>
 
             <div className="action-section">
                 <div className="dot-indicator">
-                    {STEPS.map((_, i) => (
-                        <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />
-                    ))}
+                    {STEPS.map((_, i) => <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />)}
                 </div>
             </div>
-
-            <div className="purple-aura" />
         </div>
     );
 }
