@@ -129,20 +129,14 @@ export default function MemberInfoC({ onHome }) {
         setShowWithdrawModal(false);
     };
 
-    // 회원탈퇴 로딩 상태
-    const [isWithdrawing, setIsWithdrawing] = useState(false);
-
     // 회원탈퇴 실행
     const handleConfirmWithdraw = async () => {
-        if (isWithdrawing) return; // 중복 클릭 방지
-
         if (!withdrawPassword) {
             showAlert("비밀번호를 입력해주세요.", "error");
             return;
         }
 
         try {
-            setIsWithdrawing(true);
             // Updated to use the post method with password as body
             await authAPI.deleteAccount(withdrawPassword);
 
@@ -419,9 +413,8 @@ export default function MemberInfoC({ onHome }) {
                                 }}
                                 onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
                                 onMouseOut={(e) => e.target.style.backgroundColor = '#e53e3e'}
-                                disabled={isWithdrawing}
                             >
-                                {isWithdrawing ? '처리중...' : '탈퇴하기'}
+                                탈퇴하기
                             </button>
                         </div>
                     </div>
