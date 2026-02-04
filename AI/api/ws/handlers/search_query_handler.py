@@ -12,7 +12,7 @@ import logging
 import re
 from typing import Optional, Tuple
 
-from ..presenter.pages.search import (
+from services.llm.generators.tts_pages.search import (
     build_search_list_tts,
     MORE_PROMPT_NUMBER,
     NO_DISCOUNT_INFO,

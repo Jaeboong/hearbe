@@ -121,6 +121,12 @@ class AIServer:
         if self.session_manager:
             await self.session_manager.shutdown()
 
+        try:
+            from api.ws.utils.temp_file_manager import TempFileManager
+            TempFileManager().cleanup_all()
+        except Exception as e:
+            logger.warning(f"Temp cleanup skipped: {e}")
+
         logger.info("All services shut down")
 
     def create_app(self) -> FastAPI:

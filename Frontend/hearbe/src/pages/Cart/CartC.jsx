@@ -119,6 +119,19 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
+        }
+    };
+
     // 임베디드 모드 - 기존 동작 유지
     if (isEmbedded) {
         return (
@@ -205,20 +218,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
     }
 
     // 독립 페이지 모드 - 사이드바 포함
-    const handleLogout = async () => {
-        try {
-            await authAPI.logout();
-            navigate('/');
-        } catch (error) {
-            console.error('Logout failed:', error);
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('username');
-            localStorage.removeItem('user_name');
-            navigate('/');
-        }
-    };
-
     return (
         <div className="mypage-container">
             {/* Header */}

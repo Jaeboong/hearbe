@@ -12,6 +12,7 @@ import { memberAPI } from '../../services/memberAPI';
 import './MyPageC.css';
 import logoC from '../../assets/logoC.png';
 
+
 export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -188,12 +189,13 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
             {/* Header 섹션 (디자인 통일) */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
                         <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
+
                     <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>

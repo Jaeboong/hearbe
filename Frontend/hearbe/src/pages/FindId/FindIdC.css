@@ -1,4 +1,4 @@
-.find-id-container {
+.find-id-container-c {
     min-height: 100vh;
     background-color: #f8f9fb;
     display: flex;
@@ -31,7 +31,7 @@
     background: #fdfbff;
 }
 
-.find-id-main {
+.find-id-main-c {
     flex: 1;
     display: flex;
     align-items: center;
@@ -39,7 +39,7 @@
     padding: 2rem;
 }
 
-.find-id-card {
+.find-id-card-c {
     width: 780px;
     background: white;
     padding: 90px 80px;
@@ -52,7 +52,7 @@
     z-index: 1;
 }
 
-.card-header {
+.card-header-c {
     text-align: center;
     margin-bottom: 3rem;
     width: 100%;
@@ -61,41 +61,41 @@
     align-items: center;
 }
 
-.mini-logo {
+.mini-logo-c {
     height: 140px;
     width: auto;
     margin-bottom: 40px;
     object-fit: contain;
 }
 
-.card-header h1 {
+.card-header-c h1 {
     font-size: 50px;
     font-weight: 800;
     color: #111827;
     margin-bottom: 0.75rem;
 }
 
-.card-header p {
+.card-header-c p {
     color: #6b7280;
     font-size: 24px;
     font-weight: 500;
 }
 
-.form-section {
+.form-section-c {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.input-field {
+.input-field-c {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.input-field label {
+.input-field-c label {
     display: block;
     font-size: 22px;
     font-weight: 600;
@@ -105,7 +105,7 @@
     text-align: left;
 }
 
-.input-wrapper {
+.input-wrapper-c {
     position: relative;
     display: flex;
     align-items: center;
@@ -114,12 +114,12 @@
     transition: all 0.2s;
 }
 
-.input-wrapper:focus-within {
+.input-wrapper-c:focus-within {
     background-color: white;
     box-shadow: 0 0 0 2px #7c3aed;
 }
 
-.input-icon {
+.input-icon-c {
     position: absolute;
     left: 20px;
     top: 50%;
@@ -130,11 +130,10 @@
     pointer-events: none;
 }
 
-.input-wrapper input {
+.input-wrapper-c input {
     width: 100%;
     padding: 26px 30px 26px 70px;
     border: 1.5px solid #f1f5f9;
-    /* Matched border to LoginC */
     border-radius: 20px;
     background: transparent !important;
     font-size: 26px;
@@ -143,24 +142,24 @@
     font-weight: 500;
 }
 
-.input-wrapper input::placeholder {
+.input-wrapper-c input::placeholder {
     color: #d1d5db;
     font-weight: 500;
 }
 
-.flex-row {
+.flex-row-c {
     display: flex;
 }
 
-.flex-grow {
+.flex-grow-c {
     flex-grow: 1;
 }
 
-.gap-2 {
+.gap-2-c {
     gap: 0.5rem;
 }
 
-.secondary-btn {
+.secondary-btn-c {
     padding: 0 2rem;
     background: #f3f4f6;
     border: none;
@@ -172,18 +171,26 @@
     font-size: 1.2rem;
 }
 
-.black-btn {
+.black-btn-c {
     padding: 0 2rem;
-    background: #111827;
+    background: #8b5cf6;
     color: white;
     border: none;
     border-radius: 20px;
     font-weight: 700;
     cursor: pointer;
     font-size: 1.2rem;
+    transition: all 0.2s;
 }
 
-.code-input {
+.black-btn-c:hover {
+    background-color: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.code-input-c {
+    width: 100%;
     padding: 26px 30px;
     border: 1.5px solid #f1f5f9;
     border-radius: 20px;
@@ -192,15 +199,16 @@
     color: #1f2937;
     outline: none;
     font-weight: 500;
+    text-align: left;
     transition: all 0.2s;
 }
 
-.code-input:focus {
+.code-input-c:focus {
     background-color: white;
     box-shadow: 0 0 0 2px #7c3aed;
 }
 
-.submit-full-btn {
+.submit-full-btn-c {
     margin-top: 2rem;
     padding: 1.5rem;
     border-radius: 20px;
@@ -211,19 +219,18 @@
     transition: all 0.2s;
 }
 
-.submit-full-btn.active {
+.submit-full-btn-c.active {
     background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
     color: white;
     box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
 }
 
-.submit-full-btn.disabled {
+.submit-full-btn-c.disabled {
     background: #e5e7eb;
     color: #9ca3af;
     cursor: not-allowed;
 }
 
-/* Modal Styles */
 .modal-overlay-c {
     position: fixed;
     inset: 0;
@@ -293,9 +300,7 @@
     cursor: pointer;
 }
 
-/* .find-id-footer removed to use global .landing-footer */
-
-.animate-slide-down {
+.animate-slide-down-c {
     animation: slideDown 0.3s ease-out;
 }
 

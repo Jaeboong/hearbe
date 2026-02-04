@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, User, ArrowUpRight, LogOut } from 'lucide-react';
+import Swal from 'sweetalert2';
+import { ArrowLeft, Home, ShoppingCart, User, ArrowUpRight, Layout, LogOut } from 'lucide-react';
 import './SelectMallC.css';
 import coupangLogo from '../../assets/coupang_logo.png';
 import naverPlusLogo from '../../assets/C/naver_plus_logo.png';
@@ -14,28 +15,31 @@ import { authAPI } from '../../services/authAPI';
 const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
-        // 1. 선제적 토큰 삭제
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('username');
-
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('user_id');
-        sessionStorage.removeItem('username');
-
-        try {
-            await authAPI.logout();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        } finally {
-            // 한번 더 정리 및 이동
-            navigate('/C/login');
-        }
+    const handleLogout = () => {
+        Swal.fire({
+            title: '로그아웃 하시겠습니까?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#7c3aed',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '로그아웃',
+            cancelButtonText: '취소'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await authAPI.logout();
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                } finally {
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('user_id');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('user_name');
+                    navigate('/main');
+                }
+            }
+        });
     };
 
     const malls = [
@@ -57,17 +61,22 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
             {/* Header 섹션 (디자인 통일) */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
-                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
-                    </div>
+                    <img
+                        src={logoC}
+                        alt="HearBe Logo"
+                        className="header-logo-c"
+                        onClick={() => navigate('/main')}
+                        style={{ height: '60px', cursor: 'pointer', objectFit: 'contain' }}
+                    />
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={() => { console.log('Navigating to Cart'); navigate('/C/cart'); }}>
+
+                    <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
-                    <button className="nav-item-c" onClick={() => { console.log('Navigating to MyPage'); navigate('/C/member-info'); }}>
+                    <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
                     </button>

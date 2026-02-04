@@ -6,6 +6,7 @@ Text routing orchestrator.
 from typing import Optional
 
 from core.interfaces import MCPCommand
+from services.llm.rules.product_option import handle_product_option_rule
 
 
 class TextRouter:
@@ -60,6 +61,27 @@ class TextRouter:
 
         if self._interrupts.is_interrupted(session_id, epoch):
             return None
+
+        option_response = handle_product_option_rule(text, session)
+        if option_response:
+            commands = [
+                MCPCommand(tool_name=c.tool_name, arguments=c.arguments, description=c.description)
+                for c in option_response.commands
+            ]
+            commands = self._command_pipeline.prepare_commands(
+                session_id,
+                commands,
+                session.current_url or "",
+                allow_extract=True,
+            )
+            tts_text = await self._command_pipeline.dispatch(
+                session_id,
+                commands,
+                option_response.text,
+                session.current_url or "",
+                lambda: self._interrupts.is_interrupted(session_id, epoch),
+            )
+            return tts_text
 
         if self._ai_next_router:
             ai_next_result = self._ai_next_router.route(text, session.current_url or "")

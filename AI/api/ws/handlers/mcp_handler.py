@@ -10,10 +10,8 @@ from typing import Dict, Any, Optional, List
 
 from core.event_bus import EventType, publish
 from services.llm.sites.site_manager import get_page_type
-from ..presenter.pages.search import build_search_list_tts, MORE_PROMPT_COUNT
-from ..presenter.pages.cart import build_cart_summary_tts
-from ..presenter.pages.login import build_captcha_prompt_tts
-from ..presenter.pages.product import build_product_summary_tts, build_ocr_summary_tts
+from services.llm.planner.selection.option_select import CTX_PENDING_OPTION, select_option_from_detail
+from services.llm.generators.tts_generator import TTSGenerator, MORE_PROMPT_COUNT
 from ..utils.temp_file_manager import TempFileManager
 
 # Summarizer imports (HTML parser + OCR integrator)
@@ -51,6 +49,7 @@ class MCPHandler:
         self._login_feedback = login_feedback
         self._dom_fallback = dom_fallback
         self._file_manager = TempFileManager()  # Manages temporary JSON files
+        self._tts = TTSGenerator()
 
     async def handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
         """
@@ -171,7 +170,8 @@ class MCPHandler:
                     tool_name=tool_name,
                     arguments=arguments,
                     success=success,
-                    handled=handled
+                    handled=handled,
+                    current_url=page_url or (session.current_url if session else "")
                 )
         if session and self._session:
             self._session.set_context(session_id, "mcp_result", result)
@@ -180,6 +180,15 @@ class MCPHandler:
                 if detail:
                     self._session.set_context(session_id, "product_detail", detail)
                     self._save_product_detail_to_file(detail, session_id)
+                    if isinstance(detail, dict) and detail.get("options_list"):
+                        keys = list(detail.get("options_list", {}).keys())
+                        logger.info(
+                            "Product detail options_list stored: session=%s keys=%s",
+                            session_id,
+                            keys,
+                        )
+                    if not suppress_outputs:
+                        await self._maybe_handle_pending_option(session_id, session)
                 if detail_images:
                     self._session.set_context(session_id, "detail_images", detail_images)
                 cart_items = result.get("cart_items")
@@ -201,7 +210,7 @@ class MCPHandler:
                     )
             if cart_items is not None:
                 if not suppress_outputs:
-                    tts_text = build_cart_summary_tts(cart_items, cart_summary or {})
+                    tts_text = self._tts.build_cart_summary(cart_items, cart_summary or {})
                     await self._sender.send_tts_response(session_id, tts_text)
                 return
 
@@ -234,7 +243,7 @@ class MCPHandler:
                 next_index = start_index
                 has_more = False
                 if not suppress_outputs:
-                    tts_text, next_index, has_more = build_search_list_tts(
+                    tts_text, next_index, has_more = self._tts.build_search_list(
                         products,
                         start_index=start_index,
                         count=4,
@@ -263,7 +272,7 @@ class MCPHandler:
             if isinstance(result, dict) and result.get("captcha_found"):
                 await self._sender.send_tts_response(
                     session_id,
-                    build_captcha_prompt_tts()
+                    self._tts.build_captcha_prompt()
                 )
                 return
 
@@ -273,11 +282,11 @@ class MCPHandler:
                 product_info = parse_product_html(html_content, site=site, url=page_url or "")
 
                 if product_info.is_valid():
-                    html_summary = build_product_summary_tts(product_info)
+                    html_summary = self._tts.build_product_summary(product_info)
                     logger.info(f"HTML 파싱 완료: {product_info.product_name}")
 
-                    if html_summary:
-                        await self._sender.send_tts_response(session_id, html_summary)
+                if html_summary:
+                    await self._sender.send_tts_response(session_id, html_summary)
 
                     if product_info.detail_images:
                         detail_images = product_info.detail_images
@@ -289,6 +298,26 @@ class MCPHandler:
             asyncio.create_task(
                 self._process_ocr_batch(session_id, detail_images, page_url)
             )
+
+    async def _maybe_handle_pending_option(self, session_id: str, session) -> None:
+        if not session or not self._session:
+            return
+        pending_text = self._session.get_context(session_id, CTX_PENDING_OPTION)
+        if not pending_text:
+            return
+        response = select_option_from_detail(pending_text, session)
+        self._session.set_context(session_id, CTX_PENDING_OPTION, None)
+        if not response:
+            await self._sender.send_tts_response(
+                session_id,
+                "옵션 정보를 확인하지 못했습니다. 다시 말씀해주세요."
+            )
+            return
+        commands = [cmd for cmd in (response.commands or []) if not cmd.tool_name.startswith("extract")]
+        if commands:
+            await self._sender.send_tool_calls(session_id, commands)
+        if response.text:
+            await self._sender.send_tts_response(session_id, response.text)
 
     def _build_search_signature(self, products: List[Dict[str, Any]]) -> str:
         names = []
@@ -333,7 +362,7 @@ class MCPHandler:
                 return
 
             if ocr_result.summary:
-                tts_text = build_ocr_summary_tts(ocr_result)
+                tts_text = self._tts.build_ocr_summary(ocr_result)
                 if tts_text:
                     await self._sender.send_tts_response(session_id, tts_text)
 

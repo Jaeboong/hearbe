@@ -51,30 +51,6 @@ export default function WishlistC({ onHome }) {
         fetchWishlist();
     }, []);
 
-    const handleLogout = async () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('username');
-        localStorage.removeItem('user_name');
-
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('user_id');
-        sessionStorage.removeItem('username');
-        sessionStorage.removeItem('user_name');
-
-        try {
-            await authAPI.logout();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        } finally {
-            navigate('/C/login');
-        }
-    };
-
     const fetchWishlist = async () => {
         try {
             setIsLoading(true);
@@ -114,6 +90,19 @@ export default function WishlistC({ onHome }) {
             setError(err.message);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
         }
     };
 

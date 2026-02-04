@@ -1,9 +1,10 @@
-﻿﻿import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
 // [페이지 컴포넌트]
 import MainLanding from '../pages/MainLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
+import Intro from '../pages/Intro/Intro';
 
 // [A형 페이지 컴포넌트]
 import LoginA from '../pages/Login/LoginA';
@@ -41,6 +42,7 @@ import GuardianViewS from '../pages/GuardianView/GuardianViewS';
  */
 function AppContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedMode, setSelectedMode] = useState('audio');
   const [micPermissionGranted, setMicPermissionGranted] = useState(false);
   const [showInitialSetup, setShowInitialSetup] = useState(() => {
@@ -48,52 +50,41 @@ function AppContent() {
   });
   const modeSelectionRef = useRef(null);
 
-  const handleSetupComplete = (micGranted) => {
-    setMicPermissionGranted(micGranted);
-    setShowInitialSetup(false);
-  };
-
-  // 메인 페이지에서 '보조 프로그램 다운로드' 버튼 클릭 시
-  const handleShowSetup = () => {
-    // 설정 완료 상태를 초기화하여 다시 설정 과정을 진행할 수 있도록 함
-    localStorage.removeItem('hearbe_mcp_setup_completed');
-    setShowInitialSetup(true);
-  };
-
-  const handleModeSelect = (mode, label) => {
-    if (micPermissionGranted || mode === 'audio') {
-      const utterance = new SpeechSynthesisUtterance(`${label} 모드를 선택하셨습니다.`);
-      utterance.lang = 'ko-KR';
-      window.speechSynthesis.speak(utterance);
-    }
+  const handleModeSelect = (mode) => {
     setSelectedMode(mode);
-
     // 모드에 따라 분기 처리
     if (mode === 'common') {
       navigate('/C/login');
-    } else if (mode === 'sharing') {
-      navigate('/S/join');
-    } else if (mode === 'audio') {
+    } else {
       navigate('/A/login');
     }
-    // B형(big) 등 다른 모드는 아직 구현되지 않았으므로 아무 동작도 하지 않음.
   };
 
-  // 초기 설정이 완료되지 않았으면 InitialSetup을 먼저 보여줌
+  const handleSetupComplete = () => {
+    setShowInitialSetup(false);
+  };
+
+  // 초기 설정이 완료되지 않았으면 InitialSetup을 보여줌
   if (showInitialSetup) {
     return <InitialSetup onComplete={handleSetupComplete} />;
   }
 
   return (
     <Routes>
+      {/* 기본 경로 접속 시 Intro 페이지로 리다이렉트 */}
+      <Route path="/" element={<Navigate to="/intro" replace />} />
+
+      {/* Intro 페이지 별도 경로 유지 */}
+      <Route path="/intro" element={<Intro />} />
+
       {/* 메인 랜딩 페이지 */}
       <Route
-        path="/"
+        path="/main"
         element={
           <MainLanding
             handleModeSelect={handleModeSelect}
             modeSelectionRef={modeSelectionRef}
-            onShowSetup={handleShowSetup}
+            onOpenSetup={() => setShowInitialSetup(true)}
           />
         }
       />
@@ -137,7 +128,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate('/A/mall')}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
             onCart={() => navigate('/A/cart')}
             onMyPage={() => navigate('/A/member-info')}
           />
@@ -150,7 +141,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -161,7 +152,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -172,7 +163,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -183,7 +174,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -194,7 +185,7 @@ function AppContent() {
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
+            onHome={() => navigate('/main')}
           />
         }
       />
@@ -240,7 +231,6 @@ function AppContent() {
         element={
           <SelectMallC
             onBack={() => navigate('/C/login')}
-            onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
             onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
@@ -281,12 +271,11 @@ function AppContent() {
             onBack={() => navigate('/C/mypage')} // 뒤로가기 시 /C/mypage (리다이렉트될 경로)로 이동
             onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
-            onMyPage={() => navigate('/C/member-info')} // 마이페이지 링크를 /C/member-info로 변경
+            onMyPage={() => navigate('/C/member-info')}
           />
         }
       />
 
-      {/* /C/mypage는 이제 /C/member-info로 리다이렉트 */}
       <Route path="/C/mypage" element={<Navigate to="/C/member-info" replace />} />
       <Route
         path="/C/cart"
@@ -314,11 +303,10 @@ function AppContent() {
 
       {/* Fallback */}
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/intro" replace />} />
     </Routes>
   );
 }
-
 
 /**
  * AppRouter - 애플리케이션의 최상위 라우터 컴포넌트
