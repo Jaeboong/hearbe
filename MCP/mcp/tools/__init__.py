@@ -58,6 +58,8 @@ class BrowserTools(
             "extract": self.extract,
             "extract_detail": self.extract_detail,
             "extract_cart": self.extract_cart,
+            "extract_order_detail": self.extract_order_detail,
+            "extract_order_list": self.extract_order_list,
             "get_dom_snapshot": self.get_dom_snapshot,
             "take_screenshot": self.take_screenshot,
             "screenshot_element": self.screenshot_element,

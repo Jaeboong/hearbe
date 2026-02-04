@@ -8,6 +8,7 @@ from typing import Optional, Callable, List
 
 from core.interfaces import MCPCommand
 from .command_normalizers import normalize_login_phone_commands
+from .command_expanders import expand_pre_navigation_commands
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ class CommandPipeline:
         if not allow_extract:
             commands = _filter_extract_commands(commands)
         commands = normalize_login_phone_commands(commands, current_url)
+        commands = expand_pre_navigation_commands(commands, current_url)
         if current_url and "login" in current_url:
             commands = [
                 MCPCommand(

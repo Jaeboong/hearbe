@@ -8,7 +8,9 @@
 main.py (AIServer)
 ├── FastAPI lifespan 관리
 ├── 서비스 초기화 (ASR, NLU, LLM, TTS, OCR, Flow, Session)
-├── WebSocket 엔드포인트 (/ws)
+│   ├─ ASR/TTS/OCR은 예외 시 초기화 스킵 (try/except)
+│   └─ FlowEngine은 services/flow/service.py의 하드코딩 정의 사용
+├── WebSocket 엔드포인트 (/ws, /ws/{session_id})
 ├── HTTP API 엔드포인트 (/api/v1)
 └── Health check (/)
 ```
@@ -22,7 +24,7 @@ main.py (AIServer)
 | LLM Planner | `services/llm/planner/service.py` | 의도 → MCP 명령 생성 |
 | TTS | `services/tts/service.py` | 텍스트 → 음성 합성 |
 | OCR | `services/ocr/service.py` | 이미지 → 텍스트 추출 |
-| Flow Engine | `services/flow/service.py` | 다단계 워크플로우 관리 |
+| Flow Engine | `services/flow/service.py` | 다단계 워크플로우 관리 (하드코딩 정의) |
 | Session | `services/session/service.py` | 세션 상태 관리 |
 
 ## 디렉토리 구조
@@ -57,8 +59,10 @@ AI/
 │   ├── session/                # 세션 관리
 │   └── summarizer/             # HTML/OCR 요약
 └── config/                     # 설정 파일
-    ├── flows/                  # 플로우 정의 (사이트별)
     └── sites/                  # 사이트 감지 규칙
+
+※ 참고: JSON 플로우 로더는 `services/flow/flow_engine.py`에 존재하며,
+기본 경로는 `AI/flows/` 이지만 `main.py`에서 사용되지 않습니다.
 ```
 
 ## 핵심 설계 패턴
@@ -66,5 +70,5 @@ AI/
 - **Factory Pattern**: ASR 프로바이더 선택 (Whisper vs Qwen3)
 - **Provider Pattern**: ASR/OCR/TTS 구현체 교체 가능
 - **Event Bus**: 비동기 이벤트 발행/구독 (core/event_bus.py)
-- **Pipeline Pattern**: 텍스트 입력 → 큐 → 라우팅 → 처리
+- **Pipeline Pattern**: 텍스트 입력 → 큐 → 라우팅 → 처리 (text_handler → text_router → llm_pipeline)
 - **Rule + LLM Fallback**: 규칙 기반 우선, 실패 시 LLM 호출

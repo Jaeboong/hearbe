@@ -66,3 +66,25 @@ def select_cart_items(
         if isinstance(items, list) and items:
             return items
     return []
+
+
+def select_order_detail(
+    session_context: Optional[Dict[str, Any]] = None,
+    conversation_history: List[Dict[str, Any]] = None,
+) -> Optional[Dict[str, Any]]:
+    if session_context:
+        detail = session_context.get("order_detail_data")
+        if isinstance(detail, dict) and detail:
+            return detail
+    return None
+
+
+def select_order_list(
+    session_context: Optional[Dict[str, Any]] = None,
+    conversation_history: List[Dict[str, Any]] = None,
+) -> Optional[Any]:
+    if session_context:
+        order_list = session_context.get("order_list")
+        if isinstance(order_list, (list, dict)) and order_list:
+            return order_list
+    return None

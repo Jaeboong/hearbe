@@ -5,6 +5,7 @@ Handler manager: orchestrates WS handlers and session lifecycle.
 
 import base64
 import logging
+import os
 import time
 
 from services.llm.sites.site_manager import get_current_site, get_page_type
@@ -19,6 +20,7 @@ from .page_extract_manager import PageExtractManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
 from ..feedback.login_feedback import LoginFeedbackManager
+from ..feedback.order_detail_handler import OrderDetailHandler
 from ..feedback.tool_failure_notifier import ToolFailureNotifier
 
 logger = logging.getLogger(__name__)
@@ -56,6 +58,10 @@ class HandlerManager:
             sender=sender,
             session_manager=session_manager,
         )
+        self._order_detail = OrderDetailHandler(
+            sender=sender,
+            session_manager=session_manager,
+        )
         self._page_extract = PageExtractManager(
             sender=sender,
             session_manager=session_manager,
@@ -71,6 +77,7 @@ class HandlerManager:
             login_guard=self._login_guard,
             login_feedback=self._login_feedback,
             payment_keypad=self._payment_keypad,
+            order_detail_handler=self._order_detail,
             page_extract=self._page_extract,
         )
         self._audio_handler = AudioHandler(
@@ -101,6 +108,7 @@ class HandlerManager:
         self._dom_fallback.clear_pending(session_id)
         self._mcp_handler.cleanup_session(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._order_detail.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
         audio_data = base64.b64decode(data.get("audio", ""))
@@ -125,21 +133,35 @@ class HandlerManager:
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._order_detail.cleanup_session(session_id)
 
     async def handle_interrupt(self, session_id: str):
         await self._audio_handler.clear_audio(session_id)
         await self._text_handler.interrupt(session_id)
         if self._session:
             self._session.set_context(session_id, "interrupt_ts", time.time())
+            try:
+                suppress_sec = float(os.getenv("TTS_INTERRUPT_SUPPRESS_SEC", "3"))
+            except ValueError:
+                suppress_sec = 3.0
+            self._session.set_context(
+                session_id,
+                "tts_suppress_until",
+                time.time() + suppress_sec
+            )
         self._action_feedback.clear_pending(session_id)
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._order_detail.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
 
     async def handle_mcp_result(self, session_id: str, data: dict):
         handled = await self._payment_keypad.handle_mcp_result(session_id, data)
+        if handled:
+            return
+        handled = await self._order_detail.handle_mcp_result(session_id, data)
         if handled:
             return
         await self._mcp_handler.handle_mcp_result(session_id, data)
@@ -160,6 +182,7 @@ class HandlerManager:
         if site:
             session.current_site = site.name
         await self._payment_keypad.handle_page_update(session_id, url)
+        await self._order_detail.handle_page_update(session_id, url)
         await self._page_extract.handle_page_update(session_id, url, page_id)
 
         # One-time login page guidance after redirect
