@@ -425,3 +425,9 @@
 .open-new-window-btn:active {
     transform: scale(0.95);
 }
+
+/* Hide "open in new tab" notice on share screen */
+.store-container.hide-new-tab-notice .iframe-blocked-message,
+.store-container.hide-new-tab-notice .open-new-window-btn {
+    display: none !important;
+}
