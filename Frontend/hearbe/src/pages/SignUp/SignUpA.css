@@ -3,7 +3,7 @@
    ========================================= */
 :root {
     --bg-dark: #141C29;
-    --bg-depp-dark: #0A0E14;
+    --bg-deep-dark: #0A0E14;
     --accent-yellow: #FFF064;
     --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
 }
@@ -62,13 +62,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
     letter-spacing: clamp(1px, 0.2vw, 2px);
     width: 100%;
-    background-color: #141C29;
+    background-color: #1E2A3A;
+    padding-top: clamp(20px, 5vw, 40px);
     padding-bottom: clamp(20px, 5vw, 40px);
-    /* Scroll buffer */
+    overflow-y: auto;
 }
 
 /* Back Button Component Override */
@@ -90,7 +91,7 @@
     flex-direction: column;
     gap: clamp(12px, 3vw, 24px);
     box-sizing: border-box;
-    margin-top: clamp(20px, 5vw, 40px);
+    margin-top: 0;
 }
 
 .signup-logo-area {
@@ -170,6 +171,10 @@
     font-weight: bold;
 }
 
+.signup-input.input-invalid {
+    color: #FF5A5A;
+}
+
 .signup-input.input-id,
 .signup-input.input-name {
     background-image: url('../../assets/icon-user.png');
@@ -237,6 +242,7 @@
     font-weight: bold;
     font-size: clamp(18px, 6vw, 36px);
     letter-spacing: clamp(1px, 0.2vw, 2px);
+    color: var(--accent-yellow);
 }
 
 .camera-icon-img {
@@ -309,7 +315,7 @@
     padding: clamp(8px, 2vw, 16px);
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 2vw, 16px);
+    gap: clamp(6px, 1.5vw, 10px);
 }
 
 .term-row {
@@ -320,8 +326,9 @@
     width: 100%;
 }
 
-.term-row:first-child {
-    align-items: center;
+.single-term-row {
+    align-items: flex-start;
+    padding-left: clamp(4px, 1vw, 10px);
 }
 
 .check-circle {
@@ -341,20 +348,36 @@
     transition: background-color 0.2s;
     -webkit-text-stroke: clamp(1px, 0.3vw, 3px) var(--bg-dark);
     flex-shrink: 0;
+    margin-top: clamp(1px, 0.2vw, 3px);
 }
 
 .check-circle.checked {
     background-color: var(--accent-yellow);
 }
 
-.term-text {
+.term-text-a {
     font-size: clamp(18px, 5.5vw, 32px);
     font-weight: bold;
+    flex: 1;
+    line-height: 1.3;
+    color: var(--accent-yellow);
 }
 
 .bold {
     font-weight: 900;
     font-size: clamp(20px, 6.5vw, 38px);
+}
+
+.terms-view-btn {
+    border: none;
+    background: transparent;
+    color: var(--accent-yellow);
+    font-family: var(--font-main);
+    font-size: clamp(16px, 4.5vw, 28px);
+    font-weight: 900;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
 }
 
 /* 회원가입 제출 버튼 */
@@ -618,6 +641,7 @@ body:has(.modal-overlay) .global-back-button {
 .card-register-btn {
     flex: 1;
     font-size: clamp(20px, 6.5vw, 38px);
+    font-weight: bold;
     padding: clamp(12px, 3vw, 20px);
     border-radius: clamp(6px, 1.5vw, 12px);
     font-family: var(--font-main);
@@ -648,7 +672,7 @@ body:has(.modal-overlay) .global-back-button {
    9. 에러/성공 모달
    ========================================= */
 .error-modal-box {
-    width: 60vw;
+    width: min(86vw, 760px);
     background-color: var(--bg-dark);
     border: 0.5vw solid var(--accent-yellow);
     border-radius: 2vw;
@@ -662,20 +686,152 @@ body:has(.modal-overlay) .global-back-button {
     position: relative;
 }
 
-.error-message {
-    font-size: 4vw !important;
+.signup-error-message {
+    font-size: clamp(24px, 8vw, 80px);
     font-weight: bold;
+    line-height: 1.35;
+    width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.signup-error-message.is-error {
+    color: #FF5A5A;
+}
+
+.signup-error-message.is-info {
     color: var(--accent-yellow);
-    line-height: 1.6;
-    word-break: keep-all;
 }
 
 .error-confirm-btn {
-    padding: 1.5vw 3vw 1.5vw;
-    border-radius: 1.5vw;
-    font-size: 5vw;
+    padding: clamp(9px, 0.9vw, 18px) clamp(21px, 2.1vw, 36px);
+    border-radius: clamp(12px, 1.5vw, 21px);
+    font-size: clamp(30px, 4.95vw, 60px);
 }
 
 .success-icon {
     font-size: 8vw;
+}
+
+/* =========================================
+   10. 약관 상세 모달
+   ========================================= */
+.policy-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    background-color: rgba(10, 14, 20, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(14px, 4vw, 30px);
+}
+
+.policy-modal-box {
+    width: min(92vw, 760px);
+    max-height: 88vh;
+    overflow-y: auto;
+    background-color: #171C28;
+    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
+    border-radius: clamp(16px, 4vw, 28px);
+    padding: clamp(18px, 4vw, 30px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 3vw, 18px);
+    position: relative;
+}
+
+.card-info-modal-box {
+    width: min(96vw, 980px);
+    max-width: 96vw;
+    padding: clamp(10px, 2.2vw, 18px);
+    background-color: #141C29;
+    overflow-x: hidden;
+}
+
+.card-info-modal-box .card-form-box {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.card-info-modal-box .modal-input {
+    background: #171C28;
+}
+
+.card-info-modal-box .card-form-header {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+}
+
+.policy-modal-title {
+    color: var(--accent-yellow);
+    font-size: clamp(24px, 7vw, 40px);
+    font-weight: 900;
+    text-align: left;
+    padding-right: clamp(32px, 8vw, 60px);
+}
+
+.policy-modal-close {
+    position: absolute;
+    top: clamp(12px, 3vw, 20px);
+    right: clamp(12px, 3vw, 20px);
+    border: none;
+    background: transparent;
+    color: var(--accent-yellow);
+    font-size: clamp(28px, 8vw, 44px);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.policy-modal-content {
+    background: var(--bg-deep-dark);
+    color: var(--accent-yellow);
+    border-radius: clamp(10px, 2.5vw, 18px);
+    padding: clamp(14px, 4vw, 22px);
+    max-height: 50vh;
+    overflow-y: auto;
+    font-size: clamp(15px, 4.2vw, 24px);
+    font-weight: 800;
+    line-height: 1.55;
+    white-space: pre-line;
+}
+
+.policy-modal-content p {
+    margin: 0 0 clamp(12px, 3vw, 18px);
+}
+
+.policy-modal-content p:last-child {
+    margin-bottom: 0;
+}
+
+.policy-confirm-btn {
+    width: 100%;
+    border: none;
+    border-radius: clamp(8px, 2vw, 14px);
+    background-color: var(--accent-yellow);
+    color: #171C28;
+    font-family: var(--font-main);
+    font-size: clamp(20px, 6vw, 34px);
+    font-weight: 900;
+    padding: clamp(10px, 3vw, 16px);
+    cursor: pointer;
+}
+
+.policy-modal-box::-webkit-scrollbar,
+.policy-modal-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.policy-modal-box::-webkit-scrollbar-thumb,
+.policy-modal-content::-webkit-scrollbar-thumb {
+    background-color: var(--accent-yellow);
+    border-radius: 999px;
+}
+
+.policy-modal-box::-webkit-scrollbar-track,
+.policy-modal-content::-webkit-scrollbar-track {
+    background-color: rgba(255, 240, 100, 0.15);
 }
