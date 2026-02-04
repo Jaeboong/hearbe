@@ -1,4 +1,5 @@
 ﻿// API Base URL Configuration
+import { apiClient } from './apiClient.js';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 // API Service for Authentication
@@ -100,12 +101,18 @@ export const authAPI = {
             }
 
             if (!response.ok) {
-                throw new Error(data.message || '로그인에 실패했습니다.');
+                const error = new Error(data.message || '로그인에 실패했습니다.');
+                error.status = response.status;
+                throw error;
             }
 
             // 토큰 받아 사용자 정보 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
             if (data.data && data.data.accessToken) {
                 localStorage.setItem('accessToken', data.data.accessToken);
+            }
+            // refreshToken 저장 (토큰 갱신을 위해 필수)
+            if (data.data && data.data.refreshToken) {
+                localStorage.setItem('refreshToken', data.data.refreshToken);
             }
             // user_id 저장
             if (data.data && data.data.id) {
@@ -134,7 +141,7 @@ export const authAPI = {
                 throw new Error('로그인이 필요합니다');
             }
 
-            const response = await fetch(`${API_BASE_URL}/auth/mypage`, {
+            const response = await apiClient(`${API_BASE_URL}/auth/mypage`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -239,6 +246,50 @@ export const authAPI = {
         }
     },
 
+
+
+    // 토큰 갱신 API
+    refreshToken: async () => {
+        try {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) {
+                throw new Error('로그인 정보가 만료되었습니다. 다시 로그인해주세요.');
+            }
+
+            console.log("🔄 토큰 갱신을 시도합니다...");
+
+            const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || '토큰 갱신에 실패했습니다.');
+            }
+
+            // 새로운 토큰 저장
+            if (data.data && data.data.accessToken) {
+                console.log("✅ Access Token 갱신 완료:", data.data.accessToken.substring(0, 10) + "...");
+                localStorage.setItem('accessToken', data.data.accessToken);
+            }
+            if (data.data && data.data.refreshToken) {
+                console.log("✅ Refresh Token 갱신 완료");
+                localStorage.setItem('refreshToken', data.data.refreshToken);
+            }
+
+            return data;
+        } catch (error) {
+            console.error('RefreshToken API Error:', error);
+            // 갱신 실패 시 로그아웃 처리가 필요할 수 있음 (호출부에서 처리 권장)
+            throw error;
+        }
+    },
+
     // 로그아웃 API
     logout: async () => {
         try {
@@ -311,11 +362,6 @@ export const authAPI = {
             });
 
             const data = await response.json();
-
-            // 백엔드가 code: 200을 반환하더라도 HTTP Status가 200이 아닐 수 있는 경우를 대비하거나
-            // 혹은 HTTP 500이라도 data.code가 200이면 성공으로 처리하는 로직이 필요할 수 있음
-            // 하지만 표준적으로는 response.ok를 체크함.
-            // 사용자의 요청인 "백엔드 기준"을 맞추기 위해 표준 구현 유지하되 로그 제거.
 
             if (!response.ok) {
                 throw new Error(data.message || '회원탈퇴에 실패했습니다.');
@@ -494,3 +540,56 @@ export const authAPI = {
         }
     }
 };
+
+
+// 개발 환경에서 콘솔 테스트용 //
+if (import.meta.env.DEV) {
+    window.authAPI = authAPI;
+
+    // 토큰 갱신 테스트 헬퍼 함수
+    window.testTokenRefresh = () => {
+        console.log('=== 토큰 갱신 테스트 시작 ===');
+
+        // 1. authAPI 로드 확인
+        console.log('✓ authAPI 로드됨:', !!authAPI);
+
+        // 2. refreshToken 존재 확인
+        const hasRefreshToken = !!localStorage.getItem('refreshToken');
+        console.log('✓ RefreshToken 존재:', hasRefreshToken ? '있음' : '없음');
+
+        if (!hasRefreshToken) {
+            console.error('❌ RefreshToken이 없습니다. 먼저 로그인해주세요.');
+            return;
+        }
+
+        // 3. 현재 토큰 저장
+        const oldAccessToken = localStorage.getItem('accessToken');
+        const oldRefreshToken = localStorage.getItem('refreshToken');
+        console.log('이전 Access Token:', oldAccessToken?.substring(0, 30) + '...');
+        console.log('이전 Refresh Token:', oldRefreshToken?.substring(0, 30) + '...');
+
+        // 4. 토큰 갱신 실행
+        return authAPI.refreshToken()
+            .then(result => {
+                console.log('✅ 갱신 성공:', result);
+
+                const newAccessToken = localStorage.getItem('accessToken');
+                const newRefreshToken = localStorage.getItem('refreshToken');
+
+                console.log('새 Access Token:', newAccessToken?.substring(0, 30) + '...');
+                console.log('새 Refresh Token:', newRefreshToken?.substring(0, 30) + '...');
+                console.log('Access Token 변경됨:', oldAccessToken !== newAccessToken);
+                console.log('Refresh Token 변경됨:', oldRefreshToken !== newRefreshToken);
+                console.log('=== 테스트 완료 ===');
+
+                return result;
+            })
+            .catch(error => {
+                console.error('❌ 갱신 실패:', error.message);
+                console.log('=== 테스트 실패 ===');
+                throw error;
+            });
+    };
+
+    console.log('💡 테스트 함수 사용법: testTokenRefresh()');
+}
