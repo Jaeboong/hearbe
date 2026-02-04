@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/share")
+@RequestMapping("/share")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ShareCodeController {
