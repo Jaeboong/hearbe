@@ -5,6 +5,8 @@ import com.ssafy.d108.backend.auth.dto.FindIdByEmailRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.RefreshTokenRequest;
+import com.ssafy.d108.backend.auth.dto.RefreshTokenResponse;
 import com.ssafy.d108.backend.auth.dto.DeleteAccountRequest;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordBlindRequest;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordByWelfareRequest;
@@ -25,6 +27,7 @@ import com.ssafy.d108.backend.entity.WelfareCard;
 import com.ssafy.d108.backend.global.auth.JwtTokenProvider;
 import com.ssafy.d108.backend.global.exception.DuplicateUserException;
 import com.ssafy.d108.backend.global.exception.InvalidPasswordException;
+import com.ssafy.d108.backend.global.exception.UnauthorizedException;
 import com.ssafy.d108.backend.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +49,7 @@ import java.util.Collections;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRedisService refreshTokenRedisService;
     private final WelfareCardRepository welfareCardRepository;
     private final SharingSessionLogRepository sharingSessionLogRepository;
     private final CartItemRepository cartItemRepository;
@@ -184,13 +188,44 @@ public class AuthService {
 
         // 4. JWT 토큰 생성
         String accessToken = jwtTokenProvider.createToken(authentication, user.getId());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getId());
+        refreshTokenRedisService.save(user.getId(), refreshToken, jwtTokenProvider.getExpiration(refreshToken));
 
         return new LoginResponse(
                 user.getId(),
                 user.getName(),
                 user.getUserType(),
                 accessToken,
+                refreshToken,
                 "로그인 성공");
+    }
+
+    @Transactional
+    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
+        String refreshToken = request.getRefreshToken();
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
+            throw new UnauthorizedException("토큰이 유효하지 않습니다.");
+        }
+
+        Integer userId = jwtTokenProvider.getUserId(refreshToken);
+        if (!refreshTokenRedisService.matches(userId, refreshToken)) {
+            throw new UnauthorizedException("토큰이 유효하지 않습니다.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getUsername(),
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+
+        String newAccessToken = jwtTokenProvider.createToken(authentication, user.getId());
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getId());
+        refreshTokenRedisService.save(user.getId(), newRefreshToken, jwtTokenProvider.getExpiration(newRefreshToken));
+
+        return new RefreshTokenResponse(newAccessToken, newRefreshToken, "토큰 재발급 성공");
     }
 
     /**
@@ -219,7 +254,7 @@ public class AuthService {
      * 로그아웃
      */
     public void logout(Integer userId) {
-        // TODO: 추후 JWT 토큰 무효화(Redis Blacklist) 등 구현
+        refreshTokenRedisService.delete(userId);
     }
 
     /**
@@ -287,6 +322,7 @@ public class AuthService {
         sharingSessionLogRepository.deleteAllByHostUserId(userId);
         profileRepository.deleteByUserId(userId);
         welfareCardRepository.deleteByUserId(userId);
+        refreshTokenRedisService.delete(userId);
 
         userRepository.delete(user);
         return userId;
