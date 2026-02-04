@@ -17,8 +17,8 @@ const MemberInfoA = () => {
     const menuItems = [
         { id: 'profile', label: '회원정보', path: '/A/member-info' },
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
     ];
 
@@ -226,20 +226,40 @@ const MemberInfoA = () => {
                         </div>
                     ) : userData ? (
                         <>
-                            <div className="info-table">
-                                <div className="table-row">
-                                    <div className="table-label">이름</div>
-                                    <div className="table-value">{userData.name}</div>
+                            <div className="member-info-box">
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">아이디</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <span className="member-value">{localStorage.getItem('username') || '-'}</span>
+                                    </div>
                                 </div>
-                                <div className="table-row">
-                                    <div className="table-label">휴대폰번호</div>
-                                    <div className="table-value">{userData.phone}</div>
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">비밀번호</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <div className="password-wrapper">
+                                            <span className="member-value">{userData.password}</span>
+                                            <button className="password-change-btn">변경하기</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="table-row">
-                                    <div className="table-label">비밀번호</div>
-                                    <div className="table-value password-value">
-                                        {userData.password}
-                                        <button className="password-change-btn">변경하기</button>
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">이름</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <span className="member-value">{userData.name}</span>
+                                    </div>
+                                </div>
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">휴대폰번호</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <span className="member-value">{userData.phone}</span>
                                     </div>
                                 </div>
                             </div>

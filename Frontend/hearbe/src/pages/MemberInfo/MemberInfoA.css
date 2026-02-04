@@ -87,9 +87,9 @@
 
 /* Main Content */
 .memberinfo-main {
-    flex: 1.3;
-    background-color: #1E2A3A;
-    width: min(772px, 90vw);
+    flex: 1;
+    width: 100%;
+    max-width: 1000px;
     height: min(1030px, 90vh);
     box-sizing: border-box;
 }
@@ -114,44 +114,95 @@
     font-size: clamp(28px, 4.5vw, 42px);
     font-weight: 900;
     color: #FFF064;
-    margin-bottom: clamp(30px, 5vw, 50px);
+    margin-bottom: 20px;
     font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
-/* Info Table */
-.info-table {
-    border: clamp(3px, 0.6vw, 6px) solid #FFF064;
+/* Member Info Box */
+.member-info-box {
+    background-color: #141C29;
+    padding: 0;
+    border: clamp(3px, 0.4vw, 6px) solid #FFF064;
     border-radius: clamp(12px, 2vw, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    max-width: 800px;
+    margin-left: 0;
+    margin-right: auto;
+    box-sizing: border-box;
     overflow: hidden;
 }
 
-.table-row {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    border-bottom: clamp(3px, 0.6vw, 6px) solid #FFF064;
+.member-info-row {
+    display: flex;
+    border-bottom: clamp(2px, 0.4vw, 3px) solid #FFF064;
 }
 
-.table-row:last-child {
+.member-info-row:last-child {
     border-bottom: none;
 }
 
-.table-label,
-.table-value {
-    padding: clamp(20px, 4vw, 35px) clamp(24px, 4vw, 40px);
-    font-size: clamp(18px, 3vw, 28px);
+/* Left Column (Label) */
+.member-col-left {
+    flex: 0 0 30%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-right: clamp(2px, 0.4vw, 3px) solid #FFF064;
+    padding: clamp(16px, 3vw, 24px);
+    background-color: #141C29;
+}
+
+/* Right Column (Value) */
+.member-col-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: clamp(16px, 3vw, 24px);
+    background-color: #121521;
+}
+
+.member-label {
+    font-size: clamp(22px, 4.2vw, 34px);
     font-weight: bold;
+    color: #FFF064;
     font-family: 'KoddiUD OnGothic', sans-serif;
+    text-align: left;
+    margin: 0;
 }
 
-.table-label {
-    background-color: #171C28;
+.member-value {
+    font-size: clamp(22px, 4.2vw, 34px);
+    font-weight: 900;
     color: #FFF064;
-    border-right: clamp(3px, 0.6vw, 6px) solid #FFF064;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+    min-height: auto;
+    margin: 0;
+    width: 100%;
 }
 
-.table-value {
-    background-color: #171C28;
-    color: #FFF064;
+/* Password Wrapper */
+.password-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: clamp(12px, 2vw, 20px);
+}
+
+.password-change-btn {
+    background-color: #FFF064;
+    color: #1E2A3A;
+    border: none;
+    border-radius: clamp(6px, 1.5vw, 12px);
+    padding: clamp(6px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
+    font-size: clamp(16px, 2.5vw, 22px);
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'KoddiUD OnGothic', sans-serif;
+    white-space: nowrap;
+    margin-left: auto;
 }
 
 /* Logout Section */
@@ -159,6 +210,10 @@
     display: flex;
     justify-content: flex-end;
     margin-top: clamp(20px, 4vw, 30px);
+    width: 100%;
+    max-width: 800px;
+    /* Box is margin-left: 0, margin-right: auto */
+    /* To align with box right edge, we need same constraint */
 }
 
 .logout-link {
@@ -175,25 +230,7 @@
     opacity: 0.8;
 }
 
-.password-value {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: clamp(12px, 2vw, 20px);
-}
 
-.password-change-btn {
-    background-color: #FFF064;
-    color: #1E2A3A;
-    border: none;
-    border-radius: clamp(6px, 1.5vw, 12px);
-    padding: clamp(6px, 1.5vw, 12px) clamp(12px, 2.5vw, 20px);
-    font-size: clamp(14px, 2.5vw, 20px);
-    font-weight: 900;
-    cursor: pointer;
-    font-family: 'KoddiUD OnGothic', sans-serif;
-    white-space: nowrap;
-}
 
 
 /* Loading State */
