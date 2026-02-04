@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as _motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, PartyPopper } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import logoC from '../../assets/logoC.png'; // C형 로고로 변경
 import './SignUpC.css';
 
-export default function SignUpC({ onBack }) {
+export default function SignUpC() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
@@ -506,7 +506,7 @@ ${termContents.privacy}`;
       <AnimatePresence>
         {isModalOpen && (
           <div className="modal-overlay-c">
-            <motion.div
+            <_motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -520,13 +520,13 @@ ${termContents.privacy}`;
               <button onClick={() => { setIsModalOpen(false); navigate('/C/login'); }} className="modal-btn-c">
                 확인
               </button>
-            </motion.div>
+            </_motion.div>
           </div>
         )}
 
         {termModalState.isOpen && (
           <div className="modal-overlay-c" onClick={() => closeTermModal(false)}>
-            <motion.div
+            <_motion.div
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
@@ -543,7 +543,7 @@ ${termContents.privacy}`;
               <button onClick={() => closeTermModal(true)} className="modal-btn-c term-confirm-btn">
                 확인
               </button>
-            </motion.div>
+            </_motion.div>
           </div>
         )}
       </AnimatePresence>
