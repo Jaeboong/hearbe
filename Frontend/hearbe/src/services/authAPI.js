@@ -298,17 +298,24 @@ export const authAPI = {
     },
 
     // 회원탈퇴 API
-    deleteAccount: async () => {
+    deleteAccount: async (password) => {
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${API_BASE_URL}/auth/withdraw`, {
-                method: 'DELETE',
+            const response = await fetch(`${API_BASE_URL}/auth/delete-account`, {
+                method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ password }),
             });
 
             const data = await response.json();
+
+            // 백엔드가 code: 200을 반환하더라도 HTTP Status가 200이 아닐 수 있는 경우를 대비하거나
+            // 혹은 HTTP 500이라도 data.code가 200이면 성공으로 처리하는 로직이 필요할 수 있음
+            // 하지만 표준적으로는 response.ok를 체크함.
+            // 사용자의 요청인 "백엔드 기준"을 맞추기 위해 표준 구현 유지하되 로그 제거.
 
             if (!response.ok) {
                 throw new Error(data.message || '회원탈퇴에 실패했습니다.');
