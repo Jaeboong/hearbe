@@ -192,7 +192,7 @@ export default function OrderHistoryC({ onHome }) {
                                                     className="btn-outline-sm"
                                                     onClick={() => group.orderUrl && window.open(group.orderUrl, '_blank')}
                                                 >
-                                                    상세 조회
+                                                    주문 상세 조회
                                                 </button>
                                             </div>
                                         </div>
