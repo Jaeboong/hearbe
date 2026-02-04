@@ -23,6 +23,7 @@ class EventType(Enum):
     RECORDING_STOPPED = auto()
     AUDIO_READY = auto()
     TTS_PLAYBACK_FINISHED = auto()
+    AUDIO_DEVICE_CHANGED = auto()
 
     # Network 모듈 이벤트
     WS_CONNECTED = auto()

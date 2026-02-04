@@ -43,7 +43,11 @@ class AudioPlayer(IAudioPlayer):
         - Publishes: TTS_PLAYBACK_FINISHED
     """
 
-    def __init__(self, sample_rate: int = TTS_SAMPLE_RATE):
+    def __init__(
+        self,
+        sample_rate: int = TTS_SAMPLE_RATE,
+        output_device_index: Optional[int] = None
+    ):
         if pyaudio is None:
             raise ImportError("pyaudio not installed. Run: pip install pyaudio")
 
@@ -53,12 +57,17 @@ class AudioPlayer(IAudioPlayer):
         self._playing = False
         self._stop_requested = False
         self._suppress_until = 0.0
+        self.output_device_index = output_device_index
 
         # Audio queue for streaming playback
         self._audio_queue: queue.Queue = queue.Queue()
         self._playback_thread: Optional[threading.Thread] = None
 
-        logger.info(f"AudioPlayer initialized: sample_rate={sample_rate}")
+        logger.info(
+            "AudioPlayer initialized: "
+            f"sample_rate={sample_rate}, "
+            f"output_device_index={output_device_index}"
+        )
 
     def start(self):
         """Start player and register event handlers"""
@@ -74,10 +83,12 @@ class AudioPlayer(IAudioPlayer):
 
         self.audio = pyaudio.PyAudio()
 
-        # Find default output device
+        # Log default output device (no selection logic here)
         try:
             default_output = self.audio.get_default_output_device_info()
-            logger.info(f"Default output device: {default_output.get('name', 'unknown')}")
+            logger.info(
+                f"Default output device: {default_output.get('name', 'unknown')}"
+            )
         except Exception as e:
             logger.warning(f"Could not get default output device: {e}")
 
@@ -138,12 +149,18 @@ class AudioPlayer(IAudioPlayer):
 
             # Open stream if not already open
             if self.stream is None or not self.stream.is_active():
+                stream_kwargs = {
+                    "format": TTS_FORMAT,
+                    "channels": TTS_CHANNELS,
+                    "rate": self.sample_rate,
+                    "output": True,
+                    "frames_per_buffer": TTS_CHUNK_SIZE
+                }
+                if self.output_device_index is not None:
+                    stream_kwargs["output_device_index"] = self.output_device_index
+
                 self.stream = self.audio.open(
-                    format=TTS_FORMAT,
-                    channels=TTS_CHANNELS,
-                    rate=self.sample_rate,
-                    output=True,
-                    frames_per_buffer=TTS_CHUNK_SIZE
+                    **stream_kwargs
                 )
 
             # Write audio data to stream

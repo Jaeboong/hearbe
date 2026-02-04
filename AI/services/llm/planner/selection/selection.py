@@ -35,31 +35,31 @@ def select_from_results(
     ordinal_index = extract_ordinal_index(target)
     if ordinal_index is not None:
         if 0 <= ordinal_index < len(results):
-            item = results[ordinal_index] if isinstance(results[ordinal_index], dict) else {}
-            name = item.get("name") or item.get("title") or item.get("product_name")
-            if name:
-                commands = [
-                    MCPCommand(
-                        tool_name="click_text",
-                        arguments={"text": name},
-                        description=f"search result click '{name}'"
-                    ),
-                    MCPCommand(
-                        tool_name="wait_for_new_page",
-                        arguments={"timeout_ms": 1500, "focus": True},
-                        description="detect new tab and focus"
-                    ),
-                    MCPCommand(
-                        tool_name="wait",
-                        arguments={"ms": 1500},
-                        description="wait for product page"
-                    )
-                ]
-                extract_command = build_product_extract_command(session)
-                if extract_command:
-                    commands.append(extract_command)
-            else:
-                commands = _build_click_nth_result_commands(session, ordinal_index)
+            commands = _build_click_nth_result_commands(session, ordinal_index)
+            if not commands:
+                item = results[ordinal_index] if isinstance(results[ordinal_index], dict) else {}
+                name = item.get("name") or item.get("title") or item.get("product_name")
+                if name:
+                    commands = [
+                        MCPCommand(
+                            tool_name="click_text",
+                            arguments={"text": name},
+                            description=f"search result click '{name}'"
+                        ),
+                        MCPCommand(
+                            tool_name="wait_for_new_page",
+                            arguments={"timeout_ms": 1500, "focus": True},
+                            description="detect new tab and focus"
+                        ),
+                        MCPCommand(
+                            tool_name="wait",
+                            arguments={"ms": 1500},
+                            description="wait for product page"
+                        )
+                    ]
+                    extract_command = build_product_extract_command(session)
+                    if extract_command:
+                        commands.append(extract_command)
             if commands:
                 return LLMResponse(
                     text=f"{ordinal_index + 1}번째 상품을 선택합니다.",
@@ -69,7 +69,8 @@ def select_from_results(
                 )
 
     matched_name = None
-    for item in results:
+    matched_index = None
+    for idx, item in enumerate(results):
         if not isinstance(item, dict):
             continue
         name = item.get("name") or item.get("title") or item.get("product_name")
@@ -78,34 +79,37 @@ def select_from_results(
         name_lower = name.lower()
         if target in name_lower or name_lower in target:
             matched_name = name
+            matched_index = idx
             break
 
     if not matched_name:
         return None
 
-    commands = [
-        MCPCommand(
-            tool_name="click_text",
-            arguments={"text": matched_name},
-            description=f"search result click '{matched_name}'"
-        ),
-        MCPCommand(
-            tool_name="wait_for_new_page",
-            arguments={"timeout_ms": 1500, "focus": True},
-            description="detect new tab and focus"
-        ),
-        MCPCommand(
-            tool_name="wait",
-            arguments={"ms": 1500},
-            description="wait for product page"
-        )
-    ]
+    commands = _build_click_nth_result_commands(session, matched_index) if matched_index is not None else None
+    if not commands:
+        commands = [
+            MCPCommand(
+                tool_name="click_text",
+                arguments={"text": matched_name},
+                description=f"search result click '{matched_name}'"
+            ),
+            MCPCommand(
+                tool_name="wait_for_new_page",
+                arguments={"timeout_ms": 1500, "focus": True},
+                description="detect new tab and focus"
+            ),
+            MCPCommand(
+                tool_name="wait",
+                arguments={"ms": 1500},
+                description="wait for product page"
+            )
+        ]
     extract_command = build_product_extract_command(session)
     if extract_command:
         commands.append(extract_command)
 
     return LLMResponse(
-        text=f"selecting '{matched_name}' from search results",
+        text=f"검색 결과에서 '{matched_name}'을 선택합니다.",
         commands=commands,
         requires_flow=False,
         flow_type=None

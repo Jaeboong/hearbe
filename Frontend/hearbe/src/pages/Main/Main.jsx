@@ -10,7 +10,7 @@ export default function Main() {
 
     const handleModeClick = (mode) => {
         if (mode === 'common') navigate('/login-c');
-        else if (mode === 'sharing') navigate('/login-s');
+        else if (mode === 'sharing') navigate('/S/join');
         else if (mode === 'big') navigate('/login-b');
         else navigate('/login-a');
     };
@@ -130,7 +130,7 @@ export default function Main() {
 
     const handleModeClick = (mode) => {
         if (mode === 'common') navigate('/C/login');
-        else if (mode === 'sharing') navigate('/login-s');
+        else if (mode === 'sharing') navigate('/S/join');
         else if (mode === 'big') navigate('/A/login');
         else navigate('/A/login');
     };

@@ -141,8 +141,30 @@ class TempFileManager:
 
     def cleanup_all(self):
         """
-        Clean up all tracked files (e.g., on server shutdown).
+        Clean up all tracked files and any leftover temp files (e.g., on server shutdown).
         """
         session_ids = list(self._session_files.keys())
         for session_id in session_ids:
             self.cleanup_session(session_id)
+
+        try:
+            if not self.base_dir.exists() or not self.base_dir.is_dir():
+                return
+
+            for path in self.base_dir.rglob("*"):
+                if path.is_file():
+                    try:
+                        path.unlink()
+                        logger.info(f"Deleted temp file: {path}")
+                    except Exception as e:
+                        logger.warning(f"Failed to delete temp file {path}: {e}")
+
+            # Remove empty dirs (bottom-up)
+            for path in sorted(self.base_dir.rglob("*"), reverse=True):
+                if path.is_dir():
+                    try:
+                        path.rmdir()
+                    except Exception:
+                        continue
+        except Exception as e:
+            logger.warning(f"Temp cleanup failed: {e}")

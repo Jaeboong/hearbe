@@ -92,7 +92,7 @@ class PageExtractManager:
         )
         if page_type == "search":
             site = get_current_site(url)
-            cmd = build_extract_products_command(site, current_url=url, limit=20)
+            cmd = build_extract_products_command(site, current_url=url, limit=0)
             if not cmd:
                 return []
             return [

@@ -5,6 +5,9 @@ NLU/LLM pipeline handler.
 
 import logging
 
+from core.interfaces import IntentType
+from services.llm.planner.selection.option_select import coerce_option_clicks, is_option_request
+
 logger = logging.getLogger(__name__)
 
 
@@ -36,6 +39,17 @@ class LLMPipelineHandler:
         if not self._llm:
             return ""
 
+        if session and session.context:
+            detail = session.context.get("product_detail")
+            if isinstance(detail, dict) and detail.get("options_list"):
+                options_list = detail.get("options_list") or {}
+                option_keys = list(options_list.keys()) if isinstance(options_list, dict) else []
+                logger.info(
+                    "LLM context has options_list: session=%s keys=%s",
+                    session_id,
+                    option_keys,
+                )
+
         response = await self._llm.generate_commands(
             resolved_text,
             intent,
@@ -43,6 +57,17 @@ class LLMPipelineHandler:
         )
         if interrupted():
             return ""
+
+        if response and response.commands:
+            allow_option = is_option_request(resolved_text)
+            coerced_commands, changed = coerce_option_clicks(response.commands, session, allow_option)
+            if changed:
+                logger.info(
+                    "Adjusted option commands (allow=%s): session=%s",
+                    allow_option,
+                    session_id,
+                )
+            response.commands = coerced_commands
 
         if response.requires_flow and self._flow:
             flow_type = response.flow_type
@@ -53,11 +78,17 @@ class LLMPipelineHandler:
             await self._sender.send_flow_step(session_id, step)
             return ""
 
+        allow_extract = bool(intent and intent.intent == IntentType.SEARCH)
+        if not allow_extract and response.commands:
+            allow_extract = any(
+                (cmd.tool_name or "").startswith("extract")
+                for cmd in response.commands
+            )
         commands = self._command_pipeline.prepare_commands(
             session_id,
             response.commands,
             session.current_url or "",
-            allow_extract=False,
+            allow_extract=allow_extract,
         )
         if not commands:
             logger.info(

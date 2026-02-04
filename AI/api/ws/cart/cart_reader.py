@@ -57,13 +57,33 @@ def build_cart_read_tts(
         remain = total_count - max_read
         tts_text += f" 나머지 {remain}개도 읽어드릴까요?"
 
-    total_price = summary.get("total_product_price") or ""
+    total_product_price = summary.get("total_product_price") or ""
+    total_instant_discount = summary.get("total_instant_discount") or summary.get("instant_discount") or ""
     shipping_fee = summary.get("shipping_fee") or ""
-    if total_price or shipping_fee:
+    final_total = summary.get("total_price") or summary.get("final_order_price") or ""
+    if total_product_price or total_instant_discount or shipping_fee or final_total:
         tts_text += " 총액 정보입니다."
-        if total_price:
-            tts_text += f" 총 상품 가격 {total_price}."
+        if total_product_price:
+            tts_text += f" 총 상품 가격 {total_product_price}."
+        if total_instant_discount:
+            tts_text += f" 총 즉시할인 {total_instant_discount}."
         if shipping_fee:
             tts_text += f" 총 배송비 {shipping_fee}."
+        if final_total:
+            tts_text += f" 최종 결제 금액 {final_total}."
+
+    rocket_blocked = summary.get("rocket_fresh_blocked") is True
+    rocket_current = summary.get("rocket_fresh_current") or ""
+    rocket_threshold = summary.get("rocket_fresh_threshold") or ""
+    rocket_remaining = summary.get("rocket_fresh_remaining") or ""
+    if rocket_blocked or rocket_remaining:
+        tts_text += " 로켓프레시 최소 결제 금액 기준이 있습니다."
+        if rocket_current:
+            tts_text += f" 현재 {rocket_current}."
+        if rocket_threshold:
+            tts_text += f" 기준 {rocket_threshold}."
+        if rocket_remaining:
+            tts_text += f" {rocket_remaining} 부족합니다."
+        tts_text += " 로켓프레시 상품을 더 담을까요, 아니면 해당 상품을 제외할까요?"
 
     return tts_text

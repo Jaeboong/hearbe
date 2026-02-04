@@ -19,6 +19,7 @@ from .text_routing.ai_next_router import AiNextRouter
 from .text_routing.text_router import TextRouter
 from .text_session.history_writer import HistoryWriter
 from .text_session.interrupt_manager import InterruptManager
+from services.llm.sites.site_manager import get_page_type
 
 logger = logging.getLogger(__name__)
 
@@ -176,6 +177,7 @@ class TextHandler:
         try:
             session = self._session.get_session(session_id) if self._session else None
             if session and self._page_extract:
+                page_type = get_page_type(session.current_url or "")
                 triggered = await self._page_extract.ensure_context(
                     session_id,
                     session.current_url,

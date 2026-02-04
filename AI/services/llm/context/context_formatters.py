@@ -6,6 +6,7 @@ import json
 from typing import Any, Dict, List, Optional
 
 from .context_commands import AVAILABLE_COMMANDS
+from ..sites.site_manager import get_selector
 
 
 def format_commands() -> str:
@@ -81,7 +82,10 @@ def format_product_detail_section(product_detail: Optional[Dict[str, Any]] = Non
     return "\n".join(lines)
 
 
-def format_cart_items_section(cart_items: List[Dict[str, Any]] = None) -> str:
+def format_cart_items_section(
+    cart_items: List[Dict[str, Any]] = None,
+    current_url: Optional[str] = None,
+) -> str:
     if not cart_items:
         return ""
 
@@ -104,7 +108,7 @@ def format_cart_items_section(cart_items: List[Dict[str, Any]] = None) -> str:
             "quantity": item.get("quantity"),
             "selected": item.get("selected"),
             "arrival": item.get("arrival"),
-            "selectors": build_cart_item_selectors(name) if name else {},
+            "selectors": build_cart_item_selectors(name, current_url) if name else {},
         }
         lines.append(json.dumps(entry, ensure_ascii=True))
     return "\n".join(lines)
@@ -116,19 +120,58 @@ def format_url_context(current_url: str, previous_url: Optional[str]) -> str:
     return f"- Previous URL: {previous_url}"
 
 
-def build_cart_item_selectors(name: str) -> Dict[str, str]:
+def _wrap_is(selector: Optional[str]) -> str:
+    if not selector:
+        return ""
+    if selector.startswith(":is("):
+        return selector
+    if "," in selector:
+        return f":is({selector})"
+    return selector
+
+
+def _build_cart_item_root_selector(name: str, current_url: Optional[str]) -> str:
     safe = name.replace('"', '\\"')
-    base = f'[id^="item_"]:has(a span:has-text("{safe}"))'
-    return {
-        "item_root": base,
-        "item_checkbox": f"{base} input[type=\"checkbox\"]",
-        "quantity_input": f"{base} input.cart-quantity-input",
-        "quantity_plus": (
+    item_selector = _wrap_is(get_selector(current_url, "cart_item")) if current_url else ""
+    title_selector = _wrap_is(get_selector(current_url, "item_title")) if current_url else ""
+    if item_selector and title_selector:
+        return f'{item_selector}:has({title_selector}:has-text("{safe}"))'
+    return f'[id^="item_"]:has(a span:has-text("{safe}"))'
+
+
+def build_cart_item_selectors(name: str, current_url: Optional[str] = None) -> Dict[str, str]:
+    base = _build_cart_item_root_selector(name, current_url)
+    checkbox_selector = _wrap_is(get_selector(current_url, "item_checkbox")) if current_url else ""
+    quantity_selector = _wrap_is(get_selector(current_url, "quantity_input")) if current_url else ""
+    plus_selector = _wrap_is(get_selector(current_url, "quantity_plus")) if current_url else ""
+    minus_selector = _wrap_is(get_selector(current_url, "quantity_minus")) if current_url else ""
+
+    if not checkbox_selector:
+        checkbox_selector = "input[type=\"checkbox\"]"
+    if not quantity_selector:
+        quantity_selector = "input.cart-quantity-input"
+
+    quantity_plus = (
+        f"{base} {plus_selector}"
+        if plus_selector
+        else (
             f"{base} [data-component-id=\"quantity-input\"] .twc-bg-plus-icon, "
             f'{base} button[aria-label*="증가"], {base} button[aria-label*="더하기"]'
-        ),
-        "quantity_minus": (
+        )
+    )
+    quantity_minus = (
+        f"{base} {minus_selector}"
+        if minus_selector
+        else (
             f"{base} [data-component-id=\"quantity-input\"] .twc-bg-minus-icon, "
             f'{base} button[aria-label*="감소"], {base} button[aria-label*="빼기"]'
-        ),
+        )
+    )
+
+    return {
+        "item_root": base,
+        "item_checkbox": f"{base} {checkbox_selector}",
+        "quantity_input": f"{base} {quantity_selector}",
+        "quantity_plus": quantity_plus,
+        "quantity_minus": quantity_minus,
     }

@@ -33,7 +33,6 @@ import FindIdC from '../pages/FindId/FindIdC';
 import FindPasswordC from '../pages/FindPassword/FindPasswordC';
 
 // [S형 페이지 컴포넌트]
-import LoginS from '../pages/Login/LoginS';
 import GuardianViewS from '../pages/GuardianView/GuardianViewS';
 
 
@@ -298,8 +297,9 @@ function AppContent() {
       <Route path="/mall-c" element={<Navigate to="/C/mall" replace />} />
       <Route path="/store-c" element={<Navigate to="/C/store" replace />} />
       <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
-      <Route path="/login-s" element={<LoginS />} />
-      <Route path="/S/guardian-view" element={<GuardianViewS />} />
+      <Route path="/login-s" element={<Navigate to="/S/join" replace />} />
+      <Route path="/S/guardian-view" element={<Navigate to="/S/join" replace />} />
+      <Route path="/S/join" element={<GuardianViewS />} />
 
       {/* Fallback */}
 
