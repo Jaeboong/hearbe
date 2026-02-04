@@ -55,6 +55,8 @@ function AppContent() {
     // 모드에 따라 분기 처리
     if (mode === 'common') {
       navigate('/C/login');
+    } else if (mode === 'sharing') {
+      navigate('/S/join');
     } else {
       navigate('/A/login');
     }
@@ -298,7 +300,7 @@ function AppContent() {
       <Route path="/store-c" element={<Navigate to="/C/store" replace />} />
       <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
       <Route path="/login-s" element={<Navigate to="/S/join" replace />} />
-      <Route path="/S/guardian-view" element={<GuardianViewS />} caseSensitive={false} />
+      <Route path="/S/guardian-view" element={<Navigate to="/S/join" replace />} />
       <Route path="/S/join" element={<GuardianViewS />} caseSensitive={false} />
 
       {/* Fallback */}
