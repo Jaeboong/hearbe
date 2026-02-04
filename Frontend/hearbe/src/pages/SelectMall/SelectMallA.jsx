@@ -27,6 +27,7 @@ const SelectMall = () => {
 
         const targetUrl = mallUrlMap[mall];
         if (targetUrl) {
+            window.open(targetUrl, '_blank', 'noopener,noreferrer');
             navigate(`/A/store?url=${encodeURIComponent(targetUrl)}`);
         }
     };
