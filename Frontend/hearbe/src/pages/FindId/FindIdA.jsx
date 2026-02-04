@@ -63,7 +63,7 @@ const FindIdA = () => {
         if (stream && videoRef.current) {
             videoRef.current.muted = true;
             videoRef.current.srcObject = stream;
-            videoRef.current.play().catch(() => {});
+            videoRef.current.play().catch(() => { });
         }
     }, [stream]);
 
@@ -196,7 +196,7 @@ const FindIdA = () => {
                 src={logoA}
                 alt="Logo"
                 className="findid-logo"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="findid-box">

@@ -150,7 +150,7 @@ const OrderHistoryA = () => {
                 src={logoA}
                 alt="Logo"
                 className="orderhistory-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">

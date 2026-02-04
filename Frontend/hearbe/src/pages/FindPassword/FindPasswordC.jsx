@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, ShieldCheck, Smile } from 'lucide-react';
 import logoC from '../../assets/logoC.png';
 import './FindPasswordC.css';
@@ -7,6 +8,7 @@ import { authAPI } from '../../services/authAPI';
 import { emailService } from '../../services/emailService';
 
 export default function FindPasswordPage({ onBack, micPermissionGranted }) {
+    const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
@@ -87,7 +89,13 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
             <main className="find-pw-main-c">
                 <div className="pw-form-card-c">
                     <div className="pw-card-header-c">
-                        <img src={logoC} alt="HearBe" className="pw-logo-c" />
+                        <img
+                            src={logoC}
+                            alt="HearBe"
+                            className="pw-logo-c"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => navigate('/main')}
+                        />
                         <h1>비밀번호 재설정</h1>
                         <p className="pw-desc-c">안전한 서비스 이용을 위해 본인 확인이 필요합니다.</p>
                     </div>

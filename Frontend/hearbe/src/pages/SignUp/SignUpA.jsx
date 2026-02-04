@@ -1,5 +1,6 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PartyPopper } from 'lucide-react';
 import iconCard from '../../assets/icon-card.png';
 import iconCamera from '../../assets/icon-camera.png';
 import logo from '../../assets/logoA.png';
@@ -163,11 +164,11 @@ const SignUp = () => {
 
         try {
             const result = await authAPI.checkDuplicate(formData.id);
-            
+
             console.log("서버에서 온 진짜 값:", result);
 
             const isDuplicate = result.data; // 서버에서 중복 여부를 나타내는 필드명에 맞게 수정 필요
-            
+
             if (isDuplicate === false) { // 중복이 아니라면 (사용 가능)
                 setIsIdChecked(true);
                 alert("사용 가능한 아이디입니다.");
@@ -402,7 +403,7 @@ const SignUp = () => {
                         src={logo}
                         alt="Logo"
                         className="signup-logo-image"
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/main')}
                         style={{ cursor: 'pointer' }}
                     />
                 </div>
@@ -652,14 +653,31 @@ const SignUp = () => {
             {
                 showSuccess && (
                     <div className="modal-overlay" onClick={() => { }}>
-                        <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
-                            <div className="success-icon">🎉</div>
-                            <div className="error-message">회원가입이 완료되었습니다!</div>
+                        <div className="error-modal-box" onClick={(e) => e.stopPropagation()} style={{ padding: '3rem', borderRadius: '1.5rem', textAlign: 'center' }}>
+                            <div className="success-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                                <PartyPopper size={80} color="#FACC15" />
+                            </div>
+                            <div className="error-message" style={{ color: '#FACC15', fontSize: '2rem', fontWeight: '800', marginBottom: '1rem' }}>
+                                가입완료!
+                            </div>
+                            <p style={{ color: '#cbd5e1', fontSize: '1.2rem', marginBottom: '2rem' }}>
+                                HearBe 회원이 되신 것을 축하드립니다.
+                            </p>
                             <button
                                 className="error-confirm-btn"
                                 onClick={() => navigate('/A/login')}
+                                style={{
+                                    backgroundColor: '#FACC15',
+                                    color: '#1e293b',
+                                    padding: '1rem 2rem',
+                                    fontSize: '1.4rem',
+                                    borderRadius: '1rem',
+                                    border: 'none',
+                                    fontWeight: '800',
+                                    width: '100%'
+                                }}
                             >
-                                로그인하러 가기
+                                확인
                             </button>
                         </div>
                     </div>

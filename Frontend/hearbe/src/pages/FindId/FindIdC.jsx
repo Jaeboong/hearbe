@@ -82,7 +82,13 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
             <main className="find-id-main-c">
                 <div className="find-id-card-c">
                     <div className="card-header-c">
-                        <img src={logoC} alt="HearBe" className="mini-logo-c" />
+                        <img
+                            src={logoC}
+                            alt="HearBe"
+                            className="mini-logo-c"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => navigate('/main')}
+                        />
                         <h1>아이디 찾기</h1>
                         <p>가입 시 등록한 정보로 아이디를 찾을 수 있습니다.</p>
                     </div>

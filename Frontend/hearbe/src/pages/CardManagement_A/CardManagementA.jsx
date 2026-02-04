@@ -231,7 +231,7 @@ const CardManagementA = () => {
                 src={logoA}
                 alt="Logo"
                 className="cardmgmt-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">

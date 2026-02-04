@@ -95,7 +95,7 @@ const CartA = () => {
                 src={logoA}
                 alt="Logo"
                 className="cart-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">

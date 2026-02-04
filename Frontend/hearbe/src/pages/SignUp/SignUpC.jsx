@@ -1,7 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, PartyPopper } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
 import Swal from 'sweetalert2';
@@ -82,24 +82,71 @@ ${termContents.privacy}`;
     }
   };
 
+  const [matchMessage, setMatchMessage] = useState('');
+  const [matchValid, setMatchValid] = useState(false);
+
+  const handlePasswordCheck = () => {
+    if (!confirmPassword) {
+      setMatchMessage('');
+      setMatchValid(false);
+      return;
+    }
+
+    if (formData.password === confirmPassword) {
+      setMatchMessage('비밀번호가 일치합니다.');
+      setMatchValid(true);
+    } else {
+      setMatchMessage('비밀번호가 일치하지 않습니다.');
+      setMatchValid(false);
+    }
+  };
+
   const handleConfirmPasswordChange = (value) => {
     setConfirmPassword(value);
     if (errors.confirmPassword) {
       setErrors({ ...errors, confirmPassword: null });
     }
+    // 입력 중에도 메시지 초기화 혹은 실시간 체크를 원한다면 여기서 호출 가능
+    // 하지만 LoginC와 동일하게 onBlur/onMouseLeave에서만 메시지 뜨게 하려면 여기서는 메시지 초기화만
+    if (matchMessage) {
+      setMatchMessage('');
+    }
   };
 
   const handleCheckUsername = async () => {
-    const usernameError = validateUsername(formData.username);
-    if (usernameError) {
+    // 1. 길이 검사 (4자 이상)
+    if (!formData.username || formData.username.length < 4) {
       Swal.fire({
         icon: 'warning',
-        text: usernameError,
+        text: '아이디는 4자 이상 입력해주세요.',
         confirmButtonColor: '#7c3aed',
         confirmButtonText: '확인'
       });
       return;
     }
+
+    // 2. 영문 + 숫자 포함 검사
+    const hasLetter = /[a-zA-Z]/.test(formData.username);
+    const hasNumber = /[0-9]/.test(formData.username);
+
+    if (!hasLetter || !hasNumber) {
+      Swal.fire({
+        icon: 'warning',
+        text: '아이디는 영문과 숫자를 모두 포함해야 합니다.',
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
+      return;
+    }
+
+    // 기존 usernameError check는 위 로직으로 대체되었으므로 제거하거나 기본적인 것만 유지할 수 있지만,
+    // 여기서는 사용자가 요청한 규칙이 우선이므로 위 로직 통과 후 다른 검증(예: 공백 등)은 validateUsername에 맡기되
+    // 위 에러들과 중복되지 않게 처리하거나 바로 중복확인으로 넘어감.
+    // 하지만 validateUsername에는 길이 체크등이 있어서 그냥 여기 로직만 통과하면 중복체크로 넘어가도 무방하지만
+    // validateUsername이 '아이디를 입력해주세요' 등을 리턴하므로 안전하게 호출하되, 위 조건들에 걸리지 않는 에러만 처리.
+
+    // 단순화: 위 조건 통과하면 바로 API 호출 시도 (validateUsername은 submit시에 한번 더 체크됨)
+
 
     try {
       const apiResponse = await authAPI.checkDuplicate(formData.username);
@@ -141,14 +188,56 @@ ${termContents.privacy}`;
   // 하지만 호환성을 위해 남겨두거나 삭제하고 JSX에서 setAgreements 직접 호출
 
 
+  const handleEmailBlur = () => {
+    if (!formData.email) return; // 빈 값일 때는 에러 표시 안 함 (선택 사항)
+
+    if (!formData.email.includes('@')) {
+      setErrors((prev) => ({ ...prev, email: '@포함한 유효한 이메일을 입력해주세요' }));
+      return;
+    }
+
+    // 간단한 도메인 체크를 포함한 정규식 (최소한 . 뒤에 2글자 이상)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      setErrors((prev) => ({ ...prev, email: '유효한 이메일을 입력해주세요' }));
+      return;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const usernameError = validateUsername(formData.username);
     const passwordError = validatePassword(formData.password);
     const confirmPasswordError = validatePasswordConfirm(formData.password, confirmPassword);
-    const emailError = validateEmail(formData.email);
+    // emailError는 아래에서 별도로 처리하거나 validateEmail 결과 사용
     const nameError = validateName(formData.name);
+
+    // 이메일 정밀 검사
+    if (!formData.email.includes('@')) {
+      Swal.fire({
+        icon: 'warning',
+        text: '@를 포함하여 이메일을 작성해주세요.',
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      Swal.fire({
+        icon: 'warning',
+        text: '올바른 이메일 주소를 입력해주세요.', // 도메인 포함 여부 등 포괄적 메시지
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
+      return;
+    }
+
+    // validateEmail 결과도 확인 (혹시 모를 다른 케이스)
+    const emailError = validateEmail(formData.email);
+
 
     if (!isUsernameChecked || !isUsernameAvailable) {
       Swal.fire({
@@ -241,7 +330,13 @@ ${termContents.privacy}`;
       <main className="signup-c-main">
         <div className="signup-card-c">
           <div className="signup-header-c"> {/* 로고 이미지 사용 */}
-            <img src={logoC} alt="HearBe Logo" className="signup-logo-c" style={{ marginBottom: '20px' }} />
+            <img
+              src={logoC}
+              alt="HearBe Logo"
+              className="signup-logo-c"
+              style={{ marginBottom: '20px', cursor: 'pointer' }}
+              onClick={() => navigate('/main')}
+            />
             <div className="header-title-group-c" style={{ display: 'none' }}>
               <div className="title-icon-c">
                 <User size={32} />
@@ -326,6 +421,8 @@ ${termContents.privacy}`;
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                    onMouseLeave={handlePasswordCheck}
+                    onBlur={handlePasswordCheck}
                     placeholder="비밀번호 재확인"
                     className="signup-input-c gray-bg-c"
                   />
@@ -337,6 +434,19 @@ ${termContents.privacy}`;
                     {showConfirmPassword ? <EyeOff size={32} color="#94A3B8" /> : <Eye size={32} color="#94A3B8" />}
                   </button>
                 </div>
+                {matchMessage && (
+                  <div style={{ textAlign: 'left', marginTop: '8px', paddingLeft: '5px' }}>
+                    <p
+                      className={`pw-condition-text ${matchValid ? 'satisfied' : 'unsatisfied'}`}
+                      style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <span style={{ fontSize: matchValid ? '14px' : '8px', lineHeight: '1' }}>
+                        {matchValid ? '✓' : '●'}
+                      </span>
+                      {matchMessage}
+                    </p>
+                  </div>
+                )}
                 {errors.confirmPassword && <span className="error-text-c">{errors.confirmPassword}</span>}
               </div >
             </div >
@@ -359,6 +469,7 @@ ${termContents.privacy}`;
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
+                  onBlur={handleEmailBlur}
                   placeholder="이메일(example@gmail.com)"
                   className="signup-input-c"
                 />

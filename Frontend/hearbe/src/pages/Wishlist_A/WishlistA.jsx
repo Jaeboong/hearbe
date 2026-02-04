@@ -124,7 +124,7 @@ const WishlistA = () => {
                 src={logoA}
                 alt="Logo"
                 className="wishlist-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">

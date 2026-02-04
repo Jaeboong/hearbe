@@ -50,7 +50,7 @@ const ChangePasswordA = () => {
                 src={logoA}
                 alt="Logo"
                 className="change-pw-logo"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/main')}
             />
             <div className="change-pw-card">
                 <h1 className="change-pw-title">비밀번호 변경</h1>

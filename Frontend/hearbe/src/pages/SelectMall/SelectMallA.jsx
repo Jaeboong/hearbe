@@ -54,7 +54,7 @@ const SelectMall = () => {
                 src={logoA}
                 alt="Logo"
                 className="mall-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
             {/* Header */}
             <div className="mypage-topbar">
