@@ -202,10 +202,7 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                                                     <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
                                                 </div>
                                             </div>
-                                            <button className="mall-pay-button" onClick={() => alert(`${mallName} 결제 페이지로 이동합니다.`)}>
-                                                <span>결제하기</span>
-                                                <ArrowLeft className="rotate-180" />
-                                            </button>
+
                                         </div>
                                     </section>
                                 );
@@ -352,10 +349,7 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                                                         <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
                                                     </div>
                                                 </div>
-                                                <button className="mall-pay-button" onClick={() => alert(`${mallName} 결제 페이지로 이동합니다.`)}>
-                                                    <span>결제하기</span>
-                                                    <ArrowLeft className="rotate-180" />
-                                                </button>
+
                                             </div>
                                         </section>
                                     );
