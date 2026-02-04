@@ -21,7 +21,6 @@ export default function MemberInfoC({ onHome }) {
 
     // 회원탈퇴 모달 상태
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-    const [withdrawPassword, setWithdrawPassword] = useState('');
     const [withdrawError, setWithdrawError] = useState('');
     const [isWithdrawing, setIsWithdrawing] = useState(false);
 
@@ -102,29 +101,22 @@ export default function MemberInfoC({ onHome }) {
     // 회원탈퇴 모달 열기
     const handleWithdraw = () => {
         setShowWithdrawModal(true);
-        setWithdrawPassword('');
         setWithdrawError('');
     };
 
     // 회원탈퇴 모달 닫기
     const handleCloseWithdrawModal = () => {
         setShowWithdrawModal(false);
-        setWithdrawPassword('');
         setWithdrawError('');
     };
 
     // 회원탈퇴 실행
     const handleConfirmWithdraw = async () => {
-        if (!withdrawPassword) {
-            setWithdrawError('비밀번호를 입력해주세요.');
-            return;
-        }
-
         setIsWithdrawing(true);
         setWithdrawError('');
 
         try {
-            await authAPI.deleteAccount(withdrawPassword);
+            await authAPI.deleteAccount();
             await Swal.fire({
                 icon: 'success',
                 title: '탈퇴 완료',
@@ -342,29 +334,10 @@ export default function MemberInfoC({ onHome }) {
                             </button>
                         </div>
 
-                        <p style={{ fontSize: '1.1rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-                            회원탈퇴를 진행하시려면 비밀번호를 입력해주세요.
+                        <p style={{ fontSize: '1.1rem', color: '#6b7280', marginBottom: '1rem', lineHeight: '1.6', textAlign: 'center' }}>
+                            정말 탈퇴하시겠습니까?<br />
+                            탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.
                         </p>
-
-                        <div style={{ marginBottom: '1rem' }}>
-                            <input
-                                type="password"
-                                placeholder="비밀번호 입력"
-                                value={withdrawPassword}
-                                onChange={(e) => setWithdrawPassword(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '1rem 1.2rem',
-                                    fontSize: '1.1rem',
-                                    border: '2px solid #e5e7eb',
-                                    borderRadius: '0.75rem',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = '#7c3aed'}
-                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                            />
-                        </div>
 
                         {withdrawError && (
                             <p style={{ color: '#e53e3e', fontSize: '0.95rem', marginBottom: '1rem' }}>
