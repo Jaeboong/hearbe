@@ -8,7 +8,7 @@ Tracks login submit attempts and announces successful navigation after login.
 from typing import Optional
 
 from services.llm.sites.site_manager import get_page_type, get_selector
-from ..presenter.pages.login import build_login_success_tts
+from services.llm.generators.tts_generator import TTSGenerator
 
 
 class LoginFeedbackManager:
@@ -17,6 +17,7 @@ class LoginFeedbackManager:
     def __init__(self, session_manager, sender):
         self._session = session_manager
         self._sender = sender
+        self._tts = TTSGenerator()
 
     def clear_pending(self, session_id: str):
         if self._session:
@@ -75,7 +76,7 @@ class LoginFeedbackManager:
         if not self._session.get_context(session_id, "login_submit_pending", False):
             return
 
-        tts = build_login_success_tts(current_url)
+        tts = self._tts.build_login_success(current_url)
         if tts:
             await self._sender.send_tts_response(session_id, tts)
         self._session.set_context(session_id, "login_submit_pending", False)

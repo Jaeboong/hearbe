@@ -8,7 +8,7 @@ import logging
 import time
 
 from services.llm.sites.site_manager import get_current_site, get_page_type
-from ..presenter.pages.login import build_login_guidance_tts
+from services.llm.generators.tts_generator import TTSGenerator
 
 from .audio_handler import AudioHandler
 from .text_handler import TextHandler
@@ -39,6 +39,7 @@ class HandlerManager:
     ):
         self._sender = sender
         self._session = session_manager
+        self._tts = TTSGenerator()
 
         self._action_feedback = ActionFeedbackManager(sender)
         self._failure_notifier = ToolFailureNotifier(sender)
@@ -173,7 +174,7 @@ class HandlerManager:
         if self._sender:
             await self._sender.send_tts_response(
                 session_id,
-                build_login_guidance_tts()
+                self._tts.build_login_guidance()
             )
         self._session.set_context(session_id, "login_guidance_shown", True)
 

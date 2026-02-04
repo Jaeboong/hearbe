@@ -10,8 +10,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Optional, List, Any
 
-from services.llm.sites.site_manager import get_selector
-from services.llm.sites.site_manager import get_site_manager
+from services.llm.sites.site_manager import get_selector, get_page_type, get_site_manager
 from core.interfaces import MCPCommand
 from ..utils.temp_file_manager import TempFileManager
 
@@ -46,6 +45,8 @@ class ActionFeedbackManager:
             return None
 
         selector = get_selector(current_url, "add_to_cart") if current_url else None
+        checkout_selector = get_selector(current_url, "checkout_button") if current_url else None
+        is_cart_page = bool(current_url and get_page_type(current_url) == "cart")
 
         for cmd in commands:
             tool = cmd.tool_name
@@ -60,6 +61,14 @@ class ActionFeedbackManager:
                         current_url=current_url
                     )
                     return "장바구니 담기를 시도합니다. 결과를 확인 중입니다."
+                if is_cart_page and checkout_selector and args.get("selector") == checkout_selector:
+                    self._pending[session_id] = PendingAction(
+                        action_type="checkout",
+                        selector=checkout_selector,
+                        tool_name=tool,
+                        current_url=current_url
+                    )
+                    return "결제를 시도합니다. 잠시만 기다려주세요."
 
             if tool == "click_text":
                 text = (args.get("text") or "").strip()
@@ -71,6 +80,14 @@ class ActionFeedbackManager:
                         current_url=current_url
                     )
                     return "장바구니 담기를 시도합니다. 결과를 확인 중입니다."
+                if is_cart_page and any(keyword in text for keyword in ("구매하기", "결제", "주문하기")):
+                    self._pending[session_id] = PendingAction(
+                        action_type="checkout",
+                        selector=None,
+                        tool_name=tool,
+                        current_url=current_url
+                    )
+                    return "결제를 시도합니다. 잠시만 기다려주세요."
 
         return None
 
@@ -115,6 +132,12 @@ class ActionFeedbackManager:
                 return True
             return False
 
+        if pending.action_type == "checkout_verify":
+            if tool_name == "extract_cart":
+                self._pending.pop(session_id, None)
+                return True
+            return False
+
         if tool_name not in ("click", "click_element", "click_text"):
             return False
 
@@ -123,10 +146,24 @@ class ActionFeedbackManager:
                 return False
 
         if not success:
-            await self._sender.send_tts_response(
-                session_id,
-                "장바구니 담기 버튼 클릭에 실패했습니다. 다시 시도해주세요."
-            )
+            msg = "장바구니 담기 버튼 클릭에 실패했습니다. 다시 시도해주세요."
+            if pending.action_type == "checkout":
+                msg = "결제 버튼 클릭에 실패했습니다. 다시 시도해주세요."
+            await self._sender.send_tts_response(session_id, msg)
+            self._pending.pop(session_id, None)
+            return True
+
+        if pending.action_type == "checkout":
+            verify_commands = self._build_verify_checkout_commands(pending.current_url or "")
+            if verify_commands:
+                await self._sender.send_tool_calls(session_id, verify_commands)
+                self._pending[session_id] = PendingAction(
+                    action_type="checkout_verify",
+                    selector=None,
+                    tool_name="extract_cart",
+                    current_url=pending.current_url
+                )
+                return True
             self._pending.pop(session_id, None)
             return True
 
@@ -181,6 +218,22 @@ class ActionFeedbackManager:
             )
         ]
         return commands
+
+    def _build_verify_checkout_commands(self, current_url: str) -> List[MCPCommand]:
+        if not current_url or get_page_type(current_url) != "cart":
+            return []
+        return [
+            MCPCommand(
+                tool_name="wait",
+                arguments={"ms": 800},
+                description="Wait for checkout modal"
+            ),
+            MCPCommand(
+                tool_name="extract_cart",
+                arguments={},
+                description="Extract cart summary after checkout"
+            ),
+        ]
 
     def clear_pending(self, session_id: str):
         """Clear pending actions for a session."""

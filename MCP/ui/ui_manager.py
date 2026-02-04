@@ -6,7 +6,9 @@ UI 모듈의 통합 관리
 
 import logging
 import threading
-from typing import Optional
+import time
+import queue
+from typing import Optional, Tuple
 
 from core.interfaces import IUIManager, AppStatus
 from core.event_bus import subscribe, publish_sync, EventType, Event
@@ -44,6 +46,7 @@ class UIManager(IUIManager):
         try:
             self.mini_window = MiniWindow()
             self.mini_window.set_exit_callback(self._on_exit_requested)
+            self.mini_window.set_device_select_callback(self._on_device_select_requested)
             self.mini_window.show()
             self.mini_window.run()
         except Exception as e:
@@ -96,6 +99,65 @@ class UIManager(IUIManager):
 
         logger.info("UIManager stopped")
 
+    def select_audio_devices(
+        self,
+        force_select: bool = False,
+        timeout_sec: float = 10.0
+    ) -> Tuple[Optional[int], Optional[int]]:
+        """
+        GUI로 마이크/스피커 장치 선택
+
+        Returns:
+            (input_device_index, output_device_index)
+        """
+        from audio.device_selector import (
+            DeviceSelectorDialog,
+            load_device_prefs,
+            save_device_prefs,
+            validate_device_indices
+        )
+
+        saved_input, saved_output, has_prefs = load_device_prefs()
+        saved_input, saved_output = validate_device_indices(saved_input, saved_output)
+
+        if has_prefs and not force_select:
+            return saved_input, saved_output
+
+        if not self.running:
+            logger.warning("UIManager not running; using saved/default devices")
+            return saved_input, saved_output
+
+        start = time.time()
+        while (self.mini_window is None or self.mini_window.root is None) and \
+                (time.time() - start) < timeout_sec:
+            time.sleep(0.05)
+
+        if self.mini_window is None or self.mini_window.root is None:
+            logger.warning("UI not ready; using saved/default devices")
+            return saved_input, saved_output
+
+        result_queue: queue.Queue = queue.Queue(maxsize=1)
+
+        def _show_dialog():
+            try:
+                dialog = DeviceSelectorDialog(
+                    self.mini_window.root,
+                    default_input_index=saved_input,
+                    default_output_index=saved_output
+                )
+                input_index, output_index, cancelled = dialog.show_modal()
+                if cancelled:
+                    result_queue.put((saved_input, saved_output))
+                    return
+                save_device_prefs(input_index, output_index)
+                result_queue.put((input_index, output_index))
+            except Exception as e:
+                logger.error(f"Failed to show device selector: {e}", exc_info=True)
+                result_queue.put((None, None))
+
+        self.mini_window.root.after(0, _show_dialog)
+        return result_queue.get()
+
     # ========================================================================
     # 이벤트 핸들러 등록 헬퍼
     # ========================================================================
@@ -140,6 +202,44 @@ class UIManager(IUIManager):
         """오류 발생"""
         error_msg = event.data if event.data else "오류 발생"
         self.update_status(AppStatus(status="오류", message=str(error_msg)[:30]))
+
+    def _on_device_select_requested(self):
+        """장치 선택 GUI 요청"""
+        try:
+            from audio.device_selector import (
+                DeviceSelectorDialog,
+                load_device_prefs,
+                save_device_prefs,
+                validate_device_indices
+            )
+            saved_input, saved_output, _ = load_device_prefs()
+            saved_input, saved_output = validate_device_indices(
+                saved_input, saved_output
+            )
+
+            if not self.mini_window or not self.mini_window.root:
+                return
+
+            dialog = DeviceSelectorDialog(
+                self.mini_window.root,
+                default_input_index=saved_input,
+                default_output_index=saved_output
+            )
+            input_index, output_index, cancelled = dialog.show_modal()
+            if cancelled:
+                return
+
+            save_device_prefs(input_index, output_index)
+            publish_sync(
+                EventType.AUDIO_DEVICE_CHANGED,
+                data={
+                    "input_device_index": input_index,
+                    "output_device_index": output_index
+                },
+                source="ui"
+            )
+        except Exception as e:
+            logger.error(f"Failed to open device selector: {e}", exc_info=True)
 
     def _on_exit_requested(self):
         """UI에서 종료 요청"""

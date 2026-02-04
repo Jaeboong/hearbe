@@ -43,21 +43,23 @@ def log_llm_request(
     base_url: str,
     messages: List[Dict[str, str]],
     max_tokens: int,
-    response_format: Dict[str, Any],
+    response_format: Optional[Dict[str, Any]],
     token_param: str,
 ) -> None:
     if not _DEBUG_ENABLED:
         return
+    payload = {
+        "model": model,
+        "base_url": base_url,
+        token_param: max_tokens,
+        "messages": redact_messages(messages),
+    }
+    if response_format:
+        payload["response_format"] = response_format
     logger.info(
         "LLM request payload: %s",
         json.dumps(
-            {
-                "model": model,
-                "base_url": base_url,
-                "response_format": response_format,
-                token_param: max_tokens,
-                "messages": redact_messages(messages),
-            },
+            payload,
             ensure_ascii=True,
         ),
     )
