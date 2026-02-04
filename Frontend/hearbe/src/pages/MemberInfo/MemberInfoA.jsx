@@ -75,10 +75,39 @@ const MemberInfoA = () => {
             console.warn('Logout failed:', err);
         } finally {
             localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('savedLoginId');
+            localStorage.removeItem('savedLoginPassword');
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            window.location.href = 'http://localhost:5173/';
+            localStorage.removeItem('user_name');
+            navigate('/');
+        }
+    };
+
+    const handleWithdraw = async () => {
+        if (!window.confirm("정말로 탈퇴하시겠습니까? 탈퇴 시 모든 정보가 삭제됩니다.")) {
+            return;
+        }
+
+        try {
+            await authAPI.deleteAccount();
+            alert("회원탈퇴가 완료되었습니다.");
+
+            // 로그아웃과 동일한 정리 작업
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('savedLoginId');
+            localStorage.removeItem('savedLoginPassword');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            localStorage.removeItem('user_name');
+            navigate('/');
+        } catch (err) {
+            console.error('Withdrawal failed:', err);
+            alert(`회원탈퇴 실패: ${err.message}`);
         }
     };
 
@@ -166,7 +195,7 @@ const MemberInfoA = () => {
                             </div>
 
                             <div className="logout-section">
-                                <span className="logout-link" onClick={handleLogout}>
+                                <span className="logout-link" onClick={handleWithdraw}>
                                     회원탈퇴
                                 </span>
                             </div>

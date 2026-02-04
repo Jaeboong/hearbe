@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import logoC from '../../assets/logoC.png'; // C형 로고로 변경
+import { useNavigate, Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { Eye, EyeOff } from 'lucide-react';
+import logoC from '../../assets/logoC.png';
 import { authAPI } from '../../services/authAPI';
 import './LoginC.css';
 
@@ -10,28 +11,52 @@ export default function LoginC() {
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberId, setRememberId] = useState(false);
+    const [rememberLogin, setRememberLogin] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const savedUsername = localStorage.getItem('rememberedUsername');
-        if (savedUsername) {
-            setId(savedUsername);
-            setRememberId(true);
-        }
-    }, []);
-
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        if (!id || !password) {
-            alert("아이디와 비밀번호를 입력해주세요.");
+        // 이미 로그인 되어있는지 확인
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            navigate('/C/mall');
             return;
         }
 
-        try {
-            const response = await authAPI.login(id, password);
+        // 저장된 로그인 정보 확인 (자동 로그인)
+        const savedId = localStorage.getItem('savedLoginId_C');
+        const savedPassword = localStorage.getItem('savedLoginPassword_C');
+        if (savedId) {
+            setId(savedId);
+            setRememberLogin(true);
+        }
+        if (savedPassword) {
+            setPassword(savedPassword);
+            setRememberLogin(true);
+        }
+        // 저장된 정보가 있으면 자동 로그인 시도
+        if (savedId && savedPassword) {
+            handleLogin(null, savedId, savedPassword, true);
+        }
+    }, []);
 
-            // 토큰 저장
+    const handleLogin = async (e, loginId = id, loginPassword = password, isAuto = false) => {
+        if (e) e.preventDefault();
+
+        if (!loginId || !loginPassword) {
+            Swal.fire({
+                icon: 'warning',
+                text: '아이디와 비밀번호를 입력해주세요.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await authAPI.login(loginId, loginPassword);
+
+            // 토큰을 localStorage에 저장 (다른 페이지에서 사용하기 위해)
             if (response.data && response.data.accessToken) {
                 localStorage.setItem('accessToken', response.data.accessToken);
             }
@@ -39,36 +64,56 @@ export default function LoginC() {
                 localStorage.setItem('refreshToken', response.data.refreshToken);
             }
 
-            // 아이디 저장 여부에 따라 localStorage에 저장/삭제
-            if (rememberId) {
-                localStorage.setItem('rememberedUsername', id);
+            // 로그인 유지 체크 시 아이디/비밀번호 저장
+            if (rememberLogin) {
+                localStorage.setItem('savedLoginId_C', loginId);
+                localStorage.setItem('savedLoginPassword_C', loginPassword);
             } else {
-                localStorage.removeItem('rememberedUsername');
+                localStorage.removeItem('savedLoginId_C');
+                localStorage.removeItem('savedLoginPassword_C');
             }
 
-            // Save user info basics
-            if (response.data) {
-                localStorage.setItem('user', JSON.stringify(response.data));
+            // 사용자 정보 저장
+            if (response.data && response.data.id) {
+                localStorage.setItem('user_id', response.data.id);
+                localStorage.setItem('username', loginId);
+            }
+            if (response.data && response.data.name) {
+                localStorage.setItem('user_name', response.data.name);
             }
 
             navigate('/C/mall');
         } catch (error) {
             console.error("Login failed:", error);
-            alert(error.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
+            if (!isAuto) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '로그인 실패',
+                    text: error.message || "아이디 또는 비밀번호가 일치하지 않습니다.",
+                    confirmButtonColor: '#7c3aed',
+                    confirmButtonText: '확인'
+                });
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="login-c-page">
-
-
             <main className="login-c-content">
                 <div className="login-c-card">
                     <div className="logo-area-c">
-                        <img src={logoC} alt="HearBe Logo" className="logo-image-c" />
+                        <img
+                            src={logoC}
+                            alt="HearBe Logo"
+                            className="logo-image-c"
+                            onClick={() => navigate('/main')}
+                            style={{ cursor: 'pointer' }}
+                        />
                     </div>
 
-                    <form className="login-c-form" onSubmit={handleLogin}>
+                    <form className="login-c-form" onSubmit={(e) => handleLogin(e)}>
                         <input
                             type="text"
                             placeholder="아이디 입력"
@@ -86,24 +131,26 @@ export default function LoginC() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                             <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showPassword ? <EyeOff size={32} /> : <Eye size={32} />}
                             </button>
                         </div>
 
-                        <button type="submit" className="login-submit-btn-c">로그인</button>
+                        <button type="submit" className="login-submit-btn-c" disabled={isLoading}>
+                            {isLoading ? '로그인 중...' : '로그인'}
+                        </button>
 
                         <div className="login-keep-c">
                             <input
                                 type="checkbox"
-                                id="rememberId"
-                                checked={rememberId}
-                                onChange={(e) => setRememberId(e.target.checked)}
+                                id="rememberLogin"
+                                checked={rememberLogin}
+                                onChange={(e) => setRememberLogin(e.target.checked)}
                             />
-                            <label htmlFor="rememberId">아이디 저장</label>
+                            <label htmlFor="rememberLogin">로그인 유지</label>
                         </div>
 
                         <div className="login-links-c">
-                            <span onClick={() => navigate('/C/findId')}>아이디 찾기</span> | <span onClick={() => navigate('/C/findPassword')}>비밀번호 재설정</span> | <span onClick={() => navigate('/signup-c')}>회원가입</span>
+                            <Link to="/C/findId">아이디 찾기</Link> | <Link to="/C/findPassword">비밀번호 재설정</Link> | <Link to="/C/signup">회원가입</Link>
                         </div>
                     </form>
                 </div>
@@ -112,8 +159,6 @@ export default function LoginC() {
             <footer className="landing-footer">
                 <p>© 2026 HearBe. All rights reserved.</p>
             </footer>
-
-
         </div>
     );
 }

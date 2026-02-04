@@ -36,16 +36,19 @@
 .signup-c-main {
     display: flex;
     justify-content: center;
-    padding: 4rem 1rem 6rem;
+    padding: 2rem 1rem 4rem;
     flex: 1;
 }
 
 .signup-card-c {
     background: white;
     width: 100%;
-    max-width: 800px;
-    padding: 5rem 5rem;
-    border-radius: 50px;
+    max-width: 600px;
+    /* Reduced */
+    padding: 3rem 3rem;
+    /* Reduced */
+    border-radius: 40px;
+    /* Adjusted radius slightly */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
     text-align: center;
     z-index: 1;
@@ -56,16 +59,18 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 /* Logo centering */
 .signup-logo-c {
-    height: 160px;
+    height: 120px;
+    /* Reduced */
     width: auto;
     object-fit: contain;
     display: block;
-    margin: 0 auto 3rem auto;
+    margin: 0 auto 2rem auto;
+    /* Reduced bottom margin */
 }
 
 .password-requirements-c {
@@ -85,15 +90,19 @@
 .signup-form-c {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 24px;
+    /* Reduced slightly */
 }
 
 .signup-input-c {
     width: 100%;
-    padding: 1.8rem 2.2rem;
+    padding: 1.4rem 1.6rem;
+    /* Reduced */
     border: 1.5px solid #f1f5f9;
-    border-radius: 20px;
-    font-size: 1.4rem;
+    border-radius: 16px;
+    /* Adjusted */
+    font-size: 1.2rem;
+    /* Reduced */
     outline: none;
     background-color: white;
     color: #1e293b;
@@ -111,7 +120,7 @@
 .input-section-c {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 20px;
 }
 
 .gray-bg-c {
@@ -180,7 +189,7 @@
 .form-divider-c {
     border: none;
     border-top: 2px solid #8b5cf6;
-    margin: 12px 0;
+    margin: 8px 0;
 }
 
 /* 비밀번호 재확인 위의 실선 제거 */
@@ -223,13 +232,14 @@
 }
 
 .signup-submit-btn-c {
-    margin-top: 4rem;
-    padding: 1.6rem;
+    margin-top: 1rem;
+    /* Further reduced */
+    padding: 1.4rem;
     background-color: #8b5cf6;
     color: white;
     border: none;
     border-radius: 20px;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 10px 25px rgba(139, 92, 246, 0.25);
@@ -241,6 +251,13 @@
     transform: translateY(-2px);
 }
 
+.signup-submit-btn-c.disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
 .modal-overlay-c {
     position: fixed;
     inset: 0;
@@ -249,7 +266,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 9999;
 }
 
 .modal-content-c {
@@ -303,4 +320,195 @@
     color: #e2e8f0;
     letter-spacing: 2px;
     pointer-events: none;
+}
+
+/* Password Condition Check Styles */
+.password-conditions-c {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    padding-left: 5px;
+}
+
+.condition-item-c {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #94a3b8;
+    /* Default gray (before input) */
+    transition: all 0.2s ease;
+}
+
+.condition-item-c.satisfied {
+    color: #10b981;
+    /* Green when satisfied */
+    font-weight: 600;
+}
+
+.condition-item-c.unsatisfied {
+    color: #ef4444;
+    /* Red when input exists but not satisfied */
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2 !important;
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Terms Styles */
+.terms-list-c {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.terms-item-c {
+    justify-content: space-between;
+    /* Space out checkbox+label and View button */
+    padding: 2px 0;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.terms-view-btn-c {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0 5px;
+}
+
+.terms-view-btn-c:hover {
+    color: #8b5cf6;
+}
+
+/* Ensure button is clickable */
+.terms-view-btn-c {
+    position: relative;
+    z-index: 10;
+}
+
+/* Term Modal Specifics */
+.term-modal-c {
+    padding: 2.5rem !important;
+    /* Override default padding */
+    text-align: left !important;
+    max-width: 500px !important;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
+.term-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.term-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.close-btn-c {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.term-scroll-box {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.term-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4b5563;
+    margin: 0;
+    white-space: pre-wrap;
+    /* Preserve line breaks */
+}
+
+/* Text-based Password Feedback Styles */
+.password-conditions-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    padding-left: 0;
+    /* Removed padding */
+    text-align: left;
+}
+
+.pw-condition-text {
+    margin: 0;
+    font-size: 15px;
+    /* Increased */
+    color: #94a3b8;
+    /* Default Gray */
+    transition: color 0.2s;
+    font-weight: 600;
+    /* Bold */
+    margin-left: 10px;
+    /* Consistent alignment */
+    margin-top: 8px;
+}
+
+.pw-condition-text.satisfied {
+    color: #10b981;
+    /* Green */
+    font-weight: 600;
+}
+
+.pw-condition-text.unsatisfied {
+    color: #ef4444;
+    /* Red */
+}
+
+.error-text-c {
+    display: block;
+    text-align: left;
+    color: #ef4444;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 8px;
+    margin-left: 10px;
 }

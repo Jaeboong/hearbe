@@ -60,7 +60,7 @@ const GuardianViewS = () => {
 
     const handleLeave = () => {
         leave();
-        navigate('/');
+        navigate('/main');
     };
 
     return (
@@ -108,7 +108,7 @@ const GuardianViewS = () => {
             {/* 코드 입력 모달 (직접 접속 시) */}
             <GuardianJoinModal
                 isOpen={showJoinModal}
-                onClose={() => navigate('/')}
+                onClose={() => navigate('/main')}
                 onJoin={handleManualJoin}
             />
         </div>

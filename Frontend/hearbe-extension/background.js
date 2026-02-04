@@ -1,4 +1,4 @@
-const HEARBE_APP_URL = "http://localhost:5173/A/store";
+const HEARBE_APP_URL = "https://i14d108.p.ssafy.io/A/store";
 
 function buildHearbeUrl(targetUrl) {
   const encoded = encodeURIComponent(targetUrl || "");

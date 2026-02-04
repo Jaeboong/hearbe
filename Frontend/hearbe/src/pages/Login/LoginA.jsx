@@ -70,6 +70,9 @@ const Login = () => {
                     localStorage.removeItem('savedLoginPassword');
                 }
                 // 로그인 성공
+                const utterance = new SpeechSynthesisUtterance("로그인되었습니다.");
+                utterance.lang = 'ko-KR';
+                window.speechSynthesis.speak(utterance);
                 navigate('/A/mall');
             } else if (!isAuto) {
                 const message = response?.message || '';
@@ -144,13 +147,13 @@ const Login = () => {
                     <label className="checkbox-container">
                         <input
                             type="checkbox"
-                        checked={rememberLogin}
-                        onChange={(e) => setRememberLogin(e.target.checked)}
-                    />
-                    <span className="checkmark"></span>
-                    자동 로그인
-                </label>
-            </div>
+                            checked={rememberLogin}
+                            onChange={(e) => setRememberLogin(e.target.checked)}
+                        />
+                        <span className="checkmark"></span>
+                        자동 로그인
+                    </label>
+                </div>
 
                 {/* Footer Links */}
                 <div className="login-footer">

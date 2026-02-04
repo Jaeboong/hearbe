@@ -88,7 +88,7 @@ const SharingViewerS = () => {
 
     const handleLeave = () => {
         if (socketRef.current) socketRef.current.disconnect();
-        navigate('/');
+        navigate('/main');
     };
 
     return (

@@ -8,13 +8,6 @@
     --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
 }
 
-body {
-    margin: 0;
-    font-family: var(--font-main);
-    background-color: var(--bg-dark);
-    color: var(--accent-yellow);
-}
-
 /* =========================================
    2. 유틸리티 & 공통 스타일
    ========================================= */

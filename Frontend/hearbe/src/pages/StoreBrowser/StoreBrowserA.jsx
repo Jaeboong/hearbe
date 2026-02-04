@@ -33,6 +33,7 @@ const StoreBrowser = () => {
     const queryUrl = searchParams.get('url');
     const autoShare = searchParams.get('autoshare') === '1';
     const url = queryUrl ? decodeURIComponent(queryUrl) : (location.state?.url || getMallUrl(mallId));
+    const isExtensionFlow = Boolean(queryUrl || autoShare);
 
     // PeerJS Hooks
     const { shareCode, isSharing, startSharing, stopSharing, error: peerError } = usePeerShare();
@@ -196,14 +197,48 @@ const StoreBrowser = () => {
             <div className="iframe-blocked-message">
                 <div className="blocked-content">
                     <img src={logo} alt="Logo" className="blocked-logo" />
-                    <h2>보안상 앱 내에서<br />바로 보기가 제한됩니다.</h2>
-                    <p>아래 버튼으로 쇼핑몰을 새 탭에서 열고<br /><strong>[공유]</strong> 버튼으로 화면을 공유해주세요!</p>
-                    <button
-                        className="open-new-window-btn"
-                        onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
-                    >
-                        새 탭에서 쇼핑몰 열기
-                    </button>
+                    {isSharing ? (
+                        <>
+                            <h2>화면 공유가 시작되었습니다.</h2>
+                            <p>
+                                쇼핑몰 탭으로 돌아가서 계속 이용하세요.
+                                <br />
+                                이 페이지는 공유 유지/종료용입니다.
+                            </p>
+                            <button
+                                className="open-new-window-btn"
+                                onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+                            >
+                                쇼핑몰 탭 다시 열기
+                            </button>
+                        </>
+                    ) : isExtensionFlow ? (
+                        <>
+                            <h2>쇼핑몰 탭에서 공유 버튼을 누르셨나요?</h2>
+                            <p>
+                                이미 열려 있는 쇼핑몰 탭을 화면 공유 대상으로 선택하면 됩니다.
+                                <br />
+                                이 페이지는 공유 코드 발급/종료용이에요.
+                            </p>
+                            <button
+                                className="open-new-window-btn"
+                                onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+                            >
+                                쇼핑몰 탭 다시 열기
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <h2>보안상 앱 내에서<br />바로 보기가 제한됩니다.</h2>
+                            <p>아래 버튼으로 쇼핑몰을 새 탭에서 열고<br /><strong>[공유]</strong> 버튼으로 화면을 공유해주세요!</p>
+                            <button
+                                className="open-new-window-btn"
+                                onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+                            >
+                                새 탭에서 쇼핑몰 열기
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 

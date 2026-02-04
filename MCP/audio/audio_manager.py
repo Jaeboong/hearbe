@@ -82,40 +82,7 @@ class AudioManager:
             return
             
         self.audio = pyaudio.PyAudio()
-        
-        # 입력 장치 목록 출력
-        info = self.audio.get_host_api_info_by_index(0)
-        num_devices = info.get('deviceCount')
-        
-        logger.info("Available input devices:")
-        for i in range(num_devices):
-            device_info = self.audio.get_device_info_by_host_api_device_index(0, i)
-            if device_info.get('maxInputChannels') > 0:
-                logger.info(f"  [{i}] {device_info.get('name')}")
 
-        if self.input_device_index is not None:
-            try:
-                device_info = self.audio.get_device_info_by_host_api_device_index(
-                    0, self.input_device_index
-                )
-                if device_info.get('maxInputChannels') > 0:
-                    logger.info(
-                        f"Using input device index {self.input_device_index}: "
-                        f"{device_info.get('name')}"
-                    )
-                else:
-                    logger.warning(
-                        f"Input device index {self.input_device_index} has no input channels; "
-                        "falling back to default device"
-                    )
-                    self.input_device_index = None
-            except Exception as e:
-                logger.warning(
-                    f"Invalid input device index {self.input_device_index}: {e}; "
-                    "falling back to default device"
-                )
-                self.input_device_index = None
-    
     def _start_recording(self):
         """녹음 시작"""
         if self.recording:

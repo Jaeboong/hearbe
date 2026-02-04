@@ -11,12 +11,12 @@ const LoginS = () => {
   const handleJoin = (code) => {
     // 코드 검증은 GuardianViewS 내부에서 하거나 여기서 API 호출
     // 일단 바로 이동
-    navigate('/S/guardian-view', { state: { code } });
+    navigate('/S/join', { state: { code } });
   };
 
   const handleClose = () => {
     setIsModalOpen(false);
-    navigate('/'); // 메인으로 돌아가기
+    navigate('/main'); // 메인으로 돌아가기
   };
 
   // 모달이 닫히면 다시 메인으로 돌아가는 것이 자연스러움

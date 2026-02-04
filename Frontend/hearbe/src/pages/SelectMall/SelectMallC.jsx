@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Home, ShoppingCart, User, ArrowUpRight, Layout } from 'lucide-react';
+import Swal from 'sweetalert2';
+import { ArrowLeft, Home, ShoppingCart, User, ArrowUpRight, Layout, LogOut } from 'lucide-react';
 import './SelectMallC.css';
 import coupangLogo from '../../assets/coupang_logo.png';
 import naverPlusLogo from '../../assets/C/naver_plus_logo.png';
@@ -8,9 +9,38 @@ import gmarketLogo from '../../assets/C/Gmarket_logo.png';
 import kurlyLogo from '../../assets/C/Kurly_logo.png';
 import st11Logo from '../../assets/C/11st_logo.png';
 import ssgLogo from '../../assets/C/ssg_logo.png';
+import logoC from '../../assets/logoC.png';
+import { authAPI } from '../../services/authAPI';
 
 const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     const navigate = useNavigate();
+
+    const handleLogout = () => {
+        Swal.fire({
+            title: '로그아웃 하시겠습니까?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#7c3aed',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '로그아웃',
+            cancelButtonText: '취소'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await authAPI.logout();
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                } finally {
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('user_id');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('user_name');
+                    navigate('/main');
+                }
+            }
+        });
+    };
 
     const malls = [
         { id: 'coupang', name: '쿠팡', desc: '', color: '#E2211C', initial: 'C', logo: coupangLogo, logoSize: 300, url: 'https://www.coupang.com' },
@@ -31,22 +61,17 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
             {/* Header 섹션 (디자인 통일) */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0 }}>
-                        <div className="title-icon-box-c">
-                            <Layout size={24} />
-                        </div>
-                        <div className="title-text-c">
-                            <h1>쇼핑몰 선택</h1>
-                            <span className="subtitle-c">Select Shopping Mall</span>
-                        </div>
-                    </div>
+                    <img
+                        src={logoC}
+                        alt="HearBe Logo"
+                        className="header-logo-c"
+                        onClick={() => navigate('/main')}
+                        style={{ height: '60px', cursor: 'pointer', objectFit: 'contain' }}
+                    />
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
-                        <div className="nav-icon-c"><Home size={24} /></div>
-                        <span>홈</span>
-                    </button>
+
                     <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
@@ -54,6 +79,10 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                     <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
+                    </button>
+                    <button className="nav-item-c" onClick={handleLogout}>
+                        <div className="nav-icon-c"><LogOut size={24} /></div>
+                        <span>로그아웃</span>
                     </button>
                 </div>
             </header >

@@ -43,7 +43,7 @@ def build_system_prompt(
         else ""
     )
     cart_items_section = (
-        format_cart_items_section(cart_items)
+        format_cart_items_section(cart_items, current_url)
         if page_context.page_type == "cart"
         else ""
     )

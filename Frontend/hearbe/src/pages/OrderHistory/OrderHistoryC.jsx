@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Home, ShoppingCart, Package } from 'lucide-react';
+import { User, Home, ShoppingCart, Package, LogOut } from 'lucide-react';
 import { orderAPI } from '../../services/orderAPI';
+import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
 import '../Wishlist_C/WishlistC.css';
 import './OrderHistoryC.css';
+import logoC from '../../assets/logoC.png';
 
 export default function OrderHistoryC({ onHome }) {
     const navigate = useNavigate();
@@ -16,18 +18,11 @@ export default function OrderHistoryC({ onHome }) {
 
     // localStorage에서 사용자 정보 로드
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try {
-                const parsed = JSON.parse(storedUser);
-                setUserData({
-                    name: parsed.name || parsed.username || '회원',
-                    email: parsed.email || '',
-                });
-            } catch (e) {
-                console.error('Failed to parse user data:', e);
-            }
-        }
+        const userName = localStorage.getItem('user_name');
+        setUserData({
+            name: userName || '회원',
+            email: '',
+        });
     }, []);
 
     // 사이드바 아이템
@@ -56,6 +51,19 @@ export default function OrderHistoryC({ onHome }) {
     useEffect(() => {
         fetchOrders();
     }, []);
+
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
+        }
+    };
 
     const fetchOrders = async () => {
         try {
@@ -91,9 +99,6 @@ export default function OrderHistoryC({ onHome }) {
         } catch (err) {
             console.error('Failed to fetch orders:', err);
             setError(err.message);
-            if (err.message === '로그인이 필요합니다.') {
-                navigate('/C/login');
-            }
         } finally {
             setIsLoading(false);
         }
@@ -104,29 +109,19 @@ export default function OrderHistoryC({ onHome }) {
             {/* Header */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0 }}>
-                        <div className="title-icon-box-c">
-                            <User size={24} />
-                        </div>
-                        <div className="title-text-c">
-                            <h1>마이페이지</h1>
-                            <span className="subtitle-c">My Page</span>
-                        </div>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
+                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>
-                    <button className="nav-item-c" onClick={() => navigate('/C/cart')}>
-                        <div className="nav-icon-c"><ShoppingCart size={24} /></div>
-                        <span>장바구니</span>
-                    </button>
-                    <button className="nav-item-c active">
-                        <div className="nav-icon-c"><User size={24} /></div>
-                        <span>마이페이지</span>
+                    <button className="nav-item-c" onClick={handleLogout}>
+                        <div className="nav-icon-c"><LogOut size={24} /></div>
+                        <span>로그아웃</span>
                     </button>
                 </div>
             </header>

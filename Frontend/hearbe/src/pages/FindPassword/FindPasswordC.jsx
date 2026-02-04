@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, AtSign, Mail, Lock, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, ShieldCheck, Smile } from 'lucide-react';
 import logoC from '../../assets/logoC.png';
 import './FindPasswordC.css';
 
@@ -98,7 +98,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
                             <div className="pw-input-group-c">
                                 <label>이름</label>
                                 <div className="pw-input-wrapper-c">
-                                    <User className="pw-icon-c" size={32} />
+                                    <Smile className="pw-icon-c" size={32} />
                                     <input
                                         type="text"
                                         value={name}
@@ -111,7 +111,7 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
                             <div className="pw-input-group-c">
                                 <label>아이디</label>
                                 <div className="pw-input-wrapper-c">
-                                    <AtSign className="pw-icon-c" size={32} />
+                                    <User className="pw-icon-c" size={32} />
                                     <input
                                         type="text"
                                         value={username}
