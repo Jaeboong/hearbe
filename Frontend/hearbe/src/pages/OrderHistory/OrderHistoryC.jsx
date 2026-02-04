@@ -61,7 +61,6 @@ export default function OrderHistoryC({ onHome }) {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            localStorage.removeItem('user_name');
             navigate('/');
         }
     };

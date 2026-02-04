@@ -76,22 +76,22 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
     };
 
     return (
-        <div className="find-id-container">
+        <div className="find-id-container-c">
 
 
-            <main className="find-id-main">
-                <div className="find-id-card">
-                    <div className="card-header">
-                        <img src={logoC} alt="HearBe" className="mini-logo" />
+            <main className="find-id-main-c">
+                <div className="find-id-card-c">
+                    <div className="card-header-c">
+                        <img src={logoC} alt="HearBe" className="mini-logo-c" />
                         <h1>아이디 찾기</h1>
                         <p>가입 시 등록한 정보로 아이디를 찾을 수 있습니다.</p>
                     </div>
 
-                    <div className="form-section">
-                        <div className="input-field">
+                    <div className="form-section-c">
+                        <div className="input-field-c">
                             <label>이름</label>
-                            <div className="input-wrapper">
-                                <User className="input-icon" />
+                            <div className="input-wrapper-c">
+                                <User className="input-icon-c" />
                                 <input
                                     type="text"
                                     value={name}
@@ -101,11 +101,11 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                             </div>
                         </div>
 
-                        <div className="input-field">
+                        <div className="input-field-c">
                             <label>이메일</label>
-                            <div className="flex-row gap-2">
-                                <div className="input-wrapper grow">
-                                    <Mail className="input-icon" />
+                            <div className="flex-row-c gap-2-c">
+                                <div className="input-wrapper-c grow">
+                                    <Mail className="input-icon-c" />
                                     <input
                                         type="email"
                                         value={email}
@@ -113,24 +113,24 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                                         placeholder="example@mail.com"
                                     />
                                 </div>
-                                <button onClick={handleSendVerification} className="secondary-btn">
+                                <button onClick={handleSendVerification} className="secondary-btn-c">
                                     {isSent ? '재전송' : '인증요청'}
                                 </button>
                             </div>
                         </div>
 
                         {isSent && (
-                            <div className="input-field animate-slide-down">
+                            <div className="input-field-c animate-slide-down-c">
                                 <label>인증번호</label>
-                                <div className="flex-row gap-2">
+                                <div className="flex-row-c gap-2-c">
                                     <input
                                         type="text"
                                         value={verificationCode}
                                         onChange={(e) => setVerificationCode(e.target.value)}
                                         placeholder="6자리 숫자 입력"
-                                        className="grow code-input"
+                                        className="grow code-input-c"
                                     />
-                                    <button onClick={handleVerifyCode} className="black-btn">
+                                    <button onClick={handleVerifyCode} className="black-btn-c">
                                         확인
                                     </button>
                                 </div>
@@ -139,10 +139,11 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
 
                         <button
                             onClick={handleFindId}
-                            className="submit-full-btn active"
+                            className="submit-full-btn-c active"
                         >
                             아이디 확인하기
                         </button>
+
                     </div>
                 </div>
             </main>

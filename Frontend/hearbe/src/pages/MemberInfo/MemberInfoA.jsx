@@ -87,15 +87,12 @@ const MemberInfoA = () => {
     };
 
     const handleWithdraw = async () => {
-        const password = window.prompt("회원탈퇴를 위해 비밀번호를 입력해주세요.");
-        if (!password) return;
-
         if (!window.confirm("정말로 탈퇴하시겠습니까? 탈퇴 시 모든 정보가 삭제됩니다.")) {
             return;
         }
 
         try {
-            await authAPI.deleteAccount(password);
+            await authAPI.deleteAccount();
             alert("회원탈퇴가 완료되었습니다.");
 
             // 로그아웃과 동일한 정리 작업

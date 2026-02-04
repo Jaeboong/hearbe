@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { Eye, EyeOff } from 'lucide-react';
 import logoC from '../../assets/logoC.png';
 import { authAPI } from '../../services/authAPI';
@@ -10,7 +11,7 @@ export default function LoginC() {
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberLogin, setRememberLogin] = useState(false);
+    const [rememberLogin, setRememberLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -42,7 +43,12 @@ export default function LoginC() {
         if (e) e.preventDefault();
 
         if (!loginId || !loginPassword) {
-            alert("아이디와 비밀번호를 입력해주세요.");
+            Swal.fire({
+                icon: 'warning',
+                text: '아이디와 비밀번호를 입력해주세요.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
             return;
         }
 
@@ -80,7 +86,13 @@ export default function LoginC() {
         } catch (error) {
             console.error("Login failed:", error);
             if (!isAuto) {
-                alert(error.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
+                Swal.fire({
+                    icon: 'error',
+                    title: '로그인 실패',
+                    text: error.message || "아이디 또는 비밀번호가 일치하지 않습니다.",
+                    confirmButtonColor: '#7c3aed',
+                    confirmButtonText: '확인'
+                });
             }
         } finally {
             setIsLoading(false);
@@ -96,7 +108,7 @@ export default function LoginC() {
                             src={logoC}
                             alt="HearBe Logo"
                             className="logo-image-c"
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/main')}
                             style={{ cursor: 'pointer' }}
                         />
                     </div>
@@ -119,7 +131,7 @@ export default function LoginC() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                             <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showPassword ? <EyeOff size={32} /> : <Eye size={32} />}
                             </button>
                         </div>
 

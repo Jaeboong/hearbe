@@ -298,16 +298,14 @@ export const authAPI = {
     },
 
     // 회원탈퇴 API
-    deleteAccount: async (password) => {
+    deleteAccount: async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${API_BASE_URL}/auth/delete-account`, {
-                method: 'POST',
+            const response = await fetch(`${API_BASE_URL}/auth/withdraw`, {
+                method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ password }),
             });
 
             const data = await response.json();

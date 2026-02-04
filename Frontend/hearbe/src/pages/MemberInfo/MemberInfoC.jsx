@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { User, Mail, Lock, Home, ShieldCheck, LogOut, X } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
@@ -20,7 +21,6 @@ export default function MemberInfoC({ onHome }) {
 
     // 회원탈퇴 모달 상태
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-    const [withdrawPassword, setWithdrawPassword] = useState('');
     const [withdrawError, setWithdrawError] = useState('');
     const [isWithdrawing, setIsWithdrawing] = useState(false);
 
@@ -44,7 +44,7 @@ export default function MemberInfoC({ onHome }) {
 
                 setUserData({
                     userId: localStorage.getItem('username') || '', // ID from storage (backend does not send it)
-                    userName: profileData.username || localStorage.getItem('user_name') || '',   // 백엔드는 username 필드에 이름을 보냄
+                    userName: profileData.username || profileData.name || '',   // Name (backend puts name in 'username' field)
                     email: profileData.email || '',
                     phone: profileData.phoneNumber || profileData.phone || '',
                 });
@@ -53,10 +53,12 @@ export default function MemberInfoC({ onHome }) {
                 setError(err.message);
 
                 if (err.message === '로그인이 필요합니다.' || err.message === '접근 권한이 없습니다.') {
-                    // 무한 리다이렉트 방지를 위해 자동 이동 제거, 대신 에러 표시
-                    // localStorage.removeItem('accessToken'); ...
-                    // navigate('/C/login');
-                    console.warn('Authentication error:', err.message);
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('username');
+                    navigate('/C/login');
+                    return;
                 }
 
                 // API 실패 시 localStorage에서 백업 데이터 로드
@@ -66,7 +68,7 @@ export default function MemberInfoC({ onHome }) {
 
                 let fallbackData = {
                     userId: storedUsername || '',
-                    userName: localStorage.getItem('user_name') || '',
+                    userName: '',
                     email: '',
                     phone: ''
                 };
@@ -83,13 +85,7 @@ export default function MemberInfoC({ onHome }) {
                     }
                 }
 
-                // 폴백 데이터가 있으면 그것을 보여주고 에러는 콘솔에만
-                if (fallbackData.userId) {
-                    setUserData(fallbackData);
-                    setError(null); // 폴백으로 표시하므로 에러 UI 숨김
-                } else {
-                    // 폴백도 없으면 에러 표시
-                }
+                setUserData(fallbackData);
             } finally {
                 setIsLoading(false);
             }
@@ -105,30 +101,40 @@ export default function MemberInfoC({ onHome }) {
     // 회원탈퇴 모달 열기
     const handleWithdraw = () => {
         setShowWithdrawModal(true);
-        setWithdrawPassword('');
         setWithdrawError('');
     };
 
     // 회원탈퇴 모달 닫기
     const handleCloseWithdrawModal = () => {
         setShowWithdrawModal(false);
-        setWithdrawPassword('');
         setWithdrawError('');
     };
 
     // 회원탈퇴 실행
     const handleConfirmWithdraw = async () => {
-        if (!withdrawPassword) {
-            setWithdrawError('비밀번호를 입력해주세요.');
-            return;
-        }
-
         setIsWithdrawing(true);
         setWithdrawError('');
 
         try {
-            await authAPI.deleteAccount(withdrawPassword);
-            alert('회원탈퇴가 완료되었습니다.');
+            await authAPI.deleteAccount();
+            await Swal.fire({
+                icon: 'success',
+                title: '탈퇴 완료',
+                text: '회원탈퇴가 완료되었습니다.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
+
+            // Local Storage 정리
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('username');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('savedLoginId_C');
+            localStorage.removeItem('savedLoginPassword_C');
+
             navigate('/');
         } catch (error) {
             console.error('Delete account failed:', error);
@@ -144,32 +150,17 @@ export default function MemberInfoC({ onHome }) {
     }, []);
 
     const handleLogout = async () => {
-        // 1. 선제적 토큰 삭제 (API 에러 여부와 상관없이 즉시 로그아웃 처리)
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('username');
-        localStorage.removeItem('user_name');
-
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('user_id');
-        sessionStorage.removeItem('username');
-        sessionStorage.removeItem('user_name');
-
         try {
             await authAPI.logout();
         } catch (error) {
             console.error('Logout failed:', error);
         } finally {
-            // 한 번 더 확인 사살
-            localStorage.clear(); // Auth 관련 외에 다른게 없다면 clear도 방법, 하지만 안전하게 개별 삭제 유지하거나 removeItem 반복
-            sessionStorage.clear();
-
-            // 로그인 화면으로 이동
-            navigate('/C/login');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/');
         }
     };
 
@@ -178,7 +169,7 @@ export default function MemberInfoC({ onHome }) {
             {/* Header - MyPageC와 동일한 구조 */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
                         <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
                     </div>
                 </div>
@@ -203,7 +194,7 @@ export default function MemberInfoC({ onHome }) {
                             <User size={40} color="#7c3aed" />
                         </div>
                         <div className="sidebar-profile-info">
-                            <h2 className="sidebar-name">{userData.userName || '회원'}님</h2>
+                            <h2 className="sidebar-name">{userData.userName || userData.userId}님</h2>
                             <span className="sidebar-badge">hearbe 회원</span>
                         </div>
                         <p className="sidebar-welcome">오늘도 즐거운 쇼핑 되세요!</p>
@@ -343,29 +334,10 @@ export default function MemberInfoC({ onHome }) {
                             </button>
                         </div>
 
-                        <p style={{ fontSize: '1.1rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-                            회원탈퇴를 진행하시려면 비밀번호를 입력해주세요.
+                        <p style={{ fontSize: '1.1rem', color: '#6b7280', marginBottom: '1rem', lineHeight: '1.6', textAlign: 'center' }}>
+                            정말 탈퇴하시겠습니까?<br />
+                            탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.
                         </p>
-
-                        <div style={{ marginBottom: '1rem' }}>
-                            <input
-                                type="password"
-                                placeholder="비밀번호 입력"
-                                value={withdrawPassword}
-                                onChange={(e) => setWithdrawPassword(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '1rem 1.2rem',
-                                    fontSize: '1.1rem',
-                                    border: '2px solid #e5e7eb',
-                                    borderRadius: '0.75rem',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = '#7c3aed'}
-                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                            />
-                        </div>
 
                         {withdrawError && (
                             <p style={{ color: '#e53e3e', fontSize: '0.95rem', marginBottom: '1rem' }}>

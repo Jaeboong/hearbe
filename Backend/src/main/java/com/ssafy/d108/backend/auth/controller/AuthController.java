@@ -113,7 +113,8 @@ public class AuthController {
      */
     @Operation(summary = "회원탈퇴", description = "비밀번호 확인 후 회원탈퇴 처리")
     @PostMapping("/delete-account")
-    public ResponseEntity<ApiResponse<DeleteAccountResponse>> deleteAccount(@Valid @RequestBody DeleteAccountRequest request) {
+    public ResponseEntity<ApiResponse<DeleteAccountResponse>> deleteAccount(
+            @Valid @RequestBody DeleteAccountRequest request) {
         Integer userId = SecurityUtil.getCurrentUserId();
         Integer deletedUserId = authService.deleteAccount(request, userId);
         return ResponseEntity.ok(ApiResponse.success(DeleteAccountResponse.of(deletedUserId), "회원탈퇴 완료"));
@@ -124,7 +125,8 @@ public class AuthController {
      */
     @Operation(summary = "비밀번호 재설정 (Blind)", description = "복지카드 인증 후 비밀번호 재설정 (A형 전용)")
     @PostMapping("/resetPasswordBlind")
-    public ResponseEntity<ResetPasswordResponse> resetPasswordBlind(@Valid @RequestBody ResetPasswordByWelfareRequest request) {
+    public ResponseEntity<ResetPasswordResponse> resetPasswordBlind(
+            @Valid @RequestBody ResetPasswordByWelfareRequest request) {
         authService.resetPasswordByWelfare(request);
         return ResponseEntity.ok(ResetPasswordResponse.success());
     }
