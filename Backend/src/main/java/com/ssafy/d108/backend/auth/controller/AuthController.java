@@ -8,6 +8,8 @@ import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.CheckIdRequest;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.RefreshTokenRequest;
+import com.ssafy.d108.backend.auth.dto.RefreshTokenResponse;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordByWelfareRequest;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordRequest;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordResponse;
@@ -56,6 +58,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 토큰 재발급
+     */
+    @Operation(summary = "토큰 재발급", description = "Refresh Token으로 Access Token 재발급")
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        RefreshTokenResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
