@@ -324,7 +324,6 @@ def _format_pay_type(pay_type: str, bank_name: str = "") -> str:
 
 
 def _build_thank_you_tts(info: Dict[str, Any]) -> str:
-    order_id = info.get("order_id") or ""
     title = info.get("title") or ""
     price = _format_won(info.get("price"))
     pay_type = _format_pay_type(info.get("pay_type") or "", info.get("bank_name") or "")
@@ -332,8 +331,6 @@ def _build_thank_you_tts(info: Dict[str, Any]) -> str:
     parts = ["주문이 완료되었습니다."]
     if title:
         parts.append(f"상품명은 {title}입니다.")
-    if order_id:
-        parts.append(f"주문번호는 {order_id}입니다.")
     if price:
         parts.append(f"결제금액은 {price}입니다.")
     if pay_type:

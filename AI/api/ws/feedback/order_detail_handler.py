@@ -164,11 +164,7 @@ class OrderDetailHandler:
         if not isinstance(order_data, dict):
             order_data = {}
 
-        order_id = _extract_order_id_from_order_detail_url(page_url)
-        if order_id:
-            order_data.setdefault("order", {})
-            if isinstance(order_data["order"], dict):
-                order_data["order"].setdefault("order_id", order_id)
+        # Do not store order_id in order detail data to avoid reading it out.
 
         self._session.set_context(session_id, CTX_ORDER_DETAIL_DATA, order_data)
 
@@ -295,15 +291,12 @@ def _build_order_detail_summary(data: Dict[str, Any]) -> str:
     items = data.get("items") or []
     payment = data.get("payment") or {}
 
-    order_id = order.get("order_id") or text.get("order_id") or ""
     title = order.get("title") or (items[0].get("product_name") if items else "") or ""
     status = text.get("status") or ""
     eta = text.get("eta") or ""
     total = _format_won(payment.get("total_payed_amount") or text.get("total_price"))
 
     parts = ["주문 상세 정보를 안내합니다."]
-    if order_id:
-        parts.append(f"주문번호는 {order_id}입니다.")
     if status:
         parts.append(f"현재 상태는 {status}입니다.")
     if eta:
