@@ -3,6 +3,7 @@ package com.ssafy.d108.backend.member.dto;
 import com.ssafy.d108.backend.entity.enums.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProfileUpdateRequest {
 
     @JsonProperty("gender")

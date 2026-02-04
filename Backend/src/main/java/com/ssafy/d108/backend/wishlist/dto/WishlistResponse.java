@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WishlistResponseDto {
+public class WishlistResponse {
 
     @JsonProperty("total_count")
     private int totalCount;

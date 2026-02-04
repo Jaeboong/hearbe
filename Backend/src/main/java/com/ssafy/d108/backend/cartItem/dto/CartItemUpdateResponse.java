@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItemUpdateResponseDto {
+public class CartItemUpdateResponse {
 
     @JsonProperty("cart_item_id")
     private Long cartItemId;
