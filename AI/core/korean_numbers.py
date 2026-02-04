@@ -5,7 +5,7 @@ Korean number parsing helpers.
 from __future__ import annotations
 
 import re
-from typing import Optional
+from typing import Optional, Sequence
 
 
 _SINO_DIGITS = {
@@ -48,6 +48,60 @@ _NATIVE_ONES = {
 _ORDINAL_NATIVE = {
     "첫": 1,
 }
+
+DEFAULT_COUNT_UNITS: Sequence[str] = (
+    "개입",
+    "매입",
+    "세트",
+    "박스",
+    "팩",
+    "개",
+    "매",
+    "병",
+    "캔",
+    "장",
+    "봉",
+    "포",
+    "종",
+    "입",
+)
+
+
+def parse_korean_number(token: str) -> Optional[int]:
+    """
+    Parse a Korean or numeric token into an integer.
+    Returns None when parsing fails.
+    """
+    if token is None:
+        return None
+    token = str(token).strip()
+    if not token:
+        return None
+    if token.isdigit():
+        return int(token)
+    return _parse_number_token(token)
+
+
+def replace_korean_number_units(
+    text: str,
+    units: Optional[Sequence[str]] = None,
+) -> str:
+    """
+    Replace Korean number + unit combinations with digit+unit (e.g., "열두 개" -> "12개").
+    """
+    if not text:
+        return text
+    unit_list = list(units) if units else list(DEFAULT_COUNT_UNITS)
+    unit_list.sort(key=len, reverse=True)
+    pattern = re.compile(rf"([가-힣]+)\s*({'|'.join(map(re.escape, unit_list))})")
+
+    def repl(match: re.Match[str]) -> str:
+        value = parse_korean_number(match.group(1))
+        if value is None:
+            return match.group(0)
+        return f"{value}{match.group(2)}"
+
+    return pattern.sub(repl, text)
 
 
 def extract_ordinal_index(text: str) -> Optional[int]:

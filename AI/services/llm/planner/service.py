@@ -15,8 +15,11 @@ from core.interfaces import (
 
 from ..generators.command_generator import CommandGenerator, CommandResult
 from ..generators.llm_generator import LLMGenerator, LLMResult, resolve_llm_api_key
+from ..generators.tts_text_generator import TTSTextGenerator
+from ..sites.site_manager import get_page_type
 from .routing import LLMRoutingPolicy
-from .selection import select_from_results, select_option_from_detail
+from .selection import select_from_results
+from services.llm.rules.product_option import handle_product_option_rule
 from .cart_action import handle_cart_action
 from .fallback import build_llm_fallback_response
 
@@ -34,8 +37,10 @@ class LLMPlanner(ILLMPlanner):
     def __init__(self, use_llm_fallback: bool = True):
         self._rule_generator: Optional[CommandGenerator] = None
         self._llm_generator: Optional[LLMGenerator] = None
+        self._tts_text_generator: Optional[TTSTextGenerator] = None
         self._use_llm_fallback = use_llm_fallback
         self._routing_policy = LLMRoutingPolicy()
+        self._use_llm_tts = os.getenv("LLM_TTS_SEPARATE", "true").lower() in ("1", "true", "yes", "y")
 
     async def initialize(self):
         """초기화"""
@@ -46,6 +51,8 @@ class LLMPlanner(ILLMPlanner):
             api_key = resolve_llm_api_key()
             if api_key:
                 self._llm_generator = LLMGenerator(api_key=api_key)
+                if self._use_llm_tts:
+                    self._tts_text_generator = TTSTextGenerator(api_key=api_key)
                 logger.info("LLMPlanner initialized with LLM fallback")
             else:
                 logger.warning(
@@ -85,14 +92,16 @@ class LLMPlanner(ILLMPlanner):
         if selection:
             return selection
 
+        # 1.05. Option selection on product detail (avoid LLM click_text on recommendation items)
+        option_selection = handle_product_option_rule(user_text, session)
+        if option_selection:
+            return option_selection
+
         # 1.1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
 
         # 1.5. Post-rule session-aware handlers
         if rule_result.matched_rule == "none":
-            option_selection = select_option_from_detail(user_text, session)
-            if option_selection:
-                return option_selection
             cart_action = handle_cart_action(user_text, session)
             if cart_action:
                 return cart_action
@@ -110,9 +119,20 @@ class LLMPlanner(ILLMPlanner):
                     conversation_history=conversation_history,
                     session_context=session_context
                 )
-                
+
                 if llm_result.success and llm_result.commands:
-                    return self._llm_result_to_response(llm_result)
+                    response_text = llm_result.response_text
+                    if self._tts_text_generator:
+                        page_type = get_page_type(current_url) if current_url else None
+                        response_text = await self._tts_text_generator.generate(
+                            user_text=user_text,
+                            current_url=current_url,
+                            page_type=page_type,
+                            commands=llm_result.commands,
+                            fallback_text=llm_result.response_text,
+                            session_context=session_context,
+                        )
+                    return self._llm_result_to_response(llm_result, response_text)
                 if llm_result.success:
                     fallback = build_llm_fallback_response(
                         user_text=user_text,
@@ -145,7 +165,7 @@ class LLMPlanner(ILLMPlanner):
             flow_type=result.flow_type
         )
 
-    def _llm_result_to_response(self, result: LLMResult) -> LLMResponse:
+    def _llm_result_to_response(self, result: LLMResult, response_text: Optional[str] = None) -> LLMResponse:
         """LLMResult → LLMResponse 변환"""
         commands = [
             MCPCommand(
@@ -157,7 +177,7 @@ class LLMPlanner(ILLMPlanner):
         ]
 
         return LLMResponse(
-            text=result.response_text,
+            text=response_text if response_text is not None else result.response_text,
             commands=commands,
             requires_flow=False,
             flow_type=None
@@ -207,4 +227,5 @@ class LLMPlanner(ILLMPlanner):
         """리소스 정리"""
         self._rule_generator = None
         self._llm_generator = None
+        self._tts_text_generator = None
         logger.info("LLMPlanner shutdown")

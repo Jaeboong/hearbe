@@ -1,4 +1,4 @@
-"""
+﻿"""
 MCP 데스크탑 앱 메인 진입점
 
 시각장애인을 위한 음성 기반 웹 쇼핑 지원 애플리케이션
@@ -9,6 +9,7 @@ import asyncio
 import logging
 import signal
 import sys
+import subprocess
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -45,6 +46,35 @@ class Application:
         self.modules = {}
 
         logger.info("Application initialized")
+
+    def _merge_integrated_log(self):
+        """MCP 시작 시 AI+MCP 로그를 한번 통합(덮어쓰기)."""
+        try:
+            mcp_root = Path(__file__).parent
+            shared_root = mcp_root.parent
+            script_path = shared_root / "AI" / "scripts" / "merge_ai_mcp_logs.ps1"
+
+            if not script_path.exists():
+                logger.warning(f"Integrated log script not found: {script_path}")
+                return
+
+            cmd = [
+                "powershell",
+                "-ExecutionPolicy", "Bypass",
+                "-File", str(script_path)
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            if result.returncode != 0:
+                logger.warning(
+                    "Integrated log merge failed: rc=%s stderr=%s",
+                    result.returncode,
+                    (result.stderr or "").strip()
+                )
+                return
+
+            logger.info("Integrated log merged (ai_mcp_integrate.log) on MCP start")
+        except Exception as e:
+            logger.warning(f"Integrated log merge skipped: {e}")
 
     async def setup_modules(self):
         """모듈 초기화"""
@@ -104,6 +134,9 @@ class Application:
     async def start(self):
         """애플리케이션 시작"""
         logger.info("Starting application...")
+
+        # MCP 실행 시 통합 로그 1회 갱신
+        self._merge_integrated_log()
 
         await event_bus.start()
         await self.setup_modules()

@@ -21,6 +21,8 @@ class MiniWindow:
         self.current_status = "대기 중"
         self.current_message = "Hotkey: space 스페이스"
         self.exit_callback = None
+        self.device_select_callback = None
+        self.device_button = None
 
     def create_window(self):
         """창 생성"""
@@ -29,7 +31,7 @@ class MiniWindow:
 
         # 창 크기 및 위치 설정
         window_width = 250
-        window_height = 100
+        window_height = 140
 
         # 화면 우측 하단에 배치
         screen_width = self.root.winfo_screenwidth()
@@ -71,6 +73,13 @@ class MiniWindow:
             bg="#2C3E50"
         )
         self.message_label.pack()
+        self.device_button = tk.Button(
+            frame,
+            text="\uc7a5\uce58 \ubcc0\uacbd",
+            font=("Segoe UI", 9),
+            command=self._request_device_select
+        )
+        self.device_button.pack(pady=(8, 0))
 
         logger.info("Mini window created")
 
@@ -146,6 +155,20 @@ class MiniWindow:
             except Exception as e:
                 logger.warning(f"Error destroying window: {e}")
             self.root = None
+
+    def set_device_select_callback(self, callback):
+        """
+        장치 선택 콜백 설정
+
+        Args:
+            callback: 장치 변경 버튼 클릭 시 호출되는 함수
+        """
+        self.device_select_callback = callback
+
+    def _request_device_select(self):
+        """장치 선택 요청"""
+        if self.device_select_callback:
+            self.device_select_callback()
 
     def set_exit_callback(self, callback):
         """
