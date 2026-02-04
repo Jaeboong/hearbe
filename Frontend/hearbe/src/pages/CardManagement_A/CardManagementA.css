@@ -35,8 +35,8 @@
     gap: clamp(30px, 5vw, 60px);
     width: min(90rem, 90vw);
     min-height: 80vh;
-    margin: 0 auto;
-    padding: 40px;
+    margin-left: 130px;
+    padding: 20px;
     box-sizing: border-box;
     min-width: 680px;
 }
