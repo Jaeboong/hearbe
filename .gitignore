@@ -564,3 +564,4 @@ google-service-account.json
 docker
 
 MCP/temp_test_profile/**
+Frontend/hearbe/.env.production
