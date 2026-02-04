@@ -38,7 +38,7 @@
     gap: clamp(30px, 5vw, 60px);
     width: min(90rem, 90vw);
     min-height: 80vh;
-    margin-left: 130px;
+    margin-left: 60px;
     padding: 20px;
     box-sizing: border-box;
     min-width: 680px;
@@ -99,7 +99,6 @@
     .memberinfo-container .memberinfo-content {
         width: 100%;
         height: auto;
-        padding: 32px 100px;
     }
 
     .memberinfo-main {
@@ -109,6 +108,9 @@
 }
 
 .content-title {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 16px);
     font-size: clamp(28px, 4.5vw, 42px);
     font-weight: 900;
     color: #FFF064;

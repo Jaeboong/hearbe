@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, Package } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { orderAPI } from '../../services/orderAPI';
 import { authAPI } from '../../services/authAPI';
@@ -44,7 +44,7 @@ const OrderHistoryA = () => {
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            window.location.href = 'http://localhost:5173/';
+            navigate('/main');
         }
     };
 
@@ -185,7 +185,10 @@ const OrderHistoryA = () => {
 
                 {/* Main Content */}
                 <main className="orderhistory-main">
-                    <h2 className="content-title">주문내역</h2>
+                    <h2 className="content-title">
+                        <Package size={40} color="#FFF064" />
+                        주문내역
+                    </h2>
 
                     {/* 로딩 상태 */}
                     {isLoading && (
@@ -279,6 +282,10 @@ const OrderHistoryA = () => {
                     )}
                 </main>
             </div>
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

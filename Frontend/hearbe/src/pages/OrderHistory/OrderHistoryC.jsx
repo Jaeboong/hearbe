@@ -55,13 +55,13 @@ export default function OrderHistoryC({ onHome }) {
     const handleLogout = async () => {
         try {
             await authAPI.logout();
-            navigate('/');
+            navigate('/main');
         } catch (error) {
             console.error('Logout failed:', error);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 

@@ -122,6 +122,11 @@ const Login = () => {
                             className="login-input first-input"
                             value={id}
                             onChange={(e) => setId(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleLogin();
+                                }
+                            }}
                         />
                         <input
                             type="password"
@@ -130,6 +135,11 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             maxLength={6}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleLogin();
+                                }
+                            }}
                         />
                     </div>
 

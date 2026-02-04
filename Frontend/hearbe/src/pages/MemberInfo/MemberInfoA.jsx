@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, User } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
@@ -82,7 +82,7 @@ const MemberInfoA = () => {
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
             localStorage.removeItem('user_name');
-            navigate('/');
+            navigate('/main');
         }
     };
 
@@ -206,7 +206,10 @@ const MemberInfoA = () => {
 
                 {/* Main Content */}
                 <main className="memberinfo-main">
-                    <h2 className="content-title">회원 정보</h2>
+                    <h2 className="content-title">
+                        <User size={40} color="#FFF064" />
+                        회원 정보
+                    </h2>
 
                     {loading ? (
                         <div className="loading-state">
@@ -308,6 +311,10 @@ const MemberInfoA = () => {
                     </div>
                 </div>
             )}
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

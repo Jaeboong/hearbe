@@ -44,7 +44,7 @@ const SelectMall = () => {
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 
@@ -110,6 +110,10 @@ const SelectMall = () => {
                     </div>
                 </div>
             </div>
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

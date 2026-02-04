@@ -182,7 +182,7 @@ export default function MemberInfoC({ onHome }) {
             localStorage.removeItem('user');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 

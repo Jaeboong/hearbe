@@ -1,6 +1,5 @@
-﻿// API Base URL Configuration
-import { apiClient } from './apiClient.js';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+﻿import { apiClient } from './apiClient.js';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // API Service for Authentication
 export const authAPI = {
@@ -446,7 +445,7 @@ export const authAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/welfare`, {
+            const response = await apiClient(`${API_BASE_URL}/welfare`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -481,7 +480,7 @@ export const authAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/welfare`, {
+            const response = await apiClient(`${API_BASE_URL}/welfare`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

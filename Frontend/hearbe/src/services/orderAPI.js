@@ -1,7 +1,7 @@
 // 공통 주문내역 API
 // A형과 C형에서 공통으로 사용
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+import { apiClient, API_BASE_URL } from './apiClient.js';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -76,7 +76,7 @@ export const orderAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/orders/me`, {
+            const response = await apiClient(`${API_BASE_URL}/orders/me`, {
                 method: 'GET',
                 headers: {
                     ...getAuthHeader(),
