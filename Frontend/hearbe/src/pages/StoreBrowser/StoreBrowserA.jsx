@@ -190,8 +190,10 @@ const StoreBrowser = () => {
         }
     };
 
+    const hideOpenInNewTabNotice = true;
+
     return (
-        <div className="store-container">
+        <div className={`store-container${hideOpenInNewTabNotice ? ' hide-new-tab-notice' : ''}`}>
 
             {/* 쇼핑몰은 새 탭에서 열리고, 이 화면은 공유 제어용으로만 사용 */}
 
