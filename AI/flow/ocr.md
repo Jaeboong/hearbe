@@ -3,6 +3,27 @@
 ## 개요
 상품 상세 이미지나 결제 키패드 이미지를 OCR로 텍스트 추출하고, LLM으로 요약하여 음성 안내하는 흐름.
 
+## 핵심 진입 파일
+
+- 상품 상세 OCR: `api/ws/handlers/mcp_handler.py`
+- 결제 키패드 OCR: `api/ws/handlers/payment_keypad.py`
+
+### import 맵 (프로젝트 내부)
+
+`api/ws/handlers/mcp_handler.py`
+- `core/event_bus.py`
+- `services/llm/generators/tts_generator.py`
+- `services/llm/planner/selection/option_select.py`
+- `services/llm/sites/site_manager.py`
+- `services/summarizer/__init__.py`
+- `api/ws/utils/temp_file_manager.py`
+
+`api/ws/handlers/payment_keypad.py`
+- `core/interfaces.py`
+- `services/llm/sites/site_manager.py`
+- `services/ocr/payment/keypad_mapper.py`
+- `api/ws/presenter/pages/checkout.py`
+
 ## Flow 다이어그램 - 상품 이미지 OCR
 
 ```
@@ -11,7 +32,10 @@ MCP 결과에 detail_images 포함
 ├─ [1] api/ws/handlers/mcp_handler.py → MCPHandler.handle_mcp_result()
 │   └─ detail_images 존재 확인 → OCR 파이프라인 호출
 │
-├─ [2] services/ocr/text_processors/ocr_pipeline.py → OCRPipeline
+├─ [2] services/summarizer/ocr_integrator.py → OCRIntegrator.process_single_batch()
+│   └─ 내부에서 services/ocr/text_processors/ocr_pipeline.py 로드
+│
+├─ [2-1] services/ocr/text_processors/ocr_pipeline.py → OCRPipeline
 │   │
 │   ├─ [2-1] image_fetcher.py → ImageFetcher
 │   │   └─ URL에서 이미지 다운로드 (base64 또는 URL)
@@ -41,11 +65,9 @@ MCP 결과에 detail_images 포함
 │       └─ OpenAI API로 OCR 텍스트 요약
 │           └─ 핵심 상품 정보만 추출
 │
-├─ [3] services/ocr/service.py → OCRService
-│   └─ 프로바이더별 분기
-│       ├─ OpenAI Vision API
-│       ├─ Tesseract OCR
-│       └─ PaddleOCR
+├─ [3] api/ws/handlers/mcp_handler.py
+│   ├─ ocr_progress 전송 (started → ocr_completed → completed)
+│   └─ build_ocr_summary_tts() → TTS 전송
 │
 └─ [4] api/ws/presenter/pages/product.py → build_ocr_summary_tts()
     └─ 요약된 텍스트를 TTS 포맷으로 변환
@@ -59,29 +81,20 @@ MCP 결과에 detail_images 포함
 ├─ [1] api/ws/handlers/payment_keypad.py → PaymentKeypadManager
 │   └─ 키패드 이미지 캡처 요청
 │
-├─ [2] services/ocr/payment/payment_ocr.py → PaymentOCR
-│   │
-│   ├─ [2-1] payment_ocr_pipeline.py → 키패드 전용 파이프라인
-│   │
-│   ├─ [2-2] digit_extractor.py → DigitExtractor
-│   │   └─ 키패드에서 숫자(0~9) 위치 추출
-│   │
-│   ├─ [2-3] digit_to_dom_mapper.py → DigitToDomMapper
-│   │   └─ 추출된 숫자 위치 → DOM 요소 좌표 매핑
-│   │
-│   └─ [2-4] keypad_mapper.py → KeypadMapper
-│       └─ 사용자 입력 숫자 → 클릭할 DOM 좌표 반환
+├─ [2] services/ocr/payment/keypad_mapper.py → map_keypad_image()
+│   ├─ korean_ocr.process_image() → 키패드 숫자 인식
+│   ├─ digit_extractor.py → 숫자 추출
+│   └─ digit_to_dom_mapper.py → 숫자 → DOM key 매핑
 │
 └─ [3] 사용자 음성 비밀번호 → 순서대로 키패드 클릭 명령 생성
-    └─ MCPCommand(tool="click", args={x, y}) × N회
+    └─ MCPCommand(tool="click_element", args={selector, frame_selector?}) × N회
 ```
 
 ## 관련 파일
 
 | 단계 | 파일 | 역할 |
 |------|------|------|
-| OCR 서비스 | `services/ocr/service.py` | OCR 프로바이더 래핑 |
-| OCR 코어 | `services/ocr/ocr.py` | 핵심 OCR 로직 |
+| OCR 통합 | `services/summarizer/ocr_integrator.py` | 이미지 URL → OCR 파이프라인 연결 |
 | OCR 파이프라인 | `services/ocr/text_processors/ocr_pipeline.py` | 이미지 → 텍스트 파이프라인 |
 | 이미지 다운로드 | `services/ocr/text_processors/image_fetcher.py` | 이미지 가져오기 |
 | 텍스트 추출 | `services/ocr/text_processors/extract_rec_texts.py` | PaddleOCR 텍스트 인식 |
@@ -91,8 +104,7 @@ MCP 결과에 detail_images 포함
 | 텍스트 병합 | `services/ocr/text_processors/ocr_text_merger.py` | 세그먼트 병합 |
 | LLM 요약 | `services/ocr/text_processors/ocr_llm_summarizer.py` | OCR 결과 요약 |
 | 상품 타입 | `services/ocr/text_processors/product_type_detector.py` | 상품 카테고리 감지 |
-| 키패드 OCR | `services/ocr/payment/payment_ocr.py` | 결제 키패드 인식 |
+| 키패드 OCR | `services/ocr/payment/keypad_mapper.py` | 결제 키패드 인식 |
 | 숫자 추출 | `services/ocr/payment/digit_extractor.py` | 키패드 숫자 추출 |
 | DOM 매핑 | `services/ocr/payment/digit_to_dom_mapper.py` | 숫자 → DOM 좌표 |
-| 키패드 매퍼 | `services/ocr/payment/keypad_mapper.py` | 키패드 매핑 |
 | 유틸리티 | `services/ocr/text_processors/utils.py` | 공통 유틸 |

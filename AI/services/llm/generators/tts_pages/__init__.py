@@ -1,4 +1,5 @@
 from .cart import build_cart_summary_tts
+from .order_list import build_order_list_summary_tts
 from .search import (
     build_search_list_tts,
     MORE_PROMPT_COUNT,
@@ -13,6 +14,7 @@ from .login import build_login_success_tts, build_login_guidance_tts, build_capt
 
 __all__ = [
     "build_cart_summary_tts",
+    "build_order_list_summary_tts",
     "build_search_list_tts",
     "MORE_PROMPT_COUNT",
     "MORE_PROMPT_NUMBER",

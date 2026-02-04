@@ -24,7 +24,7 @@ def resolve_llm_api_key(explicit_key: Optional[str] = None) -> Optional[str]:
     Order:
     1) explicit_key (if provided)
     2) LLM_API_KEY_NAME -> env value
-    3) GMS_API_KEY, GMS_KEY, OPENAI_API_KEY
+    3) GMS_API_KEY, OPENAI_API_KEY
     """
     if explicit_key:
         return explicit_key

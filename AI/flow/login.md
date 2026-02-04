@@ -4,9 +4,25 @@
 로그인 관련 규칙은 CommandGenerator에 등록되어 있지 않고, login.py에 4개의 별도 규칙 클래스가 정의됨.
 LoginRule은 로그인 페이지 이동만 처리하고, 로그인 페이지 내 동작(전화번호/OTP/탭전환)은 별도 규칙으로 처리.
 
+## 핵심 진입 파일
+
+- `services/llm/rules/login.py`
+- `api/ws/handlers/command_pipeline.py`
+
+### import 맵 (프로젝트 내부)
+
+`services/llm/rules/login.py`
+- `services/llm/context/context_rules.py`
+- `services/llm/rules/__init__.py`
+- `services/llm/sites/site_manager.py`
+
+`api/ws/handlers/command_pipeline.py`
+- `core/interfaces.py`
+- `api/ws/handlers/command_normalizers.py`
+
 ## 핵심 포인트
 - LoginRule, LoginPhoneRule, LoginPhoneTabRule, LoginOtpRule → 4개 클래스 존재
-- CommandGenerator의 규칙 체인에는 미등록 → LLM 폴백 또는 별도 경로로 동작
+- CommandGenerator의 규칙 체인에는 미등록 → 현재 실행 경로에 연결되지 않음
 - 로그인 페이지(get_page_type == "login")에서는 LoginRule.check()가 None 반환
 - 로그인 가드(LoginGuard)와 로그인 피드백(LoginFeedback)이 CommandPipeline에서 작동
 - 캡차 처리: 로그인 URL이면 CommandPipeline이 handle_captcha_modal 명령을 자동 추가
@@ -26,7 +42,7 @@ LoginRule은 로그인 페이지 이동만 처리하고, 로그인 페이지 내
 │       └─ GenericClickRule: "클릭/눌러/선택" 키워드 없음 → 미매칭
 │       └─ matched_rule="none"
 │
-│   ※ LoginRule은 CommandGenerator 외부에서 사용되거나 LLM 폴백으로 처리
+│   ※ 현재 LoginRule은 실행 경로에 연결되어 있지 않음
 │   └─ LLM 폴백 → build_login_page_commands()와 유사한 명령 생성
 │
 ├─ [3] 실제 생성되는 명령:
@@ -63,6 +79,7 @@ LoginRule은 로그인 페이지 이동만 처리하고, 로그인 페이지 내
 │       └─ click(selector=submit_button) → "인증번호 요청"
 │
 └─ TTS: "휴대폰 번호를 입력하고 인증번호를 요청합니다."
+※ 현재 LoginPhoneRule은 실행 경로에 연결되어 있지 않음
 ```
 
 ## Flow C: 휴대폰 로그인 탭 전환 ("휴대폰 로그인")
@@ -80,6 +97,7 @@ LoginRule은 로그인 페이지 이동만 처리하고, 로그인 페이지 내
 │       └─ wait_for_selector(phone_input, state="visible", timeout=8000)
 │
 └─ TTS: "휴대폰 로그인 탭으로 전환합니다, 휴대폰 번호를 불러주시면 대신 입력해 드릴게요."
+※ 현재 LoginPhoneTabRule은 실행 경로에 연결되어 있지 않음
 ```
 
 ## Flow D: OTP 인증번호 입력 ("인증번호 123456")
@@ -98,6 +116,7 @@ LoginRule은 로그인 페이지 이동만 처리하고, 로그인 페이지 내
 │       └─ press(selector=otp_input, key="Enter")
 │
 └─ TTS: "인증번호를 입력합니다."
+※ 현재 LoginOtpRule은 실행 경로에 연결되어 있지 않음
 ```
 
 ## Flow E: 로그인 완료 감지

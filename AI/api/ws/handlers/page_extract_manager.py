@@ -155,6 +155,15 @@ class PageExtractManager:
                     description="extract cart summary on page change",
                 ),
             ]
+        if page_type == "orderlist":
+            return [
+                wait_cmd,
+                MCPCommand(
+                    tool_name="extract_order_list",
+                    arguments={},
+                    description="extract order list on page change",
+                ),
+            ]
         return []
 
     def _is_context_missing(self, page_type: str, session) -> bool:
@@ -165,6 +174,8 @@ class PageExtractManager:
             return not context.get("product_detail")
         if page_type == "cart":
             return not context.get("cart_items")
+        if page_type == "orderlist":
+            return not context.get("order_list")
         return False
 
     def _get_context(self, session_id: str, key: str, default=None):

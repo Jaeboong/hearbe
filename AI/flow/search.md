@@ -3,9 +3,31 @@
 ## 개요
 사용자가 음성/텍스트로 상품을 검색하면, goto/fill/press/wait + extract 조합의 브라우저 자동화 명령을 생성하여 검색을 실행하고, extract 결과를 기반으로 음성 안내하는 흐름.
 
+## 핵심 진입 파일
+
+- 검색 명령 규칙: `services/llm/rules/search.py`
+- 검색 결과 읽기: `api/ws/handlers/search_query_handler.py`
+- 자동 추출: `api/ws/handlers/page_extract_manager.py`
+
+### import 맵 (프로젝트 내부)
+
+`services/llm/rules/search.py`
+- `services/llm/context/context_rules.py`
+- `services/llm/rules/__init__.py`
+
+`api/ws/handlers/search_query_handler.py`
+- `services/llm/generators/tts_pages/search.py`
+- `api/ws/search/search_insights.py`
+
+`api/ws/handlers/page_extract_manager.py`
+- `core/interfaces.py`
+- `services/llm/context/context_rules.py`
+- `services/llm/sites/site_manager.py`
+
 ## 핵심 포인트
 - 검색 명령은 `search`라는 단일 도구가 아닌, `goto` → `fill` → `press`(Enter) → `wait` → `extract` 조합으로 생성됨
-- 검색 결과 읽기/필터/최저가 등은 `SearchQueryHandler`가 LLM 없이 먼저 처리
+- 검색 결과 **읽기만** `SearchQueryHandler`가 LLM 없이 처리
+- 최저가/할인율/내일배송/무료배송 필터 요청은 현재 LLM으로 위임됨
 - 결과 읽기는 `search_reader.build_search_read_tts()`를 `presenter/pages/search.py`가 래핑하여 사용
 - 페이지 변경 시 `PageExtractManager`가 자동으로 extract 명령을 트리거
 

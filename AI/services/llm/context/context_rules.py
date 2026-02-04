@@ -1,4 +1,4 @@
-"""
+﻿"""
 명령 빌더 모듈
 
 MCP 브라우저 자동화 명령을 생성하는 빌더 함수들을 정의합니다.
@@ -110,6 +110,7 @@ def build_click_text_command(text: str, description: str = "") -> GeneratedComma
         arguments={"text": text},
         description=description or f"'{text}' 텍스트 클릭"
     )
+
 
 def build_extract_products_command(
     site: Optional[SiteConfig],
