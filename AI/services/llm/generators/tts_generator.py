@@ -23,6 +23,13 @@ class TTSGenerator:
         from .tts_pages.cart import build_cart_summary_tts
         return build_cart_summary_tts(cart_items, cart_summary or {})
 
+    def build_order_list_summary(
+        self,
+        orders: List[Dict[str, Any]],
+    ) -> str:
+        from .tts_pages.order_list import build_order_list_summary_tts
+        return build_order_list_summary_tts(orders or [])
+
     def build_search_list(
         self,
         products: List[Dict[str, Any]],

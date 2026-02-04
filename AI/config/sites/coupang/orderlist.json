@@ -5,6 +5,8 @@
   "selectors": {
     "search_input": "#headerSearchKeyword",
     "order_search_input": "input[placeholder*='주문한 상품을 검색']",
+    "order_list_item": "a[href*='/ssr/desktop/order/']",
+    "order_detail_link": "a[href*='/ssr/desktop/order/']",
     "add_to_cart": "button:has-text('장바구니 담기')",
     "track_delivery": "button:has-text('배송 조회')",
     "exchange_return": "button:has-text('교환, 반품 신청')",

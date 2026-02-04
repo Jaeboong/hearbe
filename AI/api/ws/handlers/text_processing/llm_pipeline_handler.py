@@ -7,6 +7,8 @@ import logging
 
 from core.interfaces import IntentType
 from services.llm.planner.selection.option_select import coerce_option_clicks, is_option_request
+from services.llm.feedback.fast_ack import FastAckGenerator
+from services.llm.sites.site_manager import get_page_type
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +20,7 @@ class LLMPipelineHandler:
         self._flow = flow_engine
         self._sender = sender
         self._command_pipeline = command_pipeline
+        self._fast_ack = FastAckGenerator()
 
     async def handle(self, session_id: str, text: str, session, interrupted) -> str:
         """
@@ -90,6 +93,18 @@ class LLMPipelineHandler:
             session.current_url or "",
             allow_extract=allow_extract,
         )
+        if session:
+            page_type = get_page_type(session.current_url or "") if session.current_url else None
+        else:
+            page_type = None
+        ack_text = self._fast_ack.get_ack(
+            resolved_text,
+            page_type,
+            intent.intent if intent else None,
+            commands,
+        )
+        if ack_text:
+            await self._sender.send_tts_response(session_id, ack_text)
         if not commands:
             logger.info(
                 "No commands generated for session=%s text='%s'",

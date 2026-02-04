@@ -15,7 +15,9 @@ from ..rules import BaseRule
 from ..rules.site_access import SiteAccessRule
 from ..rules.select import SearchSelectRule
 from ..rules.search import SearchRule
+from ..rules.orderdetail import OrderDetailRule
 from ..rules.cart import CartRule
+from ..rules.order_list import OrderListRule
 from ..rules.checkout import CheckoutRule
 from ..rules.generic import GenericClickRule
 
@@ -49,7 +51,9 @@ class CommandGenerator:
             SiteAccessRule(self.site_manager),
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
+            OrderDetailRule(self.site_manager),
             CartRule(self.site_manager),
+            OrderListRule(self.site_manager),
             CheckoutRule(self.site_manager),
             GenericClickRule(self.site_manager),
         ]

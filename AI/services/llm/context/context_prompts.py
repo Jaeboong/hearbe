@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 """
 Prompt construction utilities for LLM context.
 """
@@ -12,9 +13,24 @@ from .context_formatters import (
     format_search_results_section,
     format_product_detail_section,
     format_cart_items_section,
+    format_order_detail_section,
+    format_order_list_section,
     format_url_context,
 )
 from .context_models import PageContext, get_page_context
+
+
+def _format_site_urls(site) -> str:
+    if not site:
+        return ""
+    urls = []
+    for key in ("home", "cart", "mypage", "login"):
+        url = site.get_url(key)
+        if url:
+            urls.append(f"- {key}: {url}")
+    if not urls:
+        return ""
+    return "\n".join(["## Site URLs"] + urls)
 
 
 def build_system_prompt(
@@ -23,12 +39,16 @@ def build_system_prompt(
     search_results: List[Any] = None,
     product_detail: Optional[Dict[str, Any]] = None,
     cart_items: List[Dict[str, Any]] = None,
+    order_detail: Optional[Dict[str, Any]] = None,
+    order_list: Optional[Any] = None,
     previous_url: Optional[str] = None,
 ) -> str:
     """Build the LLM system prompt for the current request."""
     if page_context is None:
         site = get_site_manager().get_site_by_url(current_url)
         page_context = get_page_context(current_url, site)
+    else:
+        site = get_site_manager().get_site_by_url(current_url)
 
     commands_doc = format_commands()
     selectors_doc = format_selectors(page_context.selectors)
@@ -47,7 +67,18 @@ def build_system_prompt(
         if page_context.page_type == "cart"
         else ""
     )
+    order_detail_section = (
+        format_order_detail_section(order_detail)
+        if page_context.page_type == "orderdetail"
+        else ""
+    )
+    order_list_section = (
+        format_order_list_section(order_list)
+        if page_context.page_type == "orderlist"
+        else ""
+    )
     url_context_section = format_url_context(current_url, previous_url)
+    site_urls_section = _format_site_urls(site)
     login_constraints = (
         "## Login constraints\n"
         "- When the user expresses login intent, go to the login page without asking extra questions.\n"
@@ -90,6 +121,8 @@ def build_system_prompt(
 - Available actions: {', '.join(page_context.available_actions)}
 {url_context_section}
 
+{site_urls_section}
+
 ## Available commands
 {commands_doc}
 
@@ -99,6 +132,8 @@ def build_system_prompt(
 {search_results_section}
 {product_detail_section}
 {cart_items_section}
+{order_detail_section}
+{order_list_section}
 {login_constraints}
 ## Rules
 1. Respond with JSON only.

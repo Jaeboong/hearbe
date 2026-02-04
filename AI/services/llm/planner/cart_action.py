@@ -36,12 +36,14 @@ def handle_cart_action(user_text: str, session: Optional[SessionState]) -> Optio
             flow_type=None,
         )
 
-    target_name = _resolve_target_item(text, items)
-    if not target_name:
+    target_item = _resolve_target_item(text, items)
+    if not target_item:
         return None
+    target_name = target_item.get("name") or ""
+    target_option = target_item.get("option") or ""
 
     if any(word in text for word in ["선택", "체크"]):
-        selector = _build_cart_item_checkbox_selector(current_url, target_name)
+        selector = _build_cart_item_checkbox_selector(current_url, target_name, target_option)
         return LLMResponse(
             text=f"'{target_name}' 상품을 선택합니다.",
             commands=[MCPCommand(tool_name="click", arguments={"selector": selector}, description="select cart item")],
@@ -50,7 +52,7 @@ def handle_cart_action(user_text: str, session: Optional[SessionState]) -> Optio
         )
 
     if any(word in text for word in ["해제", "취소", "체크 해제"]):
-        selector = _build_cart_item_checkbox_selector(current_url, target_name)
+        selector = _build_cart_item_checkbox_selector(current_url, target_name, target_option)
         return LLMResponse(
             text=f"'{target_name}' 선택을 해제합니다.",
             commands=[MCPCommand(tool_name="click", arguments={"selector": selector}, description="deselect cart item")],
@@ -59,11 +61,11 @@ def handle_cart_action(user_text: str, session: Optional[SessionState]) -> Optio
         )
 
     if any(word in text for word in ["삭제", "지워", "제거", "빼줘", "빼 줘"]):
-        delete_selector = _build_cart_item_delete_selector(current_url, target_name)
+        delete_selector = _build_cart_item_delete_selector(current_url, target_name, target_option)
         if delete_selector:
             commands = [MCPCommand(tool_name="click", arguments={"selector": delete_selector}, description="delete cart item")]
         else:
-            checkbox_selector = _build_cart_item_checkbox_selector(current_url, target_name)
+            checkbox_selector = _build_cart_item_checkbox_selector(current_url, target_name, target_option)
             delete_selected = _wrap_is(get_selector(current_url, "delete_selected")) or "button:has-text(\"선택 삭제\")"
             commands = [
                 MCPCommand(tool_name="click", arguments={"selector": checkbox_selector}, description="select cart item"),
@@ -80,7 +82,7 @@ def handle_cart_action(user_text: str, session: Optional[SessionState]) -> Optio
     if quantity is not None:
         current_qty = _find_current_quantity(target_name, items)
         if current_qty is None:
-            selector = _build_cart_item_quantity_selector(current_url, target_name)
+            selector = _build_cart_item_quantity_selector(current_url, target_name, target_option)
             commands = [
                 MCPCommand(tool_name="fill", arguments={"selector": selector, "text": str(quantity)}, description="update cart quantity"),
                 MCPCommand(tool_name="press", arguments={"selector": selector, "key": "Enter"}, description="apply quantity"),
@@ -95,10 +97,10 @@ def handle_cart_action(user_text: str, session: Optional[SessionState]) -> Optio
                     flow_type=None,
                 )
             if delta > 0:
-                button_selector = _build_cart_item_plus_selector(current_url, target_name)
+                button_selector = _build_cart_item_plus_selector(current_url, target_name, target_option)
                 cmd_desc = "increase quantity"
             else:
-                button_selector = _build_cart_item_minus_selector(current_url, target_name)
+                button_selector = _build_cart_item_minus_selector(current_url, target_name, target_option)
                 cmd_desc = "decrease quantity"
             commands = [
                 MCPCommand(tool_name="click", arguments={"selector": button_selector}, description=cmd_desc)
@@ -114,32 +116,37 @@ def handle_cart_action(user_text: str, session: Optional[SessionState]) -> Optio
     return None
 
 
-def _resolve_target_item(text: str, items: List[Dict]) -> Optional[str]:
+def _resolve_target_item(text: str, items: List[Dict]) -> Optional[Dict]:
     if not items:
         return None
 
     ordinal = extract_ordinal_index(text)
     if ordinal is not None and 0 <= ordinal < len(items):
-        name = items[ordinal].get("name")
-        if name:
-            return name
+        return items[ordinal]
 
     for item in items:
         name = item.get("name")
         if not name:
             continue
         if name in text:
-            return name
+            return item
 
     if len(items) == 1:
-        return items[0].get("name")
+        return items[0]
 
     selected_name = prefer_single_selected(items)
     if selected_name:
-        return selected_name
+        for item in items:
+            if item.get("name") == selected_name:
+                return item
 
     match = match_cart_item_name(text, items)
-    return match.name
+    if not match.name:
+        return None
+    for item in items:
+        if item.get("name") == match.name:
+            return item
+    return None
 
 
 def _wrap_is(selector: Optional[str]) -> str:
@@ -152,39 +159,43 @@ def _wrap_is(selector: Optional[str]) -> str:
     return selector
 
 
-def _build_cart_item_root_selector(current_url: str, name: str) -> str:
+def _build_cart_item_root_selector(current_url: str, name: str, option: str = "") -> str:
     safe = _sanitize_selector_text(name)
+    safe_option = _sanitize_selector_text(option)
     item_selector = _wrap_is(get_selector(current_url, "cart_item")) or '[id^="item_"]'
     title_selector = _wrap_is(get_selector(current_url, "item_title")) or "a span"
-    return f'{item_selector}:has({title_selector}:has-text("{safe}"))'
+    base = f'{item_selector}:has({title_selector}:has-text("{safe}"))'
+    if safe_option:
+        base = f'{base}:has-text("{safe_option}")'
+    return base
 
 
-def _build_cart_item_checkbox_selector(current_url: str, name: str) -> str:
-    base = _build_cart_item_root_selector(current_url, name)
+def _build_cart_item_checkbox_selector(current_url: str, name: str, option: str = "") -> str:
+    base = _build_cart_item_root_selector(current_url, name, option)
     checkbox_selector = _wrap_is(get_selector(current_url, "item_checkbox")) or "input[type=\"checkbox\"]"
     return f"{base} {checkbox_selector}"
 
 
-def _build_cart_item_quantity_selector(current_url: str, name: str) -> str:
-    base = _build_cart_item_root_selector(current_url, name)
+def _build_cart_item_quantity_selector(current_url: str, name: str, option: str = "") -> str:
+    base = _build_cart_item_root_selector(current_url, name, option)
     quantity_selector = _wrap_is(get_selector(current_url, "quantity_input")) or "input.cart-quantity-input"
     return f"{base} {quantity_selector}"
 
 
-def _build_cart_item_plus_selector(current_url: str, name: str) -> str:
-    base = _build_cart_item_root_selector(current_url, name)
+def _build_cart_item_plus_selector(current_url: str, name: str, option: str = "") -> str:
+    base = _build_cart_item_root_selector(current_url, name, option)
     plus_selector = _wrap_is(get_selector(current_url, "quantity_plus")) or "[data-component-id='quantity-input'] .twc-bg-plus-icon"
     return f"{base} {plus_selector}"
 
 
-def _build_cart_item_minus_selector(current_url: str, name: str) -> str:
-    base = _build_cart_item_root_selector(current_url, name)
+def _build_cart_item_minus_selector(current_url: str, name: str, option: str = "") -> str:
+    base = _build_cart_item_root_selector(current_url, name, option)
     minus_selector = _wrap_is(get_selector(current_url, "quantity_minus")) or "[data-component-id='quantity-input'] .twc-bg-minus-icon"
     return f"{base} {minus_selector}"
 
 
-def _build_cart_item_delete_selector(current_url: str, name: str) -> str:
-    base = _build_cart_item_root_selector(current_url, name)
+def _build_cart_item_delete_selector(current_url: str, name: str, option: str = "") -> str:
+    base = _build_cart_item_root_selector(current_url, name, option)
     delete_selector = _wrap_is(get_selector(current_url, "delete_button"))
     if not delete_selector:
         return ""

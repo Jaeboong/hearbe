@@ -14,6 +14,7 @@ class TextRouter:
         self,
         session_manager,
         payment_keypad,
+        order_detail_handler,
         flow_handler,
         search_query_handler,
         ai_next_router,
@@ -24,6 +25,7 @@ class TextRouter:
     ):
         self._session = session_manager
         self._payment_keypad = payment_keypad
+        self._order_detail = order_detail_handler
         self._flow_handler = flow_handler
         self._search_query_handler = search_query_handler
         self._ai_next_router = ai_next_router
@@ -44,6 +46,14 @@ class TextRouter:
                 return None
 
         self._history.add_user(session_id, text)
+
+        if self._interrupts.is_interrupted(session_id, epoch):
+            return None
+
+        if self._order_detail:
+            handled = await self._order_detail.handle_user_text(session_id, text)
+            if handled:
+                return None
 
         if self._interrupts.is_interrupted(session_id, epoch):
             return None

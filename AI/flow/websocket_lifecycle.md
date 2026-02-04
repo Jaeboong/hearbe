@@ -3,6 +3,17 @@
 ## 개요
 클라이언트가 WebSocket으로 연결하면 세션을 생성하고, 메시지 타입에 따라 각 핸들러로 라우팅하는 전체 생명주기.
 
+## 핵심 진입 파일
+
+- `api/websocket.py`
+
+### import 맵 (프로젝트 내부)
+
+- `core/event_bus.py`
+- `api/ws/router.py`
+- `api/ws/sender.py`
+- `api/ws/handlers/handler_manager.py`
+
 ## Flow 다이어그램
 
 ```
@@ -10,13 +21,14 @@
 │
 ├─ [1] api/websocket.py → WebSocketHandler.handle_connection()
 │   ├─ ConnectionManager.connect() → 연결 등록
-│   └─ 세션 생성/복원
+│   ├─ SessionManager.get_session() → 없으면 create_session()
+│   └─ HandlerManager.create_session()
 │
 ├─ [2] api/ws/handlers/handler_manager.py → HandlerManager.create_session()
 │   └─ services/session/service.py → SessionManager.create_session()
 │
 ├─ [3] api/ws/sender.py → send_status("connected")
-│   └─ { type: "status", data: { status: "connected", session_id } }
+│   └─ { type: "status", data: { status: "connected", message } }
 │
 ├─ [4] 메시지 수신 루프 ──────────────────────────────────
 │   │
@@ -49,13 +61,13 @@
 │   └─ 바이너리 메시지 (오디오)
 │       └─ api/ws/router.py → WebSocketRouter.handle_binary()
 │           └─ HandlerManager.handle_binary_audio()
-│               └─ → audio_handler.py (ASR 처리)
+│               └─ → audio_handler.py (ASR 처리, raw bytes)
 │
 └─ [5] 연결 종료
     ├─ api/ws/handlers/handler_manager.py → HandlerManager.cleanup_session()
     │   ├─ AudioHandler 정리
     │   ├─ TextHandler 정리
-    │   └─ 세션 타이머 시작 (30분 유지)
+    │   └─ 세션은 SessionManager의 접근 시점 기반 만료 정책 적용
     └─ ConnectionManager.disconnect()
 ```
 
@@ -65,7 +77,7 @@
 
 | 타입 | 설명 | 핸들러 |
 |------|------|--------|
-| `audio_chunk` | 마이크 오디오 (바이너리) | `audio_handler.py` |
+| `audio_chunk` | 마이크 오디오 (텍스트 메시지, base64) | `audio_handler.py` |
 | `user_input` | 텍스트 입력 | `text_handler.py` |
 | `user_confirm` | 플로우 확인 | `flow_handler.py` |
 | `cancel` | 작업 취소 | `handler_manager.py` |
@@ -80,10 +92,13 @@
 | `asr_result` | ASR 인식 결과 | `sender.py` |
 | `tool_calls` | MCP 명령 리스트 | `sender.py` |
 | `flow_step` | 플로우 단계 안내 | `sender.py` |
-| `tts_chunk` | 음성 오디오 (바이너리) | `sender.py` |
+| `tts_chunk` | 음성 오디오 (hex 문자열 JSON) | `sender.py` |
 | `status` | 서버 상태 | `sender.py` |
 | `error` | 에러 메시지 | `sender.py` |
 | `ocr_progress` | OCR 처리 상태 | `sender.py` |
+
+※ 바이너리 프레임은 별도 타입 없이 `WebSocketRouter.handle_binary()`로 들어와
+`HandlerManager.handle_binary_audio()` → `audio_handler.py`로 처리됩니다.
 
 ## 관련 파일
 

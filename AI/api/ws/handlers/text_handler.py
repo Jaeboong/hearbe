@@ -44,6 +44,7 @@ class TextHandler:
         login_guard=None,
         login_feedback=None,
         payment_keypad=None,
+        order_detail_handler=None,
         page_extract=None,
     ):
         self._nlu = nlu_service
@@ -55,6 +56,7 @@ class TextHandler:
         self._login_guard = login_guard
         self._login_feedback = login_feedback
         self._payment_keypad = payment_keypad
+        self._order_detail = order_detail_handler
         self._page_extract = page_extract
         self._command_pipeline = CommandPipeline(
             sender=sender,
@@ -83,6 +85,7 @@ class TextHandler:
         self._text_router = TextRouter(
             session_manager=session_manager,
             payment_keypad=payment_keypad,
+            order_detail_handler=order_detail_handler,
             flow_handler=self._flow_handler,
             search_query_handler=self._search_query_handler,
             ai_next_router=self._ai_next_router,
@@ -176,6 +179,24 @@ class TextHandler:
         """
         try:
             session = self._session.get_session(session_id) if self._session else None
+            if session and self._order_detail:
+                triggered = await self._order_detail.ensure_context(
+                    session_id,
+                    session.current_url,
+                    session,
+                )
+                if triggered:
+                    retries = 0
+                    if self._session:
+                        retries = self._session.get_context(session_id, "auto_extract_retry", 0)
+                    if retries < 1:
+                        if self._session:
+                            self._session.set_context(session_id, "auto_extract_retry", retries + 1)
+                        asyncio.create_task(self._requeue_after_delay(session_id, text, delay_sec=1.6))
+                        return
+                    if self._session:
+                        self._session.set_context(session_id, "auto_extract_retry", 0)
+
             if session and self._page_extract:
                 page_type = get_page_type(session.current_url or "")
                 triggered = await self._page_extract.ensure_context(

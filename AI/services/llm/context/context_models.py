@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 """
 Page context models and page type detection.
 """
@@ -18,13 +19,15 @@ class PageContext:
     selectors: Dict[str, str]
 
 
-COMMON_ACTIONS = ["navigate", "scroll", "click", "go_to_cart"]
+COMMON_ACTIONS = ["navigate", "scroll", "click", "go_to_cart", "go_to_order_list"]
 
 PAGE_SPECIFIC_ACTIONS = {
     "home": ["search", "login"],
     "search": ["select_product", "next_page", "filter", "sort"],
     "product": ["add_to_cart", "buy_now", "view_reviews"],
     "cart": ["checkout", "remove_item", "change_quantity", "continue_shopping"],
+    "orderlist": ["open_order_detail", "search_order"],
+    "orderdetail": ["order_detail_actions"],
     "login": ["submit_login", "find_id", "find_password", "signup"],
     "unknown": [],
 }
@@ -50,6 +53,10 @@ def detect_page_type(url: str) -> str:
         return "product"
     if "/cart" in url_lower:
         return "cart"
+    if "/ssr/desktop/order/list" in url_lower:
+        return "orderlist"
+    if "/ssr/desktop/order/" in url_lower:
+        return "orderdetail"
     if "/checkout" in url_lower or "/order" in url_lower:
         return "checkout"
     return "home"

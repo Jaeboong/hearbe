@@ -3,6 +3,20 @@
 ## 개요
 사용자가 검색 결과에서 상품을 선택하면, 해당 상품 페이지로 이동 후 HTML 파싱 + OCR로 상품 정보를 추출하여 음성으로 안내하는 흐름.
 
+## 핵심 진입 파일
+
+- 선택 처리: `services/llm/planner/selection/selection.py`
+- 결과 처리: `api/ws/handlers/mcp_handler.py`
+
+### import 맵 (프로젝트 내부)
+
+`services/llm/planner/selection/selection.py`
+- `core/interfaces.py`
+- `core/korean_numbers.py`
+- `services/llm/planner/selection/selection_extract.py`
+- `services/llm/planner/selection/selection_intent.py`
+- `services/llm/sites/site_manager.py`
+
 ## Flow 다이어그램
 
 ```
@@ -17,12 +31,12 @@
 │   │   └─ resolve_reference() → "첫 번째" → 인덱스 1로 변환
 │   │
 │   ├─ [2-2] services/llm/planner/service.py → generate_commands()
-│   │   └─ services/llm/generators/command_generator.py
-│   │       └─ services/llm/rules/select.py → SearchSelectRule 매칭
-│   │           └─ services/llm/planner/selection/selection.py
-│   │               ├─ selection_intent.py → 선택 의도 확인
-│   │               ├─ selection_extract.py → 인덱스 추출
-│   │               └─ site_extractors/coupang.py → 사이트별 선택기
+│   │   ├─ services/llm/planner/selection/selection.py → select_from_results()
+│   │   │   ├─ selection_intent.py → 선택 의도 확인
+│   │   │   ├─ selection_extract.py → 인덱스 추출
+│   │   │   └─ site_extractors/* → 사이트별 선택기
+│   │   └─ (선택 실패 시) services/llm/generators/command_generator.py
+│   │       └─ services/llm/rules/select.py → SearchSelectRule (텍스트 선택)
 │   │
 │   └─ [2-3] MCPCommand(tool="click", args={selector: "상품 링크"})
 │
@@ -64,8 +78,8 @@
 
 | 단계 | 파일 | 역할 |
 |------|------|------|
-| 선택 규칙 | `services/llm/rules/select.py` | 상품 선택 명령 생성 |
-| 선택 처리 | `services/llm/planner/selection/selection.py` | 선택 로직 오케스트레이션 |
+| 선택 규칙 | `services/llm/rules/select.py` | 텍스트 기반 선택 |
+| 선택 처리 | `services/llm/planner/selection/selection.py` | 검색 결과 기반 선택 |
 | 인덱스 추출 | `services/llm/planner/selection/selection_extract.py` | "첫 번째" → 1 변환 |
 | 사이트 추출기 | `services/llm/planner/selection/site_extractors/coupang.py` | 쿠팡 상품 선택기 |
 | HTML 파싱 | `services/summarizer/html_parser.py` | 상품 HTML → 구조화 |

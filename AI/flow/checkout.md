@@ -3,6 +3,24 @@
 ## 개요
 사용자가 결제를 요청하면 CheckoutRule이 페이지 타입에 따라 적절한 결제 버튼 클릭 명령을 생성. FlowEngine은 별도의 다단계 워크플로우를 관리하며, 결제 키패드는 OCR 기반으로 처리.
 
+## 핵심 진입 파일
+
+- 결제 명령 규칙: `services/llm/rules/checkout.py`
+- 키패드 처리: `api/ws/handlers/payment_keypad.py`
+
+### import 맵 (프로젝트 내부)
+
+`services/llm/rules/checkout.py`
+- `services/llm/context/context_rules.py`
+- `services/llm/rules/__init__.py`
+- `services/llm/sites/site_manager.py`
+
+`api/ws/handlers/payment_keypad.py`
+- `core/interfaces.py`
+- `services/llm/sites/site_manager.py`
+- `services/ocr/payment/keypad_mapper.py`
+- `api/ws/presenter/pages/checkout.py`
+
 ## 핵심 포인트
 - CheckoutRule은 FlowEngine을 직접 호출하지 않음 → click + wait 명령만 생성
 - FlowEngine은 LLMPlanner가 `requires_flow=true`를 반환할 때 LLMPipelineHandler에서 시작
@@ -58,14 +76,13 @@
 ├─ [2] api/ws/handlers/payment_keypad.py → PaymentKeypadManager
 │   └─ 사용자 음성 비밀번호 수신 ("1234")
 │
-├─ [3] services/ocr/payment/ → 키패드 OCR 파이프라인
-│   ├─ payment_ocr.py → 키패드 이미지 인식
-│   ├─ digit_extractor.py → 숫자(0~9) 위치 추출
-│   ├─ digit_to_dom_mapper.py → 숫자 위치 → DOM 좌표 매핑
-│   └─ keypad_mapper.py → 입력 숫자 → 클릭할 좌표 반환
+├─ [3] services/ocr/payment/keypad_mapper.py
+│   ├─ korean_ocr.process_image() → 숫자 인식
+│   ├─ digit_extractor.py → 숫자 추출
+│   └─ digit_to_dom_mapper.py → 숫자 → DOM key 매핑
 │
 └─ [4] 각 숫자별 클릭 명령 생성
-    └─ click(x, y) × N회 → 클라이언트에서 순차 실행
+    └─ click_element(selector, frame_selector?) × N회 → 클라이언트에서 순차 실행
 ```
 
 ---
@@ -78,9 +95,8 @@
 | 명령 빌더 | `services/llm/context/context_rules.py` | GeneratedCommand 데이터클래스 |
 | 사이트 매니저 | `services/llm/sites/site_manager.py` | get_page_type(), get_selector() |
 | **결제 키패드** | `api/ws/handlers/payment_keypad.py` | 키패드 OCR 관리 |
-| 키패드 OCR | `services/ocr/payment/payment_ocr.py` | 키패드 이미지 인식 |
+| 키패드 OCR | `services/ocr/payment/keypad_mapper.py` | 키패드 이미지 인식 |
 | 숫자 추출 | `services/ocr/payment/digit_extractor.py` | 키패드 숫자 위치 추출 |
 | DOM 매핑 | `services/ocr/payment/digit_to_dom_mapper.py` | 숫자 → DOM 좌표 |
-| 키패드 매퍼 | `services/ocr/payment/keypad_mapper.py` | 키패드 매핑 |
 | 플로우 엔진 | `services/flow/service.py` | 다단계 플로우 관리 |
-| 플로우 설정 | `config/flows/coupang/` | 사이트별 플로우 정의 |
+| 플로우 정의 | `services/flow/service.py` | 하드코딩 플로우 정의 |

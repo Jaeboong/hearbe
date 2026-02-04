@@ -6,6 +6,7 @@ MCP result handler: HTML/OCR summary -> TTS
 import asyncio
 import json
 import logging
+import time
 from typing import Dict, Any, Optional, List
 
 from core.event_bus import EventType, publish
@@ -71,6 +72,7 @@ class MCPHandler:
             products = result.get("products")
         cart_items = None
         cart_summary = None
+        order_list = None
 
         page_url = None
         if isinstance(page_data, dict):
@@ -193,10 +195,16 @@ class MCPHandler:
                     self._session.set_context(session_id, "detail_images", detail_images)
                 cart_items = result.get("cart_items")
                 cart_summary = result.get("cart_summary") or {}
+                order_list = result.get("order_list")
+                if order_list is None:
+                    order_list = result.get("orders")
                 if cart_items is not None:
                     self._session.set_context(session_id, "cart_items", cart_items)
                     self._session.set_context(session_id, "cart_summary", cart_summary)
                     self._save_cart_to_file(cart_items, cart_summary, session_id)
+                if order_list is not None:
+                    self._session.set_context(session_id, "order_list", order_list)
+                    self._save_order_list_to_file(order_list, session_id)
             previous_url = session.current_url
             if page_url:
                 if previous_url and previous_url != page_url:
@@ -209,9 +217,36 @@ class MCPHandler:
                         page_url
                     )
             if cart_items is not None:
-                if not suppress_outputs:
+                suppress_cart_tts = False
+                if handled and tool_name == "extract_cart":
+                    suppress_cart_tts = True
+                if session and self._session:
+                    until = self._session.get_context(session_id, "tts_suppress_until", 0)
+                    if until and time.time() < float(until):
+                        suppress_cart_tts = True
+                if not suppress_outputs and not suppress_cart_tts:
                     tts_text = self._tts.build_cart_summary(cart_items, cart_summary or {})
                     await self._sender.send_tts_response(session_id, tts_text)
+                return
+            if order_list is not None:
+                if not suppress_outputs:
+                    prompt_pending = False
+                    if self._session:
+                        prompt_pending = bool(
+                            self._session.get_context(session_id, "order_list_prompt_pending", False)
+                        )
+                    if not prompt_pending and self._session:
+                        self._session.set_context(session_id, "order_list_prompt_pending", True)
+                    if not prompt_pending:
+                        previous_url = None
+                        if self._session:
+                            previous_url = self._session.get_context(session_id, "previous_url")
+                        prev_type = get_page_type(previous_url) if previous_url else None
+                        if previous_url and page_url and previous_url != page_url and prev_type != "orderlist":
+                            tts_text = "주문 목록 페이지로 이동이 완료되었습니다. 주문 목록을 읽어드릴까요?"
+                        else:
+                            tts_text = "주문 목록을 읽어드릴까요?"
+                        await self._sender.send_tts_response(session_id, tts_text)
                 return
 
             if products:
@@ -409,6 +444,18 @@ class MCPHandler:
             session_id=session_id,
             category="cart",
             filename_prefix="cart"
+        )
+
+    def _save_order_list_to_file(self, orders: List[Dict[str, Any]], session_id: str):
+        payload = {
+            "orders": orders or [],
+            "count": len(orders or []),
+        }
+        self._file_manager.save_json(
+            data=payload,
+            session_id=session_id,
+            category="order_list",
+            filename_prefix="order_list"
         )
 
     def cleanup_session(self, session_id: str):

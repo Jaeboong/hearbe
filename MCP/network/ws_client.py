@@ -296,7 +296,7 @@ class WSClient:
             return
         
         logger.info(f"Received {len(commands)} tool call(s)")
-        
+
         for i, cmd in enumerate(commands):
             tool_name = cmd.get("tool_name")
             arguments = cmd.get("arguments", {})

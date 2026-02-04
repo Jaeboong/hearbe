@@ -7,6 +7,7 @@ Takes a keypad image, runs OCR, and returns digit-to-key mapping.
 
 import os
 import tempfile
+import time
 import threading
 from typing import Dict, List, Optional
 
@@ -16,12 +17,26 @@ from services.ocr.payment.digit_to_dom_mapper import create_digit_to_key_mapping
 
 _OCR_LOCK = threading.Lock()
 _OCR_INSTANCE = None
+_OCR_INSTANCE_READY = False
 
 
 def _get_ocr_instance(device: str):
     global _OCR_INSTANCE
+    global _OCR_INSTANCE_READY
     if _OCR_INSTANCE is None:
+        start = time.time()
         _OCR_INSTANCE = korean_ocr.create_ocr_instance(device=device)
+        _OCR_INSTANCE_READY = True
+        duration = time.time() - start
+        try:
+            import logging
+            logging.getLogger(__name__).info(
+                "Keypad OCR instance initialized: device=%s duration=%.2fs",
+                device,
+                duration,
+            )
+        except Exception:
+            pass
     return _OCR_INSTANCE
 
 
@@ -53,6 +68,7 @@ def map_keypad_image(
             f.write(image_bytes)
 
         with _OCR_LOCK:
+            start = time.time()
             ocr = _get_ocr_instance(device)
             ocr_result = korean_ocr.process_image(
                 image_path,
@@ -60,6 +76,16 @@ def map_keypad_image(
                 save_vis=False,
                 ocr_instance=ocr,
             )
+            duration = time.time() - start
+            try:
+                import logging
+                logging.getLogger(__name__).info(
+                    "Keypad OCR process completed: device=%s duration=%.2fs",
+                    device,
+                    duration,
+                )
+            except Exception:
+                pass
 
     digits = extract_digits_from_ocr_result(ocr_result)
     mapping = create_digit_to_key_mapping(digits, dom_keys)
@@ -68,3 +94,7 @@ def map_keypad_image(
         "dom_keys": dom_keys,
         "digit_to_key_mapping": mapping,
     }
+
+
+def is_ocr_instance_ready() -> bool:
+    return _OCR_INSTANCE_READY
