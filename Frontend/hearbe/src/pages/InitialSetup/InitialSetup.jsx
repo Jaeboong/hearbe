@@ -10,13 +10,7 @@ const STEPS = {
 };
 
 export default function InitialSetup({ onComplete }) {
-    const [currentStep, setCurrentStep] = useState(() => {
-        const setupCompleted = localStorage.getItem('hearbe_mcp_setup_completed');
-        if (setupCompleted === 'true') {
-            return STEPS.COMPLETED;
-        }
-        return STEPS.MCP_DOWNLOAD;
-    });
+    const [currentStep, setCurrentStep] = useState(STEPS.MCP_DOWNLOAD);
 
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
 
@@ -107,7 +101,7 @@ export default function InitialSetup({ onComplete }) {
                     </div>
                 </div>
             </div>
-        ); 
+        );
     }
 
     // --- 단계 3: 스피커 테스트 팝업 ---

@@ -9,15 +9,15 @@ import introAudio2 from '../../assets/Intro/intro2.wav';
 import introAudio3 from '../../assets/Intro/intro3.wav';
 
 const STEPS = [
-    { title: "목소리만으로 완성하는 새로운 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1 },
-    { title: "보이지 않아도, 스스로 선택하는 쇼핑", desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.", audioSrc: introAudio2 },
-    { title: "검색부터 결제까지, HearBe와 함께 시작해보세요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3 },
+    { title: "목소리만으로 완성하는 새로운 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1, duration: 5000 },
+    { title: "보이지 않아도, 스스로 선택하는 쇼핑", desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.", audioSrc: introAudio2, duration: 5000 },
+    { title: "검색부터 결제까지, HearBe와 함께 시작해보세요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3, duration: 5000 },
 ];
 
 export default function Intro() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [isReady, setIsReady] = useState(false); // 마운트 후 잠시 대기
+    const [hasStarted, setHasStarted] = useState(false); // 시작 화면 제어
     const navigate = useNavigate();
 
     // 오디오와 타이머 객체 관리 (중복 실행 방지)
@@ -31,15 +31,27 @@ export default function Intro() {
         setTimeout(() => navigate('/welcome'), 850);
     };
 
-    // 1. 초기 로딩 딜레이 (급발진 방지)
-    useEffect(() => {
-        const t = setTimeout(() => setIsReady(true), 100);
-        return () => clearTimeout(t);
-    }, []);
+    const handleStart = () => {
+        setHasStarted(true);
+    };
 
-    // 2. 스텝 변경 및 오디오 재생 로직
+    // 스페이스바, 탭키로 시작 (시작 화면에서만)
     useEffect(() => {
-        if (!isReady || isTransitioning) return;
+        if (hasStarted) return;
+
+        const handleKeyDown = (e) => {
+            if (e.code === 'Space' || e.key === ' ' || e.code === 'Tab' || e.key === 'Tab') {
+                e.preventDefault();
+                handleStart();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [hasStarted]);
+
+    // 스텝 변경 및 오디오 재생 로직
+    useEffect(() => {
+        if (!hasStarted || isTransitioning) return;
 
         // Strict Mode 중복 실행 방지
         if (timerRef.current) {
@@ -67,11 +79,11 @@ export default function Intro() {
             });
         }
 
-        // 페이지 4초 유지 후 다음으로 이동
+        // 각 페이지의 duration만큼 유지 후 다음으로 이동
         timerRef.current = setTimeout(() => {
             timerRef.current = null;
             handleNext();
-        }, 4000);
+        }, STEPS[currentStep].duration);
 
         return () => {
             // cleanup
@@ -91,7 +103,34 @@ export default function Intro() {
                 isMountedRef.current = true;
             }, 0);
         };
-    }, [currentStep, isReady, isTransitioning]);
+    }, [currentStep, hasStarted, isTransitioning]);
+
+    // 시작 화면
+    if (!hasStarted) {
+        return (
+            <div className="intro-container" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                cursor: 'pointer'
+            }} onClick={handleStart}>
+                <div style={{ textAlign: 'center', color: 'white' }}>
+                    <h1 style={{
+                        fontSize: '4rem',
+                        fontWeight: 'bold',
+                        marginBottom: '2rem',
+                        animation: 'pulse 2s infinite'
+                    }}>
+                        HearBe 서비스 시작하기
+                    </h1>
+                    <p style={{ fontSize: '1.5rem', opacity: 0.9 }}>
+                        스페이스바 또는 화면을 클릭하여 시작하세요
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="intro-container">

@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, Download, ArrowRight, Share2, Layout, Zap } from 'lucide-react';
+import { Volume2, Download, ArrowRight, Share2, Layout, Zap, Settings } from 'lucide-react';
 import '../App.css';
 import '../index.css'
 import logoC from '../assets/logoC.png';
@@ -72,9 +72,9 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             <button
               onClick={onOpenSetup}
               className="px-10 py-5 rounded-full font-extrabold text-2xl text-white flex items-center gap-3 shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1"
-              style={{ background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)' }}
+              style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}
             >
-              <Download size={24} /> 설정 도우미
+              <Settings size={28} /> 설정 도우미
             </button>
           </div>
         </div>
@@ -98,10 +98,10 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             mode={{
               id: 'audio',
               label: 'TYPE A',
-              title: <>보이스 & 큰글씨<br />통합 쇼핑</>,
-              desc: <>저시력자와 시각장애인을 위한<br />음성 안내 및 큰 글씨 모드</>,
-              tags: ['음성 안내', '큰 글씨', '통합 지원'],
-              bgColor: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+              title: '음성·큰글씨 쇼핑',
+              desc: '듣고 말하는 가장 쉬운 쇼핑',
+              tags: ['#음성안내', '#큰글자'],
+              bgColor: 'linear-gradient(135deg, #6D28D9 0%, #4C1D95 100%)', // Deep Violet
               textColor: '#FFFFFF',
               icon: <Volume2 size={32} />,
               iconLarge: <Zap size={300} />
@@ -112,10 +112,10 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             mode={{
               id: 'common',
               label: 'TYPE C',
-              title: <>표준<br />일반 쇼핑</>,
-              desc: <>시각 정보를 활용한<br />우리에게 익숙한 표준 모드</>,
-              tags: ['표준 UI', '시각·음성 병행'],
-              bgColor: 'linear-gradient(135deg, #818CF8 0%, #6366F1 100%)',
+              title: '일반 쇼핑',
+              desc: '우리에게 익숙한 표준 화면',
+              tags: ['#표준화면', '#빠른탐색'],
+              bgColor: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', // Royal Blue
               textColor: '#FFFFFF',
               icon: <Layout size={32} />,
               iconLarge: <Layout size={300} />
@@ -126,10 +126,10 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             mode={{
               id: 'sharing',
               label: 'TYPE S',
-              title: <>원격 지원<br />공유 쇼핑</>,
-              desc: <>함께 실시간 화면을<br />보며 즐기는 소통 쇼핑</>,
-              tags: ['화면 공유', '라이브'],
-              bgColor: 'linear-gradient(135deg, #F472B6 0%, #EC4899 100%)',
+              title: '함께 쇼핑',
+              desc: '화면을 공유하며 소통해요',
+              tags: ['#화면공유', '#실시간'],
+              bgColor: 'linear-gradient(135deg, #C084FC 0%, #A855F7 100%)', // Electric Lavender
               textColor: '#FFFFFF',
               icon: <Share2 size={32} />,
               iconLarge: <Share2 size={300} />

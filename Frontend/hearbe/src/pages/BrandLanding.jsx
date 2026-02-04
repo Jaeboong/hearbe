@@ -63,8 +63,6 @@ const BrandLanding = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const SECTION_DURATION = 6000;
 
-    const [hasStarted, setHasStarted] = useState(false);
-
     // Strict Mode 방지용
     const timerRef = useRef(null);
     const audioRef = useRef(null);
@@ -74,16 +72,12 @@ const BrandLanding = () => {
         navigate('/main');
     };
 
-    const handleStart = () => {
-        setHasStarted(true);
-    };
-
     const totalSteps = 3;
 
     const GUIDE_STEPS = [
         {
             id: 'speciality',
-            audioSrc: guideAudio2,
+            audioSrc: guideAudio1,
             duration: 8000,
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 shrink-0">
@@ -128,8 +122,8 @@ const BrandLanding = () => {
         },
         {
             id: 'how-to',
-            audioSrc: guideAudio1,
-            duration: 14000,
+            audioSrc: guideAudio2,
+            duration: 17000,
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 z-10 shrink-0">
                     <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
@@ -180,8 +174,8 @@ const BrandLanding = () => {
                 <section className="min-w-[100vw] h-full flex flex-col justify-center items-center relative px-6 z-10 bg-gradient-to-br from-gray-900 to-black text-white shrink-0">
                     <div className="text-center">
                         <h2 className="text-6xl md:text-8xl font-black mb-12 tracking-tight">
-                            Ready to<br />
-                            <span className="text-purple-400">HearBe?</span>
+                            준비되셨나요?<br />
+                            <span className="text-purple-400">HearBe 시작</span>
                         </h2>
                         <button
                             onClick={goToMain}
@@ -198,23 +192,10 @@ const BrandLanding = () => {
         }
     ];
 
-    // Spacebar로 Click to Start (첫 화면)
-    useEffect(() => {
-        if (hasStarted) return;
 
-        const handleKeyDown = (e) => {
-            if (e.code === 'Space' || e.key === ' ') {
-                e.preventDefault();
-                handleStart();
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [hasStarted]);
 
     // Audio와 화면 전환 동기화 로직
     useEffect(() => {
-        if (!hasStarted) return;
 
         // Strict Mode 중복 실행 방지
         if (timerRef.current) {
@@ -233,11 +214,14 @@ const BrandLanding = () => {
             }
         };
 
-        // 타이머 설정 (각 단계별 duration 적용)
-        timerRef.current = setTimeout(() => {
-            timerRef.current = null;
-            handleMove();
-        }, stepData.duration);
+        // 마지막 단계가 아니면 타이머 설정 (각 단계별 duration 적용)
+        // 마지막 단계는 자동 넘김 없이 사용자가 스페이스바로 넘김
+        if (currentStep < totalSteps - 1) {
+            timerRef.current = setTimeout(() => {
+                timerRef.current = null;
+                handleMove();
+            }, stepData.duration);
+        }
 
         // 오디오 재생
         if (stepData.audioSrc) {
@@ -264,14 +248,21 @@ const BrandLanding = () => {
                 isMountedRef.current = true;
             }, 0);
         };
-    }, [currentStep, navigate, hasStarted]);
+    }, [currentStep, navigate]);
 
-    // Spacebar로 쇼핑 시작하기 (마지막 단계에서만)
+    // Spacebar로 다음 단계로 이동 (모든 단계에서)
     useEffect(() => {
+
         const handleKeyDown = (e) => {
-            if (currentStep === totalSteps - 1 && (e.code === 'Space' || e.key === ' ')) {
+            if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();
-                goToMain();
+
+                // 마지막 단계면 메인으로, 아니면 다음 단계로
+                if (currentStep === totalSteps - 1) {
+                    goToMain();
+                } else {
+                    setCurrentStep(prev => prev + 1);
+                }
             }
         };
 
@@ -288,15 +279,7 @@ const BrandLanding = () => {
     };
 
 
-    if (!hasStarted) {
-        return (
-            <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center cursor-pointer" onClick={handleStart}>
-                <h1 className="text-white text-6xl font-black mb-8 animate-pulse">Click to Start</h1>
-                <p className="text-gray-400 text-xl">화면을 클릭하여 가이드를 시작하세요</p>
-                <div className="mt-12 w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
-    }
+
 
     return (
         <div className="relative w-full h-screen overflow-hidden bg-white selection:bg-purple-200">
