@@ -7,7 +7,9 @@ import base64
 import logging
 import os
 import time
+from urllib.parse import urlparse
 
+from core.interfaces import MCPCommand
 from services.llm.sites.site_manager import get_current_site, get_page_type
 from services.llm.generators.tts_generator import TTSGenerator
 
@@ -228,6 +230,25 @@ class HandlerManager:
         # On login page entry, trigger autofill probe (no user text required).
         if get_page_type(url) == "login":
             await self._login_autofill.handle_page_update(session_id, url, previous_url)
+
+        # On main page entry for our backend site, cache access token via localStorage.
+        try:
+            parsed = urlparse(url)
+            host = (parsed.netloc or "").lower()
+            path = parsed.path or ""
+            if host == "i14d108.p.ssafy.io" and path.startswith("/main") and previous_url != url:
+                await self._sender.send_tool_calls(
+                    session_id,
+                    [
+                        MCPCommand(
+                            tool_name="get_user_session",
+                            arguments={},
+                            description="cache access token from localStorage",
+                        )
+                    ],
+                )
+        except Exception:
+            pass
 
     async def handle_invalid_message(self, session_id: str, error: str):
         await self._sender.send_error(session_id, error)
