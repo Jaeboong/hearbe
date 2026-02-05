@@ -20,6 +20,7 @@ from .dom_fallback import DomFallbackManager
 from .payment_keypad import PaymentKeypadManager
 from .login_autofill import LoginAutofillManager
 from .login_status import LoginStatusManager
+from .login_challenge import LoginChallengeManager
 from .command_queue import CommandQueueManager
 from .page_extract_manager import PageExtractManager
 from ..feedback.action_feedback import ActionFeedbackManager
@@ -27,6 +28,7 @@ from ..feedback.login_guard import LoginGuard
 from ..feedback.login_feedback import LoginFeedbackManager
 from ..feedback.order_detail_handler import OrderDetailHandler
 from ..feedback.tool_failure_notifier import ToolFailureNotifier
+from ..auth.token_manager import TokenManager
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +49,7 @@ class HandlerManager:
         self._sender = sender
         self._session = session_manager
         self._tts = TTSGenerator()
+        self._token_manager = TokenManager(sender, session_manager)
 
         self._command_queue = CommandQueueManager(sender)
         self._action_feedback = ActionFeedbackManager(sender)
@@ -73,6 +76,10 @@ class HandlerManager:
             sender=sender,
             session_manager=session_manager,
         )
+        self._login_challenge = LoginChallengeManager(
+            sender=sender,
+            session_manager=session_manager,
+        )
         self._login_autofill = LoginAutofillManager(
             sender=sender,
             session_manager=session_manager,
@@ -81,6 +88,7 @@ class HandlerManager:
         self._order_detail = OrderDetailHandler(
             sender=sender,
             session_manager=session_manager,
+            token_manager=self._token_manager,
         )
         self._page_extract = PageExtractManager(
             sender=sender,
@@ -98,6 +106,7 @@ class HandlerManager:
             login_feedback=self._login_feedback,
             payment_keypad=self._payment_keypad,
             login_status=self._login_status,
+            login_challenge=self._login_challenge,
             login_autofill=self._login_autofill,
             order_detail_handler=self._order_detail,
             page_extract=self._page_extract,
@@ -136,8 +145,10 @@ class HandlerManager:
         self._mcp_handler.cleanup_session(session_id)
         self._payment_keypad.cleanup_session(session_id)
         self._login_status.cleanup_session(session_id)
+        self._login_challenge.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
+        self._token_manager.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
         audio_data = base64.b64decode(data.get("audio", ""))
@@ -163,8 +174,10 @@ class HandlerManager:
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
         self._login_status.cleanup_session(session_id)
+        self._login_challenge.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
+        self._token_manager.cleanup_session(session_id)
 
     async def handle_interrupt(self, session_id: str):
         await self._audio_handler.clear_audio(session_id)
@@ -186,6 +199,7 @@ class HandlerManager:
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
+        self._login_challenge.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
@@ -193,6 +207,32 @@ class HandlerManager:
     async def handle_mcp_result(self, session_id: str, data: dict):
         tool_name = data.get("tool_name")
         arguments = data.get("arguments") or {}
+        if tool_name == "get_user_session" and self._session:
+            result = data.get("result") or {}
+            if isinstance(result, dict):
+                access_token, refresh_token = await self._token_manager.handle_user_session(
+                    session_id,
+                    data,
+                )
+                user_id = result.get("user_id") or result.get("userId") or ""
+                if user_id:
+                    self._session.set_context(session_id, "user_id", str(user_id))
+                user_type = result.get("user_type") or result.get("userType") or ""
+                if user_type:
+                    self._session.set_context(session_id, "user_type", str(user_type))
+                logger.info(
+                    "get_user_session meta: session=%s user_type=%s user_id=%s",
+                    session_id,
+                    user_type or "missing",
+                    str(user_id) if user_id else "missing",
+                )
+                self._order_detail.handle_token_update(session_id, access_token, refresh_token)
+            else:
+                logger.warning(
+                    "get_user_session result is not a dict: session=%s type=%s",
+                    session_id,
+                    type(result),
+                )
         await self._command_queue.handle_mcp_result(session_id, tool_name, arguments)
         handled = await self._payment_keypad.handle_mcp_result(session_id, data)
         if handled:
@@ -227,6 +267,7 @@ class HandlerManager:
         if site:
             session.current_site = site.name
         await self._payment_keypad.handle_page_update(session_id, url)
+        await self._login_challenge.handle_page_update(session_id, url)
         await self._order_detail.handle_page_update(session_id, url)
         await self._page_extract.handle_page_update(session_id, url, page_id)
 

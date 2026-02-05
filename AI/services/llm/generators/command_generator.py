@@ -157,6 +157,8 @@ class CommandGenerator:
             page_selectors = current_site.get_page_selectors(page_type)
             if page_selectors:
                 available_selectors = page_selectors.selectors
+        if current_url and "login.coupang.com/login/pincode" in current_url:
+            available_selectors = _filter_pincode_selectors(available_selectors)
         
         # LLM에게 위임
         try:
@@ -226,3 +228,17 @@ class CommandGenerator:
             result.response_text = f"재시도: {result.response_text}"
         
         return result
+
+
+def _filter_pincode_selectors(selectors: dict) -> dict:
+    if not selectors:
+        return selectors
+    allow_keys = {
+        "pincode_method_sms",
+        "pincode_method_email",
+        "pincode_method_submit",
+        "pincode_input",
+        "pincode_submit",
+    }
+    filtered = {k: v for k, v in selectors.items() if k in allow_keys}
+    return filtered or selectors
