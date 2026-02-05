@@ -54,7 +54,10 @@ REM ---------------------------------------------------------------------------
 echo [INFO] Creating ZIP archive...
 IF EXIST "dist\MCPDesktop.zip" del /Q "dist\MCPDesktop.zip"
 REM Using tar (built-in Windows 10+) to avoid PowerShell execution policy issues
-tar -a -c -f "dist\MCPDesktop.zip" -C "dist" "MCPDesktop"
+REM pushd/popd ensures correct relative paths without ./ prefix
+pushd "dist\MCPDesktop"
+tar -a -c -f "..\MCPDesktop.zip" MCPDesktop.exe _internal
+popd
 
 IF %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Failed to create ZIP archive.
