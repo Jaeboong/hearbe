@@ -211,6 +211,7 @@ class HandlerManager:
     async def handle_page_update(self, session_id: str, data: dict):
         url = data.get("url") or data.get("page_url") or data.get("current_url")
         page_id = data.get("page_id")
+        logger.info("handle_page_update: session=%s url=%s page_id=%s", session_id, url, page_id)
         if not url:
             return
         session = self._session.get_session(session_id) if self._session else None
@@ -221,6 +222,8 @@ class HandlerManager:
             self._session.set_context(session_id, "previous_url", previous_url)
         session.current_url = url
         site = get_current_site(url)
+        page_type = get_page_type(url)
+        logger.info("handle_page_update: site=%s page_type=%s", site.name if site else None, page_type)
         if site:
             session.current_site = site.name
         await self._payment_keypad.handle_page_update(session_id, url)
@@ -228,8 +231,11 @@ class HandlerManager:
         await self._page_extract.handle_page_update(session_id, url, page_id)
 
         # On login page entry, trigger autofill probe (no user text required).
-        if get_page_type(url) == "login":
+        if page_type == "login":
             await self._login_autofill.handle_page_update(session_id, url, previous_url)
+        # On main page entry, check if user is logged in and redirect to appropriate mall.
+        elif page_type == "main":
+            await self._login_autofill.handle_main_page_update(session_id, url)
 
         # On main page entry for our backend site, cache access token via localStorage.
         try:

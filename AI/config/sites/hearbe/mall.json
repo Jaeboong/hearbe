@@ -1,0 +1,6 @@
+{
+  "page_type": "mall",
+  "url_pattern": "/[ABC]/mall",
+  "description": "Hearbe mall page",
+  "selectors": {}
+}

@@ -26,6 +26,8 @@ CTX_PASS_FILLED = "login_autofill_pass_filled"
 CTX_PENDING = "login_autofill_pending"
 CTX_ATTEMPT = "login_autofill_attempt"
 CTX_LAST_URL = "login_autofill_last_url"
+CTX_SESSION_CHECK_PENDING = "login_autofill_session_check_pending"
+CTX_SESSION_CHECK_URL = "login_autofill_session_check_url"
 
 MAX_ATTEMPTS = 2
 FOCUS_WAIT_MS = 300
@@ -59,19 +61,73 @@ class LoginAutofillManager:
         return await self._start_probe(session_id, current_url, source="text")
 
     async def handle_page_update(self, session_id: str, url: str, previous_url: Optional[str] = None) -> bool:
-        if get_page_type(url) != "login":
+        page_type = get_page_type(url)
+        logger.info(
+            "login_autofill handle_page_update: session=%s url=%s page_type=%s previous_url=%s",
+            session_id, url, page_type, previous_url,
+        )
+        if page_type != "login":
+            logger.info("login_autofill skip: page_type is not login")
             return False
         if previous_url and get_page_type(previous_url) == "login":
+            logger.info("login_autofill skip: previous_url was also login")
             return False
         if self._session.get_context(session_id, CTX_PENDING):
+            logger.info("login_autofill skip: CTX_PENDING is True")
+            return True
+        if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
+            logger.info("login_autofill skip: CTX_SESSION_CHECK_PENDING is True")
             return True
         last_url = self._session.get_context(session_id, CTX_LAST_URL)
         if last_url == url:
+            logger.info("login_autofill skip: same as last_url")
             return False
-        return await self._start_probe(session_id, url, source="page")
+
+        # Check existing session before autofill probe
+        return await self._start_session_check(session_id, url)
+
+    async def handle_main_page_update(self, session_id: str, url: str) -> bool:
+        """Handle main page entry - redirect logged-in users to appropriate mall."""
+        logger.info(
+            "login_autofill handle_main_page_update: session=%s url=%s",
+            session_id, url,
+        )
+        if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
+            logger.info("login_autofill main skip: CTX_SESSION_CHECK_PENDING is True")
+            return True
+
+        # Check existing session and redirect if logged in
+        return await self._start_session_check(session_id, url)
+
+    async def _start_session_check(self, session_id: str, url: str) -> bool:
+        """Check if user already has a valid session in localStorage."""
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, True)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_URL, url)
+
+        logger.info(
+            "login session check start: session=%s url=%s",
+            session_id,
+            url,
+        )
+        await self._sender.send_tool_calls(
+            session_id,
+            [
+                MCPCommand(
+                    tool_name="get_user_session",
+                    arguments={},
+                    description="check existing user session",
+                )
+            ],
+        )
+        return True
 
     async def handle_mcp_result(self, session_id: str, data: Dict[str, Any]) -> bool:
         tool_name = data.get("tool_name")
+
+        # Handle session check result
+        if tool_name == "get_user_session":
+            return await self._handle_session_check_result(session_id, data)
+
         if tool_name != "get_attribute_list":
             return False
 
@@ -97,6 +153,63 @@ class LoginAutofillManager:
 
         return False
 
+    async def _handle_session_check_result(self, session_id: str, data: Dict[str, Any]) -> bool:
+        """Handle get_user_session result and redirect if logged in."""
+        if not self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
+            return False
+
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, None)
+        result = data.get("result") or {}
+        logged_in = result.get("logged_in", False)
+        user_type = result.get("user_type")
+        check_url = self._session.get_context(session_id, CTX_SESSION_CHECK_URL) or ""
+
+        if logged_in and user_type:
+            # Redirect based on userType
+            redirect_url = self._get_redirect_url(user_type, check_url)
+            logger.info(
+                "login session found: session=%s user_type=%s redirect=%s",
+                session_id,
+                user_type,
+                redirect_url,
+            )
+            await self._sender.send_tool_calls(
+                session_id,
+                [
+                    MCPCommand(
+                        tool_name="navigate_to_url",
+                        arguments={"url": redirect_url},
+                        description=f"redirect to {user_type} mall",
+                    )
+                ],
+            )
+            await self._sender.send_tts_response(
+                session_id,
+                "이미 로그인되어 있습니다. 쇼핑몰 페이지로 이동합니다.",
+            )
+            return True
+
+        # No session found, proceed with autofill probe
+        logger.info(
+            "login session not found: session=%s, starting autofill probe",
+            session_id,
+        )
+        return await self._start_probe(session_id, check_url, source="page")
+
+    def _get_redirect_url(self, user_type: str, current_url: str) -> str:
+        """Get redirect URL based on userType."""
+        # Extract base URL from current login URL
+        # e.g., https://i14d108.p.ssafy.io/A/login -> https://i14d108.p.ssafy.io
+        base_match = re.match(r"(https?://[^/]+)", current_url)
+        base_url = base_match.group(1) if base_match else "https://i14d108.p.ssafy.io"
+
+        if user_type == "BLIND":
+            return f"{base_url}/A/mall"
+        elif user_type == "LOW_VISION":
+            return f"{base_url}/B/mall"
+        else:  # GENERAL or others
+            return f"{base_url}/C/mall"
+
     def cleanup_session(self, session_id: str):
         if not self._session:
             return
@@ -107,6 +220,8 @@ class LoginAutofillManager:
         self._session.set_context(session_id, CTX_PENDING, None)
         self._session.set_context(session_id, CTX_ATTEMPT, None)
         self._session.set_context(session_id, CTX_LAST_URL, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
 
     async def _maybe_finalize(self, session_id: str) -> bool:
         email_filled = self._session.get_context(session_id, CTX_EMAIL_FILLED)
