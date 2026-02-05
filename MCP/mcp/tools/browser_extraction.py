@@ -6,6 +6,7 @@
 
 import logging
 from typing import Any, Dict, Optional
+from urllib.parse import urljoin, urlparse
 
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
 from browser.extractors import (
@@ -18,6 +19,36 @@ from browser.fallbacks.search_fallback import build_search_fallback_result
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
+
+
+def _pick_src_from_srcset(srcset: str) -> Optional[str]:
+    """Pick the most suitable URL from a srcset attribute."""
+    if not srcset:
+        return None
+    parts = [part.strip() for part in srcset.split(",") if part.strip()]
+    if not parts:
+        return None
+    # Prefer the last candidate (typically highest resolution).
+    candidate = parts[-1]
+    return candidate.split()[0] if candidate else None
+
+
+def _normalize_image_url(raw_url: str, base_url: str) -> Optional[str]:
+    if not raw_url:
+        return None
+    url = raw_url.strip()
+    if not url:
+        return None
+    if url.startswith(("data:", "blob:", "javascript:")):
+        return None
+    if url.startswith("//"):
+        url = f"https:{url}"
+    elif url.startswith("/") and base_url:
+        url = urljoin(base_url, url)
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        return None
+    return url
 
 
 class BrowserExtractionMixin:
@@ -304,15 +335,42 @@ class BrowserExtractionMixin:
                 img_locator = context.locator(image_selector) if context_type == "frame_locator" else context.locator(image_selector)
                 count = await img_locator.count()
                 max_items = min(count, image_limit) if image_limit > 0 else count
+                base_url = getattr(context, "url", None) or page.url or ""
+                seen = set()
+                attr_candidates = [image_attribute] if image_attribute else ["src"]
+                fallback_attrs = [
+                    "src",
+                    "data-src",
+                    "data-lazy-src",
+                    "data-original",
+                    "data-zoom",
+                    "data-image-src",
+                    "srcset",
+                    "data-srcset",
+                ]
+                for attr in fallback_attrs:
+                    if attr not in attr_candidates:
+                        attr_candidates.append(attr)
                 for i in range(max_items):
                     item = img_locator.nth(i)
-                    src = await item.get_attribute(image_attribute)
+                    src = None
+                    for attr in attr_candidates:
+                        value = await item.get_attribute(attr)
+                        if not value:
+                            continue
+                        if attr in ("srcset", "data-srcset"):
+                            value = _pick_src_from_srcset(value)
+                            if not value:
+                                continue
+                        src = value
+                        break
                     if not src:
                         continue
-                    src = src.strip()
-                    if src.startswith("//"):
-                        src = f"https:{src}"
-                    images.append(src)
+                    normalized = _normalize_image_url(src, base_url)
+                    if not normalized or normalized in seen:
+                        continue
+                    seen.add(normalized)
+                    images.append(normalized)
 
             # 동적 fallback: 옵션 필드가 없거나 실패한 경우
             if fallback_dynamic:

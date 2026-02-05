@@ -84,6 +84,7 @@ class WSClient:
         event_bus.subscribe(EventType.AUDIO_READY, self._on_audio_ready)  # PTT 오디오
         event_bus.subscribe(EventType.HOTKEY_PRESSED, self._on_hotkey_pressed)
         event_bus.subscribe(EventType.PAGE_URL_UPDATED, self._on_page_url_updated)
+        event_bus.subscribe(EventType.TEXT_INPUT_READY, self._on_text_input_ready)
         event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
         logger.info("WSClient event handlers registered")
     
@@ -409,6 +410,16 @@ class WSClient:
         await self.send_message(
             MessageType.INTERRUPT,
             {"reason": "hotkey"}
+        )
+
+    async def _on_text_input_ready(self, event):
+        """Send text input to server (bypass ASR)."""
+        text = (event.data or "").strip()
+        if not text:
+            return
+        await self.send_message(
+            MessageType.USER_INPUT,
+            {"text": text}
         )
 
     async def _on_page_url_updated(self, event):

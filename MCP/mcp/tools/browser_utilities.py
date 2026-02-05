@@ -153,7 +153,7 @@ class BrowserUtilitiesMixin:
             return {"success": False, "error": "Not connected to browser"}
 
         try:
-            captcha_input = page.locator(
+            captcha_input = page.locator(''
                 "input[placeholder*='자동입력'], "
                 "input[placeholder*='보안문자'], "
                 "input[placeholder*='방지문자']"
