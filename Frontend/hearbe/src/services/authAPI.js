@@ -117,6 +117,10 @@ export const authAPI = {
             if (data.data && data.data.name) {
                 localStorage.setItem('user_name', data.data.name);
             }
+            // userType 저장 (BLIND, LOW_VISION, GENERAL)
+            if (data.data && data.data.userType) {
+                localStorage.setItem('userType', data.data.userType);
+            }
 
             return data;
         } catch (error) {
@@ -288,6 +292,7 @@ export const authAPI = {
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
             localStorage.removeItem('user_name');
+            localStorage.removeItem('userType');
             // sessionStorage 정리 (혹시 남아있을 경우)
             sessionStorage.removeItem('accessToken');
             sessionStorage.removeItem('refreshToken');
