@@ -30,6 +30,71 @@ async def extract_coupang_order_detail(page) -> Dict[str, Any]:
       const normalize = (text) => String(text || '')
         .replace(/[\s·\.\-]+/g, '')
         .replace(/[^0-9A-Za-z가-힣]/g, '');
+      const resolveUrl = (raw) => {
+        if (!raw) return '';
+        const url = String(raw).trim();
+        if (!url) return '';
+        if (url.startsWith('//')) return `https:${url}`;
+        if (url.startsWith('/')) return `https://www.coupang.com${url}`;
+        return url;
+      };
+      const buildProductUrl = (product) => {
+        if (!product) return '';
+        const direct = product.productUrl || product.product_url || '';
+        if (direct) return resolveUrl(direct);
+        const productId = product.productId || product.productID || '';
+        if (!productId) return '';
+        let url = `https://www.coupang.com/vp/products/${productId}`;
+        const itemId = product.itemId || '';
+        const vendorItemId = product.vendorItemId || '';
+        const qs = [];
+        if (itemId) qs.push(`itemId=${itemId}`);
+        if (vendorItemId) qs.push(`vendorItemId=${vendorItemId}`);
+        if (qs.length) url += `?${qs.join('&')}`;
+        return url;
+      };
+      const findDomItems = () => {
+        const items = [];
+        const seen = new Set();
+        const links = Array.from(
+          document.querySelectorAll("a[href*='/vp/products/'], a[href*='/products/']")
+        );
+        for (const link of links) {
+          const href = resolveUrl(link.getAttribute('href') || '');
+          if (!href) continue;
+          const root = link.closest('li') || link.closest('div') || link;
+          const imgEl = root.querySelector('img[alt], img[src]') || link.querySelector('img[alt], img[src]');
+          const name = (imgEl && (imgEl.getAttribute('alt') || '')) || getText(link);
+          const key = normalize(name);
+          if (!key || seen.has(key)) continue;
+          seen.add(key);
+          const imgUrl = resolveUrl(
+            (imgEl && (imgEl.getAttribute('src') || imgEl.getAttribute('data-src'))) || ''
+          );
+          const deliverEl = Array.from(root.querySelectorAll('a, button')).find((el) => /배송\s*조회/.test(getText(el)));
+          let deliverUrl = '';
+          if (deliverEl) {
+            deliverUrl = resolveUrl(
+              deliverEl.getAttribute('href')
+              || deliverEl.getAttribute('data-href')
+              || ''
+            );
+            if (!deliverUrl) {
+              const onclick = deliverEl.getAttribute('onclick') || '';
+              const match = onclick.match(/https?:\/\/[^'"\s]+/);
+              if (match) deliverUrl = match[0];
+            }
+          }
+          items.push({
+            key,
+            name,
+            product_url: href,
+            img_url: imgUrl,
+            deliver_url: deliverUrl,
+          });
+        }
+        return items;
+      };
 
       const parseNumber = (value) => {
         if (value === null || value === undefined) return null;
@@ -66,16 +131,57 @@ async def extract_coupang_order_detail(page) -> Dict[str, Any]:
           const products = group?.productList || [];
           for (const product of products) {
             if (!product) continue;
+            const builtUrl = buildProductUrl(product);
+            const imagePath = resolveUrl(product.imagePath || '');
+            const deliverUrl = resolveUrl(
+              product.deliveryTrackingUrl
+              || product.trackingUrl
+              || product.traceUrl
+              || ''
+            );
             items.push({
               product_name: product.productName || '',
               vendor_item_name: product.vendorItemName || '',
               quantity: product.quantity ?? null,
               unit_price: product.unitPrice ?? null,
               discounted_unit_price: product.discountedUnitPrice ?? null,
-              image: product.imagePath || '',
+              image: imagePath,
+              img_url: imagePath,
+              product_url: builtUrl,
+              deliver_url: deliverUrl,
               vendor_name: group?.vendor?.vendorName || '',
             });
           }
+        }
+      }
+      const domItems = findDomItems();
+      if (domItems.length) {
+        const domIndex = new Map(domItems.map((item) => [item.key, item]));
+        const used = new Set();
+        const findMatch = (key) => {
+          if (!key) return null;
+          const direct = domIndex.get(key);
+          if (direct && !used.has(direct.key)) return direct;
+          for (const candidate of domItems) {
+            if (used.has(candidate.key)) continue;
+            if (candidate.key.includes(key) || key.includes(candidate.key)) {
+              return candidate;
+            }
+          }
+          return null;
+        };
+        for (const item of items) {
+          const key = normalize(item.product_name || item.vendor_item_name || '');
+          let match = findMatch(key);
+          if (!match && domItems.length === 1) {
+            match = domItems[0];
+          }
+          if (!match) continue;
+          used.add(match.key);
+          if (!item.product_url && match.product_url) item.product_url = match.product_url;
+          if (!item.image && match.img_url) item.image = match.img_url;
+          if (!item.img_url && match.img_url) item.img_url = match.img_url;
+          if (!item.deliver_url && match.deliver_url) item.deliver_url = match.deliver_url;
         }
       }
 
