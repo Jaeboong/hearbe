@@ -36,6 +36,7 @@ class BrowserConfig:
     window_width: int = 1280
     window_height: int = 720
     extension_path: Optional[str] = None
+    home_url: Optional[str] = None
 
 
 @dataclass
@@ -212,7 +213,8 @@ class ConfigManager:
             headless=self._get_env_bool("BROWSER_HEADLESS", False),
             window_width=self._get_env_int("BROWSER_WINDOW_WIDTH", 1280),
             window_height=self._get_env_int("BROWSER_WINDOW_HEIGHT", 720),
-            extension_path=self._get_extension_path()
+            extension_path=self._get_extension_path(),
+            home_url=self._get_env("HOME_URL", "https://i14d108.p.ssafy.io/main")
         )
 
         # MCP 설정
