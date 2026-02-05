@@ -16,6 +16,60 @@
     box-shadow: 0 20px 50px rgba(139, 92, 246, 0.25);
 }
 
+/* Theme A: Purple Gradient (Default) */
+.hero-card.type-a {
+    background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+    box-shadow: 0 20px 50px rgba(147, 51, 234, 0.3);
+}
+
+/* Theme B: High Contrast (Yellow on Black) */
+.hero-card.type-b {
+    background: #171C28;
+    color: #FFF064;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    border: 2px solid #FFF064;
+}
+
+.hero-card.type-b .hero-badge {
+    background: rgba(255, 240, 100, 0.2);
+    color: #FFF064;
+    border-color: #FFF064;
+}
+
+.hero-card.type-b .hero-title,
+.hero-card.type-b .hero-subtitle {
+    color: #FFF064 !important;
+    text-shadow: none;
+}
+
+.hero-card.type-b .visual-circle {
+    background: #FFF064;
+    opacity: 0.1;
+}
+
+/* Theme C: Blue Gradient (Common) */
+.hero-card.type-c {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 20px 50px rgba(37, 99, 235, 0.3);
+}
+
+.hero-card.type-c .hero-badge {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Theme S: Pink Gradient (Sharing) */
+.hero-card.type-s {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    box-shadow: 0 20px 50px rgba(219, 39, 119, 0.3);
+}
+
+.hero-card.type-s .hero-badge {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+
 .hero-content {
     position: relative;
     z-index: 10;
@@ -217,4 +271,25 @@
 .btn-setting-helper:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(109, 40, 217, 0.35);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .mode-list {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-card {
+        padding: 2rem;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 32px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
 }
