@@ -3,6 +3,14 @@
 ## Purpose
 This guide documents how to run MCP scripted-input tests without ASR, and how to avoid the common failure modes that caused long debugging cycles.
 
+## Test Command
+```
+$env:DEBUG_SCRIPTED_INPUT="1"
+$env:DEBUG_SCRIPTED_INPUT_FILE="C:\ssafy\공통\MCP\debug\scripted_input.txt"
+$env:DEBUG_SCRIPTED_INPUT_DELAY_MS="7000"
+.\venv\Scripts\python.exe .\main.py
+```
+
 ## Quick Start (scripted input)
 1) Ensure no stray MCP processes are running:
    - `Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match "\\main.py" }`

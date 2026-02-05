@@ -44,6 +44,7 @@ class TextHandler:
         login_guard=None,
         login_feedback=None,
         payment_keypad=None,
+        login_autofill=None,
         order_detail_handler=None,
         page_extract=None,
     ):
@@ -56,6 +57,7 @@ class TextHandler:
         self._login_guard = login_guard
         self._login_feedback = login_feedback
         self._payment_keypad = payment_keypad
+        self._login_autofill = login_autofill
         self._order_detail = order_detail_handler
         self._page_extract = page_extract
         self._command_pipeline = CommandPipeline(
@@ -85,6 +87,7 @@ class TextHandler:
         self._text_router = TextRouter(
             session_manager=session_manager,
             payment_keypad=payment_keypad,
+            login_autofill=login_autofill,
             order_detail_handler=order_detail_handler,
             flow_handler=self._flow_handler,
             search_query_handler=self._search_query_handler,

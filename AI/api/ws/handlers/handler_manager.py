@@ -16,6 +16,7 @@ from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
 from .dom_fallback import DomFallbackManager
 from .payment_keypad import PaymentKeypadManager
+from .login_autofill import LoginAutofillManager
 from .page_extract_manager import PageExtractManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
@@ -58,6 +59,11 @@ class HandlerManager:
             sender=sender,
             session_manager=session_manager,
         )
+        self._login_autofill = LoginAutofillManager(
+            sender=sender,
+            session_manager=session_manager,
+            login_feedback=self._login_feedback,
+        )
         self._order_detail = OrderDetailHandler(
             sender=sender,
             session_manager=session_manager,
@@ -77,6 +83,7 @@ class HandlerManager:
             login_guard=self._login_guard,
             login_feedback=self._login_feedback,
             payment_keypad=self._payment_keypad,
+            login_autofill=self._login_autofill,
             order_detail_handler=self._order_detail,
             page_extract=self._page_extract,
         )
@@ -108,6 +115,7 @@ class HandlerManager:
         self._dom_fallback.clear_pending(session_id)
         self._mcp_handler.cleanup_session(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
@@ -133,6 +141,7 @@ class HandlerManager:
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
 
     async def handle_interrupt(self, session_id: str):
@@ -153,12 +162,16 @@ class HandlerManager:
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
 
     async def handle_mcp_result(self, session_id: str, data: dict):
         handled = await self._payment_keypad.handle_mcp_result(session_id, data)
+        if handled:
+            return
+        handled = await self._login_autofill.handle_mcp_result(session_id, data)
         if handled:
             return
         handled = await self._order_detail.handle_mcp_result(session_id, data)
@@ -185,21 +198,9 @@ class HandlerManager:
         await self._order_detail.handle_page_update(session_id, url)
         await self._page_extract.handle_page_update(session_id, url, page_id)
 
-        # One-time login page guidance after redirect
-        if not previous_url or previous_url == url:
-            return
-        if get_page_type(url) != "login":
-            return
-        if get_page_type(previous_url) == "login":
-            return
-        if not self._session or self._session.get_context(session_id, "login_guidance_shown", False):
-            return
-        if self._sender:
-            await self._sender.send_tts_response(
-                session_id,
-                self._tts.build_login_guidance()
-            )
-        self._session.set_context(session_id, "login_guidance_shown", True)
+        # On login page entry, trigger autofill probe (no user text required).
+        if get_page_type(url) == "login":
+            await self._login_autofill.handle_page_update(session_id, url, previous_url)
 
     async def handle_invalid_message(self, session_id: str, error: str):
         await self._sender.send_error(session_id, error)

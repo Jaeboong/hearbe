@@ -153,7 +153,13 @@ class BrowserExtractionMixin:
             values = []
             for i in range(count):
                 item = locator.nth(i)
-                value = await item.get_attribute(attribute)
+                if attribute == "value":
+                    try:
+                        value = await item.input_value()
+                    except Exception:
+                        value = await item.get_attribute(attribute)
+                else:
+                    value = await item.get_attribute(attribute)
                 if value is None:
                     if include_empty:
                         values.append("")
