@@ -161,22 +161,38 @@ const CardManagementA = () => {
         const cardNumberNormalized = formData.number.replace(/\s+/g, '');
 
         if (!formData.company || !cardNumberNormalized || !formData.expiry || !formData.cvc) {
-            alert('복지카드 정보를 모두 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '복지카드 정보를 모두 입력해주세요.',
+                confirmButtonText: '확인'
+            });
             return;
         }
         const expPattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
         if (!expPattern.test(formData.expiry)) {
-            alert('유효기간은 MM/YY 형식으로 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '유효기간은 MM/YY 형식으로 입력해주세요.',
+                confirmButtonText: '확인'
+            });
             return;
         }
         const cardPattern = /^\d{16}$/;
         if (!cardPattern.test(cardNumberNormalized)) {
-            alert('카드번호는 숫자 16자리로 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '카드번호는 숫자 16자리로 입력해주세요.',
+                confirmButtonText: '확인'
+            });
             return;
         }
         const cvcPattern = /^\d{3}$/;
         if (!cvcPattern.test(formData.cvc)) {
-            alert('CVC는 3자리 숫자여야 합니다.');
+            Swal.fire({
+                icon: 'warning',
+                text: 'CVC는 3자리 숫자여야 합니다.',
+                confirmButtonText: '확인'
+            });
             return;
         }
 
@@ -192,7 +208,11 @@ const CardManagementA = () => {
             setShowModal(false);
             setModalStep('camera');
         } catch (error) {
-            alert(error.message || '복지카드 정보 저장에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '복지카드 정보 저장에 실패했습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -202,11 +222,11 @@ const CardManagementA = () => {
     };
 
     const menuItems = [
-        { id: 'profile', label: '회원정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문내역', path: '/A/order-history' },
+        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
-        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -238,11 +258,11 @@ const CardManagementA = () => {
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
                     <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
-                        <Home size={72} />
+                        <Home size={56} />
                         <span>홈</span>
                     </button>
                     <button className="topbar-action cursor-pointer" onClick={handleLogout}>
-                        <LogOut size={72} />
+                        <LogOut size={56} />
                         <span>로그아웃</span>
                     </button>
                 </div>
@@ -251,51 +271,55 @@ const CardManagementA = () => {
             <div className="cardmgmt-content">
                 {/* Sidebar */}
                 <aside className="cardmgmt-sidebar">
-                    <nav className="sidebar-nav">
-                        {menuItems.map(item => (
-                            <div
-                                key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''} cursor-pointer`}
-                                onClick={() => navigate(item.path)}
-                            >
-                                {item.label}
-                            </div>
-                        ))}
-                    </nav>
+                    <div className="sidebar-menu-card">
+                        <nav className="sidebar-nav">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    className={`sidebar-item ${currentPath === item.path ? 'active' : ''} cursor-pointer`}
+                                    onClick={() => navigate(item.path)}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
                 </aside>
 
                 {/* Main Content */}
                 <main className="cardmgmt-main">
-                    <h2 className="content-title">
-                        <CreditCard size={40} color="#FFF064" />
-                        장애인 복지카드 변경하기
-                    </h2>
+                    <div className="content-card">
+                        <h2 className="content-title">
+                            <CreditCard size={64} color="#FFF064" />
+                            장애인 복지카드 변경하기
+                        </h2>
 
-                    {/* Current Card Display */}
-                    <div className="current-card-display">
-                        <div className="card-info-row">
-                            <span className="card-label">카드사</span>
-                            <span className="card-value">{cardData.company}</span>
-                        </div>
-                        <div className="card-info-row">
-                            <span className="card-label">복지카드 번호</span>
-                            <span className="card-value">{maskCardNumber(cardData.number)}</span>
-                        </div>
-                        <div className="card-info-row-flex">
-                            <div className="card-info-col">
-                                <span className="card-label">유효기간</span>
-                                <span className="card-value">{cardData.expiry}</span>
+                        {/* Current Card Display */}
+                        <div className="current-card-display">
+                            <div className="card-info-row">
+                                <span className="card-label">카드사</span>
+                                <span className="card-value">{cardData.company}</span>
                             </div>
-                            <div className="card-info-col">
-                                <span className="card-label">CVC</span>
-                                <span className="card-value">***</span>
+                            <div className="card-info-row">
+                                <span className="card-label">복지카드 번호</span>
+                                <span className="card-value">{maskCardNumber(cardData.number)}</span>
+                            </div>
+                            <div className="card-info-row-flex">
+                                <div className="card-info-col">
+                                    <span className="card-label">유효기간</span>
+                                    <span className="card-value">{cardData.expiry}</span>
+                                </div>
+                                <div className="card-info-col">
+                                    <span className="card-label">CVC</span>
+                                    <span className="card-value">***</span>
+                                </div>
                             </div>
                         </div>
+
+                        <button className="change-card-btn cursor-pointer" onClick={handleChangeClick}>
+                            변경하기
+                        </button>
                     </div>
-
-                    <button className="change-card-btn cursor-pointer" onClick={handleChangeClick}>
-                        변경하기
-                    </button>
                 </main>
             </div>
 

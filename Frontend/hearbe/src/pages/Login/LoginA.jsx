@@ -1,13 +1,16 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { Eye, EyeOff, User, Lock, CheckCircle2 } from 'lucide-react';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
-import './LoginA.css'; // Importing empty file for safety, can be removed later
+import './LoginA.css';
 
 const Login = () => {
     const navigate = useNavigate();
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [rememberLogin, setRememberLogin] = useState(true);
 
@@ -28,13 +31,21 @@ const Login = () => {
             setRememberLogin(true);
         }
         if (savedId && savedPassword) {
-            handleLogin(savedId, savedPassword, true);
+            handleLogin(null, savedId, savedPassword, true);
         }
     }, [navigate]);
 
-    const handleLogin = async (loginId = id, loginPassword = password, isAuto = false) => {
+    const handleLogin = async (e, loginId = id, loginPassword = password, isAuto = false) => {
+        if (e) e.preventDefault();
+
         if (!loginId || !loginPassword) {
-            alert('아이디와 비밀번호를 입력해주세요.');
+            if (!isAuto) {
+                Swal.fire({
+                    icon: 'warning',
+                    text: '아이디와 비밀번호를 입력해주세요.',
+                    confirmButtonText: '확인'
+                });
+            }
             return;
         }
         setIsLoading(true);
@@ -72,22 +83,22 @@ const Login = () => {
                 // 로그인 성공
                 navigate('/A/mall');
             } else if (!isAuto) {
-                const message = response?.message || '';
-                if (message.includes('존재') || message.includes('없')) {
-                    alert('회원가입이 필요합니다.');
-                } else {
-                    alert(message || '로그인에 실패했습니다.');
-                }
+                const message = response?.message || '로그인에 실패했습니다.';
+                Swal.fire({
+                    icon: 'error',
+                    text: message.includes('존재') || message.includes('없') ? '회원가입이 필요합니다.' : message,
+                    confirmButtonText: '확인'
+                });
             }
         } catch (error) {
             console.error('Login Error:', error);
             if (!isAuto) {
-                const errorMessage = error?.message || '';
-                if (errorMessage.includes('존재') || errorMessage.includes('없')) {
-                    alert('회원가입이 필요합니다.');
-                } else {
-                    alert(errorMessage || '아이디 또는 비밀번호가 일치하지 않습니다.');
-                }
+                const errorMessage = error?.message || '아이디 또는 비밀번호가 일치하지 않습니다.';
+                Swal.fire({
+                    icon: 'error',
+                    text: errorMessage.includes('존재') || errorMessage.includes('없') ? '회원가입이 필요합니다.' : errorMessage,
+                    confirmButtonText: '확인'
+                });
             }
         } finally {
             setIsLoading(false);
@@ -95,91 +106,84 @@ const Login = () => {
     };
 
     return (
-        <div className="login-container">
-            <div className="login-box">
-                {/* Logo Section */}
-                <div className="logo-area">
-                    <img
-                        src={logo}
-                        alt="Logo"
-                        className="logo-image cursor-pointer"
-                        onClick={() => navigate('/')}
-                    />
-                </div>
-
-                <form
-                    className="login-form"
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleLogin();
-                    }}
-                >
-                    {/* Input Section */}
-                    <div className="input-box">
-                        <input
-                            type="text"
-                            placeholder="아이디"
-                            className="login-input"
-                            value={id}
-                            onChange={(e) => setId(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleLogin();
-                                }
-                            }}
-                        />
-                    </div>
-                    <div className="input-box">
-                        <input
-                            type="password"
-                            placeholder="비밀번호"
-                            className="login-input"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            maxLength={6}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleLogin();
-                                }
-                            }}
+        <div className="login-a-page-new">
+            <main className="login-a-content-new">
+                <div className="login-a-card-new">
+                    <div className="logo-area-a-new">
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            onClick={() => navigate('/main')}
+                            className="logo-image-a-new cursor-pointer"
                         />
                     </div>
 
-                    {/* Login Button */}
-                    <button className="login-button" type="submit" disabled={isLoading}>
-                        로그인
-                    </button>
-                </form>
+                    <form className="login-a-form-new" onSubmit={(e) => handleLogin(e)}>
+                        <div className="input-with-icon-a-new">
+                            <User className="input-icon-a-new" size={32} />
+                            <input
+                                type="text"
+                                placeholder="아이디"
+                                className="login-input-a-new"
+                                value={id}
+                                onChange={(e) => setId(e.target.value)}
+                            />
+                        </div>
 
-                {/* Features (Save ID) */}
-                <div className="login-options">
-                    <label className="checkbox-container">
-                        <input
-                            type="checkbox"
-                            className="checkbox-input"
-                            checked={rememberLogin}
-                            onChange={(e) => setRememberLogin(e.target.checked)}
-                        />
-                        <span className="checkmark">
-                            <span className="checkmark-icon"></span>
-                        </span>
-                        자동 로그인
-                    </label>
-                </div>
+                        <div className="password-wrapper-a-new">
+                            <Lock className="input-icon-a-new" size={32} />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="비밀번호"
+                                className="login-input-a-new"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                maxLength={6}
+                            />
+                            <button
+                                type="button"
+                                className="pw-toggle-a-new"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeOff size={36} /> : <Eye size={36} />}
+                            </button>
+                        </div>
 
-                {/* Footer Links */}
-                <div className="login-footer">
-                    <span onClick={() => navigate('/A/findId')} className="cursor-pointer">아이디 찾기</span>
-                    <span className="login-separator">|</span>
-                    <span onClick={() => navigate('/A/findPassword')} className="cursor-pointer">비밀번호 변경</span>
-                    <span className="login-separator">|</span>
-                    <span onClick={() => navigate('/A/signup')} className="cursor-pointer">
-                        회원가입
-                    </span>
+                        <div className="login-options-a-new">
+                            <label className="checkbox-container-a-new">
+                                <input
+                                    type="checkbox"
+                                    checked={rememberLogin}
+                                    onChange={(e) => setRememberLogin(e.target.checked)}
+                                />
+                                <span className="checkmark-a-new">
+                                    {rememberLogin && <CheckCircle2 size={24} className="checked-icon" />}
+                                </span>
+                                <span className="label-text-a-new">로그인 유지</span>
+                            </label>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="login-submit-btn-a-new"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? '로그인 중...' : '로그인'}
+                        </button>
+
+                        <div className="login-footer-links-a-new">
+                            <span onClick={() => navigate('/A/findId')} className="cursor-pointer">아이디 찾기</span>
+                            <span className="separator-a-new">|</span>
+                            <span onClick={() => navigate('/A/findPassword')} className="cursor-pointer">비밀번호 재설정</span>
+                            <span className="separator-a-new">|</span>
+                            <span onClick={() => navigate('/A/signup')} className="cursor-pointer">회원가입</span>
+                        </div>
+                    </form>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };
 
 export default Login;
+

@@ -11,11 +11,11 @@ const Mypage = () => {
     const [activeMenuId, setActiveMenuId] = useState(null);
 
     const requestedMenuItems = [
-        { id: 1, label: '회원정보', action: () => { } },
-        { id: 2, label: '주문내역', action: () => { } },
+        { id: 1, label: '회원 정보', action: () => { } },
+        { id: 2, label: '주문 내역', action: () => { } },
         { id: 3, label: '장바구니', action: () => navigate('/A/cart') },
         { id: 4, label: '찜한 상품', action: () => { } },
-        { id: 5, label: <>장애인 복지카드<br />변경</>, action: () => { } },
+        { id: 5, label: <>장애인 복지<br />카드 변경</>, action: () => { } },
     ];
 
     return (

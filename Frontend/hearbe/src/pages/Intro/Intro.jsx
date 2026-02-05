@@ -40,7 +40,7 @@ export default function Intro() {
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-        setTimeout(() => navigate('/guide'), 850);
+        setTimeout(() => navigate('/main'), 850);
     };
 
     const handleStart = () => {
@@ -55,11 +55,11 @@ export default function Intro() {
                 if (!hasStarted) {
                     handleStart();
                 } else {
-                    // 다음 단계로 이동 (마지막 단계면 Skip)
+                    // 다음 단계로 이동 (마지막 단계면 메인으로)
                     if (currentStep < STEPS.length - 1) {
                         setCurrentStep(prev => prev + 1);
                     } else {
-                        navigate('/guide');
+                        navigate('/main');
                     }
                 }
             }
@@ -153,7 +153,7 @@ export default function Intro() {
 
     return (
         <div className="intro-container">
-            <button className="skip-btn cursor-pointer" onClick={() => navigate('/guide')}>Skip</button>
+            <button className="skip-btn cursor-pointer" onClick={() => navigate('/main')}>메인으로</button>
 
             <AnimatePresence>
                 {isTransitioning && (

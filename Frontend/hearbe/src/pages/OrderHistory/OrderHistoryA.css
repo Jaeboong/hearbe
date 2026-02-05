@@ -11,7 +11,7 @@
 
 .orderhistory-container {
     min-height: 100vh;
-    background-color: #1E2A3A;
+    background-color: #141C29;
     padding: 0;
     padding-top: 10px;
     padding-right: 10px;
@@ -21,9 +21,9 @@
 
 .orderhistory-logo-left {
     position: absolute;
-    top: clamp(12px, 3vw, 24px);
-    left: clamp(12px, 3vw, 24px);
-    width: clamp(120px, 20vw, 200px);
+    top: 25px;
+    left: 40px;
+    width: 320px;
     height: auto;
     cursor: pointer;
     z-index: 10;
@@ -43,45 +43,59 @@
 
 .orderhistory-container .orderhistory-content {
     display: flex;
-    gap: clamp(16px, 3vw, 30px);
+    gap: 40px;
     width: 100%;
     max-width: 1200px;
     min-height: 80vh;
     margin: 0 auto;
-    padding: clamp(10px, 2vw, 20px);
+    padding: 20px 40px 60px;
     box-sizing: border-box;
-    min-width: 0;
+    flex: 1;
 }
 
-/* Sidebar */
+/* Sidebar Navigation - C형 스타일 카드화 */
 .orderhistory-sidebar {
-    flex: 0 0 clamp(200px, 25vw, 300px);
-    border: none;
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.sidebar-title {
-    font-size: clamp(24px, 4vw, 32px);
-    font-weight: 900;
-    color: #FFF064;
-    margin-bottom: clamp(30px, 5vw, 50px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+.sidebar-menu-card {
+    background-color: #141C29;
+    border: 4px solid #FFF064;
+    border-radius: 30px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 2vw, 16px);
+    gap: 10px;
 }
 
 .sidebar-item {
-    font-size: clamp(18px, 3vw, 28px);
-    font-weight: bold;
+    font-size: 32px;
+    /* 48px는 너무 클 수 있으므로 36px로 먼저 시도, 그래도 메뉴명 폰트가 크므로 적절히 조정 */
+    /* 사용자 요청: "메뉴들 이름 있짜나 ... 그 폰트 크기랑 일치하게" -> .content-title은 48px임.
+       하지만 사이드바 폭이 320px이고 메뉴가 5개이므로 48px은 사이드바를 넘칠 수 있음.
+       일단 40px 정도로 대폭 키우고 줄바꿈 허용 등으로 처리해야 함. */
+    font-weight: 950;
     color: #FFF064;
-    padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
-    border-radius: clamp(8px, 2vw, 12px);
+    padding: 20px 24px;
+    /* 패딩 증가 */
+    border-radius: 20px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: all 0.2s;
+    font-family: 'Pretendard', sans-serif;
+    text-align: left;
+    border: none;
+    background: transparent;
+    line-height: 1.3;
+    /* 줄간격 확보 */
 }
 
 .sidebar-item:hover {
@@ -89,75 +103,74 @@
 }
 
 .sidebar-item.active {
-    background-color: #171C28;
-    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    background-color: #FFF064;
+    color: #141C29;
 }
 
-/* Main Content */
+/* Main Content - 카드 형태로 묶음 */
 .orderhistory-main {
     flex: 1;
-    width: 100%;
-    /* max-width removed to allow full usage of available space within container */
-    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.content-card {
+    background-color: #141C29;
+    border: 4px solid #FFF064;
+    border-radius: 40px;
+    padding: 40px;
     box-sizing: border-box;
-    min-width: 0;
+    width: 100%;
 }
 
 .content-title {
     display: flex;
     align-items: center;
-    gap: clamp(12px, 2vw, 16px);
-    font-size: clamp(20px, 3vw, 28px);
-    font-weight: 900;
+    gap: 20px;
+    font-size: 48px;
+    font-weight: 950;
     color: #FFF064;
-    margin-bottom: 20px;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    margin-bottom: 30px;
+    font-family: 'Pretendard', sans-serif;
 }
 
-/* Mall Section */
+/* Mall Section - 개별 카드박스 형태로 복구 */
 .mall-section {
-    margin-bottom: clamp(24px, 4vw, 36px);
-    background-color: #FFF064;
-    border: clamp(2px, 0.4vw, 3px) solid #FFF064;
-    border-radius: clamp(12px, 2.5vw, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 40px;
+    background-color: #121521;
+    border: 4px solid #FFF064;
+    border-radius: 30px;
     overflow: hidden;
-    width: 100%;
-    margin-left: 0;
-    margin-right: auto;
 }
 
 .mall-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: clamp(18px, 3vw, 28px) clamp(16px, 3vw, 24px);
     background-color: #FFF064;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    /* 헤더는 다시 노란색으로 강조 (A형 스타일 복구) */
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-.mall-header:hover {
-    background-color: #F7EA4C;
+.mall-header::before {
+    display: none;
+    /* 이전 인디케이터 제거 */
 }
 
 .mall-name {
-    font-size: clamp(24px, 5vw, 36px);
-    font-weight: 1000;
-    color: #171C28;
+    font-size: 32px;
+    font-weight: 950;
+    color: #141C29;
+    /* 노란색 배경이므로 어두운 글씨 */
     margin: 0;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: clamp(6px, 1.5vw, 10px);
+    font-family: 'Pretendard', sans-serif;
 }
 
-.toggle-icon {
-    font-size: clamp(16px, 3vw, 24px);
-    color: #1E2A3A;
-    font-weight: bold;
-}
-
-/* Orders List */
+/* Items List Container (Wishlist/Cart 와 동일한 내부 여백 적용) */
 .orders-list {
     display: flex;
     flex-direction: column;
@@ -166,6 +179,8 @@
     border-radius: clamp(10px, 2vw, 14px);
     overflow: hidden;
 }
+
+/* Old block removed */
 
 .order-group {
     border-bottom: clamp(1px, 0.2vw, 2px) solid rgba(255, 240, 100, 0.2);
@@ -177,12 +192,12 @@
 }
 
 .order-date-header {
-    padding: clamp(12px, 2.5vw, 18px) clamp(16px, 3vw, 24px);
-    background-color: #121521;
-    font-size: clamp(16px, 3vw, 22px);
+    padding: 15px 25px;
+    background-color: rgba(255, 240, 100, 0.05);
+    font-size: 20px;
     font-weight: bold;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', sans-serif;
     border-bottom: 1px solid rgba(255, 240, 100, 0.2);
 }
 
@@ -190,7 +205,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(16px, 3vw, 24px);
     gap: clamp(16px, 3vw, 24px);
     background-color: #121521;
 }
@@ -204,15 +218,20 @@
 
 .order-item {
     display: flex;
-    gap: clamp(12px, 2.5vw, 18px);
     align-items: center;
+    gap: clamp(16px, 3vw, 24px);
+    padding: 15px 25px;
+    /* 헤더 및 날짜바와 좌측 정렬 일치시킴 */
+    box-sizing: border-box;
 }
 
 .order-item-image {
-    width: clamp(60px, 12vw, 80px);
-    height: clamp(60px, 12vw, 80px);
-    object-fit: cover;
-    border-radius: clamp(6px, 1.5vw, 10px);
+    width: 80px;
+    /* 찜한 상품, 장바구니와 동일하게 80px로 통일 */
+    height: 80px;
+    object-fit: contain;
+    background-color: #ffffff;
+    border-radius: 12px;
     flex-shrink: 0;
 }
 
@@ -224,10 +243,10 @@
 }
 
 .order-item-name {
-    font-size: clamp(16px, 3vw, 22px);
-    font-weight: bold;
+    font-size: 24px;
+    font-weight: 800;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', sans-serif;
     line-height: 1.4;
 }
 
@@ -235,20 +254,20 @@
     font-size: clamp(16px, 3vw, 22px);
     color: #FFF064;
     font-weight: bold;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
-/* Track Delivery Button */
+/* Track Delivery Button - 버튼 크기 축소 */
 .track-delivery-btn {
-    padding: clamp(10px, 2vw, 16px) clamp(20px, 3.5vw, 32px);
+    padding: clamp(8px, 1.5vw, 12px) clamp(16px, 2.5vw, 24px);
     background-color: #FFF064;
     color: #171C28;
     border: clamp(2px, 0.4vw, 3px) solid #FFF064;
     border-radius: clamp(6px, 1.5vw, 10px);
-    font-size: clamp(16px, 3vw, 24px);
+    font-size: clamp(14px, 2.5vw, 20px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     transition: opacity 0.2s, background-color 0.2s;
     white-space: nowrap;
     flex-shrink: 0;
@@ -295,7 +314,7 @@
     font-size: clamp(18px, 3.5vw, 28px);
     font-weight: bold;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 /* Error State */
@@ -312,14 +331,14 @@
     font-size: clamp(20px, 4vw, 32px);
     font-weight: bold;
     color: #FF6B6B;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     text-align: center;
 }
 
 .error-state .error-detail {
     font-size: clamp(14px, 2.5vw, 20px);
     color: #AAAAAA;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     text-align: center;
 }
 
@@ -333,7 +352,7 @@
     font-size: clamp(16px, 3vw, 24px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     transition: opacity 0.2s;
 }
 
@@ -348,7 +367,7 @@
     font-size: clamp(20px, 4vw, 32px);
     font-weight: bold;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 /* Responsive */
@@ -405,7 +424,9 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: clamp(6px, 1vw, 12px) 0 clamp(12px, 2.5vw, 24px);
+    padding: 20px 40px 0;
+    margin-bottom: 30px;
+    /* 헤더 아래 공간 추가 */
 }
 
 .mypage-topbar-title {
@@ -416,28 +437,28 @@
     font-weight: 900;
     color: #FFF064;
     margin: 0;
-    font-family: 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .mypage-topbar-actions {
     display: flex;
-    gap: clamp(8px, 1.6vw, 14px);
+    gap: 30px;
 }
 
 .topbar-action {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    gap: 6px;
     background: transparent;
     border: none;
     color: #FFF064;
-    padding: clamp(4px, 1vw, 8px);
-    border-radius: 0.75rem;
-    font-size: clamp(14px, 2vw, 18px);
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 21px;
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .topbar-action:hover {
@@ -449,4 +470,9 @@
     flex-direction: column;
     gap: clamp(8px, 1.5vw, 12px);
     align-items: flex-end;
+    padding-right: 25px;
+    /* 버튼 우측 여백 추가 */
+    padding-bottom: 15px;
+    /* 하단 여백 추가 -> 아이템과 높이 균형 */
+    justify-content: center;
 }

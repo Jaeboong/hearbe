@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCallback } from 'react';
+import Swal from 'sweetalert2';
 import './StoreBrowserA.css';
 import iconCart from '../../assets/icon-cart.png';
 import iconShare from '../../assets/icon-share.png';
@@ -55,7 +56,11 @@ const StoreBrowser = () => {
     // Error handling
     useEffect(() => {
         if (peerError) {
-            alert(`화면 공유 에러: ${peerError}`);
+            Swal.fire({
+                icon: 'error',
+                text: `화면 공유 에러: ${peerError}`,
+                confirmButtonText: '확인'
+            });
         }
     }, [peerError]);
 
@@ -94,9 +99,17 @@ const StoreBrowser = () => {
             };
 
             await cartAPI.addToCart(itemData);
-            alert(`[시뮬레이션] 장바구니에 '${randomItem.name}'이(가) 추가되었습니다!`);
+            Swal.fire({
+                icon: 'success',
+                text: `[시뮬레이션] 장바구니에 '${randomItem.name}'이(가) 추가되었습니다!`,
+                confirmButtonText: '확인'
+            });
         } catch (error) {
-            alert(`시뮬레이션 추가 실패: ${error.message}`);
+            Swal.fire({
+                icon: 'error',
+                text: `시뮬레이션 추가 실패: ${error.message}`,
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -112,7 +125,11 @@ const StoreBrowser = () => {
             setTempCode(code);
         } catch (error) {
             console.error('Create code error:', error);
-            alert('공유 코드를 생성할 수 없습니다. (백엔드 연결 확인)');
+            Swal.fire({
+                icon: 'error',
+                text: '공유 코드를 생성할 수 없습니다. (백엔드 연결 확인)',
+                confirmButtonText: '확인'
+            });
             setShowShareModal(false);
         } finally {
             setIsLoadingCode(false);
@@ -147,7 +164,11 @@ const StoreBrowser = () => {
         if (cartUrl) {
             window.open(cartUrl, '_blank');
         } else {
-            alert('현재 쇼핑몰의 장바구니 URL을 찾을 수 없습니다.');
+            Swal.fire({
+                icon: 'info',
+                text: '현재 쇼핑몰의 장바구니 URL을 찾을 수 없습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -162,7 +183,11 @@ const StoreBrowser = () => {
 
     const handleSubmitProduct = async () => {
         if (!productInfo.name || !productInfo.price) {
-            alert('상품명과 가격은 필수 항목입니다.');
+            Swal.fire({
+                icon: 'warning',
+                text: '상품명과 가격은 필수 항목입니다.',
+                confirmButtonText: '확인'
+            });
             return;
         }
 
@@ -182,11 +207,19 @@ const StoreBrowser = () => {
             };
 
             await cartAPI.addToCart(itemData);
-            alert('장바구니에 상품이 추가되었습니다!');
+            Swal.fire({
+                icon: 'success',
+                text: '장바구니에 상품이 추가되었습니다!',
+                confirmButtonText: '확인'
+            });
             setShowAddCartModal(false);
             setProductInfo({ name: '', price: '', url: '', img_url: '' });
         } catch (error) {
-            alert(`장바구니 추가 실패: ${error.message}`);
+            Swal.fire({
+                icon: 'error',
+                text: `장바구니 추가 실패: ${error.message}`,
+                confirmButtonText: '확인'
+            });
         }
     };
 

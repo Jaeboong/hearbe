@@ -1,837 +1,424 @@
-/* =========================================
-   1. 기본 설정 및 변수 (색상, 폰트)
-   ========================================= */
-:root {
-    --bg-dark: #141C29;
-    --bg-deep-dark: #0A0E14;
-    --accent-yellow: #FFF064;
-    --font-main: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
-}
-
-/* =========================================
-   2. 유틸리티 & 공통 스타일
-   ========================================= */
-.flex-col-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 공통 버튼 스타일 */
-.check-btn,
-.signup-submit-btn,
-.error-confirm-btn,
-.card-register-btn {
-    background-color: var(--accent-yellow);
-    color: var(--bg-dark);
-    border: none;
-    font-family: var(--font-main);
-    font-weight: 900;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.check-btn:hover,
-.signup-submit-btn:hover,
-.error-confirm-btn:hover,
-.card-register-btn:hover {
-    opacity: 0.9;
-}
-
-/* 공통 Input 스타일 */
-.signup-input,
-.modal-input {
-    background: #141C29;
-    color: var(--accent-yellow);
-    font-family: var(--font-main);
-    font-weight: bold;
-    outline: none;
-    width: 100%;
-}
-
-/* =========================================
-   3. 회원가입 메인 레이아웃
-   ========================================= */
-.signup-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+.signup-a-page-new {
     min-height: 100vh;
-    letter-spacing: clamp(1px, 0.2vw, 2px);
     width: 100%;
-    background-color: #1E2A3A;
-    padding-top: clamp(20px, 5vw, 40px);
-    padding-bottom: clamp(20px, 5vw, 40px);
-    overflow-y: auto;
-}
-
-/* Back Button Component Override */
-.signup-container .global-back-button.arrow-only {
-    left: clamp(12px, 4vw, 32px);
-    top: clamp(12px, 4vw, 32px);
-    transform: none;
-}
-
-.signup-container .global-back-button.arrow-only .back-arrow-svg {
-    width: clamp(48px, 16vw, 96px);
-    height: clamp(48px, 16vw, 96px);
-}
-
-.signup-box {
-    width: clamp(320px, 86vw, 760px);
-    padding: clamp(8px, 2vw, 16px);
-    display: flex;
-    flex-direction: column;
-    gap: clamp(12px, 3vw, 24px);
-    box-sizing: border-box;
-    margin-top: 0;
-}
-
-.signup-logo-area {
+    background-color: #141C29;
+    font-family: 'Pretendard', sans-serif;
+    padding: 60px 20px;
+    margin: 0;
     display: flex;
     justify-content: center;
-    margin-bottom: clamp(8px, 2vw, 16px);
 }
 
-.signup-logo-image {
-    width: clamp(210px, 52.5vw, 420px);
-    height: auto;
-    object-fit: contain;
+.signup-a-content-new {
+    width: 100%;
+    max-width: 800px;
 }
 
-/* 뒤로가기 화살표 (fallback if not using component) */
-.back-arrow {
+.signup-a-card-new {
+    background: #141C29;
+    width: 100%;
+    padding: 60px;
+    border: 4px solid #FFF064;
+    border-radius: 40px;
+}
+
+.signup-a-header-new {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.signup-logo-a-new {
+    height: 100px;
+    margin-bottom: 24px;
+}
+
+.signup-title-a-new {
+    font-size: 44px;
+    /* 52px -> 44px */
+    font-weight: 950;
+    color: #FFF064;
+    margin-bottom: 10px;
+}
+
+.signup-subtitle-a-new {
+    font-size: 24px;
+    /* 26px -> 24px */
+    color: rgba(255, 240, 100, 0.8);
+    font-weight: 600;
+}
+
+.signup-a-form-new {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.input-section-a-new {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.input-label-a-new {
+    font-size: 24px;
+    /* 28px -> 24px */
+    font-weight: 900;
+    color: #FFF064;
+    padding-left: 10px;
+}
+
+.input-with-button-a-new {
+    display: flex;
+    gap: 16px;
+}
+
+.input-icon-wrapper-a-new {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.input-icon-wrapper-a-new>svg {
     position: absolute;
-    top: clamp(12px, 3vw, 24px);
-    left: clamp(12px, 3vw, 24px);
-    font-size: clamp(24px, 8vw, 48px);
-    color: var(--accent-yellow);
-    cursor: pointer;
-    font-weight: bold;
+    left: 20px;
+    color: #FFF064;
+    z-index: 10;
+    /* 입력창 아이콘이 위에 오도록 */
 }
 
-/* =========================================
-   4. 입력 폼 (Input) 스타일
-   ========================================= */
-.form-group-outline {
-    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
-    border-radius: clamp(8px, 2vw, 16px);
-    background-color: var(--bg-dark);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.input-row {
-    display: flex;
-    align-items: center;
-    padding: clamp(8px, 2vw, 16px);
-    font-weight: bold;
-    font-size: clamp(14px, 4vw, 24px);
-}
-
-.border-bottom {
-    border-bottom: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
-}
-
-.header-row {
-    padding-left: clamp(8px, 2vw, 16px);
-    gap: clamp(8px, 2vw, 16px);
-}
-
-.input-icon {
-    width: clamp(28px, 9vw, 56px);
-    height: clamp(28px, 9vw, 56px);
-    object-fit: contain;
-}
-
-.signup-input {
-    flex: 1;
-    border: none;
-    padding: clamp(4px, 1vw, 8px);
-    font-size: clamp(18px, 5vw, 36px);
-    letter-spacing: clamp(1px, 0.2vw, 2px);
-    height: auto;
-    min-width: 0;
-    background-repeat: no-repeat;
-    background-position: left clamp(8px, 2vw, 16px) center;
-    background-size: clamp(28px, 6vw, 48px);
-    padding-left: clamp(48px, 10vw, 72px);
-}
-
-.signup-input::placeholder {
-    color: var(--accent-yellow);
-    font-weight: bold;
-}
-
-.signup-input.input-invalid {
-    color: #FF5A5A;
-}
-
-.signup-input.input-id,
-.signup-input.input-name {
-    background-image: url('../../assets/icon-user.png');
-}
-
-.signup-input.input-password {
-    background-image: url('../../assets/icon-lock.png');
-}
-
-.signup-input.input-phone {
-    background-image: url('../../assets/icon-phone.png');
-}
-
-/* 중복확인 버튼 */
-.check-btn {
-    padding: clamp(6px, 1.5vw, 12px) clamp(12px, 3vw, 24px);
-    border-radius: clamp(6px, 1.5vw, 12px);
-    font-size: clamp(16px, 5vw, 28px);
-    white-space: nowrap;
-    flex-shrink: 0;
-    letter-spacing: clamp(0.5px, 0.1vw, 1px);
-    margin-left: clamp(8px, 2vw, 16px);
-}
-
-/* 라벨 텍스트 */
-.label {
-    flex-grow: 1;
-    font-size: clamp(22px, 7vw, 42px);
-    letter-spacing: clamp(1px, 0.2vw, 2px);
-}
-
-.label.card-label {
-    background-image: url('../../assets/icon-card.png');
-    background-repeat: no-repeat;
-    background-position: left clamp(8px, 2vw, 16px) center;
-    background-size: clamp(28px, 6vw, 48px);
-    padding-left: clamp(48px, 10vw, 72px);
-    font-size: clamp(26px, 7.5vw, 46px);
-    white-space: nowrap;
-}
-
-/* =========================================
-   5. 카드 섹션 (메인 화면)
-   ========================================= */
-.card-section {
-    padding: 0.5vw;
-}
-
-/* 메인 화면의 카메라 실행 버튼 영역 */
-.camera-area {
-    border: clamp(2px, 0.6vw, 5px) solid var(--accent-yellow);
-    border-radius: clamp(8px, 2vw, 16px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(8px, 2vw, 16px);
-    margin: 0 clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px);
+.signup-input-a-new {
+    width: 100%;
+    padding: 22px 84px 22px 64px;
+    /* 패딩 소폭 조정 */
+    border: 3px solid #FFF064;
+    border-radius: 20px;
+    font-size: 28px;
+    /* 32px -> 28px */
+    font-weight: 800;
+    outline: none;
     background-color: transparent;
-    padding: clamp(12px, 4vw, 32px);
-    min-height: clamp(80px, 25vw, 200px);
+    color: #FFF064;
 }
 
-.camera-text {
-    font-weight: bold;
-    font-size: clamp(18px, 6vw, 36px);
-    letter-spacing: clamp(1px, 0.2vw, 2px);
-    color: var(--accent-yellow);
+.signup-input-a-new::placeholder {
+    color: rgba(255, 240, 100, 0.4);
 }
 
-.camera-icon-img {
-    width: clamp(60px, 20vw, 140px);
-    height: auto;
-}
-
-/* 등록 완료 후 카드 정보 표시 박스 */
-.card-info-display {
-    padding: clamp(16px, 3vw, 30px);
-    display: flex;
-    flex-direction: column;
-    gap: clamp(10px, 2vw, 20px);
-    border: clamp(2px, 0.4vw, 4px) solid var(--accent-yellow);
-    border-radius: clamp(8px, 2vw, 16px);
-    margin: 0 clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px) clamp(8px, 1.5vw, 16px);
-}
-
-.card-retake-wrap {
-    margin: 0 clamp(8px, 1.5vw, 16px) clamp(8px, 2vw, 16px);
-}
-
-.card-section .card-retake-btn {
-    width: 100%;
-    min-height: 44px;
-    background-color: var(--accent-yellow);
-    color: var(--bg-dark);
-    font-size: clamp(22px, 7.5vw, 44px);
-    border: none;
-}
-
-.info-row {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(4px, 0.5vw, 8px);
-}
-
-.info-row-flex {
-    display: flex;
-    gap: clamp(16px, 3vw, 32px);
-}
-
-.info-col {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(4px, 0.5vw, 8px);
-    flex: 1;
-}
-
-.info-label-main {
-    font-size: clamp(14px, 3vw, 24px);
-    color: var(--accent-yellow);
-    font-weight: bold;
-    opacity: 0.8;
-}
-
-.info-val-main {
-    font-size: clamp(20px, 4vw, 36px);
-    color: var(--accent-yellow);
-    font-weight: 900;
-    padding-left: clamp(4px, 1vw, 8px);
-    border-bottom: clamp(1px, 0.2vw, 2px) solid var(--accent-yellow);
-    padding-bottom: clamp(4px, 1vw, 8px);
-}
-
-/* =========================================
-   6. 약관 동의 (Terms) 섹션
-   ========================================= */
-.terms-section {
-    padding: clamp(8px, 2vw, 16px);
-    display: flex;
-    flex-direction: column;
-    gap: clamp(6px, 1.5vw, 10px);
-}
-
-.term-row {
-    display: flex;
-    align-items: flex-start;
-    gap: clamp(8px, 2vw, 16px);
-    cursor: pointer;
-    width: 100%;
-}
-
-.single-term-row {
-    align-items: flex-start;
-    padding-left: clamp(4px, 1vw, 10px);
-}
-
-.check-circle {
-    width: clamp(18px, 6vw, 36px);
-    height: clamp(18px, 6vw, 36px);
-    min-width: clamp(18px, 6vw, 36px);
-    min-height: clamp(18px, 6vw, 36px);
-    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(12px, 4vw, 24px);
-    font-weight: 900;
-    color: var(--bg-dark);
+.check-btn-a-new {
+    padding: 0 28px;
     background-color: transparent;
-    transition: background-color 0.2s;
-    -webkit-text-stroke: clamp(1px, 0.3vw, 3px) var(--bg-dark);
-    flex-shrink: 0;
-    margin-top: clamp(1px, 0.2vw, 3px);
-}
-
-.check-circle.checked {
-    background-color: var(--accent-yellow);
-}
-
-.term-text-a {
-    font-size: clamp(18px, 5.5vw, 32px);
-    font-weight: bold;
-    flex: 1;
-    line-height: 1.3;
-    color: var(--accent-yellow);
-}
-
-.bold {
-    font-weight: 900;
-    font-size: clamp(20px, 6.5vw, 38px);
-}
-
-.terms-view-btn {
-    border: none;
-    background: transparent;
-    color: var(--accent-yellow);
-    font-family: var(--font-main);
-    font-size: clamp(16px, 4.5vw, 28px);
-    font-weight: 900;
+    color: #FFF064;
+    border: 3px solid #FFF064;
+    border-radius: 20px;
+    font-size: 24px;
+    /* 26px -> 24px */
+    font-weight: 800;
     cursor: pointer;
-    padding: 0;
-    white-space: nowrap;
 }
 
-/* 회원가입 제출 버튼 */
-.signup-submit-btn {
-    font-size: clamp(20px, 7vw, 42px);
-    padding: clamp(12px, 3vw, 24px);
-    border-radius: clamp(8px, 2vw, 16px);
-    margin-top: clamp(8px, 2vw, 16px);
-    width: 100%;
-    min-height: 44px;
+.check-btn-a-new.available {
+    background-color: #FFF064;
+    color: #141C29;
 }
 
-/* =========================================
-   7. 모달 (팝업) 스타일
-   ========================================= */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #1E2A3A;
-    z-index: 1000;
+.pw-toggle-a-new {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    /* 수직 중앙 정렬 */
+    background: none;
+    border: none;
+    color: #FFF064;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(8px, 2vw, 16px);
-    backdrop-filter: blur(5px);
+    z-index: 10;
+    width: 56px;
+    /* 아이콘 확대에 따른 크기 확보 */
+    height: 56px;
 }
 
-/* 모달이 열렸을 때 뒤로가기 버튼 숨기기 */
-.modal-overlay~.signup-container .global-back-button,
-body:has(.modal-overlay) .global-back-button {
+.camera-trigger-a-new {
+    border: 4px dashed rgba(255, 240, 100, 0.5);
+    border-radius: 24px;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    background-color: rgba(255, 240, 100, 0.05);
+    color: #FFF064;
+    cursor: pointer;
+}
+
+.camera-trigger-a-new span {
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.card-info-box-a-new {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    border: 3px solid #FFF064;
+    border-radius: 24px;
+    background-color: rgba(255, 240, 100, 0.1);
+    color: #FFF064;
+    cursor: pointer;
+}
+
+.card-icon-wrapper-a-new {
+    background: #FFF064;
+    padding: 16px;
+    border-radius: 16px;
+}
+
+.card-company-a-new {
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.card-number-a-new {
+    font-size: 24px;
+    color: rgba(255, 240, 100, 0.8);
+}
+
+.terms-section-a-new {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    background-color: rgba(255, 240, 100, 0.1);
+    border-radius: 20px;
+}
+
+.terms-all-a-new {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+}
+
+.terms-all-a-new input {
     display: none;
 }
 
-.modal-content {
-    width: 100%;
+.terms-checkmark-a-new {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #FFF064;
+    border-radius: 12px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1vw;
-}
-
-.hearbe-text {
-    font-size: 4vw;
-    font-weight: 900;
-    color: var(--accent-yellow);
-    font-style: italic;
-    margin-bottom: 1vw;
-    align-self: flex-start;
-    margin-left: 1vw;
-    letter-spacing: 0.1vw;
-}
-
-/* 팝업 박스 본체 */
-.modal-box {
-    width: clamp(300px, 98vw, 900px);
-    max-width: 98vw;
-    max-height: 88vh;
-    overflow-y: auto;
-    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
-    border-radius: clamp(8px, 2vw, 16px);
-    padding: clamp(10px, 3vw, 24px) clamp(12px, 4vw, 28px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(6px, 1.6vw, 12px);
-    box-sizing: border-box;
-    background-color: #141C29;
-    position: relative;
-}
-
-.modal-box::-webkit-scrollbar {
-    width: 10px;
-}
-
-.modal-box::-webkit-scrollbar-thumb {
-    background-color: var(--accent-yellow);
-    border-radius: 999px;
-}
-
-.modal-box::-webkit-scrollbar-track {
-    background-color: rgba(255, 240, 100, 0.15);
-}
-
-/* 닫기 버튼 (X) */
-.modal-close-x,
-.modal-close-btn {
-    position: absolute;
-    top: clamp(8px, 2.5vw, 20px);
-    right: clamp(8px, 2.5vw, 20px);
-    font-size: clamp(32px, 12vw, 64px);
-    font-weight: 1000;
-    color: var(--accent-yellow);
-    cursor: pointer;
-    line-height: 1;
-    z-index: 30;
-    transition: transform 0.2s;
-}
-
-.modal-close-btn:hover {
-    transform: scale(1.1);
-}
-
-.modal-title {
-    font-size: clamp(36px, 11vw, 64px);
-    font-weight: 900;
-    color: var(--accent-yellow);
-    letter-spacing: clamp(1px, 0.2vw, 2px);
-    text-align: center;
-}
-
-.modal-desc {
-    font-size: clamp(16px, 5vw, 28px);
-    font-weight: 900;
-    color: var(--accent-yellow);
-    margin-bottom: clamp(8px, 2vw, 16px);
-    text-align: center;
-    letter-spacing: clamp(1px, 0.2vw, 2px);
-}
-
-/* 모달 내 카메라 영역 */
-.modal-camera-area {
-    width: 85%;
-    max-width: 600px;
-    border: clamp(2px, 0.4vw, 3px) solid var(--accent-yellow);
-    border-radius: clamp(8px, 2vw, 16px);
-    padding: 0;
-    display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #000;
-    height: clamp(200px, 28vh, 320px);
-    position: relative;
-    overflow: hidden;
+    background-color: transparent;
 }
 
-.modal-video-stream {
+.terms-all-a-new input:checked+.terms-checkmark-a-new {
+    background-color: #FFF064;
+}
+
+.terms-all-a-new input:checked+.terms-checkmark-a-new svg {
+    color: #141C29;
+}
+
+.terms-label-text-a-new {
+    font-size: 24px;
+    /* 28px -> 24px */
+    font-weight: 850;
+    color: #FFF064;
+}
+
+.terms-view-btn-a-new {
+    background: none;
+    border: none;
+    color: #FFF064;
+    font-size: 24px;
+    /* 26px -> 24px */
+    font-weight: 800;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.signup-submit-btn-a-new {
+    background-color: #FFF064;
+    color: #141C29;
+    border: none;
+    padding: 24px;
+    /* 30px -> 24px */
+    border-radius: 24px;
+    font-size: 38px;
+    /* 44px -> 38px */
+    font-weight: 950;
+    cursor: pointer;
+}
+
+/* Modal Styling */
+.signup-modal-overlay-a-new {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.signup-modal-box-a-new {
+    background: #141C29;
+    width: 100%;
+    max-width: 850px;
+    border: 4px solid #FFF064;
+    border-radius: 40px;
+    padding: 50px;
+    color: #FFF064;
+    overflow-y: auto;
+    max-height: 95vh;
+}
+
+.modal-title-a-new {
+    font-size: 48px;
+    font-weight: 950;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.camera-view-a-new {
+    width: 100%;
+    aspect-ratio: 1.5;
+    background: #000;
+    border: 3px solid #FFF064;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.shutter-btn-a-new {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 6px solid #FFF064;
+    background: transparent;
+    margin: 0 auto;
+    display: block;
+}
+
+.shutter-inner-a-new {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-}
-
-.modal-camera-text {
-    font-size: 4vw;
-    font-weight: bold;
-    color: var(--accent-yellow);
-    margin-bottom: 2vw;
-}
-
-.modal-camera-icon {
-    width: 15vw;
-    height: auto;
-}
-
-/* 셔터 버튼 */
-.shutter-button {
-    width: clamp(40px, 12vw, 80px);
-    height: clamp(40px, 12vw, 80px);
     border-radius: 50%;
-    background-color: transparent;
-    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
-    position: relative;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: clamp(12px, 3vw, 24px);
+    background-color: #FFF064;
 }
 
-.shutter-inner {
-    width: clamp(28px, 9vw, 60px);
-    height: clamp(28px, 9vw, 60px);
-    border-radius: 50%;
-    background-color: var(--accent-yellow);
-    transition: transform 0.1s;
-}
-
-.shutter-button:active .shutter-inner {
-    transform: scale(0.9);
-}
-
-/* =========================================
-   8. 모달 내 카드 폼 (Card Form in Modal)
-   ========================================= */
-.card-form-box {
-    width: 100%;
-    border: none;
-    border-radius: clamp(8px, 2vw, 20px);
-    padding: clamp(12px, 2.5vw, 22px);
-    background-color: transparent;
+.modal-form-a-new {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1.6vw, 14px);
-    box-sizing: border-box;
-    max-width: 600px;
-    /* Safety cap */
-    margin: 0 auto;
+    gap: 24px;
 }
 
-.card-form-header {
-    display: flex;
-    align-items: center;
-    gap: clamp(6px, 1.5vw, 12px);
-    font-size: clamp(36px, 11vw, 64px);
-    font-weight: 900;
-    color: var(--accent-yellow);
-    margin-bottom: clamp(4px, 1vw, 8px);
-    justify-content: center;
-    white-space: nowrap;
+.modal-input-group-a-new label {
+    font-size: 26px;
+    font-weight: 850;
+    margin-bottom: 8px;
 }
 
-.small-card-icon {
-    width: clamp(24px, 5vw, 50px);
-    height: auto;
-}
-
-.form-field-group {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(4px, 1vw, 10px);
-    width: 100%;
-}
-
-.form-field-group label {
-    font-size: clamp(14px, 3vw, 24px);
-    font-weight: bold;
-    color: var(--accent-yellow);
-    margin-left: clamp(2px, 0.5vw, 5px);
-}
-
-.modal-input {
-    border: clamp(2px, 0.4vw, 4px) solid var(--accent-yellow);
-    border-radius: clamp(6px, 1.5vw, 15px);
-    padding: clamp(8px, 1.5vw, 16px);
-    font-size: clamp(16px, 3.5vw, 28px);
-    box-sizing: border-box;
-}
-
-.form-row-group {
-    display: flex;
-    gap: clamp(10px, 2vw, 20px);
-    width: 100%;
-}
-
-.half {
-    flex: 1;
-}
-
-/* 카드 버튼 그룹 */
-.card-button-group {
-    display: flex;
-    gap: clamp(8px, 2vw, 16px);
-    width: 100%;
-    margin-top: clamp(8px, 1.5vw, 12px);
-}
-
-.card-retake-btn,
-.card-register-btn {
-    flex: 1;
-    font-size: clamp(20px, 6.5vw, 38px);
-    font-weight: bold;
-    padding: clamp(12px, 3vw, 20px);
-    border-radius: clamp(6px, 1.5vw, 12px);
-    font-family: var(--font-main);
-    font-weight: 900;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    border: none;
-    min-height: 44px;
-}
-
-.card-retake-btn {
-    background-color: transparent;
-    border: clamp(2px, 0.4vw, 3px) solid var(--accent-yellow);
-    color: var(--accent-yellow);
-}
-
-.card-register-btn {
-    background-color: var(--accent-yellow);
-    color: var(--bg-dark);
-}
-
-.card-retake-btn:hover,
-.card-register-btn:hover {
-    opacity: 0.9;
-}
-
-/* =========================================
-   9. 에러/성공 모달
-   ========================================= */
-.error-modal-box {
-    width: min(86vw, 760px);
-    background-color: var(--bg-dark);
-    border: 0.5vw solid var(--accent-yellow);
-    border-radius: 2vw;
-    padding: 5vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4vw;
-    box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.5);
-    text-align: center;
-    position: relative;
-}
-
-.signup-error-message {
-    font-size: clamp(24px, 8vw, 80px);
-    font-weight: bold;
-    line-height: 1.35;
-    width: 100%;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    white-space: normal;
-}
-
-.signup-error-message.is-error {
-    color: #FF5A5A;
-}
-
-.signup-error-message.is-info {
-    color: var(--accent-yellow);
-}
-
-.error-confirm-btn {
-    padding: clamp(9px, 0.9vw, 18px) clamp(21px, 2.1vw, 36px);
-    border-radius: clamp(12px, 1.5vw, 21px);
-    font-size: clamp(30px, 4.95vw, 60px);
-}
-
-.success-icon {
-    font-size: 8vw;
-}
-
-/* =========================================
-   10. 약관 상세 모달
-   ========================================= */
-.policy-modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1100;
-    background-color: rgba(10, 14, 20, 0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(14px, 4vw, 30px);
-}
-
-.policy-modal-box {
-    width: min(92vw, 760px);
-    max-height: 88vh;
-    overflow-y: auto;
-    background-color: #171C28;
-    border: clamp(2px, 0.5vw, 4px) solid var(--accent-yellow);
-    border-radius: clamp(16px, 4vw, 28px);
-    padding: clamp(18px, 4vw, 30px);
-    display: flex;
-    flex-direction: column;
-    gap: clamp(12px, 3vw, 18px);
-    position: relative;
-}
-
-.card-info-modal-box {
-    width: min(96vw, 980px);
-    max-width: 96vw;
-    padding: clamp(10px, 2.2vw, 18px);
-    background-color: #141C29;
-    overflow-x: hidden;
-}
-
-.card-info-modal-box .card-form-box {
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-}
-
-.card-info-modal-box .modal-input {
-    background: #171C28;
-}
-
-.card-info-modal-box .card-form-header {
-    white-space: normal;
-    text-align: center;
-    line-height: 1.25;
-}
-
-.policy-modal-title {
-    color: var(--accent-yellow);
-    font-size: clamp(24px, 7vw, 40px);
-    font-weight: 900;
-    text-align: left;
-    padding-right: clamp(32px, 8vw, 60px);
-}
-
-.policy-modal-close {
-    position: absolute;
-    top: clamp(12px, 3vw, 20px);
-    right: clamp(12px, 3vw, 20px);
-    border: none;
-    background: transparent;
-    color: var(--accent-yellow);
-    font-size: clamp(28px, 8vw, 44px);
-    line-height: 1;
-    cursor: pointer;
-}
-
-.policy-modal-content {
-    background: var(--bg-deep-dark);
-    color: var(--accent-yellow);
-    border-radius: clamp(10px, 2.5vw, 18px);
-    padding: clamp(14px, 4vw, 22px);
-    max-height: 50vh;
-    overflow-y: auto;
-    font-size: clamp(15px, 4.2vw, 24px);
+.modal-input-group-a-new input {
+    padding: 20px;
+    border: 3px solid #FFF064;
+    border-radius: 16px;
+    font-size: 28px;
     font-weight: 800;
-    line-height: 1.55;
-    white-space: pre-line;
+    background-color: transparent;
+    color: #FFF064;
 }
 
-.policy-modal-content p {
-    margin: 0 0 clamp(12px, 3vw, 18px);
+.modal-btn-group-a-new {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
 }
 
-.policy-modal-content p:last-child {
-    margin-bottom: 0;
-}
-
-.policy-confirm-btn {
-    width: 100%;
+.modal-primary-btn-a-new {
+    flex: 2;
+    padding: 24px;
+    background-color: #FFF064;
+    color: #141C29;
+    font-size: 32px;
+    font-weight: 950;
+    border-radius: 20px;
     border: none;
-    border-radius: clamp(8px, 2vw, 14px);
-    background-color: var(--accent-yellow);
-    color: #171C28;
-    font-family: var(--font-main);
-    font-size: clamp(20px, 6vw, 34px);
-    font-weight: 900;
-    padding: clamp(10px, 3vw, 16px);
+}
+
+.modal-secondary-btn-a-new {
+    flex: 1;
+    padding: 24px;
+    background-color: transparent;
+    color: #FFF064;
+    border: 3px solid #FFF064;
+    font-size: 32px;
+    font-weight: 950;
+    border-radius: 20px;
+}
+
+/* Terms Modal Specific */
+.terms-modal-box-a-new {
+    background: #FFF064;
+    /* A타입 전용 노란색 박스 */
+    width: 100%;
+    max-width: 800px;
+    border: 6px solid #141C29;
+    border-radius: 40px;
+    padding: 60px;
+    color: #141C29;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-height: 90vh;
+}
+
+.terms-modal-title-a-new {
+    font-size: 44px;
+    font-weight: 950;
+    text-align: center;
+    border-bottom: 4px solid #141C29;
+    padding-bottom: 20px;
+}
+
+.terms-modal-content-area-a-new {
+    font-size: 26px;
+    line-height: 1.6;
+    font-weight: 600;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+.terms-modal-confirm-btn-a-new {
+    background-color: #141C29;
+    color: #FFF064;
+    border: none;
+    padding: 24px;
+    border-radius: 20px;
+    font-size: 36px;
+    font-weight: 950;
     cursor: pointer;
+    width: 100%;
 }
 
-.policy-modal-box::-webkit-scrollbar,
-.policy-modal-content::-webkit-scrollbar {
-    width: 10px;
-}
+@media (max-width: 768px) {
+    .signup-a-card-new {
+        padding: 40px 20px;
+    }
 
-.policy-modal-box::-webkit-scrollbar-thumb,
-.policy-modal-content::-webkit-scrollbar-thumb {
-    background-color: var(--accent-yellow);
-    border-radius: 999px;
-}
-
-.policy-modal-box::-webkit-scrollbar-track,
-.policy-modal-content::-webkit-scrollbar-track {
-    background-color: rgba(255, 240, 100, 0.15);
+    .signup-title-a-new {
+        font-size: 36px;
+    }
 }

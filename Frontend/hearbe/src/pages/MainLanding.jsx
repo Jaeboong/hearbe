@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, Download, ArrowRight, Share2, Layout, Zap, Settings } from 'lucide-react';
+import { Volume2, Download, ArrowRight, Share2, Layout, Zap, Settings, Info, BookOpen } from 'lucide-react';
 import '../App.css';
 import '../index.css'
 import logoC from '../assets/logoC.png';
@@ -68,15 +68,52 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none h-20 md:h-32 flex items-center transition-all duration-300">
         <div className="max-w-7xl w-full mx-auto px-4 md:px-8 flex items-center justify-between">
           <img src={logoC} alt="HearBe" className="h-10 md:h-24 object-contain cursor-pointer drop-shadow-sm" onClick={() => window.location.href = '/main'} />
-          <div className="flex items-center gap-2 md:gap-4">
-            <a
+          <div className="flex items-center gap-2 md:gap-6">
+            {/* 서비스 소개 버튼 */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/intro')}
+              className="p-2 md:p-3 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center relative group"
+              title="서비스 소개"
+            >
+              <Info className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
+              {/* 말풍선 */}
+              <div className="absolute top-full mt-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                서비스 소개
+              </div>
+            </motion.button>
+
+            {/* 가이드 버튼 */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/guide')}
+              className="p-2 md:p-3 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center relative group"
+              title="가이드"
+            >
+              <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
+              {/* 말풍선 */}
+              <div className="absolute top-full mt-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                가이드
+              </div>
+            </motion.button>
+
+            {/* 음성 프로그램 다운로드 */}
+            <motion.a
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
               href="/downloads/MCPDesktop.zip"
               download
-              className="px-4 py-2 md:px-10 md:py-5 rounded-full font-extrabold text-sm md:text-2xl text-white flex items-center gap-2 md:gap-3 shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1 no-underline cursor-pointer"
-              style={{ background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)' }}
+              className="p-2 md:p-3 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center relative group"
+              title="음성 프로그램 다운로드"
             >
-              <Download className="w-4 h-4 md:w-6 md:h-6" /> <span className="hidden md:inline">음성 프로그램 </span>다운로드
-            </a>
+              <Download className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
+              {/* 말풍선 */}
+              <div className="absolute top-full mt-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                음성 프로그램 다운로드
+              </div>
+            </motion.a>
           </div>
         </div>
       </header>

@@ -26,11 +26,11 @@ const WishlistA = () => {
     };
 
     const menuItems = [
-        { id: 'profile', label: '회원정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문내역', path: '/A/order-history' },
+        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
-        { id: 'card', label: (<>장애인 복지카드<br />변경</>), path: '/A/card-management' }
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -107,10 +107,18 @@ const WishlistA = () => {
                 productName: item.name,
                 imgUrl: item.image
             });
-            alert(`${item.name}을(를) 장바구니에 담았습니다.`);
+            Swal.fire({
+                icon: 'success',
+                text: `${item.name}을(를) 장바구니에 담았습니다.`,
+                confirmButtonText: '확인'
+            });
         } catch (err) {
             console.error('Failed to add to cart:', err);
-            alert(err.message || '장바구니 담기에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: err.message || '장바구니 담기에 실패했습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -131,11 +139,11 @@ const WishlistA = () => {
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
                     <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
-                        <Home size={72} />
+                        <Home size={56} />
                         <span>홈</span>
                     </button>
                     <button className="topbar-action cursor-pointer" onClick={handleLogout}>
-                        <LogOut size={72} />
+                        <LogOut size={56} />
                         <span>로그아웃</span>
                     </button>
                 </div>
@@ -144,94 +152,98 @@ const WishlistA = () => {
             <div className="wishlist-content">
                 {/* Sidebar */}
                 <aside className="wishlist-sidebar">
-                    <nav className="sidebar-nav">
-                        {menuItems.map(item => (
-                            <div
-                                key={item.id}
-                                className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
-                                onClick={() => navigate(item.path)}
-                            >
-                                {item.label}
-                            </div>
-                        ))}
-                    </nav>
+                    <div className="sidebar-menu-card">
+                        <nav className="sidebar-nav">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
+                                    onClick={() => navigate(item.path)}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
                 </aside>
 
                 {/* Main Content */}
                 <main className="wishlist-main">
-                    <h2 className="content-title">
-                        <Heart size={40} color="#FFF064" fill="#FFF064" />
-                        찜한 상품
-                    </h2>
+                    <div className="content-card">
+                        <h2 className="content-title">
+                            <Heart size={64} color="#FFF064" fill="#FFF064" />
+                            찜한 상품
+                        </h2>
 
-                    {/* 로딩 상태 */}
-                    {isLoading && (
-                        <div className="loading-state">
-                            <div className="spinner"></div>
-                            <p>찜한 상품을 불러오는 중...</p>
-                        </div>
-                    )}
+                        {/* 로딩 상태 */}
+                        {isLoading && (
+                            <div className="loading-state">
+                                <div className="spinner"></div>
+                                <p>찜한 상품을 불러오는 중...</p>
+                            </div>
+                        )}
 
-                    {/* 에러 상태 */}
-                    {!isLoading && error && (
-                        <div className="error-state">
-                            <p className="error-message">찜한 상품을 불러오지 못했습니다.</p>
-                            <p className="error-detail">{error}</p>
-                            <button className="retry-btn cursor-pointer" onClick={handleRetry}>
-                                다시 시도
-                            </button>
-                        </div>
-                    )}
+                        {/* 에러 상태 */}
+                        {!isLoading && error && (
+                            <div className="error-state">
+                                <p className="error-message">찜한 상품을 불러오지 못했습니다.</p>
+                                <p className="error-detail">{error}</p>
+                                <button className="retry-btn cursor-pointer" onClick={handleRetry}>
+                                    다시 시도
+                                </button>
+                            </div>
+                        )}
 
-                    {/* 빈 상태 */}
-                    {!isLoading && !error && Object.keys(wishlistData).length === 0 ? (
-                        <div className="empty-wishlist">
-                            찜한 상품이 없습니다.
-                        </div>
-                    ) : (
-                        <>
-                            {/* Wishlist by Mall */}
-                            {Object.entries(wishlistData).map(([mallName, items]) => (
-                                items.length > 0 && (
-                                    <div key={mallName} className="mall-section">
-                                        <div className="mall-header">
-                                            <h3 className="mall-name">{mallName}</h3>
-                                        </div>
+                        {/* 빈 상태 */}
+                        {!isLoading && !error && Object.keys(wishlistData).length === 0 ? (
+                            <div className="empty-wishlist">
+                                찜한 상품이 없습니다.
+                            </div>
+                        ) : (
+                            <>
+                                {/* Wishlist by Mall */}
+                                {Object.entries(wishlistData).map(([mallName, items]) => (
+                                    items.length > 0 && (
+                                        <div key={mallName} className="mall-section">
+                                            <div className="mall-header">
+                                                <h3 className="mall-name">{mallName}</h3>
+                                            </div>
 
-                                        <div className="items-list">
-                                            {items.map(item => (
-                                                <div
-                                                    key={item.id}
-                                                    className="wishlist-item-wrapper cursor-pointer"
-                                                    onClick={() => item.url && window.open(item.url, '_blank', 'noopener,noreferrer')}
-                                                    style={{ cursor: item.url ? 'pointer' : 'default' }}
-                                                >
-                                                    <div className="wishlist-item">
-                                                        <img src={item.image} alt={item.name} className="item-image" />
-                                                        <div className="item-details">
-                                                            <div className="item-name">{item.name}</div>
-                                                            <div className="item-price-a">{item.price}</div>
-                                                        </div>
-                                                        <div className="item-actions">
-                                                            <button
-                                                                className="add-cart-btn cursor-pointer"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleAddToCart(item);
-                                                                }}
-                                                            >
-                                                                상품 조회
-                                                            </button>
+                                            <div className="items-list">
+                                                {items.map(item => (
+                                                    <div
+                                                        key={item.id}
+                                                        className="wishlist-item-wrapper cursor-pointer"
+                                                        onClick={() => item.url && window.open(item.url, '_blank', 'noopener,noreferrer')}
+                                                        style={{ cursor: item.url ? 'pointer' : 'default' }}
+                                                    >
+                                                        <div className="wishlist-item">
+                                                            <img src={item.image} alt={item.name} className="item-image" />
+                                                            <div className="item-details">
+                                                                <div className="item-name">{item.name}</div>
+                                                                <div className="item-price-a">{item.price}</div>
+                                                            </div>
+                                                            <div className="item-actions">
+                                                                <button
+                                                                    className="add-cart-btn cursor-pointer"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleAddToCart(item);
+                                                                    }}
+                                                                >
+                                                                    상품 조회
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )
-                            ))}
-                        </>
-                    )}
+                                    )
+                                ))}
+                            </>
+                        )}
+                    </div>
                 </main>
             </div>
 

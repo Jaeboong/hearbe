@@ -358,19 +358,21 @@
 /* A형 전용 푸터 스타일 */
 .landing-footer-a {
   width: 100%;
-  padding: 1.5rem 0;
+  padding: 3rem 0;
   text-align: center;
-  color: rgba(252, 211, 77, 0.8);
-  /* 노란색 0.8 투명도 */
-  font-size: 1.75rem;
-  font-weight: 500;
-  background: transparent;
+  color: rgba(255, 240, 100, 0.7);
+  font-size: 1.5rem;
+  font-weight: 600;
+  background-color: #141C29;
+  /* 배경색 일치 */
+  border: none !important;
+  /* 선 제거 */
   margin-top: auto;
 }
 
 .landing-footer-a p {
   margin: 0;
-  color: rgba(252, 211, 77, 0.8);
+  color: rgba(255, 240, 100, 0.6);
 }
 
 @keyframes ping {

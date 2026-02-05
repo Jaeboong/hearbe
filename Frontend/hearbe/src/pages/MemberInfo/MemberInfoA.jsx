@@ -15,11 +15,11 @@ const MemberInfoA = () => {
     const [error, setError] = useState(null);
 
     const menuItems = [
-        { id: 'profile', label: '회원정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문내역', path: '/A/order-history' },
+        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
         { id: 'cart', label: '장바구니', path: '/A/cart' },
-        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -86,27 +86,14 @@ const MemberInfoA = () => {
         }
     };
 
-    // Alert Modal State
-    const [alertState, setAlertState] = useState({
-        isOpen: false,
-        message: '',
-        type: 'success', // 'success' or 'error'
-        onConfirm: null
-    });
-
     const showAlert = (message, type = 'success', onConfirm = null) => {
-        setAlertState({
-            isOpen: true,
-            message,
-            type,
-            onConfirm
+        Swal.fire({
+            icon: type,
+            text: message,
+            confirmButtonText: '확인'
+        }).then(() => {
+            if (onConfirm) onConfirm();
         });
-    };
-
-    const handleAlertClose = () => {
-        const callback = alertState.onConfirm;
-        setAlertState(prev => ({ ...prev, isOpen: false }));
-        if (callback) callback();
     };
 
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -178,104 +165,108 @@ const MemberInfoA = () => {
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
                     <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
-                        <Home size={72} />
+                        <Home size={56} />
                         <span>홈</span>
                     </button>
                     <button className="topbar-action cursor-pointer" onClick={handleLogout}>
-                        <LogOut size={72} />
+                        <LogOut size={56} />
                         <span>로그아웃</span>
                     </button>
                 </div>
             </div>
 
             <div className="memberinfo-content">
-                {/* Sidebar Navigation */}
+                {/* Sidebar Navigation - Omit avatar, keep menu in a card */}
                 <aside className="memberinfo-sidebar">
-                    <nav className="sidebar-nav">
-                        {menuItems.map(item => (
-                            <div
-                                key={item.id}
-                                className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
-                                onClick={() => navigate(item.path)}
-                            >
-                                {item.label}
-                            </div>
-                        ))}
-                    </nav>
+                    <div className="sidebar-menu-card">
+                        <nav className="sidebar-nav">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
+                                    onClick={() => navigate(item.path)}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
                 </aside>
 
-                {/* Main Content */}
+                {/* Main Content - Card structure */}
                 <main className="memberinfo-main">
-                    <h2 className="content-title">
-                        <User size={40} color="#FFF064" />
-                        회원 정보
-                    </h2>
+                    <div className="content-card">
+                        <h2 className="content-title">
+                            <User size={64} color="#FFF064" />
+                            회원 정보
+                        </h2>
 
-                    {loading ? (
-                        <div className="loading-state">
-                            <div className="spinner"></div>
-                            <p>사용자 정보를 불러오는 중...</p>
-                        </div>
-                    ) : error ? (
-                        <div className="error-state">
-                            <p className="error-message">사용자 정보를 불러오지 못했습니다.</p>
-                            <p className="error-detail">{error}</p>
-                            <button className="retry-btn cursor-pointer" onClick={handleRetry}>
-                                다시 시도
-                            </button>
-                        </div>
-                    ) : userData ? (
-                        <>
-                            <div className="member-info-box">
-                                <div className="member-info-row">
-                                    <div className="member-col-left">
-                                        <span className="member-label">아이디</span>
+                        {loading ? (
+                            <div className="loading-state">
+                                <div className="spinner"></div>
+                                <p>사용자 정보를 불러오는 중...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="error-state">
+                                <p className="error-message">사용자 정보를 불러오지 못했습니다.</p>
+                                <p className="error-detail">{error}</p>
+                                <button className="retry-btn cursor-pointer" onClick={handleRetry}>
+                                    다시 시도
+                                </button>
+                            </div>
+                        ) : userData ? (
+                            <>
+                                <div className="member-info-list">
+                                    <div className="member-info-row">
+                                        <div className="member-col-left">
+                                            <span className="member-label">아이디</span>
+                                        </div>
+                                        <div className="member-col-right">
+                                            <span className="member-value">{localStorage.getItem('username') || '-'}</span>
+                                        </div>
                                     </div>
-                                    <div className="member-col-right">
-                                        <span className="member-value">{localStorage.getItem('username') || '-'}</span>
+                                    <div className="member-info-row">
+                                        <div className="member-col-left">
+                                            <span className="member-label">비밀번호</span>
+                                        </div>
+                                        <div className="member-col-right">
+                                            <div className="password-wrapper">
+                                                <span className="member-value">{userData.password}</span>
+                                                <button
+                                                    className="password-change-btn cursor-pointer"
+                                                    onClick={() => navigate('/A/changePassword')}
+                                                >
+                                                    변경하기
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="member-info-row">
-                                    <div className="member-col-left">
-                                        <span className="member-label">비밀번호</span>
+                                    <div className="member-info-row">
+                                        <div className="member-col-left">
+                                            <span className="member-label">이름</span>
+                                        </div>
+                                        <div className="member-col-right">
+                                            <span className="member-value">{userData.name}</span>
+                                        </div>
                                     </div>
-                                    <div className="member-col-right">
-                                        <div className="password-wrapper">
-                                            <span className="member-value">{userData.password}</span>
-                                            <button
-                                                className="password-change-btn cursor-pointer"
-                                                onClick={() => navigate('/A/changePassword')}
-                                            >
-                                                변경하기
-                                            </button>
+                                    <div className="member-info-row">
+                                        <div className="member-col-left">
+                                            <span className="member-label">휴대폰번호</span>
+                                        </div>
+                                        <div className="member-col-right">
+                                            <span className="member-value">{userData.phone}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="member-info-row">
-                                    <div className="member-col-left">
-                                        <span className="member-label">이름</span>
-                                    </div>
-                                    <div className="member-col-right">
-                                        <span className="member-value">{userData.name}</span>
-                                    </div>
-                                </div>
-                                <div className="member-info-row">
-                                    <div className="member-col-left">
-                                        <span className="member-label">휴대폰번호</span>
-                                    </div>
-                                    <div className="member-col-right">
-                                        <span className="member-value">{userData.phone}</span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div className="logout-section">
-                                <span className="logout-link cursor-pointer" onClick={handleWithdrawClick}>
-                                    회원탈퇴
-                                </span>
-                            </div>
-                        </>
-                    ) : null}
+                                <div className="logout-section">
+                                    <span className="logout-link cursor-pointer" onClick={handleWithdrawClick}>
+                                        회원탈퇴
+                                    </span>
+                                </div>
+                            </>
+                        ) : null}
+                    </div>
                 </main>
             </div>
 
@@ -315,27 +306,6 @@ const MemberInfoA = () => {
                 </div>
             )}
 
-            {/* Custom Alert Modal */}
-            {alertState.isOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-box" style={{ width: 'clamp(300px, 80vw, 500px)' }}> {/* Slightly smaller for alerts */}
-                        <h1 className="modal-title">
-                            {alertState.type === 'success' ? '알림' : '오류'}
-                        </h1>
-                        <p className="modal-desc" style={{ whiteSpace: 'pre-line' }}>
-                            {alertState.message}
-                        </p>
-                        <div className="modal-actions">
-                            <button
-                                className="modal-btn confirm cursor-pointer"
-                                onClick={handleAlertClose}
-                            >
-                                확인
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <footer className="landing-footer-a">
                 <p>© 2026 HearBe. All rights reserved.</p>
