@@ -5,6 +5,7 @@ MCP 데스크탑 앱 메인 진입점
 """
 
 import argparse
+import os
 import asyncio
 import logging
 import signal
@@ -125,6 +126,11 @@ class Application:
             from debug.console_input import ConsoleInputManager
             self.modules["console_input"] = ConsoleInputManager()
 
+        # 스크립트 입력 모듈 (테스트용)
+        if os.getenv("DEBUG_SCRIPTED_INPUT", "").lower() in ("1", "true", "yes", "y", "on"):
+            from debug.scripted_input import ScriptedInputManager
+            self.modules["scripted_input"] = ScriptedInputManager()
+
         # 시스템 이벤트 핸들러
         event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
         event_bus.subscribe(EventType.ERROR_OCCURRED, self._on_error)
@@ -156,6 +162,10 @@ class Application:
         if "console_input" in self.modules:
             await self.modules["console_input"].start()
 
+        # 스크립트 입력 시작
+        if "scripted_input" in self.modules:
+            await self.modules["scripted_input"].start()
+
         # Audio 모듈 시작 (PTT 녹음)
         if "audio" in self.modules:
             await self.modules["audio"].start()
@@ -180,6 +190,8 @@ class Application:
             await self.modules["audio"].stop()
         if "console_input" in self.modules:
             await self.modules["console_input"].stop()
+        if "scripted_input" in self.modules:
+            await self.modules["scripted_input"].stop()
         if "ws_client" in self.modules:
             await self.modules["ws_client"].stop()
         if "mcp" in self.modules:

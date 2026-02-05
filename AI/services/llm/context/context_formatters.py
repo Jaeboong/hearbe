@@ -76,6 +76,9 @@ def format_product_detail_section(product_detail: Optional[Dict[str, Any]] = Non
         "option": product_detail.get("option"),
         "options": product_detail.get("options"),
         "options_list": product_detail.get("options_list"),
+        "ocr_summary": product_detail.get("ocr_summary"),
+        "ocr_keywords": product_detail.get("ocr_keywords"),
+        "ocr_product_type": product_detail.get("ocr_product_type"),
     }
     lines = ["## Product Detail (current)"]
     lines.append(json.dumps(detail, ensure_ascii=True))

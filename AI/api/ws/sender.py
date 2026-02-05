@@ -7,6 +7,7 @@ Centralizes outbound message formats for WS responses.
 
 import logging
 import re
+import uuid
 from typing import Optional, Iterable, List
 
 from core.interfaces import ASRResult
@@ -96,35 +97,70 @@ class WSSender:
             return
 
         try:
+            tts_id = uuid.uuid4().hex[:10]
             text = _strip_urls(text)
             text = _normalize_line_breaks(text)
             text = normalize_tts_text(text)
             segments = _split_tts_text(text)
             epoch = self._tts_epoch.get(session_id, 0)
+            preview = _log_preview(text, 200)
+            logger.info(
+                "TTS start: id=%s session=%s chars=%d segments=%d text='%s'",
+                tts_id,
+                session_id,
+                len(text or ""),
+                len(segments),
+                preview,
+            )
             chunk_count = 0
-            for segment in segments:
+            for segment_index, segment in enumerate(segments):
                 if self._tts_epoch.get(session_id, 0) != epoch:
                     logger.info(f"TTS cancelled: session={session_id}")
                     break
                 if not segment:
                     continue
+                logger.info(
+                    "TTS text: id=%s session=%s segment=%d/%d '%s'",
+                    tts_id,
+                    session_id,
+                    segment_index + 1,
+                    len(segments),
+                    _log_preview(segment, 400),
+                )
+                first_chunk = True
                 async for chunk in self._tts.synthesize_stream(segment):
                     if self._tts_epoch.get(session_id, 0) != epoch:
                         logger.info(f"TTS cancelled: session={session_id}")
                         break
+                    data = {
+                        "audio": chunk.audio_data.hex() if chunk.audio_data else "",
+                        "is_final": chunk.is_final,
+                        "sample_rate": chunk.sample_rate,
+                        "tts_id": tts_id,
+                    }
+                    if first_chunk:
+                        data.update(
+                            {
+                                "text": segment,
+                                "segment_index": segment_index,
+                                "segment_total": len(segments),
+                            }
+                        )
+                        first_chunk = False
                     msg = WSMessage(
                         type=MessageType.TTS_CHUNK,
-                        data={
-                            "audio": chunk.audio_data.hex() if chunk.audio_data else "",
-                            "is_final": chunk.is_final,
-                            "sample_rate": chunk.sample_rate
-                        },
+                        data=data,
                         session_id=session_id
                     )
                     await self._connections.send_message(session_id, msg)
                     chunk_count += 1
-            preview = segments[0][:50] if segments else ""
-            logger.info(f"TTS completed: {chunk_count} chunks sent for '{preview}...'")
+            logger.info(
+                "TTS completed: id=%s session=%s chunks=%d segments=%d",
+                tts_id,
+                session_id,
+                chunk_count,
+                len(segments),
+            )
         except Exception as e:
             logger.error(f"TTS streaming failed: {e}")
 
@@ -205,3 +241,14 @@ def _split_tts_text(text: str, max_chars: int = 200) -> List[str]:
         if part:
             segments.append(part)
     return segments
+
+
+def _log_preview(text: str, max_chars: int) -> str:
+    if not text:
+        return ""
+    cleaned = re.sub(r"\s+", " ", str(text)).strip()
+    if max_chars <= 0:
+        return cleaned
+    if len(cleaned) <= max_chars:
+        return cleaned
+    return cleaned[:max_chars] + "…"

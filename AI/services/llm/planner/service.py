@@ -22,6 +22,7 @@ from .selection import select_from_results
 from services.llm.rules.product_option import handle_product_option_rule
 from .cart_action import handle_cart_action
 from .order_list_action import handle_order_list_action
+from .product_info_action import handle_product_info_action
 from .fallback import build_llm_fallback_response
 
 logger = logging.getLogger(__name__)
@@ -109,6 +110,9 @@ class LLMPlanner(ILLMPlanner):
             order_list_action = handle_order_list_action(user_text, session)
             if order_list_action:
                 return order_list_action
+            product_info_action = handle_product_info_action(user_text, session)
+            if product_info_action:
+                return product_info_action
         decision = self._routing_policy.decide(user_text, intent, rule_result)
 
         # 2. LLM fallback by policy

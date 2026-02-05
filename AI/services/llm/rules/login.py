@@ -13,6 +13,7 @@ from ..context.context_rules import (
     build_login_page_commands,
     build_press_command,
     build_wait_for_selector_command,
+    detect_target_site,
 )
 from ..sites.site_manager import get_page_type, get_selector
 
@@ -23,9 +24,10 @@ class LoginRule(BaseRule):
     def check(self, text: str, current_url: str, current_site) -> Optional[RuleResult]:
         if get_page_type(current_url) == "login":
             return None
+        target_site = current_site or detect_target_site(text, self.site_manager, current_site)
         phone = _extract_phone_number(text)
         if phone and get_page_type(current_url) != "login":
-            commands = build_login_page_commands(current_site)
+            commands = build_login_page_commands(target_site)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -33,11 +35,11 @@ class LoginRule(BaseRule):
                 rule_name="login",
             )
 
-        if "로그인" not in text:
+        if "로그인" not in text and "login" not in text.lower():
             return None
 
         if any(kw in text for kw in LOGIN_SUBMIT_TRIGGERS):
-            commands = build_login_page_commands(current_site)
+            commands = build_login_page_commands(target_site)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -45,7 +47,7 @@ class LoginRule(BaseRule):
                 rule_name="login",
             )
 
-        commands = build_login_page_commands(current_site)
+        commands = build_login_page_commands(target_site)
         return RuleResult(
             matched=True,
             commands=commands,

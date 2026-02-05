@@ -3,12 +3,26 @@
 NLU/LLM pipeline handler.
 """
 
+import asyncio
 import logging
+import time
 
 from core.interfaces import IntentType
 from services.llm.planner.selection.option_select import coerce_option_clicks, is_option_request
 from services.llm.feedback.fast_ack import FastAckGenerator
-from services.llm.sites.site_manager import get_page_type
+from services.llm.generators.tts_text_generator import TTSTextGenerator
+from services.llm.sites.site_manager import get_page_type, get_selector
+from services.llm.pipelines.compound import handle_read_then_act
+from services.llm.pipelines.read import (
+    handle_product_info_read,
+    handle_cart_summary_read,
+    handle_order_list_summary_read,
+    handle_search_summary_read,
+)
+from services.llm.pipelines.read.product_info import (
+    has_recent_product_detail,
+    is_product_info_request,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +35,7 @@ class LLMPipelineHandler:
         self._sender = sender
         self._command_pipeline = command_pipeline
         self._fast_ack = FastAckGenerator()
+        self._tts_only = TTSTextGenerator()
 
     async def handle(self, session_id: str, text: str, session, interrupted) -> str:
         """
@@ -41,6 +56,64 @@ class LLMPipelineHandler:
 
         if not self._llm:
             return ""
+
+        compound_read_sent = False
+
+        # Read-only pipelines: bypass command LLM and generate TTS directly.
+        if session and session.context:
+            if is_product_info_request(resolved_text):
+                waited = await self._wait_for_product_detail(session, session_id, interrupted)
+                if not waited and not has_recent_product_detail(session):
+                    pending = session.context.get("pending_product_info_read")
+                    if not pending:
+                        session.context["pending_product_info_read"] = {
+                            "text": resolved_text,
+                            "ts": time.time(),
+                        }
+                    if not interrupted():
+                        ack_text = "상품 정보를 불러오는 중이에요. 잠시만 기다려 주세요."
+                        await self._sender.send_tts_response(session_id, ack_text)
+                        return ack_text
+            read_handlers = (
+                handle_product_info_read,
+                handle_cart_summary_read,
+                handle_order_list_summary_read,
+                handle_search_summary_read,
+            )
+            compound_result = handle_read_then_act(resolved_text, session, read_handlers)
+            if compound_result:
+                compound_response, handler_name = compound_result
+                logger.info(
+                    "Read pipeline hit (compound): handler=%s session=%s",
+                    handler_name,
+                    session_id,
+                )
+                # Avoid LLM TTS asking for confirmation when actions will run.
+                await self._sender.send_tts_response(session_id, compound_response.text)
+                compound_read_sent = True
+
+            if not compound_read_sent:
+                for handler in read_handlers:
+                    if interrupted():
+                        return ""
+                    read_response = handler(resolved_text, session)
+                    if read_response and read_response.text:
+                        logger.info(
+                            "Read pipeline hit: handler=%s session=%s",
+                            handler.__name__,
+                            session_id,
+                        )
+                        page_type = get_page_type(session.current_url or "") if session.current_url else None
+                        tts_text = await self._tts_only.generate(
+                            user_text=resolved_text,
+                            current_url=session.current_url or "",
+                            page_type=page_type,
+                            commands=read_response.commands or [],
+                            fallback_text=read_response.text,
+                            session_context=session.context,
+                        )
+                        await self._sender.send_tts_response(session_id, tts_text or read_response.text)
+                        return tts_text or read_response.text
 
         if session and session.context:
             detail = session.context.get("product_detail")
@@ -93,18 +166,24 @@ class LLMPipelineHandler:
             session.current_url or "",
             allow_extract=allow_extract,
         )
+        self._maybe_set_last_added_product(session_id, session, commands, session.current_url or "")
         if session:
             page_type = get_page_type(session.current_url or "") if session.current_url else None
         else:
             page_type = None
-        ack_text = self._fast_ack.get_ack(
-            resolved_text,
-            page_type,
-            intent.intent if intent else None,
-            commands,
-        )
-        if ack_text:
+        ack_text = None
+        if response and not (response.text or "").strip():
+            ack_text = self._fast_ack.get_ack(
+                resolved_text,
+                page_type,
+                intent.intent if intent else None,
+                commands,
+            )
+        if ack_text and not compound_read_sent:
+            logger.info("Fast ACK sent: session=%s text='%s...'", session_id, ack_text[:80])
             await self._sender.send_tts_response(session_id, ack_text)
+        elif not compound_read_sent and response and (response.text or "").strip():
+            logger.info("Fast ACK skipped: response_text_present session=%s", session_id)
         if not commands:
             logger.info(
                 "No commands generated for session=%s text='%s'",
@@ -119,3 +198,63 @@ class LLMPipelineHandler:
             interrupted,
         )
         return tts_text or ""
+
+    def _maybe_set_last_added_product(self, session_id: str, session, commands, current_url: str) -> None:
+        if not session or not session.context or not commands or not current_url:
+            return
+        selector = get_selector(current_url, "add_to_cart")
+        if not selector:
+            return
+        is_add_to_cart = False
+        for cmd in commands:
+            tool = getattr(cmd, "tool_name", "") or ""
+            args = getattr(cmd, "arguments", {}) or {}
+            if tool in ("click", "click_element") and args.get("selector") == selector:
+                is_add_to_cart = True
+                break
+            if tool == "click_text" and (args.get("text") or "").strip() == "장바구니 담기":
+                is_add_to_cart = True
+                break
+        if not is_add_to_cart:
+            return
+        name = self._extract_product_name(session.context)
+        if name:
+            session.context["last_added_product"] = name
+            logger.info("Set last_added_product: session=%s name=%s", session_id, name)
+
+    @staticmethod
+    def _extract_product_name(context) -> str:
+        if not isinstance(context, dict):
+            return ""
+        detail = context.get("product_detail")
+        if isinstance(detail, dict):
+            for key in ("name", "product_name", "title", "productTitle", "product"):
+                value = detail.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+        last_mentioned = context.get("last_mentioned_product")
+        if isinstance(last_mentioned, str):
+            return last_mentioned.strip()
+        return ""
+
+    async def _wait_for_product_detail(self, session, session_id: str, interrupted) -> bool:
+        if not session or not session.context:
+            return False
+        if has_recent_product_detail(session):
+            return True
+        deadline = time.time() + 4.5
+        while time.time() < deadline:
+            if interrupted():
+                return False
+            await asyncio.sleep(0.5)
+            if has_recent_product_detail(session):
+                logger.info(
+                    "Product detail arrived after wait: session=%s",
+                    session_id,
+                )
+                return True
+        logger.info(
+            "Product detail not available after wait: session=%s",
+            session_id,
+        )
+        return False
