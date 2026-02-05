@@ -10,6 +10,7 @@ from ..context.context_rules import (
     build_search_with_navigation_commands,
     build_extract_products_command
 )
+from ..sites.site_manager import get_page_type
 
 
 class SearchRule(BaseRule):
@@ -27,7 +28,12 @@ class SearchRule(BaseRule):
         if not target_site:
             return None
 
-        needs_navigation = not target_site.matches_domain(current_url)
+        page_type = get_page_type(current_url) if current_url else None
+        needs_navigation = True
+        if current_url and target_site.matches_domain(current_url):
+            # Only stay if we are already on a page that has a search bar.
+            if page_type in ("home", "search"):
+                needs_navigation = False
         commands = build_search_with_navigation_commands(
             target_site, query, needs_navigation, current_url
         )
