@@ -96,9 +96,20 @@ class PaymentPostHandler:
         tts_text = _build_thank_you_tts(info)
         await self._sender.send_tts_response(session_id, tts_text)
 
-        if not self._session.get_context(session_id, CTX_PAYMENT_POST_WAITING_ACTION):
-            self._session.set_context(session_id, CTX_PAYMENT_POST_WAITING_ACTION, True)
-            await self._sender.send_tts_response(session_id, FOLLOW_UP_TTS)
+        if not _is_order_detail_url(page_url):
+            pending = self._session.get_context(session_id, CTX_PAYMENT_POST_PENDING_ACTION)
+            if not pending:
+                self._session.set_context(session_id, CTX_PAYMENT_POST_PENDING_ACTION, PENDING_ACTION_ORDER_DETAIL)
+                await self._sender.send_tool_calls(
+                    session_id,
+                    [
+                        MCPCommand(
+                            tool_name="click",
+                            arguments={"selector": SELECTOR_ORDER_DETAIL_BUTTON},
+                            description="go to order detail",
+                        )
+                    ],
+                )
         return True
 
     async def handle_user_text(self, session_id: str, text: str) -> bool:
