@@ -44,9 +44,11 @@ class TextHandler:
         login_guard=None,
         login_feedback=None,
         payment_keypad=None,
+        login_status=None,
         login_autofill=None,
         order_detail_handler=None,
         page_extract=None,
+        command_queue=None,
     ):
         self._nlu = nlu_service
         self._llm = llm_planner
@@ -57,6 +59,7 @@ class TextHandler:
         self._login_guard = login_guard
         self._login_feedback = login_feedback
         self._payment_keypad = payment_keypad
+        self._login_status = login_status
         self._login_autofill = login_autofill
         self._order_detail = order_detail_handler
         self._page_extract = page_extract
@@ -65,6 +68,7 @@ class TextHandler:
             action_feedback=action_feedback,
             login_guard=login_guard,
             login_feedback=login_feedback,
+            command_queue=command_queue,
         )
 
         # Specialized handlers
@@ -87,6 +91,7 @@ class TextHandler:
         self._text_router = TextRouter(
             session_manager=session_manager,
             payment_keypad=payment_keypad,
+            login_status=login_status,
             login_autofill=login_autofill,
             order_detail_handler=order_detail_handler,
             flow_handler=self._flow_handler,
