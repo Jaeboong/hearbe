@@ -36,11 +36,12 @@
 .logo-area-a-new {
   margin-bottom: clamp(15px, 3vh, 30px);
   /* 로고 마진 살짝 축소 */
+  display: flex;
+  justify-content: center;
 }
 
 .logo-image-a-new {
-  height: clamp(75px, 11vh, 110px);
-  /* 로고 크기 아주 살짝 축소 */
+  height: 100px;
   width: auto;
 }
 
