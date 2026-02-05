@@ -8,6 +8,7 @@ import json
 import logging
 import time
 from typing import Dict, Any, Optional, List
+from urllib.parse import urljoin
 
 from core.event_bus import EventType, publish
 from services.llm.sites.site_manager import get_page_type
@@ -180,6 +181,17 @@ class MCPHandler:
             if isinstance(result, dict):
                 detail = result.get("detail") or result.get("product_detail")
                 if detail:
+                    if isinstance(detail, dict):
+                        detail = dict(detail)
+                        if detail_images:
+                            detail.setdefault("detail_images", detail_images)
+                        extracted_at = time.time()
+                        detail["_extracted_at"] = extracted_at
+                        self._session.set_context(
+                            session_id,
+                            "product_detail_received_at",
+                            extracted_at,
+                        )
                     self._session.set_context(session_id, "product_detail", detail)
                     self._save_product_detail_to_file(detail, session_id)
                     if isinstance(detail, dict) and detail.get("options_list"):
@@ -191,6 +203,32 @@ class MCPHandler:
                         )
                     if not suppress_outputs:
                         await self._maybe_handle_pending_option(session_id, session)
+                        pending = None
+                        if self._session:
+                            pending = self._session.get_context(session_id, "pending_product_info_read")
+                        if pending:
+                            pending_text = pending.get("text") if isinstance(pending, dict) else str(pending)
+                            pending_ts = pending.get("ts") if isinstance(pending, dict) else None
+                            if pending_ts and time.time() - float(pending_ts) > 30:
+                                pending_text = ""
+                            if pending_text:
+                                from services.llm.pipelines.read.product_info import handle_product_info_read
+                                read_response = handle_product_info_read(
+                                    pending_text,
+                                    session,
+                                    allow_action=True,
+                                )
+                                if read_response and read_response.text:
+                                    await self._sender.send_tts_response(
+                                        session_id,
+                                        read_response.text,
+                                    )
+                                    logger.info(
+                                        "Pending product info read delivered: session=%s",
+                                        session_id,
+                                    )
+                            if self._session:
+                                self._session.set_context(session_id, "pending_product_info_read", None)
                 if detail_images:
                     self._session.set_context(session_id, "detail_images", detail_images)
                 cart_items = result.get("cart_items")
@@ -374,6 +412,10 @@ class MCPHandler:
         모든 이미지를 한번에 OCR 처리 후 LLM 요약
         """
         try:
+            image_urls = _normalize_image_urls(image_urls, page_url)
+            if not image_urls:
+                logger.warning("OCR skipped: no valid image URLs after normalization")
+                return
             ocr_integrator = get_ocr_integrator()
             site = detect_site(page_url or "")
 
@@ -403,7 +445,16 @@ class MCPHandler:
 
             session = self._session.get_session(session_id) if self._session else None
             if session and self._session:
-                self._session.set_context(session_id, "ocr_result", ocr_result.to_dict())
+                ocr_payload = ocr_result.to_dict()
+                self._session.set_context(session_id, "ocr_result", ocr_payload)
+                detail = self._session.get_context(session_id, "product_detail")
+                if isinstance(detail, dict):
+                    updated = dict(detail)
+                    updated.setdefault("detail_images", image_urls)
+                    updated.setdefault("ocr_summary", ocr_payload.get("summary", []))
+                    updated.setdefault("ocr_keywords", ocr_payload.get("keywords", {}))
+                    updated.setdefault("ocr_product_type", ocr_payload.get("product_type"))
+                    self._session.set_context(session_id, "product_detail", updated)
 
             await self._sender.send_ocr_progress(session_id, "completed", 100, len(image_urls))
             logger.info(f"OCR 배치 처리 완료: {session_id}")
@@ -460,6 +511,32 @@ class MCPHandler:
 
     def cleanup_session(self, session_id: str):
         self._file_manager.cleanup_session(session_id)
+
+
+def _normalize_image_urls(urls: List[str], base_url: Optional[str] = None) -> List[str]:
+    if not urls:
+        return []
+    seen = set()
+    normalized: List[str] = []
+    for raw in urls:
+        if not isinstance(raw, str):
+            continue
+        url = raw.strip()
+        if not url:
+            continue
+        if url.startswith(("data:", "blob:", "javascript:")):
+            continue
+        if url.startswith("//"):
+            url = f"https:{url}"
+        elif url.startswith("/") and base_url:
+            url = urljoin(base_url, url)
+        if not (url.startswith("http://") or url.startswith("https://")):
+            continue
+        if url in seen:
+            continue
+        seen.add(url)
+        normalized.append(url)
+    return normalized
 
 
 def _extract_request_ts(request_id: Optional[str]) -> Optional[float]:
