@@ -42,6 +42,7 @@ class MCPHandler:
         login_guard=None,
         login_feedback=None,
         dom_fallback=None,
+        command_queue=None,
     ):
         self._sender = sender
         self._session = session_manager
@@ -50,6 +51,7 @@ class MCPHandler:
         self._login_guard = login_guard
         self._login_feedback = login_feedback
         self._dom_fallback = dom_fallback
+        self._command_queue = command_queue
         self._file_manager = TempFileManager()  # Manages temporary JSON files
         self._tts = TTSGenerator()
 

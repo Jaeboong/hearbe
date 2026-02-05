@@ -10,10 +10,10 @@ import asyncio
 import base64
 import logging
 import os
-import re
 from typing import Dict, Any, Optional, List
 
 from core.interfaces import MCPCommand
+from services.ocr.payment.pin_parser import PinParser
 from services.llm.sites.site_manager import get_page_type, get_selector
 from ..presenter.pages.checkout import (
     KEYPAD_PROMPT,
@@ -47,24 +47,6 @@ CTX_ARMED = "payment_keypad_armed"
 CTX_PENDING_DIGITS = "payment_keypad_pending_digits"
 
 
-_KOR_DIGIT_MAP = {
-    "영": "0",
-    "공": "0",
-    "일": "1",
-    "하나": "1",
-    "이": "2",
-    "둘": "2",
-    "삼": "3",
-    "셋": "3",
-    "사": "4",
-    "넷": "4",
-    "오": "5",
-    "육": "6",
-    "륙": "6",
-    "칠": "7",
-    "팔": "8",
-    "구": "9",
-}
 
 
 class PaymentKeypadManager:
@@ -479,39 +461,10 @@ def _args_match(expected: Dict[str, Any], actual: Dict[str, Any]) -> bool:
     return True
 
 
+
 def _extract_digits(text: str) -> List[str]:
-    if not text:
-        return []
-    digits = re.findall(r"\d", text)
-    if digits:
-        return digits
-    tokens = re.split(r"\s+", re.sub(r"[^\w가-힣]", " ", text))
-    results: List[str] = []
-    kor_keys = sorted(_KOR_DIGIT_MAP.keys(), key=len, reverse=True)
-    for token in tokens:
-        token = token.strip()
-        if not token:
-            continue
-        if token in _KOR_DIGIT_MAP:
-            results.append(_KOR_DIGIT_MAP[token])
-            continue
-        embedded = re.findall(r"\d", token)
-        if embedded:
-            results.extend(embedded)
-            continue
-        # Parse continuous Korean digit sequences (e.g., "육구칠일공공")
-        idx = 0
-        while idx < len(token):
-            matched = False
-            for key in kor_keys:
-                if token.startswith(key, idx):
-                    results.append(_KOR_DIGIT_MAP[key])
-                    idx += len(key)
-                    matched = True
-                    break
-            if not matched:
-                idx += 1
-    return results
+    result = PinParser().parse(text or "")
+    return result.digits
 
 
 def _get_key_selector(current_url: Optional[str], key: str) -> str:
