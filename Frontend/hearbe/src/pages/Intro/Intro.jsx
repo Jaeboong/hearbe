@@ -18,6 +18,8 @@ export default function Intro() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [hasStarted, setHasStarted] = useState(false); // 시작 화면 제어
+    const [splineFailed, setSplineFailed] = useState(false);
+    const splineLoadedRef = React.useRef(false);
     const navigate = useNavigate();
 
     // 오디오와 타이머 객체 관리 (중복 실행 방지)
@@ -25,10 +27,20 @@ export default function Intro() {
     const timerRef = React.useRef(null);
     const isMountedRef = React.useRef(true);
 
+    // Spline 로딩 타임아웃: 일정 시간 내 로드 안 되면 fallback 표시
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (!splineLoadedRef.current) {
+                setSplineFailed(true);
+            }
+        }, 8000);
+        return () => clearTimeout(timeout);
+    }, []);
+
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-        setTimeout(() => navigate('/welcome'), 850);
+        setTimeout(() => navigate('/guide'), 850);
     };
 
     const handleStart = () => {
@@ -47,7 +59,7 @@ export default function Intro() {
                     if (currentStep < STEPS.length - 1) {
                         setCurrentStep(prev => prev + 1);
                     } else {
-                        navigate('/welcome');
+                        navigate('/guide');
                     }
                 }
             }
@@ -141,7 +153,7 @@ export default function Intro() {
 
     return (
         <div className="intro-container">
-            <button className="skip-btn" onClick={() => navigate('/welcome')}>Skip</button>
+            <button className="skip-btn" onClick={() => navigate('/guide')}>Skip</button>
 
             <AnimatePresence>
                 {isTransitioning && (
@@ -165,7 +177,21 @@ export default function Intro() {
             </div>
 
             <div className="object-section">
-                <Spline scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode" />
+                {splineFailed ? (
+                    <div className="abstract-orb" />
+                ) : (
+                    <Spline
+                        scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
+                        onError={() => setSplineFailed(true)}
+                        onLoad={(splineApp) => {
+                            if (splineApp) {
+                                splineLoadedRef.current = true;
+                            } else {
+                                setSplineFailed(true);
+                            }
+                        }}
+                    />
+                )}
             </div>
 
             <div className="action-section">

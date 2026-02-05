@@ -67,7 +67,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
       {/* Header - Fixed & Transparent for unity */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-transparent h-32 flex items-center transition-all duration-300">
         <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
-          <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm" onClick={() => navigate('/welcome')} />
+          <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm" onClick={() => navigate('/guide')} />
           <div className="flex items-center gap-4">
             <button
               onClick={onOpenSetup}

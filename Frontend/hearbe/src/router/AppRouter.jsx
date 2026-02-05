@@ -81,7 +81,7 @@ function AppContent() {
       <Route path="/intro" element={<Intro />} />
 
       {/* 인트로 완료 후 브랜드 소개 페이지 */}
-      <Route path="/welcome" element={<BrandLanding />} />
+      <Route path="/guide" element={<BrandLanding />} />
 
       {/* 메인 랜딩 페이지 (쇼핑 모드 선택 전용) */}
       <Route
