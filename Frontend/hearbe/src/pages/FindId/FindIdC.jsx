@@ -1,6 +1,7 @@
 ﻿import { ArrowLeft, User, Mail, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import './FindIdC.css';
 import logoC from '../../assets/logoC.png';
 
@@ -28,37 +29,72 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
 
     const handleSendVerification = async () => {
         if (!name || !email) {
-            alert('이름과 이메일 주소를 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '이름과 이메일 주소를 입력해주세요.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
             return;
         }
         try {
             // EmailJS로 인증번호 발송 (클라이언트 사이드)
             await emailService.sendVerificationCode(email, name);
             setIsSent(true);
-            alert('인증번호가 이메일로 전송되었습니다. (3분 내 입력)');
+            Swal.fire({
+                icon: 'success',
+                text: '인증번호가 이메일로 전송되었습니다. (3분 내 입력)',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
         } catch (error) {
-            alert(error.message || '인증번호 전송에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '인증번호 전송에 실패했습니다.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
         }
     };
 
     const handleVerifyCode = () => {
         if (!verificationCode) {
-            alert('인증번호를 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '인증번호를 입력해주세요.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
             return;
         }
         try {
             // EmailJS 인증번호 확인 (클라이언트 사이드)
             emailService.verifyCode(email, verificationCode);
             setIsVerified(true);
-            alert('인증이 완료되었습니다.');
+            Swal.fire({
+                icon: 'success',
+                text: '인증이 완료되었습니다.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
         } catch (error) {
-            alert(error.message || '인증번호가 일치하지 않습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '인증번호가 일치하지 않습니다.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
         }
     };
 
     const handleFindId = async () => {
         if (!isVerified) {
-            alert('먼저 이메일 인증을 완료해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '먼저 이메일 인증을 완료해주세요.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
             return;
         }
         try {
@@ -68,10 +104,20 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                 setFoundUserId(response.data.username);
                 setShowIdPopup(true);
             } else {
-                alert('해당 정보로 가입된 아이디를 찾을 수 없습니다.');
+                Swal.fire({
+                    icon: 'error',
+                    text: '해당 정보로 가입된 아이디를 찾을 수 없습니다.',
+                    confirmButtonColor: '#7c3aed',
+                    confirmButtonText: '확인'
+                });
             }
         } catch (error) {
-            alert(error.message || '아이디 찾기에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '아이디 찾기에 실패했습니다.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -119,7 +165,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                                         placeholder="example@mail.com"
                                     />
                                 </div>
-                                <button onClick={handleSendVerification} className="secondary-btn-c">
+                                <button onClick={handleSendVerification} className="secondary-btn-c cursor-pointer">
                                     {isSent ? '재전송' : '인증요청'}
                                 </button>
                             </div>
@@ -136,7 +182,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                                         placeholder="6자리 숫자 입력"
                                         className="grow code-input-c"
                                     />
-                                    <button onClick={handleVerifyCode} className="black-btn-c">
+                                    <button onClick={handleVerifyCode} className="black-btn-c cursor-pointer">
                                         확인
                                     </button>
                                 </div>
@@ -145,7 +191,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
 
                         <button
                             onClick={handleFindId}
-                            className="submit-full-btn-c active"
+                            className="submit-full-btn-c active cursor-pointer"
                         >
                             아이디 확인하기
                         </button>
@@ -154,9 +200,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                 </div>
             </main>
 
-            <footer className="landing-footer">
-                <p>© 2026 HearBe. All rights reserved.</p>
-            </footer>
+
 
             {showIdPopup && (
                 <div className="modal-overlay-c">
@@ -169,7 +213,7 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
                             <span className="result-label-c">회원님의 아이디는</span>
                             <strong className="result-value-c">{foundUserId}</strong>
                         </div>
-                        <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c"> {/* 로그인 페이지로 이동 */}
+                        <button onClick={() => navigate('/C/login')} className="modal-confirm-btn-c cursor-pointer"> {/* 로그인 페이지로 이동 */}
                             확인 및 로그인하기
                         </button>
                     </div>

@@ -149,19 +149,19 @@ const OrderHistoryA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="orderhistory-logo-left"
+                className="orderhistory-logo-left cursor-pointer"
                 onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
-                        <Home size={72} />
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
+                        <Home size={36} />
                         <span>홈</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
-                        <LogOut size={72} />
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
+                        <LogOut size={36} />
                         <span>로그아웃</span>
                     </button>
                 </div>
@@ -174,7 +174,7 @@ const OrderHistoryA = () => {
                         {menuItems.map(item => (
                             <div
                                 key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''}`}
+                                className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
                                 onClick={() => navigate(item.path)}
                             >
                                 {item.label}
@@ -203,7 +203,7 @@ const OrderHistoryA = () => {
                         <div className="error-state">
                             <p className="error-message">주문내역을 불러오지 못했습니다.</p>
                             <p className="error-detail">{error}</p>
-                            <button className="retry-btn" onClick={handleRetry}>
+                            <button className="retry-btn cursor-pointer" onClick={handleRetry}>
                                 다시 시도
                             </button>
                         </div>
@@ -255,14 +255,14 @@ const OrderHistoryA = () => {
                                                     </div>
                                                     <div className="order-actions">
                                                         <button
-                                                            className={`track-delivery-btn ${!group.orderUrl ? 'disabled' : ''}`}
+                                                            className={`track-delivery-btn cursor-pointer ${!group.orderUrl ? 'disabled' : ''}`}
                                                             onClick={() => handleOrderDetail(group.orderUrl)}
                                                             disabled={!group.orderUrl}
                                                         >
                                                             상세 조회
                                                         </button>
                                                         <button
-                                                            className={`track-delivery-btn ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
+                                                            className={`track-delivery-btn cursor-pointer ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
                                                             onClick={() => {
                                                                 const deliverUrl = group.orders.find(o => o.deliverUrl)?.deliverUrl;
                                                                 handleTrackDelivery(deliverUrl);

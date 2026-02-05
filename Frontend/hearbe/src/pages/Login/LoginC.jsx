@@ -161,9 +161,7 @@ export default function LoginC() {
                 </div>
             </main>
 
-            <footer className="landing-footer">
-                <p>© 2026 HearBe. All rights reserved.</p>
-            </footer>
+
         </div>
     );
 }

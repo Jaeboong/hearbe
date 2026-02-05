@@ -53,21 +53,21 @@ const SelectMall = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="mall-logo-left"
+                className="mall-logo-left cursor-pointer"
                 onClick={() => navigate('/main')}
             />
             {/* Header */}
             <div className="mypage-topbar">
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => handleSelectMall('cart')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => handleSelectMall('cart')}>
                         <ShoppingCart size={72} />
                         <span>카트</span>
                     </button>
-                    <button className="topbar-action" onClick={() => navigate('/A/member-info')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/member-info')}>
                         <User size={72} />
                         <span>마이</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
                         <LogOut size={72} />
                         <span>로그아웃</span>
                     </button>
@@ -78,7 +78,7 @@ const SelectMall = () => {
             <div className="mall-content">
                 <div className="mall-scroll-container">
                     {/* Coupang (1) */}
-                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('coupang')}>
+                    <div className="mall-card-wrapper cursor-pointer" onClick={() => handleSelectMall('coupang')}>
                         <div className="mall-square-box coupang-box">
                             <span className="mall-number">1</span>
                             <img src={iconCoupang} alt="Coupang" className="mall-logo-img" />
@@ -86,7 +86,7 @@ const SelectMall = () => {
                     </div>
 
                     {/* Naver (2) */}
-                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('naver')}>
+                    <div className="mall-card-wrapper cursor-pointer" onClick={() => handleSelectMall('naver')}>
                         <div className="mall-square-box naver-box">
                             <span className="mall-number">2</span>
                             <img src={iconNaver} alt="Naver" className="mall-logo-img" />
@@ -94,7 +94,7 @@ const SelectMall = () => {
                     </div>
 
                     {/* 11st (3) */}
-                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('11st')}>
+                    <div className="mall-card-wrapper cursor-pointer" onClick={() => handleSelectMall('11st')}>
                         <div className="mall-square-box mall-11st-box">
                             <span className="mall-number">3</span>
                             <img src={icon11st} alt="11st" className="mall-logo-img" />
@@ -102,7 +102,7 @@ const SelectMall = () => {
                     </div>
 
                     {/* Emart (4) */}
-                    <div className="mall-card-wrapper" onClick={() => handleSelectMall('emart')}>
+                    <div className="mall-card-wrapper cursor-pointer" onClick={() => handleSelectMall('emart')}>
                         <div className="mall-square-box mall-emart-box">
                             <span className="mall-number">4</span>
                             <img src={iconEmart} alt="Emart" className="mall-logo-img" />

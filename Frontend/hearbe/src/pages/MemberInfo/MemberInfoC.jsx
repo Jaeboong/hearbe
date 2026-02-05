@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import { User, Mail, Lock, Home, ShieldCheck, LogOut, X } from 'lucide-react';
+import { User, Mail, Lock, Store, ShieldCheck, LogOut } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
@@ -194,16 +193,16 @@ export default function MemberInfoC({ onHome }) {
             <header className="mall-header-c">
                 <div className="header-left-c">
                     <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
-                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '70px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
-                        <div className="nav-icon-c"><Home size={24} /></div>
-                        <span>홈</span>
+                    <button className="nav-item-c cursor-pointer" onClick={onHome || (() => navigate('/C/mall'))}>
+                        <div className="nav-icon-c"><Store size={24} /></div>
+                        <span>쇼핑몰</span>
                     </button>
-                    <button className="nav-item-c" onClick={handleLogout}>
+                    <button className="nav-item-c cursor-pointer" onClick={handleLogout}>
                         <div className="nav-icon-c"><LogOut size={24} /></div>
                         <span>로그아웃</span>
                     </button>
@@ -229,24 +228,9 @@ export default function MemberInfoC({ onHome }) {
                             <button
                                 key={item.id}
                                 onClick={() => navigate(item.path)}
-                                className={`mp-sidebar-item ${item.id === 'member-info' ? 'active' : ''}`}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    fontSize: '1.85rem',
-                                    width: '100%',
-                                    padding: '1.4rem 2rem',
-                                    color: item.id === 'member-info' ? '#7c3aed' : '#9ca3af',
-                                    background: item.id === 'member-info' ? 'white' : 'transparent',
-                                    border: 'none',
-                                    fontWeight: item.id === 'member-info' ? '800' : '600',
-                                    boxShadow: item.id === 'member-info' ? '0 4px 15px rgba(0, 0, 0, 0.03)' : 'none',
-                                    borderRadius: '1rem',
-                                    cursor: 'pointer'
-                                }}
+                                className={`mp-sidebar-item cursor-pointer ${item.id === 'member-info' ? 'active' : ''}`}
                             >
-                                <span className="label" style={{ fontSize: 'inherit' }}>{item.label}</span>
+                                <span className="label">{item.label}</span>
                             </button>
                         ))}
                     </div>
@@ -282,36 +266,36 @@ export default function MemberInfoC({ onHome }) {
                                     <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><User size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>아이디</span>
-                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>{userData.userId || '-'}</span>
+                                            <span className="row-label" style={{ fontSize: '1.3rem' }}>아이디</span>
+                                            <span className="row-value" style={{ fontSize: '1.3rem' }}>{userData.userId || '-'}</span>
                                         </div>
                                     </div>
                                     <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><Lock size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>비밀번호</span>
-                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>********</span>
+                                            <span className="row-label" style={{ fontSize: '1.3rem' }}>비밀번호</span>
+                                            <span className="row-value" style={{ fontSize: '1.3rem' }}>********</span>
                                         </div>
-                                        <button className="small-action-btn" onClick={handlePasswordReset}>재설정하기</button>
+                                        <button className="small-action-btn cursor-pointer" onClick={handlePasswordReset}>재설정하기</button>
                                     </div>
                                     <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><User size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>이름</span>
-                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>{userData.userName || '-'}</span>
+                                            <span className="row-label" style={{ fontSize: '1.3rem' }}>이름</span>
+                                            <span className="row-value" style={{ fontSize: '1.3rem' }}>{userData.userName || '-'}</span>
                                         </div>
                                     </div>
                                     <div className="info-row-full" style={{ padding: '0.8rem 0' }}>
                                         <div className="row-icon-circle"><Mail size={20} /></div>
                                         <div className="row-content">
-                                            <span className="row-label" style={{ fontSize: '1.6rem' }}>이메일</span>
-                                            <span className="row-value" style={{ fontSize: '1.6rem' }}>{userData.email || '-'}</span>
+                                            <span className="row-label" style={{ fontSize: '1.3rem' }}>이메일</span>
+                                            <span className="row-value" style={{ fontSize: '1.3rem' }}>{userData.email || '-'}</span>
                                         </div>
                                     </div>
                                 </div>
                             )}
                         </section>
-                        <button className="withdraw-link" onClick={handleWithdraw}>회원탈퇴</button>
+                        <button className="withdraw-link cursor-pointer" onClick={handleWithdraw}>회원탈퇴</button>
                     </div>
                 </main>
             </div>
@@ -362,6 +346,7 @@ export default function MemberInfoC({ onHome }) {
                             type="password"
                             value={withdrawPassword}
                             onChange={(e) => setWithdrawPassword(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmWithdraw(); }}
                             placeholder="비밀번호 입력"
                             style={{
                                 width: '100%',

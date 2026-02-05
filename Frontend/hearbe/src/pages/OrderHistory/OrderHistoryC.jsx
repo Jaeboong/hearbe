@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Home, ShoppingCart, Package, LogOut } from 'lucide-react';
+import { User, Store, Package, LogOut } from 'lucide-react';
 import { orderAPI } from '../../services/orderAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
-import '../Wishlist_C/WishlistC.css';
 import './OrderHistoryC.css';
 import logoC from '../../assets/logoC.png';
 
@@ -113,7 +112,7 @@ export default function OrderHistoryC({ onHome }) {
                                 id: `${order.order_id}-${item.name}-${item.url || ''}`,
                                 name: item.name,
                                 price: `${item.price.toLocaleString()}원`,
-                                quantity: `${item.quantity || 1}개`,
+                                quantity: `${(item.quantity || 1)}개`,
                                 date: order.ordered_at || '',
                                 mall: mallName,
                                 icon: '📦',
@@ -147,17 +146,17 @@ export default function OrderHistoryC({ onHome }) {
             {/* Header */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
-                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '70px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
-                        <div className="nav-icon-c"><Home size={24} /></div>
-                        <span>홈</span>
+                    <button className="nav-item-c cursor-pointer" onClick={onHome || (() => navigate('/C/mall'))}>
+                        <div className="nav-icon-c"><Store size={24} /></div>
+                        <span>쇼핑몰</span>
                     </button>
-                    <button className="nav-item-c" onClick={handleLogout}>
+                    <button className="nav-item-c cursor-pointer" onClick={handleLogout}>
                         <div className="nav-icon-c"><LogOut size={24} /></div>
                         <span>로그아웃</span>
                     </button>
@@ -183,7 +182,7 @@ export default function OrderHistoryC({ onHome }) {
                             <button
                                 key={item.id}
                                 onClick={() => navigate(item.path)}
-                                className={`mp-sidebar-item ${item.id === 'order-history' ? 'active' : ''}`}
+                                className={`mp-sidebar-item cursor-pointer ${item.id === 'order-history' ? 'active' : ''}`}
                             >
                                 <span className="label">{item.label}</span>
                             </button>
@@ -194,27 +193,23 @@ export default function OrderHistoryC({ onHome }) {
                 {/* Main Content */}
                 <main className="mypage-content">
                     <section className="dashboard-card full-height">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                            <div style={{
-                                width: '50px', height: '50px', borderRadius: '1rem',
-                                backgroundColor: '#f3e8ff', color: '#7c3aed',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}>
+                        <div className="oh-content-title-row">
+                            <div className="oh-content-title-icon">
                                 <Package size={28} />
                             </div>
                             <h2 className="card-title-lg" style={{ marginBottom: 0 }}>주문 내역</h2>
                         </div>
-                        <div className="wishlist-content">
+                        <div className="oh-content-body">
                             {isLoading ? (
-                                <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
+                                <div className="oh-status-message">
                                     주문 내역을 불러오는 중...
                                 </div>
                             ) : error ? (
-                                <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#e53e3e', fontSize: '2rem', fontWeight: 'bold' }}>
+                                <div className="oh-status-message oh-error">
                                     {error}
                                 </div>
                             ) : orders.length === 0 ? (
-                                <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
+                                <div className="oh-status-message">
                                     주문 내역이 없습니다.
                                 </div>
                             ) : (
@@ -226,73 +221,63 @@ export default function OrderHistoryC({ onHome }) {
                                             : `${group.platforms[0]} 외 ${group.platforms.length - 1}곳`)
                                         : '플랫폼';
                                     return (
-                                    <div key={idx} className="mall-order-group">
-                                        <div className="mall-order-header">
-                                            <div className="mall-header-title-container">
-                                                <div className="mall-order-indicator"></div>
-                                                <div className="mall-header-text">
-                                                    <h2 className="mall-header-name">{platformLabel}</h2>
-                                                    <div className="mall-header-date">{group.date}</div>
-                                                </div>
-                                            </div>
-                                            <div className="order-group-actions">
-                                                <button
-                                                    className="btn-outline-sm"
-                                                    onClick={() => detailUrl && window.open(detailUrl, '_blank')}
-                                                    disabled={!detailUrl}
-                                                >
-                                                    주문 상세 조회
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="group-items">
-                                            {group.items.map((item) => (
-                                                <div key={item.id} className="item-row-card">
-                                                    <div className="item-row-left">
-                                                        <div className="item-thumb">
-                                                            {item.imgUrl ? (
-                                                                <img src={item.imgUrl} alt={item.name} className="order-item-image" />
-                                                            ) : (
-                                                                item.icon
-                                                            )}
-                                                        </div>
-                                                        <div className="item-info-text">
-                                                            <div className="item-name-lg" style={{ marginBottom: '0.25rem' }}>{item.name}</div>
-                                                            <div className="item-meta-text" style={{ fontSize: '1.4rem', color: '#6b7280' }}>{item.mall}</div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Quantity aligned between name and buttons */}
-                                                    <div className="item-quantity-center" style={{
-                                                        fontSize: '1.6rem',
-                                                        fontWeight: 'bold',
-                                                        color: '#374151',
-                                                        margin: '0 6rem 0 0',
-                                                        whiteSpace: 'nowrap'
-                                                    }}>
-                                                        {item.quantity}
-                                                    </div>
-
-                                                    <div className="item-row-actions order-item-actions-container">
-                                                        <button
-                                                            className="btn-outline-sm order-item-action-btn"
-                                                            onClick={() => item.productUrl && window.open(item.productUrl, '_blank')}
-                                                        >
-                                                            상품 조회
-                                                        </button>
-                                                        <button
-                                                            className="btn-fill-sm order-item-deliver-btn"
-                                                            onClick={() => item.deliverUrl && window.open(item.deliverUrl, '_blank')}
-                                                            disabled={!item.deliverUrl}
-                                                        >
-                                                            배송 조회
-                                                        </button>
+                                        <div key={idx} className="mall-order-group">
+                                            <div className="mall-order-header">
+                                                <div className="mall-header-title-container">
+                                                    <div className="mall-order-indicator"></div>
+                                                    <div className="mall-header-text">
+                                                        <h2 className="mall-header-name">{platformLabel}</h2>
+                                                        <div className="mall-header-date">{group.date}</div>
                                                     </div>
                                                 </div>
-                                            ))}
+                                                <div className="order-group-actions">
+                                                    <button
+                                                        className="btn-outline-sm cursor-pointer"
+                                                        onClick={() => detailUrl && window.open(detailUrl, '_blank')}
+                                                        disabled={!detailUrl}
+                                                    >
+                                                        주문 상세 조회
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="group-items">
+                                                {group.items.map((item) => (
+                                                    <div key={item.id} className="item-row-card">
+                                                        <div className="item-row-left">
+                                                            <div className="item-thumb">
+                                                                {item.imgUrl ? (
+                                                                    <img src={item.imgUrl} alt={item.name} className="order-item-image" />
+                                                                ) : (
+                                                                    item.icon
+                                                                )}
+                                                            </div>
+                                                            <div className="oh-item-info">
+                                                                <div className="oh-item-name">{item.name}</div>
+                                                                <div className="oh-item-price">{item.price}</div>
+                                                            </div>
+                                                        </div>
+                                                        <span className="oh-item-qty">{item.quantity}</span>
+                                                        <div className="order-item-actions-container">
+                                                            <button
+                                                                className="btn-outline-sm order-item-action-btn cursor-pointer"
+                                                                onClick={() => item.productUrl && window.open(item.productUrl, '_blank')}
+                                                            >
+                                                                상품 조회
+                                                            </button>
+                                                            <button
+                                                                className="btn-fill-sm order-item-deliver-btn cursor-pointer"
+                                                                onClick={() => item.deliverUrl && window.open(item.deliverUrl, '_blank')}
+                                                                disabled={!item.deliverUrl}
+                                                            >
+                                                                배송 조회
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )})
+                                    )
+                                })
                             )}
                         </div>
                     </section>

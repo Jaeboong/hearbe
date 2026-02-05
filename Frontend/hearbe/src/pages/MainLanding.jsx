@@ -12,7 +12,7 @@ const ModeCard = ({ mode, onSelect }) => (
     whileHover={{ y: -10 }}
     whileTap={{ scale: 0.98 }}
     onClick={() => onSelect(mode.id, mode.title)}
-    className="relative overflow-hidden group rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 w-full min-w-[280px] h-[480px] flex flex-col items-start justify-between p-8 text-left bg-white border border-gray-100"
+    className="cursor-pointer relative overflow-hidden group rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 w-full min-w-[280px] h-[480px] flex flex-col items-start justify-between p-8 text-left bg-white border border-gray-100"
     style={{ background: mode.bgColor }}
   >
     {/* Background Icon */}
@@ -61,39 +61,39 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
 
   return (
     // Main Container
-    <div className="w-full h-screen overflow-hidden bg-white flex flex-col items-center justify-center relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-blue-50 opacity-50 z-0" />
+    <div className="w-full min-h-screen overflow-y-auto overflow-x-hidden bg-white flex flex-col items-center justify-start relative">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-50 via-white to-blue-50 opacity-50 z-0 pointer-events-none" />
 
       {/* Header - Fixed & Transparent for unity */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-transparent h-32 flex items-center transition-all duration-300">
-        <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
-          <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm" onClick={() => navigate('/guide')} />
-          <div className="flex items-center gap-4">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none h-20 md:h-32 flex items-center transition-all duration-300">
+        <div className="max-w-7xl w-full mx-auto px-4 md:px-8 flex items-center justify-between">
+          <img src={logoC} alt="HearBe" className="h-10 md:h-24 object-contain cursor-pointer drop-shadow-sm" onClick={() => window.location.href = '/main'} />
+          <div className="flex items-center gap-2 md:gap-4">
             <a
               href="/downloads/MCPDesktop.zip"
               download
-              className="px-10 py-5 rounded-full font-extrabold text-2xl text-white flex items-center gap-3 shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1 no-underline"
+              className="px-4 py-2 md:px-10 md:py-5 rounded-full font-extrabold text-sm md:text-2xl text-white flex items-center gap-2 md:gap-3 shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1 no-underline cursor-pointer"
               style={{ background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)' }}
             >
-              <Download size={24} /> 설정 도우미
+              <Download className="w-4 h-4 md:w-6 md:h-6" /> <span className="hidden md:inline">음성 프로그램 </span>다운로드
             </a>
           </div>
         </div>
       </header>
 
       {/* Shopping Mode Selection Only */}
-      <div className="relative z-10 w-full max-w-6xl px-8 py-12 mt-32">
+      <div className="relative z-10 w-full max-w-6xl px-4 md:px-8 py-8 md:py-12 mt-20 md:mt-32 mb-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
         >
-          <h2 className="text-5xl md:text-7xl font-black text-gray-900 mb-6 tracking-tight">쇼핑 모드 선택</h2>
-          <p className="text-2xl text-gray-500 font-medium">당신에게 가장 편안한 방식을 선택하세요</p>
+          <h2 className="text-3xl md:text-5xl lg:text-7xl font-black text-gray-900 mb-4 md:mb-6 tracking-tight">쇼핑 모드 선택</h2>
+          <p className="text-lg md:text-2xl text-gray-500 font-medium">당신에게 가장 편안한 방식을 선택하세요</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
           <ModeCard
             onSelect={handleModeSelect}
             mode={{

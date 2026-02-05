@@ -30,7 +30,7 @@
   color: #94a3b8;
   font-size: 0.875rem;
   font-weight: 500;
-  border-top: 1px solid #f1f5f9;
+  border-top: none;
   background: white;
   margin-top: auto;
   /* 공간이 남을 경우 맨 밑으로 이동 */

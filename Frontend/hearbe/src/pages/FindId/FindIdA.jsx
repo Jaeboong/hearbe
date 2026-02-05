@@ -195,7 +195,7 @@ const FindIdA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="findid-logo"
+                className="findid-logo cursor-pointer"
                 onClick={() => navigate('/main')}
             />
 
@@ -207,7 +207,7 @@ const FindIdA = () => {
                     아이디를 찾을 수 있습니다.
                 </p>
 
-                <div className="findid-card" onClick={openCamera}>
+                <div className="findid-card cursor-pointer" onClick={openCamera}>
                     <div className="findid-card-title">장애인 복지카드 촬영하기</div>
                     <img src={iconCamera} alt="Camera" className="findid-camera-icon" />
                 </div>
@@ -216,7 +216,7 @@ const FindIdA = () => {
             {showCamera && (
                 <div className="findid-modal-overlay" onClick={() => setShowCamera(false)}>
                     <div className="findid-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="findid-modal-close" onClick={() => setShowCamera(false)}>
+                        <div className="findid-modal-close cursor-pointer" onClick={() => setShowCamera(false)}>
                             X
                         </div>
                         <div className="findid-modal-scroll">
@@ -243,7 +243,7 @@ const FindIdA = () => {
                                     </div>
 
                                     {stream && !isOcrLoading && (
-                                        <div className="findid-shutter-button" onClick={handleSnap}>
+                                        <div className="findid-shutter-button cursor-pointer" onClick={handleSnap}>
                                             <div className="findid-shutter-inner"></div>
                                         </div>
                                     )}
@@ -304,11 +304,11 @@ const FindIdA = () => {
                                             </div>
                                         </div>
                                         <div className="findid-card-btns">
-                                            <button className="findid-retake-btn" onClick={() => setModalStep('camera')}>
+                                            <button className="findid-retake-btn cursor-pointer" onClick={() => setModalStep('camera')}>
                                                 다시 촬영
                                             </button>
                                             <button
-                                                className="findid-confirm-btn"
+                                                className="findid-confirm-btn cursor-pointer"
                                                 onClick={handleSubmitFindId}
                                                 disabled={isSubmitting}
                                             >
@@ -329,7 +329,7 @@ const FindIdA = () => {
                         <div className="findid-result-title">카드 정보가 확인되었습니다</div>
                         <div className="findid-result-desc">아이디 : {foundId}</div>
                         <button
-                            className="findid-result-btn"
+                            className="findid-result-btn cursor-pointer"
                             onClick={() => {
                                 setResultModal(null);
                                 navigate('/A/login');
@@ -347,8 +347,8 @@ const FindIdA = () => {
                         <div className="findid-result-title">카드 정보가 없습니다</div>
                         <div className="findid-result-desc">다시 촬영하시겠습니까?</div>
                         <div className="findid-result-actions">
-                            <button className="findid-retake-btn" onClick={handleRetry}>다시 촬영</button>
-                            <button className="findid-result-btn" onClick={() => setResultModal(null)}>취소</button>
+                            <button className="findid-retake-btn cursor-pointer" onClick={handleRetry}>다시 촬영</button>
+                            <button className="findid-result-btn cursor-pointer" onClick={() => setResultModal(null)}>취소</button>
                         </div>
                     </div>
                 </div>

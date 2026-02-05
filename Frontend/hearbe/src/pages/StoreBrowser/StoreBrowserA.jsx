@@ -211,25 +211,25 @@ const StoreBrowser = () => {
 
                     {/* Bottom Control Bar */}
                     <div className="sharing-bottom-bar">
-                        <button className="sharing-btn" onClick={handlePlatformCart}>
+                        <button className="sharing-btn cursor-pointer" onClick={handlePlatformCart}>
                             <img src={iconCart} alt="Cart" className="s-icon" />
                             <span>쇼핑몰 장바구니</span>
                         </button>
-                        <button className="sharing-btn" onClick={handleCart}>
+                        <button className="sharing-btn cursor-pointer" onClick={handleCart}>
                             <img src={iconCart} alt="My Cart" className="s-icon" />
                             <span>내 장바구니</span>
                         </button>
-                        <button className="sharing-btn primary">
+                        <button className="sharing-btn primary cursor-pointer">
                             <img src={iconCard} alt="Buy" className="s-icon" />
                             <span>바로구매</span>
                         </button>
                         {isNaver && (
-                            <button className="sharing-btn" onClick={handleSimulateAddCart} style={{ backgroundColor: '#03C75A', color: 'white' }}>
+                            <button className="sharing-btn cursor-pointer" onClick={handleSimulateAddCart} style={{ backgroundColor: '#03C75A', color: 'white' }}>
                                 <img src={iconCart} alt="Simulate" className="s-icon" />
                                 <span>네이버 담기 (시뮬)</span>
                             </button>
                         )}
-                        <button className="sharing-btn highlight" onClick={handleEndShare}>
+                        <button className="sharing-btn highlight cursor-pointer" onClick={handleEndShare}>
                             <img src={iconShare} alt="Share" className="s-icon" />
                             <span>공유 종료</span>
                         </button>
@@ -268,8 +268,8 @@ const StoreBrowser = () => {
                             <input type="text" placeholder="이미지 URL (선택)" value={productInfo.img_url} onChange={(e) => handleProductInfoChange('img_url', e.target.value)} className="product-input" />
                         </div>
                         <div className="share-modal-btns">
-                            <button className="sm-btn cancel" onClick={() => { setShowAddCartModal(false); setProductInfo({ name: '', price: '', url: '', img_url: '' }); }}>취소</button>
-                            <button className="sm-btn confirm" onClick={handleSubmitProduct}>추가</button>
+                            <button className="sm-btn cancel cursor-pointer" onClick={() => { setShowAddCartModal(false); setProductInfo({ name: '', price: '', url: '', img_url: '' }); }}>취소</button>
+                            <button className="sm-btn confirm cursor-pointer" onClick={handleSubmitProduct}>추가</button>
                         </div>
                     </div>
                 </div>

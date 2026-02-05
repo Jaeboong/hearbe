@@ -68,7 +68,7 @@ const GuardianViewS = () => {
             {/* 헤더 */}
             <div className="guardian-header">
                 <h1>🛡️ 공유 쇼핑</h1>
-                <button className="leave-button" onClick={handleLeave}>
+                <button className="leave-button cursor-pointer" onClick={handleLeave}>
                     나가기
                 </button>
             </div>

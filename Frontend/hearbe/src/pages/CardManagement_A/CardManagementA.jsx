@@ -230,18 +230,18 @@ const CardManagementA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="cardmgmt-logo-left"
+                className="cardmgmt-logo-left cursor-pointer"
                 onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
                         <Home size={72} />
                         <span>홈</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
                         <LogOut size={72} />
                         <span>로그아웃</span>
                     </button>
@@ -255,7 +255,7 @@ const CardManagementA = () => {
                         {menuItems.map(item => (
                             <div
                                 key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''}`}
+                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''} cursor-pointer`}
                                 onClick={() => navigate(item.path)}
                             >
                                 {item.label}
@@ -293,7 +293,7 @@ const CardManagementA = () => {
                         </div>
                     </div>
 
-                    <button className="change-card-btn" onClick={handleChangeClick}>
+                    <button className="change-card-btn cursor-pointer" onClick={handleChangeClick}>
                         변경하기
                     </button>
                 </main>
@@ -304,7 +304,7 @@ const CardManagementA = () => {
                 <div className="card-modal-overlay">
                     <div className="card-modal-box" onClick={(e) => e.stopPropagation()}>
                         {/* Close Button */}
-                        <div className="card-modal-close" onClick={handleModalClose}>X</div>
+                        <div className="card-modal-close cursor-pointer" onClick={handleModalClose}>X</div>
 
                         {modalStep === 'camera' ? (
                             // Camera Step
@@ -324,7 +324,7 @@ const CardManagementA = () => {
                                 </div>
 
                                 {stream && (
-                                    <div className="card-shutter-button" onClick={handleSnap}>
+                                    <div className="card-shutter-button cursor-pointer" onClick={handleSnap}>
                                         <div className="card-shutter-inner"></div>
                                     </div>
                                 )}
@@ -388,8 +388,8 @@ const CardManagementA = () => {
                                     </div>
 
                                     <div className="card-button-group">
-                                        <button className="card-retake-btn" onClick={() => setModalStep('camera')}>다시 촬영</button>
-                                        <button className="card-register-btn" onClick={handleCardRegister}>카드 변경</button>
+                                        <button className="card-retake-btn cursor-pointer" onClick={() => setModalStep('camera')}>다시 촬영</button>
+                                        <button className="card-register-btn cursor-pointer" onClick={handleCardRegister}>카드 변경</button>
                                     </div>
                                 </div>
                             </>

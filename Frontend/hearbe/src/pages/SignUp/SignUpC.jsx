@@ -362,7 +362,7 @@ ${termContents.privacy}`;
                   <button
                     type="button"
                     onClick={handleCheckUsername}
-                    className={`check-duplicate-btn-c ${isUsernameChecked && isUsernameAvailable ? 'checked' : ''}`}
+                    className={`check-duplicate-btn-c cursor-pointer ${isUsernameChecked && isUsernameAvailable ? 'checked' : ''}`}
                   >
                     {isUsernameChecked && isUsernameAvailable ? '확인완료' : '중복확인'}
                   </button>
@@ -385,7 +385,7 @@ ${termContents.privacy}`;
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="pw-toggle-c"
+                    className="pw-toggle-c cursor-pointer"
                   >
                     {showPassword ? <EyeOff size={32} color="#94A3B8" /> : <Eye size={32} color="#94A3B8" />}
                   </button>
@@ -488,14 +488,13 @@ ${termContents.privacy}`;
                   />
                   <label htmlFor="all" style={{ fontWeight: 'bold' }}>[필수] 이용약관 및 개인정보 수집 동의</label>
                 </div>
-                <button type="button" className="terms-view-btn-c" onClick={() => openTermModal('terms')}>보기 &gt;</button>
+                <button type="button" className="terms-view-btn-c cursor-pointer" onClick={() => openTermModal('terms')}>보기 &gt;</button>
               </div>
             </div>
 
             <button
               type="submit"
-              className={`signup-submit-btn-c ${isFormValid ? '' : 'disabled'}`}
-              disabled={!isFormValid}
+              className="signup-submit-btn-c cursor-pointer"
             >
               회원 가입
             </button>
@@ -517,7 +516,7 @@ ${termContents.privacy}`;
               <p className="modal-desc-c">
                 HearBe 회원이 되신 것을 축하드립니다.
               </p>
-              <button onClick={() => { setIsModalOpen(false); navigate('/C/login'); }} className="modal-btn-c">
+              <button onClick={() => { setIsModalOpen(false); navigate('/C/login'); }} className="modal-btn-c cursor-pointer">
                 확인
               </button>
             </_motion.div>
@@ -535,12 +534,12 @@ ${termContents.privacy}`;
             >
               <div className="term-modal-header">
                 <h3 className="term-title">{termModalState.title}</h3>
-                <button onClick={() => closeTermModal(false)} className="close-btn-c">✕</button>
+                <button onClick={() => closeTermModal(false)} className="close-btn-c cursor-pointer">✕</button>
               </div>
               <div className="term-scroll-box">
                 <p className="term-text whitespace-pre-line">{termModalState.content}</p>
               </div>
-              <button onClick={() => closeTermModal(true)} className="modal-btn-c term-confirm-btn">
+              <button onClick={() => closeTermModal(true)} className="modal-btn-c term-confirm-btn cursor-pointer">
                 확인
               </button>
             </_motion.div>
@@ -548,9 +547,7 @@ ${termContents.privacy}`;
         )}
       </AnimatePresence>
 
-      <footer className="landing-footer">
-        <p>© 2026 HearBe. All rights reserved.</p>
-      </footer>
+
     </div>
   );
 }

@@ -170,18 +170,18 @@ const MemberInfoA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="memberinfo-logo-left"
+                className="memberinfo-logo-left cursor-pointer"
                 onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
                         <Home size={72} />
                         <span>홈</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
                         <LogOut size={72} />
                         <span>로그아웃</span>
                     </button>
@@ -195,7 +195,7 @@ const MemberInfoA = () => {
                         {menuItems.map(item => (
                             <div
                                 key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''}`}
+                                className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
                                 onClick={() => navigate(item.path)}
                             >
                                 {item.label}
@@ -220,7 +220,7 @@ const MemberInfoA = () => {
                         <div className="error-state">
                             <p className="error-message">사용자 정보를 불러오지 못했습니다.</p>
                             <p className="error-detail">{error}</p>
-                            <button className="retry-btn" onClick={handleRetry}>
+                            <button className="retry-btn cursor-pointer" onClick={handleRetry}>
                                 다시 시도
                             </button>
                         </div>
@@ -243,7 +243,7 @@ const MemberInfoA = () => {
                                         <div className="password-wrapper">
                                             <span className="member-value">{userData.password}</span>
                                             <button
-                                                className="password-change-btn"
+                                                className="password-change-btn cursor-pointer"
                                                 onClick={() => navigate('/A/changePassword')}
                                             >
                                                 변경하기
@@ -270,7 +270,7 @@ const MemberInfoA = () => {
                             </div>
 
                             <div className="logout-section">
-                                <span className="logout-link" onClick={handleWithdrawClick}>
+                                <span className="logout-link cursor-pointer" onClick={handleWithdrawClick}>
                                     회원탈퇴
                                 </span>
                             </div>
@@ -299,13 +299,13 @@ const MemberInfoA = () => {
                         />
                         <div className="modal-actions">
                             <button
-                                className="modal-btn cancel"
+                                className="modal-btn cancel cursor-pointer"
                                 onClick={() => setIsWithdrawModalOpen(false)}
                             >
                                 취소
                             </button>
                             <button
-                                className="modal-btn confirm"
+                                className="modal-btn confirm cursor-pointer"
                                 onClick={handleConfirmWithdraw}
                             >
                                 탈퇴하기
@@ -327,7 +327,7 @@ const MemberInfoA = () => {
                         </p>
                         <div className="modal-actions">
                             <button
-                                className="modal-btn confirm"
+                                className="modal-btn confirm cursor-pointer"
                                 onClick={handleAlertClose}
                             >
                                 확인

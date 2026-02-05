@@ -179,13 +179,13 @@ const BrandLanding = () => {
                         </h2>
                         <button
                             onClick={goToMain}
-                            className="group relative px-12 py-6 rounded-full bg-white text-black font-black text-xl overflow-hidden transition-transform hover:scale-105"
+                            className="cursor-pointer group relative px-12 py-6 rounded-full bg-white text-black font-black text-xl overflow-hidden transition-transform hover:scale-105"
                         >
                             <span className="relative z-10 group-hover:text-purple-600 transition-colors flex items-center gap-3">
                                 쇼핑 시작하기 <ArrowRight size={24} />
                             </span>
                         </button>
-                        <p className="mt-12 text-gray-500 text-sm">© 2026 HearBe Corp. All rights reserved.</p>
+                        <p className="mt-12 text-gray-500 text-sm">© 2026 HearBe. All rights reserved.</p>
                     </div>
                 </section>
             )
@@ -288,10 +288,10 @@ const BrandLanding = () => {
             {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-transparent h-32 flex items-center">
                 <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
-                    <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" onClick={() => window.scrollTo(0, 0)} />
+                    <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" onClick={() => setCurrentStep(0)} />
                     <button
                         onClick={goToMain}
-                        className="px-10 py-4 rounded-full font-bold text-xl text-white flex items-center gap-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-[length:200%_auto] hover:bg-right transition-all duration-500 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1"
+                        className="cursor-pointer px-10 py-4 rounded-full font-bold text-xl text-white flex items-center gap-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-[length:200%_auto] hover:bg-right transition-all duration-500 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1"
                     >
                         Skip Guide <ArrowRight size={24} />
                     </button>
@@ -315,7 +315,7 @@ const BrandLanding = () => {
                 <button
                     onClick={handlePrev}
                     disabled={currentStep === 0}
-                    className={`p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
+                    className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
                 >
                     <ChevronDown className="rotate-90" size={20} />
                 </button>
@@ -333,7 +333,7 @@ const BrandLanding = () => {
                 <button
                     onClick={handleNext}
                     disabled={currentStep === totalSteps - 1}
-                    className={`p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === totalSteps - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
+                    className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === totalSteps - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
                 >
                     <ChevronRight size={20} />
                 </button>

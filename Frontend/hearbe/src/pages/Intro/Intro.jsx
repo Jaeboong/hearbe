@@ -153,7 +153,7 @@ export default function Intro() {
 
     return (
         <div className="intro-container">
-            <button className="skip-btn" onClick={() => navigate('/guide')}>Skip</button>
+            <button className="skip-btn cursor-pointer" onClick={() => navigate('/guide')}>Skip</button>
 
             <AnimatePresence>
                 {isTransitioning && (

@@ -76,7 +76,7 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
 
             {/* 고정 뒤로가기 버튼 */}
             {!showMeetingRoom && (
-                <button onClick={onBack || (() => navigate(-1))} className="back-button-circle-c" aria-label="뒤로가기">
+                <button onClick={onBack || (() => navigate(-1))} className="back-button-circle-c cursor-pointer" aria-label="뒤로가기">
                     <ArrowLeft size={24} />
                 </button>
             )}
@@ -103,10 +103,10 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                             exit={{ y: 50, opacity: 0 }}
                             className="bottom-sharing-actions-c"
                         >
-                            <button onClick={() => setShowCart(true)} className="share-action-btn-c white-btn">
+                            <button onClick={() => setShowCart(true)} className="share-action-btn-c white-btn cursor-pointer">
                                 <ShoppingCart size={20} /> 장바구니
                             </button>
-                            <button onClick={handleCloseMeeting} className="share-action-btn-c purple-btn">
+                            <button onClick={handleCloseMeeting} className="share-action-btn-c purple-btn cursor-pointer">
                                 <X size={20} /> 공유 종료
                             </button>
                         </motion.div>
@@ -160,7 +160,7 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                                 {menuItems.map((item) => (
                                     <button
                                         key={item.id}
-                                        className="menu-panel-item-c"
+                                        className="menu-panel-item-c cursor-pointer"
                                         onClick={() => { item.onClick(); setShowMainMenu(false); }}
                                     >
                                         <div className="item-icon-c">{item.icon}</div>
@@ -175,7 +175,7 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setShowMainMenu(!showMainMenu)}
-                        className={`menu-toggle-btn-c ${showMainMenu ? 'active' : ''}`}
+                        className={`menu-toggle-btn-c cursor-pointer ${showMainMenu ? 'active' : ''}`}
                     >
                         {showMainMenu ? <X size={30} /> : <Menu size={30} />}
                     </motion.button>
@@ -197,8 +197,8 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                             </div>
                             <p className="modal-info">이 코드를 상대방에게 알려주세요.</p>
                             <div className="modal-btns">
-                                <button onClick={() => setShowMeetingCode(false)} className="btn-close">취소</button>
-                                <button onClick={handleJoinMeeting} className="btn-confirm">입장하기</button>
+                                <button onClick={() => setShowMeetingCode(false)} className="btn-close cursor-pointer">취소</button>
+                                <button onClick={handleJoinMeeting} className="btn-confirm cursor-pointer">입장하기</button>
                             </div>
                         </motion.div>
                     </div>

@@ -39,7 +39,7 @@ const SharingJoinS = ({ onJoin, onCancel }) => {
                     <h2 className="modal-title-s">공유 쇼핑 참여</h2>
                     <p className="modal-subtitle-s">상대방에게 받은 4자리 초대 코드를 입력하세요</p>
 
-                    <div className="code-input-field-s" onClick={focusInput}>
+                    <div className="code-input-field-s cursor-pointer" onClick={focusInput}>
                         <div className="code-display-s">
                             {[0, 1, 2, 3].map((idx) => {
                                 const char = inputCode[idx];
@@ -66,10 +66,10 @@ const SharingJoinS = ({ onJoin, onCancel }) => {
                     </div>
 
                     <div className="modal-actions-s">
-                        <button onClick={onCancel} className="btn-cancel-s">취소</button>
+                        <button onClick={onCancel} className="btn-cancel-s cursor-pointer">취소</button>
                         <button
                             onClick={handleJoinClick}
-                            className={`btn-join-s ${inputCode.length === 4 ? 'ready' : ''}`}
+                            className={`btn-join-s ${inputCode.length === 4 ? 'ready' : ''} cursor-pointer`}
                         >
                             참여하기
                         </button>

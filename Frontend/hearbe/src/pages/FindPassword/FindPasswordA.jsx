@@ -148,7 +148,7 @@ const FindPasswordA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="findpw-logo"
+                className="findpw-logo cursor-pointer"
                 onClick={() => navigate('/main')}
             />
 
@@ -160,7 +160,7 @@ const FindPasswordA = () => {
                     비밀번호를 변경할 수 있습니다.
                 </p>
 
-                <div className="findpw-card" onClick={handleOpen}>
+                <div className="findpw-card cursor-pointer" onClick={handleOpen}>
                     <div className="findpw-card-title">장애인 복지카드 촬영하기</div>
                     <img src={iconCamera} alt="Camera" className="findpw-camera-icon" />
                 </div>
@@ -169,7 +169,7 @@ const FindPasswordA = () => {
             {showModal && (
                 <div className="findpw-modal-overlay" onClick={handleClose}>
                     <div className="findpw-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="findpw-modal-close" onClick={handleClose}>X</div>
+                        <div className="findpw-modal-close cursor-pointer" onClick={handleClose}>X</div>
                         {modalStep === 'camera' ? (
                             <>
                                 <div className="findpw-modal-title">카드 촬영</div>
@@ -185,7 +185,7 @@ const FindPasswordA = () => {
                                     )}
                                 </div>
                                 {stream && (
-                                    <div className="findpw-shutter-button" onClick={handleSnap}>
+                                    <div className="findpw-shutter-button cursor-pointer" onClick={handleSnap}>
                                         <div className="findpw-shutter-inner"></div>
                                     </div>
                                 )}
@@ -240,7 +240,7 @@ const FindPasswordA = () => {
                                         />
                                     </div>
                                 </div>
-                                <button className="findpw-confirm-btn" onClick={handleVerify}>인증하기</button>
+                                <button className="findpw-confirm-btn cursor-pointer" onClick={handleVerify}>인증하기</button>
                             </>
                         )}
                     </div>

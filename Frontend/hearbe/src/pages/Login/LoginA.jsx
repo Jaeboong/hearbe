@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
-import './LoginA.css';
+import './LoginA.css'; // Importing empty file for safety, can be removed later
 
 const Login = () => {
     const navigate = useNavigate();
@@ -102,24 +102,24 @@ const Login = () => {
                     <img
                         src={logo}
                         alt="Logo"
-                        className="logo-image"
+                        className="logo-image cursor-pointer"
                         onClick={() => navigate('/')}
-                        style={{ cursor: 'pointer' }}
                     />
                 </div>
 
                 <form
+                    className="login-form"
                     onSubmit={(e) => {
                         e.preventDefault();
                         handleLogin();
                     }}
                 >
                     {/* Input Section */}
-                    <div className="input-group">
+                    <div className="input-box">
                         <input
                             type="text"
                             placeholder="아이디"
-                            className="login-input first-input"
+                            className="login-input"
                             value={id}
                             onChange={(e) => setId(e.target.value)}
                             onKeyDown={(e) => {
@@ -128,6 +128,8 @@ const Login = () => {
                                 }
                             }}
                         />
+                    </div>
+                    <div className="input-box">
                         <input
                             type="password"
                             placeholder="비밀번호"
@@ -154,21 +156,24 @@ const Login = () => {
                     <label className="checkbox-container">
                         <input
                             type="checkbox"
+                            className="checkbox-input"
                             checked={rememberLogin}
                             onChange={(e) => setRememberLogin(e.target.checked)}
                         />
-                        <span className="checkmark"></span>
+                        <span className="checkmark">
+                            <span className="checkmark-icon"></span>
+                        </span>
                         자동 로그인
                     </label>
                 </div>
 
                 {/* Footer Links */}
                 <div className="login-footer">
-                    <span onClick={() => navigate('/A/findId')} style={{ cursor: 'pointer' }}>아이디 찾기</span>
+                    <span onClick={() => navigate('/A/findId')} className="cursor-pointer">아이디 찾기</span>
                     <span className="login-separator">|</span>
-                    <span onClick={() => navigate('/A/findPassword')} style={{ cursor: 'pointer' }}>비밀번호 변경</span>
+                    <span onClick={() => navigate('/A/findPassword')} className="cursor-pointer">비밀번호 변경</span>
                     <span className="login-separator">|</span>
-                    <span className="signup-link" onClick={() => navigate('/A/signup')} style={{ cursor: 'pointer' }}>
+                    <span onClick={() => navigate('/A/signup')} className="cursor-pointer">
                         회원가입
                     </span>
                 </div>

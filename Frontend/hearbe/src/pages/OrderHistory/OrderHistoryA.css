@@ -23,7 +23,7 @@
     position: absolute;
     top: clamp(12px, 3vw, 24px);
     left: clamp(12px, 3vw, 24px);
-    width: clamp(210px, 35vw, 380px);
+    width: clamp(120px, 20vw, 200px);
     height: auto;
     cursor: pointer;
     z-index: 10;
@@ -43,13 +43,14 @@
 
 .orderhistory-container .orderhistory-content {
     display: flex;
-    gap: clamp(30px, 5vw, 60px);
-    width: min(90rem, 90vw);
+    gap: clamp(16px, 3vw, 30px);
+    width: 100%;
+    max-width: 1200px;
     min-height: 80vh;
-    margin-left: 60px;
-    padding: 20px;
+    margin: 0 auto;
+    padding: clamp(10px, 2vw, 20px);
     box-sizing: border-box;
-    min-width: 680px;
+    min-width: 0;
 }
 
 /* Sidebar */
@@ -59,7 +60,7 @@
 }
 
 .sidebar-title {
-    font-size: clamp(32px, 5vw, 48px);
+    font-size: clamp(24px, 4vw, 32px);
     font-weight: 900;
     color: #FFF064;
     margin-bottom: clamp(30px, 5vw, 50px);
@@ -96,16 +97,17 @@
 .orderhistory-main {
     flex: 1;
     width: 100%;
-    max-width: 1000px;
-    height: min(1030px, 90vh);
+    /* max-width removed to allow full usage of available space within container */
+    height: auto;
     box-sizing: border-box;
+    min-width: 0;
 }
 
 .content-title {
     display: flex;
     align-items: center;
     gap: clamp(12px, 2vw, 16px);
-    font-size: clamp(28px, 4.5vw, 42px);
+    font-size: clamp(20px, 3vw, 28px);
     font-weight: 900;
     color: #FFF064;
     margin-bottom: 20px;
@@ -120,7 +122,6 @@
     border-radius: clamp(12px, 2.5vw, 16px);
     overflow: hidden;
     width: 100%;
-    max-width: 1000px;
     margin-left: 0;
     margin-right: auto;
 }
@@ -140,14 +141,14 @@
 }
 
 .mall-name {
-    font-size: clamp(48px, 10vw, 64px);
+    font-size: clamp(24px, 5vw, 36px);
     font-weight: 1000;
     color: #171C28;
     margin: 0;
     font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
     display: flex;
     align-items: center;
-    gap: clamp(8px, 2vw, 12px);
+    gap: clamp(6px, 1.5vw, 10px);
 }
 
 .toggle-icon {
@@ -427,13 +428,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
     background: transparent;
     border: none;
     color: #FFF064;
-    padding: clamp(8px, 1.6vw, 14px);
+    padding: clamp(4px, 1vw, 8px);
     border-radius: 0.75rem;
-    font-size: clamp(18px, 3vw, 26px);
+    font-size: clamp(14px, 2vw, 18px);
     font-weight: 900;
     cursor: pointer;
     font-family: 'KoddiUD OnGothic', sans-serif;

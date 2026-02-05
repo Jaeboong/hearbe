@@ -516,7 +516,7 @@ const SignUp = () => {
                             onChange={handleInputChange}
                             onBlur={handleIdBlur}
                         />
-                        <button ref={duplicateCheckBtnRef} className="check-btn" onClick={handleDuplicateCheck}>중복확인</button>
+                        <button ref={duplicateCheckBtnRef} className="check-btn cursor-pointer" onClick={handleDuplicateCheck}>중복확인</button>
                     </div>
                     <div className="input-row">
                         <input
@@ -592,7 +592,7 @@ const SignUp = () => {
                                 </div>
                             </div>
                             <div className="card-retake-wrap">
-                                <button type="button" className="card-retake-btn" onClick={handleRetakeCard}>
+                                <button type="button" className="card-retake-btn cursor-pointer" onClick={handleRetakeCard}>
                                     다시 촬영하기
                                 </button>
                             </div>
@@ -608,7 +608,7 @@ const SignUp = () => {
 
                 {/* Terms Section */}
                 <div className="form-group-outline terms-section">
-                    <div className="term-row single-term-row" onClick={handleRequiredTermsToggle}>
+                    <div className="term-row single-term-row cursor-pointer" onClick={handleRequiredTermsToggle}>
                         <div className={`check-circle ${terms.term1 && terms.term2 ? 'checked' : ''}`}>
                             {terms.term1 && terms.term2 && '✓'}
                         </div>
@@ -619,7 +619,7 @@ const SignUp = () => {
                         </span>
                         <button
                             type="button"
-                            className="terms-view-btn"
+                            className="terms-view-btn cursor-pointer"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setShowTermsModal(true);
@@ -631,7 +631,7 @@ const SignUp = () => {
                 </div>
 
                 {/* Submit Button */}
-                <button className="signup-submit-btn" onClick={handleSignUp}>회원가입하기</button>
+                <button className="signup-submit-btn cursor-pointer" onClick={handleSignUp}>회원가입하기</button>
             </div>
 
 
@@ -645,7 +645,7 @@ const SignUp = () => {
                     >
 
                         {/* 닫기 버튼 */}
-                        <div className="modal-close-btn" onClick={handleModalClose}>
+                        <div className="modal-close-btn cursor-pointer" onClick={handleModalClose}>
                             X
                         </div>
 
@@ -667,7 +667,7 @@ const SignUp = () => {
                                 </div>
 
                                 {stream && (
-                                    <div className="shutter-button" onClick={handleSnap}>
+                                    <div className="shutter-button cursor-pointer" onClick={handleSnap}>
                                         <div className="shutter-inner"></div>
                                     </div>
                                 )}
@@ -734,8 +734,8 @@ const SignUp = () => {
 
 
                                     <div className="card-button-group">
-                                        <button className="card-retake-btn" onClick={() => setModalStep('camera')}>다시 촬영</button>
-                                        <button className="card-register-btn" onClick={handleCardRegister}>카드 등록</button>
+                                        <button className="card-retake-btn cursor-pointer" onClick={() => setModalStep('camera')}>다시 촬영</button>
+                                        <button className="card-register-btn cursor-pointer" onClick={handleCardRegister}>카드 등록</button>
                                     </div>
                                 </div>
                             </>
@@ -751,7 +751,7 @@ const SignUp = () => {
                     <div className="modal-overlay">
                         <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
                             <div className={`signup-error-message ${messageType === 'error' ? 'is-error' : 'is-info'}`}>{errorMessage}</div>
-                            <button className="error-confirm-btn" onClick={handleMessageConfirm}>확인</button>
+                            <button className="error-confirm-btn cursor-pointer" onClick={handleMessageConfirm}>확인</button>
                         </div>
                     </div>
                 )
@@ -762,7 +762,7 @@ const SignUp = () => {
                 showTermsModal && (
                     <div className="policy-modal-overlay">
                         <div className="policy-modal-box" onClick={(e) => e.stopPropagation()}>
-                            <button type="button" className="policy-modal-close" onClick={() => setShowTermsModal(false)}>×</button>
+                            <button type="button" className="policy-modal-close cursor-pointer" onClick={() => setShowTermsModal(false)}>×</button>
                             <div className="policy-modal-title">이용약관 및 개인정보 수집 동의</div>
 
                             <div className="policy-modal-content">
@@ -780,7 +780,7 @@ const SignUp = () => {
                                 </p>
                             </div>
 
-                            <button type="button" className="policy-confirm-btn" onClick={() => setShowTermsModal(false)}>
+                            <button type="button" className="policy-confirm-btn cursor-pointer" onClick={() => setShowTermsModal(false)}>
                                 확인
                             </button>
                         </div>

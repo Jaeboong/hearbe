@@ -109,3 +109,16 @@
 .btn-submit:hover {
     background-color: #7C3AED;
 }
+
+@media (max-width: 768px) {
+    .login-s-card {
+        padding: 2.5rem 1.5rem;
+        max-width: 90%;
+    }
+
+    .invite-input {
+        font-size: 20px;
+        letter-spacing: 5px;
+        padding: 1rem;
+    }
+}

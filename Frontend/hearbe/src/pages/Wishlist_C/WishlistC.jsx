@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Home, Heart, LogOut } from 'lucide-react'; // CheckSquare 제거
+import { User, Store, Heart, LogOut } from 'lucide-react';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
@@ -112,17 +112,17 @@ export default function WishlistC({ onHome }) {
             {/* Header */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
-                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '70px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
-                        <div className="nav-icon-c"><Home size={24} /></div>
-                        <span>홈</span>
+                    <button className="nav-item-c cursor-pointer" onClick={onHome || (() => navigate('/C/mall'))}>
+                        <div className="nav-icon-c"><Store size={24} /></div>
+                        <span>쇼핑몰</span>
                     </button>
-                    <button className="nav-item-c" onClick={handleLogout}>
+                    <button className="nav-item-c cursor-pointer" onClick={handleLogout}>
                         <div className="nav-icon-c"><LogOut size={24} /></div>
                         <span>로그아웃</span>
                     </button>
@@ -148,7 +148,7 @@ export default function WishlistC({ onHome }) {
                             <button
                                 key={item.id}
                                 onClick={() => navigate(item.path)}
-                                className={`mp-sidebar-item ${item.id === 'wishlist' ? 'active' : ''}`}
+                                className={`mp-sidebar-item cursor-pointer ${item.id === 'wishlist' ? 'active' : ''}`}
                             >
                                 <span className="label">{item.label}</span>
                             </button>
@@ -209,7 +209,7 @@ export default function WishlistC({ onHome }) {
                                                         </div>
                                                     </div>
                                                     <button
-                                                        className="btn-outline-sm wishlist-detail-btn"
+                                                        className="btn-outline-sm wishlist-detail-btn cursor-pointer"
                                                         onClick={() => item.productUrl && window.open(item.productUrl, '_blank')}
                                                     >
                                                         상세 조회

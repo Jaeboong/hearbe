@@ -230,7 +230,7 @@ function AppContent() {
       />
       <Route
         path="/C/findPassword"
-        element={<FindPasswordC mode="common" onBack={() => navigate(-1)} />}
+        element={<FindPasswordC mode="common" onBack={() => navigate('/C/login')} />}
       />
       <Route
         path="/C/mall"

@@ -200,13 +200,18 @@ export const authAPI = {
 
     // 비밀번호 재설정 API (C형 - 이메일 인증)
     resetPassword: async (email, newPassword) => {
+        console.log('resetPassword Request:', { email, newPassword });
         try {
             const response = await fetch(`${API_BASE_URL}/auth/resetPassword`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, newPassword }),
             });
+            console.log('resetPassword Response Status:', response.status);
+
             const data = await response.json();
+            console.log('resetPassword Response Data:', data);
+
             if (!response.ok) throw new Error(data.message || '비밀번호 재설정 실패');
             return data;
         } catch (error) {

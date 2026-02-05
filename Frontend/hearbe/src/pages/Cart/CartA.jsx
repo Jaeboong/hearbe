@@ -94,18 +94,18 @@ const CartA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="cart-logo-left"
+                className="cart-logo-left cursor-pointer"
                 onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
                         <Home size={72} />
                         <span>홈</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
                         <LogOut size={72} />
                         <span>로그아웃</span>
                     </button>
@@ -119,7 +119,7 @@ const CartA = () => {
                         {menuItems.map(item => (
                             <div
                                 key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''}`}
+                                className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
                                 onClick={() => navigate(item.path)}
                             >
                                 {item.label}

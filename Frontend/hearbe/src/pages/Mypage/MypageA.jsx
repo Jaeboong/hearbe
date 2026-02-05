@@ -23,15 +23,15 @@ const Mypage = () => {
             {/* 1. 상단 네비게이션 (홈/카트/마이)*/}
             <div className="top-nav-area">
                 <div className="header-nav">
-                    <div className="nav-item" onClick={() => navigate('/A/mall')}>
+                    <div className="nav-item cursor-pointer" onClick={() => navigate('/A/mall')}>
                         <img src={iconHome} alt="Home" className="nav-icon" />
                         <span>홈</span>
                     </div>
-                    <div className="nav-item" onClick={() => navigate('/A/cart')}>
+                    <div className="nav-item cursor-pointer" onClick={() => navigate('/A/cart')}>
                         <img src={iconCart} alt="Cart" className="nav-icon" />
                         <span>카트</span>
                     </div>
-                    <div className="nav-item" onClick={() => navigate('/A/mypage')}>
+                    <div className="nav-item cursor-pointer" onClick={() => navigate('/A/mypage')}>
                         <img src={iconUser} alt="My" className="nav-icon" />
                         <span>마이</span>
                     </div>
@@ -43,7 +43,7 @@ const Mypage = () => {
                 <img
                     src={logoA}
                     alt="Logo"
-                    className="mypage-logo-left"
+                    className="mypage-logo-left cursor-pointer"
                     onClick={() => navigate('/main')}
                 />
 
@@ -63,7 +63,7 @@ const Mypage = () => {
                 {requestedMenuItems.map((item) => (
                     <div
                         key={item.id}
-                        className={`menu-item ${activeMenuId === item.id ? 'active' : ''}`}
+                        className={`menu-item ${activeMenuId === item.id ? 'active' : ''} cursor-pointer`}
                         onClick={() => {
                             setActiveMenuId(item.id);
                             item.action();

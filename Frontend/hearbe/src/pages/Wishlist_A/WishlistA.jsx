@@ -123,18 +123,18 @@ const WishlistA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="wishlist-logo-left"
+                className="wishlist-logo-left cursor-pointer"
                 onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
                         <Home size={72} />
                         <span>홈</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
                         <LogOut size={72} />
                         <span>로그아웃</span>
                     </button>
@@ -148,7 +148,7 @@ const WishlistA = () => {
                         {menuItems.map(item => (
                             <div
                                 key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''}`}
+                                className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
                                 onClick={() => navigate(item.path)}
                             >
                                 {item.label}
@@ -177,7 +177,7 @@ const WishlistA = () => {
                         <div className="error-state">
                             <p className="error-message">찜한 상품을 불러오지 못했습니다.</p>
                             <p className="error-detail">{error}</p>
-                            <button className="retry-btn" onClick={handleRetry}>
+                            <button className="retry-btn cursor-pointer" onClick={handleRetry}>
                                 다시 시도
                             </button>
                         </div>
@@ -202,7 +202,7 @@ const WishlistA = () => {
                                             {items.map(item => (
                                                 <div
                                                     key={item.id}
-                                                    className="wishlist-item-wrapper"
+                                                    className="wishlist-item-wrapper cursor-pointer"
                                                     onClick={() => item.url && window.open(item.url, '_blank', 'noopener,noreferrer')}
                                                     style={{ cursor: item.url ? 'pointer' : 'default' }}
                                                 >
@@ -214,7 +214,7 @@ const WishlistA = () => {
                                                         </div>
                                                         <div className="item-actions">
                                                             <button
-                                                                className="add-cart-btn"
+                                                                className="add-cart-btn cursor-pointer"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     handleAddToCart(item);
