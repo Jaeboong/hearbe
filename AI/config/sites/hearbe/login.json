@@ -1,0 +1,11 @@
+{
+  "page_type": "login",
+  "url_pattern": "/[ABC]/login",
+  "description": "Hearbe login page",
+  "selectors": {
+    "email_input": "#login-email-input",
+    "password_input": "#login-password-input",
+    "login_button": "button[type='submit']",
+    "submit_button": "button[type='submit']"
+  }
+}

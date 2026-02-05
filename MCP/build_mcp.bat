@@ -28,14 +28,14 @@ REM --name: Specify the name of the executable and output directory.
 REM --onedir: Create a bundled directory containing the executable and dependencies.
 REM --noconsole: Disable the terminal window for GUI-based applications.
 REM --collect-all: Ensure all submodules and data for 'playwright' are included.
-REM --add-data: Bundle files/directories (.env, Chrome extension) into the build.
+REM --add-data: Bundle files/directories (config.env, Chrome extension) into the build.
 REM ---------------------------------------------------------------------------
 pyinstaller -y --clean ^
     --name MCPDesktop ^
     --onedir ^
     --noconsole ^
     --collect-all playwright ^
-    --add-data ".env;." ^
+    --add-data "config.env;." ^
     --add-data "..\Frontend\hearbe-extension;hearbe-extension" ^
     main.py
 
@@ -47,4 +47,33 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 echo [SUCCESS] Build completed. Output is available in the 'dist/MCPDesktop' directory.
+
+REM ---------------------------------------------------------------------------
+REM Post-build: Create ZIP archive and copy to Frontend public folder
+REM ---------------------------------------------------------------------------
+echo [INFO] Creating ZIP archive...
+IF EXIST "dist\MCPDesktop.zip" del /Q "dist\MCPDesktop.zip"
+REM Using tar (built-in Windows 10+) to avoid PowerShell execution policy issues
+REM pushd/popd ensures correct relative paths without ./ prefix
+pushd "dist\MCPDesktop"
+tar -a -c -f "..\MCPDesktop.zip" MCPDesktop.exe _internal
+popd
+
+IF %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Failed to create ZIP archive.
+    pause
+    exit /b %ERRORLEVEL%
+)
+
+echo [INFO] Copying ZIP to Frontend public folder...
+IF NOT EXIST "..\Frontend\hearbe\public\downloads" mkdir "..\Frontend\hearbe\public\downloads"
+copy /Y "dist\MCPDesktop.zip" "..\Frontend\hearbe\public\downloads\MCPDesktop.zip"
+
+IF %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Failed to copy ZIP to Frontend.
+    pause
+    exit /b %ERRORLEVEL%
+)
+
+echo [SUCCESS] MCPDesktop.zip is ready at Frontend/hearbe/public/downloads/
 pause

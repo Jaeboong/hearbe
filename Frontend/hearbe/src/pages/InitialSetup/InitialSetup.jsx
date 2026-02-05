@@ -71,7 +71,7 @@ export default function InitialSetup({ onComplete }) {
                         </p>
                         <div className="flex gap-4 w-full">
                             <button onClick={handleMcpDownload} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563]">나중에</button>
-                            <a href="/hearbe-mcp-server.exe" download onClick={handleMcpDownload}
+                            <a href="/downloads/MCPDesktop.zip" download onClick={handleMcpDownload}
                                 className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg no-underline flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>다운로드</a>
                         </div>
                     </div>

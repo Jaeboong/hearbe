@@ -6,6 +6,7 @@ Extracts and announces order detail info on order detail pages,
 and answers user questions using extracted data.
 """
 
+import asyncio
 import json
 import logging
 import re
@@ -13,6 +14,7 @@ from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 
 from core.interfaces import MCPCommand
+from api.order.order_client import OrderClient, OrderItem, COUPANG_PLATFORM_ID
 from services.llm.generators.llm_generator import LLMGenerator
 
 logger = logging.getLogger(__name__)
@@ -22,6 +24,9 @@ CTX_ORDER_DETAIL_REQUEST_TYPE = "order_detail_request_type"
 CTX_ORDER_DETAIL_PENDING_QUESTION = "order_detail_pending_question"
 CTX_ORDER_DETAIL_REQUESTED = "order_detail_requested"
 CTX_ORDER_DETAIL_DATA = "order_detail_data"
+CTX_ORDER_DETAIL_API_SENT_ID = "order_detail_api_sent_id"
+CTX_ORDER_DETAIL_API_RETRY = "order_detail_api_retry"
+CTX_ORDER_DETAIL_API_PENDING_ID = "order_detail_api_pending_id"
 
 REQUEST_SUMMARY = "summary"
 REQUEST_QUESTION = "question"
@@ -148,6 +153,27 @@ class OrderDetailHandler:
         if not self._sender or not self._session:
             return False
         tool_name = data.get("tool_name")
+        if tool_name == "get_user_session":
+            result = data.get("result") or {}
+            if not isinstance(result, dict):
+                return False
+            access_token = result.get("access_token") or result.get("accessToken") or ""
+            if access_token:
+                self._session.set_context(session_id, "access_token", access_token)
+            user_id = result.get("user_id") or result.get("userId") or ""
+            if user_id:
+                self._session.set_context(session_id, "user_id", str(user_id))
+            user_type = result.get("user_type") or result.get("userType") or ""
+            if user_type:
+                self._session.set_context(session_id, "user_type", str(user_type))
+            if access_token:
+                self._session.set_context(session_id, CTX_ORDER_DETAIL_API_RETRY, False)
+                pending_id = self._session.get_context(session_id, CTX_ORDER_DETAIL_API_PENDING_ID)
+                if pending_id:
+                    self._session.set_context(session_id, CTX_ORDER_DETAIL_API_PENDING_ID, None)
+                    order_data = self._session.get_context(session_id, CTX_ORDER_DETAIL_DATA) or {}
+                    await self._send_order_to_backend(session_id, str(pending_id), order_data, force_token=access_token)
+            return True
         if tool_name != "extract_order_detail":
             return False
 
@@ -167,6 +193,11 @@ class OrderDetailHandler:
         # Do not store order_id in order detail data to avoid reading it out.
 
         self._session.set_context(session_id, CTX_ORDER_DETAIL_DATA, order_data)
+        order_id = _extract_order_id_from_order_detail_url(page_url)
+        if order_id:
+            sent = self._session.get_context(session_id, CTX_ORDER_DETAIL_API_SENT_ID)
+            if sent != order_id:
+                asyncio.create_task(self._send_order_to_backend(session_id, order_id, order_data))
 
         request_type = self._session.get_context(session_id, CTX_ORDER_DETAIL_REQUEST_TYPE, REQUEST_SUMMARY)
         if request_type == REQUEST_QUESTION:
@@ -190,6 +221,62 @@ class OrderDetailHandler:
         self._session.set_context(session_id, CTX_ORDER_DETAIL_PENDING_QUESTION, None)
         self._session.set_context(session_id, CTX_ORDER_DETAIL_REQUESTED, None)
         self._session.set_context(session_id, CTX_ORDER_DETAIL_DATA, None)
+        self._session.set_context(session_id, CTX_ORDER_DETAIL_API_SENT_ID, None)
+        self._session.set_context(session_id, CTX_ORDER_DETAIL_API_RETRY, None)
+        self._session.set_context(session_id, CTX_ORDER_DETAIL_API_PENDING_ID, None)
+
+    async def _send_order_to_backend(
+        self,
+        session_id: str,
+        order_id: str,
+        order_data: Dict[str, Any],
+        force_token: Optional[str] = None,
+    ) -> None:
+        if not self._session:
+            return
+        token = force_token or _get_access_token(self._session, session_id)
+        if not token:
+            retry = bool(self._session.get_context(session_id, CTX_ORDER_DETAIL_API_RETRY))
+            if not retry:
+                self._session.set_context(session_id, CTX_ORDER_DETAIL_API_RETRY, True)
+                self._session.set_context(session_id, CTX_ORDER_DETAIL_API_PENDING_ID, order_id)
+                await self._sender.send_tool_calls(
+                    session_id,
+                    [
+                        MCPCommand(
+                            tool_name="get_user_session",
+                            arguments={},
+                            description="get user session from localStorage",
+                        )
+                    ],
+                )
+                logger.info("Order API token fetch requested: session=%s", session_id)
+                return
+            logger.info("Order API skipped: missing access token after retry (session=%s)", session_id)
+            return
+
+        items = _build_order_items(order_data)
+        if not items:
+            logger.warning("Order API skipped: no items extracted (session=%s)", session_id)
+            return
+
+        client = OrderClient(jwt_token=token)
+        result = await client.create_order(items=items, platform_id=COUPANG_PLATFORM_ID)
+        if result.get("success"):
+            self._session.set_context(session_id, CTX_ORDER_DETAIL_API_SENT_ID, order_id)
+            logger.info(
+                "Order API sent: session=%s order_id=%s items=%d",
+                session_id,
+                order_id,
+                len(items),
+            )
+        else:
+            logger.warning(
+                "Order API failed: session=%s order_id=%s error=%s",
+                session_id,
+                order_id,
+                result.get("error"),
+            )
 
     async def _ask_order_detail_llm(self, question: str, order_data: Dict[str, Any], page_url: str) -> str:
         if not question:
@@ -244,6 +331,86 @@ def _extract_order_id_from_order_detail_url(url: str) -> str:
         return match.group(1) if match else ""
     except Exception:
         return ""
+
+def _get_access_token(session_manager, session_id: str) -> str:
+    token_keys = [
+        "access_token",
+        "jwt_token",
+        "api_access_token",
+        "Authorization",
+        "authorization",
+        "auth_token",
+    ]
+    for key in token_keys:
+        value = session_manager.get_context(session_id, key)
+        if isinstance(value, str) and value.strip():
+            token = value.strip()
+            if token.lower().startswith("bearer "):
+                token = token[7:].strip()
+            return token
+    return ""
+
+
+def _coerce_int(value: Any, default: int = 1) -> int:
+    if value is None:
+        return default
+    if isinstance(value, int):
+        return value
+    try:
+        cleaned = re.sub(r"[^\d]", "", str(value))
+        if not cleaned:
+            return default
+        return int(cleaned)
+    except Exception:
+        return default
+
+
+def _coerce_price(value: Any) -> Optional[int]:
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return int(value)
+    try:
+        cleaned = re.sub(r"[^\d]", "", str(value))
+        if not cleaned:
+            return None
+        return int(cleaned)
+    except Exception:
+        return None
+
+
+def _build_order_items(order_data: Dict[str, Any]):
+    items = []
+    raw_items = order_data.get("items") if isinstance(order_data, dict) else None
+    if not isinstance(raw_items, list):
+        return items
+    for raw in raw_items:
+        if not isinstance(raw, dict):
+            continue
+        name = raw.get("product_name") or raw.get("vendor_item_name") or raw.get("name") or ""
+        name = str(name).strip()
+        if not name:
+            continue
+        price = _coerce_price(raw.get("discounted_unit_price"))
+        if price is None:
+            price = _coerce_price(raw.get("unit_price"))
+        if price is None:
+            continue
+        quantity = _coerce_int(raw.get("quantity"), default=1)
+        url = raw.get("product_url") or raw.get("url") or ""
+        img_url = raw.get("img_url") or raw.get("image") or ""
+        deliver_url = raw.get("deliver_url") or raw.get("tracking_url") or ""
+        items.append(
+            OrderItem(
+                name=name,
+                price=price,
+                quantity=quantity,
+                url=url or None,
+                img_url=img_url or None,
+                deliver_url=deliver_url or None,
+            )
+        )
+    return items
 
 
 def _is_order_detail_question(text: str) -> bool:
