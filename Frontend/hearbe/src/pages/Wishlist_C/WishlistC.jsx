@@ -76,6 +76,7 @@ export default function WishlistC({ onHome }) {
                         name: item.product_name,
                         price: item.price || 0,
                         imgUrl: item.img_url,
+                        productUrl: item.product_url,
                         tag: '',
                         icon: '❤️'
                     });
@@ -96,13 +97,13 @@ export default function WishlistC({ onHome }) {
     const handleLogout = async () => {
         try {
             await authAPI.logout();
-            navigate('/');
+            navigate('/main');
         } catch (error) {
             console.error('Logout failed:', error);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 
@@ -189,12 +190,6 @@ export default function WishlistC({ onHome }) {
                                                 <div className="mall-order-indicator"></div>
                                                 <h3 className="mall-header-name" style={{ marginBottom: 0 }}>{group.mall} <span className="count-badge" style={{ marginLeft: '1rem' }}>{group.count}개</span></h3>
                                             </div>
-                                            <button
-                                                className="btn-outline-sm wishlist-detail-btn"
-                                                onClick={() => group.wishlistUrl && window.open(group.wishlistUrl, '_blank')}
-                                            >
-                                                상세 조회
-                                            </button>
                                         </div>
 
                                         <div className="group-items">
@@ -213,6 +208,12 @@ export default function WishlistC({ onHome }) {
                                                             <div className="item-price-lg">{item.price.toLocaleString()}원</div>
                                                         </div>
                                                     </div>
+                                                    <button
+                                                        className="btn-outline-sm wishlist-detail-btn"
+                                                        onClick={() => item.productUrl && window.open(item.productUrl, '_blank')}
+                                                    >
+                                                        상세 조회
+                                                    </button>
                                                 </div>
                                             ))}
                                         </div>

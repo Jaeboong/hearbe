@@ -48,6 +48,29 @@ export default function OrderHistoryC({ onHome }) {
         6: '컬리'
     };
 
+    const resolvePlatformName = (order) => {
+        return (
+            platformNames[order.platform_id] ||
+            order.platform_name ||
+            order.platformName ||
+            order.mall_name ||
+            order.mallName ||
+            (order.platform_id ? `플랫폼 ${order.platform_id}` : '기타 쇼핑몰')
+        );
+    };
+
+    const formatOrderDate = (orderedAt) => {
+        if (!orderedAt) return '날짜 미상';
+        if (orderedAt.includes('T')) return orderedAt.split('T')[0];
+        if (orderedAt.includes(' ')) return orderedAt.split(' ')[0];
+        return orderedAt;
+    };
+
+    const getOrderDetailUrl = (group) => {
+        if (!group.orderUrls || group.orderUrls.length === 0) return '';
+        return group.orderUrls[0];
+    };
+
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -55,13 +78,13 @@ export default function OrderHistoryC({ onHome }) {
     const handleLogout = async () => {
         try {
             await authAPI.logout();
-            navigate('/');
+            navigate('/main');
         } catch (error) {
             console.error('Logout failed:', error);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 
@@ -72,20 +95,27 @@ export default function OrderHistoryC({ onHome }) {
             const response = await orderAPI.getOrders();
 
             if (response.data && response.data.orders) {
-                const ordersByMall = {};
+                const ordersByDate = {};
                 response.data.orders.forEach(order => {
-                    const mallName = platformNames[order.platform_id] || `Platform ${order.platform_id}`;
-                    if (!ordersByMall[mallName]) {
-                        ordersByMall[mallName] = { mall: mallName, orderUrl: order.order_url, items: [] };
+                    const dateKey = formatOrderDate(order.ordered_at);
+                    if (!ordersByDate[dateKey]) {
+                        ordersByDate[dateKey] = { date: dateKey, orderUrls: [], items: [], platforms: new Set() };
                     }
+                    if (order.order_url) {
+                        ordersByDate[dateKey].orderUrls.push(order.order_url);
+                    }
+                    const mallName = resolvePlatformName(order);
+                    ordersByDate[dateKey].platforms.add(mallName);
+
                     if (order.items && order.items.length > 0) {
                         order.items.forEach(item => {
-                            ordersByMall[mallName].items.push({
-                                id: `${order.order_id}-${item.name}`,
+                            ordersByDate[dateKey].items.push({
+                                id: `${order.order_id}-${item.name}-${item.url || ''}`,
                                 name: item.name,
                                 price: `${item.price.toLocaleString()}원`,
                                 quantity: `${item.quantity || 1}개`,
                                 date: order.ordered_at || '',
+                                mall: mallName,
                                 icon: '📦',
                                 imgUrl: item.img_url,
                                 productUrl: item.url,
@@ -94,7 +124,15 @@ export default function OrderHistoryC({ onHome }) {
                         });
                     }
                 });
-                setOrders(Object.values(ordersByMall));
+                const sortedGroups = Object.values(ordersByDate).map(group => ({
+                    ...group,
+                    platforms: Array.from(group.platforms)
+                })).sort((a, b) => {
+                    if (a.date === '날짜 미상') return 1;
+                    if (b.date === '날짜 미상') return -1;
+                    return new Date(b.date) - new Date(a.date);
+                });
+                setOrders(sortedGroups);
             }
         } catch (err) {
             console.error('Failed to fetch orders:', err);
@@ -180,19 +218,30 @@ export default function OrderHistoryC({ onHome }) {
                                     주문 내역이 없습니다.
                                 </div>
                             ) : (
-                                orders.map((group, idx) => (
+                                orders.map((group, idx) => {
+                                    const detailUrl = getOrderDetailUrl(group);
+                                    const platformLabel = group.platforms && group.platforms.length > 0
+                                        ? (group.platforms.length === 1
+                                            ? group.platforms[0]
+                                            : `${group.platforms[0]} 외 ${group.platforms.length - 1}곳`)
+                                        : '플랫폼';
+                                    return (
                                     <div key={idx} className="mall-order-group">
                                         <div className="mall-order-header">
                                             <div className="mall-header-title-container">
                                                 <div className="mall-order-indicator"></div>
-                                                <h2 className="mall-header-name">{group.mall}</h2>
+                                                <div className="mall-header-text">
+                                                    <h2 className="mall-header-name">{platformLabel}</h2>
+                                                    <div className="mall-header-date">{group.date}</div>
+                                                </div>
                                             </div>
                                             <div className="order-group-actions">
                                                 <button
                                                     className="btn-outline-sm"
-                                                    onClick={() => group.orderUrl && window.open(group.orderUrl, '_blank')}
+                                                    onClick={() => detailUrl && window.open(detailUrl, '_blank')}
+                                                    disabled={!detailUrl}
                                                 >
-                                                    상세 조회
+                                                    주문 상세 조회
                                                 </button>
                                             </div>
                                         </div>
@@ -209,7 +258,7 @@ export default function OrderHistoryC({ onHome }) {
                                                         </div>
                                                         <div className="item-info-text">
                                                             <div className="item-name-lg" style={{ marginBottom: '0.25rem' }}>{item.name}</div>
-                                                            <div className="item-meta-text" style={{ fontSize: '1.4rem', color: '#6b7280' }}>{item.date}</div>
+                                                            <div className="item-meta-text" style={{ fontSize: '1.4rem', color: '#6b7280' }}>{item.mall}</div>
                                                         </div>
                                                     </div>
 
@@ -243,7 +292,7 @@ export default function OrderHistoryC({ onHome }) {
                                             ))}
                                         </div>
                                     </div>
-                                ))
+                                )})
                             )}
                         </div>
                     </section>

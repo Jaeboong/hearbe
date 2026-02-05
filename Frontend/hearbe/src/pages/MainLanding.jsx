@@ -12,7 +12,7 @@ const ModeCard = ({ mode, onSelect }) => (
     whileHover={{ y: -10 }}
     whileTap={{ scale: 0.98 }}
     onClick={() => onSelect(mode.id, mode.title)}
-    className="relative overflow-hidden group rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 w-full min-w-[300px] h-[550px] flex flex-col items-start justify-between p-10 text-left bg-white border border-gray-100"
+    className="relative overflow-hidden group rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 w-full min-w-[280px] h-[480px] flex flex-col items-start justify-between p-8 text-left bg-white border border-gray-100"
     style={{ background: mode.bgColor }}
   >
     {/* Background Icon */}
@@ -81,7 +81,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
       </header>
 
       {/* Shopping Mode Selection Only */}
-      <div className="relative z-10 w-full max-w-[1600px] px-8 py-12">
+      <div className="relative z-10 w-full max-w-6xl px-8 py-12 mt-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -104,7 +104,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
               bgColor: 'linear-gradient(135deg, #6D28D9 0%, #4C1D95 100%)', // Deep Violet
               textColor: '#FFFFFF',
               icon: <Volume2 size={32} />,
-              iconLarge: <Zap size={300} />
+              iconLarge: <Zap size={240} />
             }}
           />
           <ModeCard
@@ -118,7 +118,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
               bgColor: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', // Royal Blue
               textColor: '#FFFFFF',
               icon: <Layout size={32} />,
-              iconLarge: <Layout size={300} />
+              iconLarge: <Layout size={240} />
             }}
           />
           <ModeCard
@@ -132,7 +132,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
               bgColor: 'linear-gradient(135deg, #C084FC 0%, #A855F7 100%)', // Electric Lavender
               textColor: '#FFFFFF',
               icon: <Share2 size={32} />,
-              iconLarge: <Share2 size={300} />
+              iconLarge: <Share2 size={240} />
             }}
           />
         </div>

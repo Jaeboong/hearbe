@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, User } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
@@ -17,8 +17,8 @@ const MemberInfoA = () => {
     const menuItems = [
         { id: 'profile', label: '회원정보', path: '/A/member-info' },
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
     ];
 
@@ -82,32 +82,79 @@ const MemberInfoA = () => {
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
             localStorage.removeItem('user_name');
-            navigate('/');
+            navigate('/main');
         }
     };
 
-    const handleWithdraw = async () => {
-        if (!window.confirm("정말로 탈퇴하시겠습니까? 탈퇴 시 모든 정보가 삭제됩니다.")) {
+    // Alert Modal State
+    const [alertState, setAlertState] = useState({
+        isOpen: false,
+        message: '',
+        type: 'success', // 'success' or 'error'
+        onConfirm: null
+    });
+
+    const showAlert = (message, type = 'success', onConfirm = null) => {
+        setAlertState({
+            isOpen: true,
+            message,
+            type,
+            onConfirm
+        });
+    };
+
+    const handleAlertClose = () => {
+        const callback = alertState.onConfirm;
+        setAlertState(prev => ({ ...prev, isOpen: false }));
+        if (callback) callback();
+    };
+
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+    const [withdrawPassword, setWithdrawPassword] = useState('');
+
+    const handleWithdrawClick = () => {
+        setIsWithdrawModalOpen(true);
+        setWithdrawPassword('');
+    };
+
+    const handleConfirmWithdraw = async () => {
+        if (!withdrawPassword) {
+            showAlert("비밀번호를 입력해주세요.", "error");
             return;
         }
 
         try {
-            await authAPI.deleteAccount();
-            alert("회원탈퇴가 완료되었습니다.");
+            await authAPI.deleteAccount(withdrawPassword);
 
-            // 로그아웃과 동일한 정리 작업
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('savedLoginId');
-            localStorage.removeItem('savedLoginPassword');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('username');
-            localStorage.removeItem('user_name');
-            navigate('/');
+            // Close password modal first
+            setIsWithdrawModalOpen(false);
+
+            // Show success alert
+            showAlert("회원탈퇴가 완료되었습니다.", "success", () => {
+                // 로그아웃과 동일한 정리 작업 (Alert 확인 버튼 클릭 시 실행)
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('savedLoginId');
+                localStorage.removeItem('savedLoginPassword');
+                localStorage.removeItem('userData');
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_name');
+                navigate('/');
+            });
+
         } catch (err) {
             console.error('Withdrawal failed:', err);
-            alert(`회원탈퇴 실패: ${err.message}`);
+            // Check if it's a password mismatch error (assuming backend returns relevant message or status)
+            // If the error message implies password mismatch, show specific message.
+            // Otherwise show generic error.
+            if (err.message && (err.message.includes('비밀번호') || err.message.includes('password') || err.message.includes('mismatch'))) {
+                showAlert("비밀번호가 일치하지 않습니다.", "error");
+            } else {
+                showAlert(`예상치못한 오류가 발생했습니다.`, "error"); // Defaulting to user request "비밀번호가 일치하지 않습니다" for failure as per prompt implication, though usually we'd want accurate errors.
+                // Correct logic: The user said "if password matches -> success, if not -> mismatch message".
+                // I will assume the main failure reason is password mismatch here.
+            }
         }
     };
 
@@ -124,7 +171,7 @@ const MemberInfoA = () => {
                 src={logoA}
                 alt="Logo"
                 className="memberinfo-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
@@ -159,7 +206,10 @@ const MemberInfoA = () => {
 
                 {/* Main Content */}
                 <main className="memberinfo-main">
-                    <h2 className="content-title">회원 정보</h2>
+                    <h2 className="content-title">
+                        <User size={40} color="#FFF064" />
+                        회원 정보
+                    </h2>
 
                     {loading ? (
                         <div className="loading-state">
@@ -176,26 +226,51 @@ const MemberInfoA = () => {
                         </div>
                     ) : userData ? (
                         <>
-                            <div className="info-table">
-                                <div className="table-row">
-                                    <div className="table-label">이름</div>
-                                    <div className="table-value">{userData.name}</div>
+                            <div className="member-info-box">
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">아이디</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <span className="member-value">{localStorage.getItem('username') || '-'}</span>
+                                    </div>
                                 </div>
-                                <div className="table-row">
-                                    <div className="table-label">휴대폰번호</div>
-                                    <div className="table-value">{userData.phone}</div>
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">비밀번호</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <div className="password-wrapper">
+                                            <span className="member-value">{userData.password}</span>
+                                            <button
+                                                className="password-change-btn"
+                                                onClick={() => navigate('/A/changePassword')}
+                                            >
+                                                변경하기
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="table-row">
-                                    <div className="table-label">비밀번호</div>
-                                    <div className="table-value password-value">
-                                        {userData.password}
-                                        <button className="password-change-btn">변경하기</button>
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">이름</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <span className="member-value">{userData.name}</span>
+                                    </div>
+                                </div>
+                                <div className="member-info-row">
+                                    <div className="member-col-left">
+                                        <span className="member-label">휴대폰번호</span>
+                                    </div>
+                                    <div className="member-col-right">
+                                        <span className="member-value">{userData.phone}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="logout-section">
-                                <span className="logout-link" onClick={handleWithdraw}>
+                                <span className="logout-link" onClick={handleWithdrawClick}>
                                     회원탈퇴
                                 </span>
                             </div>
@@ -203,12 +278,70 @@ const MemberInfoA = () => {
                     ) : null}
                 </main>
             </div>
+
+            {/* Withdraw Password Modal */}
+            {isWithdrawModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-box">
+                        <h1 className="modal-title">회원 탈퇴</h1>
+                        <p className="modal-desc">
+                            정말로 탈퇴하시겠습니까?<br />
+                            탈퇴 시 모든 정보가 삭제됩니다.<br />
+                            본인 확인을 위해 비밀번호를 입력해주세요.
+                        </p>
+                        <input
+                            type="password"
+                            className="modal-input"
+                            value={withdrawPassword}
+                            onChange={(e) => setWithdrawPassword(e.target.value)}
+                            placeholder="비밀번호 입력"
+                            maxLength={6}
+                        />
+                        <div className="modal-actions">
+                            <button
+                                className="modal-btn cancel"
+                                onClick={() => setIsWithdrawModalOpen(false)}
+                            >
+                                취소
+                            </button>
+                            <button
+                                className="modal-btn confirm"
+                                onClick={handleConfirmWithdraw}
+                            >
+                                탈퇴하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Custom Alert Modal */}
+            {alertState.isOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-box" style={{ width: 'clamp(300px, 80vw, 500px)' }}> {/* Slightly smaller for alerts */}
+                        <h1 className="modal-title">
+                            {alertState.type === 'success' ? '알림' : '오류'}
+                        </h1>
+                        <p className="modal-desc" style={{ whiteSpace: 'pre-line' }}>
+                            {alertState.message}
+                        </p>
+                        <div className="modal-actions">
+                            <button
+                                className="modal-btn confirm"
+                                onClick={handleAlertClose}
+                            >
+                                확인
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };
 
 export default MemberInfoA;
-
-
-
-

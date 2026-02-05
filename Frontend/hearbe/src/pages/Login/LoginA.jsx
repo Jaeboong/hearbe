@@ -70,9 +70,6 @@ const Login = () => {
                     localStorage.removeItem('savedLoginPassword');
                 }
                 // 로그인 성공
-                const utterance = new SpeechSynthesisUtterance("로그인되었습니다.");
-                utterance.lang = 'ko-KR';
-                window.speechSynthesis.speak(utterance);
                 navigate('/A/mall');
             } else if (!isAuto) {
                 const message = response?.message || '';
@@ -125,6 +122,11 @@ const Login = () => {
                             className="login-input first-input"
                             value={id}
                             onChange={(e) => setId(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleLogin();
+                                }
+                            }}
                         />
                         <input
                             type="password"
@@ -133,6 +135,11 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             maxLength={6}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleLogin();
+                                }
+                            }}
                         />
                     </div>
 

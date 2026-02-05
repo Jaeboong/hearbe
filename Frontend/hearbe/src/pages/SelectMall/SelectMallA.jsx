@@ -28,7 +28,6 @@ const SelectMall = () => {
         const targetUrl = mallUrlMap[mall];
         if (targetUrl) {
             window.open(targetUrl, '_blank', 'noopener,noreferrer');
-            navigate(`/A/store?url=${encodeURIComponent(targetUrl)}`);
         }
     };
 
@@ -45,7 +44,7 @@ const SelectMall = () => {
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 
@@ -55,7 +54,7 @@ const SelectMall = () => {
                 src={logoA}
                 alt="Logo"
                 className="mall-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
             {/* Header */}
             <div className="mypage-topbar">
@@ -111,6 +110,10 @@ const SelectMall = () => {
                     </div>
                 </div>
             </div>
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

@@ -1,8 +1,7 @@
 # MemberInfo_A PRD
 
 ## 1. 개요
-
-A형 회원정보 페이지. 사용자의 기본 정보를 표시한다.
+A형 회원정보 페이지. 사용자 기본 정보 조회 및 회원탈퇴 기능을 제공한다.
 
 ## 2. 현재 상태
 
@@ -117,3 +116,39 @@ const response = await memberAPI.getProfile();
 - [x] MemberInfoA.jsx API 변경 (memberAPI.getProfile)
 - [x] 로딩 상태 UI
 - [x] 에러 상태 UI
+
+### 6.1 추가: 회원탈퇴 기능
+
+#### API 명세
+
+**회원탈퇴**
+- **Endpoint**: `/auth/delete-account`
+- **Method**: `POST`
+- **Header**: `Authorization: Bearer {access_token}`
+- **Request Body**:
+  ```json
+  {
+    "password": "사용자비밀번호"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "code": 200,
+    "message": "회원탈퇴 완료",
+    "data": {
+      "userId": "사용자ID",
+      "message": "회원탈퇴가 완료되었습니다"
+    }
+  }
+  ```
+
+#### 구현 요구사항
+- **회원탈퇴 버튼 클릭 시**: 비밀번호 입력을 위한 모달 또는 프롬프트 표시
+- **확인 시**: 입력받은 비밀번호를 API의 body에 담아 요청 전송
+- **성공 시**:
+  - 알림 메시지 ("회원탈퇴가 완료되었습니다")
+  - 로그아웃 처리 (토큰 및 로컬 스토리지 정리)
+  - 메인 페이지(`/`)로 이동
+- **실패 시**:
+  - 실패 사유 알림 (예: "비밀번호가 일치하지 않습니다")

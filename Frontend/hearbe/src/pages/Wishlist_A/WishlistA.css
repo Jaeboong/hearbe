@@ -1,11 +1,4 @@
 /* body 배경색은 index.css에서 중앙 관리 */
-
-
-
-
-
-
-
 /* Wishlist Page Styles */
 
 .wishlist-container {
@@ -16,6 +9,16 @@
     padding-right: 10px;
     box-sizing: border-box;
     position: relative;
+}
+
+/* 링크 기본 스타일 리셋 */
+.wishlist-container a,
+.wishlist-container a:link,
+.wishlist-container a:visited,
+.wishlist-container a:hover,
+.wishlist-container a:active {
+    color: inherit;
+    text-decoration: none;
 }
 
 .wishlist-logo-left {
@@ -45,8 +48,9 @@
     gap: clamp(30px, 5vw, 60px);
     width: min(90rem, 90vw);
     min-height: 80vh;
-    margin: 0 auto;
-    padding: 40px;
+    margin-left: 60px;
+    margin-top: 0px;
+    padding: 20px;
     box-sizing: border-box;
     min-width: 680px;
 }
@@ -94,64 +98,78 @@
 /* Main Content */
 .wishlist-main {
     flex: 1.3;
-    width: min(772px, 90vw);
+    width: min(1000px, 90vw);
     height: min(1030px, 90vh);
     box-sizing: border-box;
 }
 
 .content-title {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 16px);
     font-size: clamp(28px, 4.5vw, 42px);
     font-weight: 900;
     color: #FFF064;
-    margin-bottom: clamp(30px, 5vw, 50px);
+    margin-bottom: 20px;
     font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
 /* Mall Section */
 .mall-section {
-    margin-bottom: clamp(30px, 5vw, 50px);
+    margin-bottom: clamp(24px, 4vw, 36px);
+    background-color: #FFF064;
+    border: clamp(2px, 0.4vw, 3px) solid #FFF064;
+    border-radius: clamp(12px, 2.5vw, 16px);
+    overflow: hidden;
+    width: 100%;
+    max-width: 1000px;
+    margin-left: 0;
+    margin-right: auto;
 }
 
 .mall-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(24px, 3.6vw, 36px) clamp(16px, 3vw, 24px);
+    padding: clamp(18px, 2.5vw, 27px);
     background-color: #FFF064;
-    border-radius: clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px) 0 0;
-    margin-bottom: clamp(2px, 0.4vw, 4px);
+    padding-top: 15px;
+    padding-bottom: 0;
 }
 
 .mall-name {
-    font-size: clamp(20px, 3.5vw, 32px);
+    font-size: clamp(24px, 4vw, 36px);
     font-weight: 900;
-    color: #1E2A3A;
+    color: #131314;
     margin: 0;
     font-family: 'KoddiUD OnGothic', sans-serif;
 }
 
-.delete-all-btn {
-    padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
-    background-color: #1E2A3A;
-    color: #FFF064;
-    border: none;
-    border-radius: clamp(6px, 1.5vw, 10px);
-    font-size: clamp(14px, 2.5vw, 20px);
-    font-weight: 900;
-    cursor: pointer;
-    font-family: 'KoddiUD OnGothic', sans-serif;
-    transition: opacity 0.2s;
-}
-
-.delete-all-btn:hover {
-    opacity: 0.9;
-}
 
 /* Items List */
 .items-list {
     display: flex;
     flex-direction: column;
-    gap: clamp(2px, 0.4vw, 4px);
+    background-color: #121521;
+    margin: clamp(12px, 2.5vw, 20px);
+    border-radius: clamp(10px, 2vw, 14px);
+    overflow: hidden;
+}
+
+.wishlist-item-wrapper {
+    background-color: #121521;
+    border-bottom: clamp(1px, 0.2vw, 2px) solid rgba(255, 240, 100, 0.2);
+    transition: all 0.3s ease;
+}
+
+
+.wishlist-item-wrapper:first-child {
+    border-top: none;
+}
+
+.wishlist-item-wrapper:last-child {
+    border-bottom: none;
+    border-radius: 0 0 clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px);
 }
 
 .wishlist-item {
@@ -159,8 +177,6 @@
     align-items: center;
     gap: clamp(16px, 3vw, 24px);
     padding: clamp(16px, 3vw, 24px);
-    background-color: #FFFFFF;
-    border-radius: clamp(4px, 1vw, 8px);
 }
 
 .item-checkbox {
@@ -188,24 +204,19 @@
     gap: clamp(6px, 1.5vw, 10px);
 }
 
-.item-date {
-    font-size: clamp(12px, 2vw, 16px);
-    color: #666666;
-    font-weight: bold;
-    font-family: 'KoddiUD OnGothic', sans-serif;
-}
+
 
 .item-name {
-    font-size: clamp(16px, 3vw, 22px);
-    color: #1E2A3A;
+    font-size: clamp(28px, 6vw, 32px);
+    color: #FFF064;
     font-weight: bold;
     font-family: 'KoddiUD OnGothic', sans-serif;
     line-height: 1.4;
 }
 
-.item-price {
-    font-size: clamp(18px, 3.5vw, 26px);
-    color: #1E2A3A;
+.item-price-a {
+    font-size: clamp(18px, 5vw, 26px);
+    color: #FFF064;
     font-weight: 900;
     font-family: 'KoddiUD OnGothic', sans-serif;
 }
@@ -213,37 +224,23 @@
 /* Item Actions */
 .item-actions {
     display: flex;
-    flex-direction: column;
-    gap: clamp(8px, 1.5vw, 12px);
+    align-items: center;
+    justify-content: flex-end;
     flex-shrink: 0;
 }
 
-.add-cart-btn,
-.delete-btn {
-    padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
-    border: none;
+.add-cart-btn {
+    padding: clamp(10px, 2vw, 16px) clamp(20px, 3.5vw, 32px);
+    background-color: #FFF064;
+    color: #171C28;
+    border: clamp(2px, 0.4vw, 3px) solid #FFF064;
     border-radius: clamp(6px, 1.5vw, 10px);
-    font-size: clamp(14px, 2.5vw, 20px);
+    font-size: clamp(20px, 5vw, 28px);
     font-weight: 900;
     cursor: pointer;
     font-family: 'KoddiUD OnGothic', sans-serif;
     transition: opacity 0.2s;
     white-space: nowrap;
-}
-
-.add-cart-btn {
-    background-color: #FFF064;
-    color: #1E2A3A;
-}
-
-.delete-btn {
-    background-color: #9C2121;
-    color: #F5F5F5;
-}
-
-.add-cart-btn:hover,
-.delete-btn:hover {
-    opacity: 0.9;
 }
 
 /* Loading State */
@@ -337,7 +334,7 @@
     .wishlist-container .wishlist-content {
         width: 100%;
         height: auto;
-        padding: 32px 100px;
+        /* padding: 32px 100px; */
     }
 
     .wishlist-main {
@@ -364,23 +361,8 @@
     }
 
     .item-actions {
-        flex-direction: row;
         width: 100%;
-    }
-
-    .add-cart-btn,
-    .delete-btn {
-        flex: 1;
-    }
-
-    .mall-header {
-        flex-direction: column;
-        gap: clamp(10px, 2vw, 16px);
-        align-items: stretch;
-    }
-
-    .delete-all-btn {
-        width: 100%;
+        justify-content: flex-start;
     }
 
     .wishlist-container .wishlist-content {

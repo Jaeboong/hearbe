@@ -78,7 +78,7 @@ const FindPasswordA = () => {
         if (stream && videoRef.current) {
             videoRef.current.muted = true;
             videoRef.current.srcObject = stream;
-            videoRef.current.play().catch(() => {});
+            videoRef.current.play().catch(() => { });
         }
     }, [stream]);
 
@@ -149,7 +149,7 @@ const FindPasswordA = () => {
                 src={logoA}
                 alt="Logo"
                 className="findpw-logo"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="findpw-box">

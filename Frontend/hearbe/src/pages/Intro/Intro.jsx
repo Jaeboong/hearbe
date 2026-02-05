@@ -35,19 +35,26 @@ export default function Intro() {
         setHasStarted(true);
     };
 
-    // 스페이스바, 탭키로 시작 (시작 화면에서만)
+    // 스페이스바, 탭키로 시작 및 다음 단계 이동
     useEffect(() => {
-        if (hasStarted) return;
-
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === ' ' || e.code === 'Tab' || e.key === 'Tab') {
                 e.preventDefault();
-                handleStart();
+                if (!hasStarted) {
+                    handleStart();
+                } else {
+                    // 다음 단계로 이동 (마지막 단계면 Skip)
+                    if (currentStep < STEPS.length - 1) {
+                        setCurrentStep(prev => prev + 1);
+                    } else {
+                        navigate('/welcome');
+                    }
+                }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [hasStarted]);
+    }, [hasStarted, navigate, currentStep]);
 
     // 스텝 변경 및 오디오 재생 로직
     useEffect(() => {

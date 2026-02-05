@@ -1,5 +1,6 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PartyPopper } from 'lucide-react';
 import iconCard from '../../assets/icon-card.png';
 import iconCamera from '../../assets/icon-camera.png';
 import logo from '../../assets/logoA.png';
@@ -28,6 +29,8 @@ const validateUserId = (userId) => {
     return hasLetter && hasNumber;
 };
 
+const validatePassword = (password) => /^\d{6}$/.test(password);
+
 const SignUp = () => {
     const navigate = useNavigate();
 
@@ -41,10 +44,14 @@ const SignUp = () => {
 
     // Validation State
     const [isIdChecked, setIsIdChecked] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState({
+        id: false,
+        password: false,
+        phone: false
+    });
 
     // Terms State
     const [terms, setTerms] = useState({
-        all: false,
         term1: false, // Essential 1
         term2: false, // Essential 2
     });
@@ -53,7 +60,10 @@ const SignUp = () => {
     const [showCamera, setShowCamera] = useState(false);
     const [showError, setShowError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [messageType, setMessageType] = useState('error');
+    const [errorFocusField, setErrorFocusField] = useState(null);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
 
     // Card Recognition State
     const [modalStep, setModalStep] = useState('camera'); // 'camera' or 'form'
@@ -67,7 +77,34 @@ const SignUp = () => {
 
     // Camera Logic
     const videoRef = useRef(null);
+    const idInputRef = useRef(null);
+    const duplicateCheckBtnRef = useRef(null);
+    const passwordInputRef = useRef(null);
+    const nameInputRef = useRef(null);
+    const phoneInputRef = useRef(null);
     const [stream, setStream] = useState(null);
+
+    const fieldRefs = {
+        id: idInputRef,
+        password: passwordInputRef,
+        name: nameInputRef,
+        phone: phoneInputRef
+    };
+
+    const openMessageModal = (message, type = 'error', focusField = null) => {
+        setErrorMessage(message);
+        setMessageType(type);
+        setErrorFocusField(focusField);
+        setShowError(true);
+    };
+
+    const handleMessageConfirm = () => {
+        setShowError(false);
+        if (errorFocusField && fieldRefs[errorFocusField]?.current) {
+            fieldRefs[errorFocusField].current.focus();
+        }
+        setErrorFocusField(null);
+    };
 
     const maskCardNumber = (value) => {
         if (!value) return '';
@@ -130,9 +167,15 @@ const SignUp = () => {
 
         // 전화번호 자동 포맷팅
         if (name === 'phone') {
+            const formattedPhone = formatPhoneNumber(value);
             setFormData(prev => ({
                 ...prev,
-                [name]: formatPhoneNumber(value)
+                [name]: formattedPhone
+            }));
+            const phoneDigits = formattedPhone.replace(/[^0-9]/g, '');
+            setFieldErrors(prev => ({
+                ...prev,
+                phone: phoneDigits.length > 0 && phoneDigits.length !== 11
             }));
         } else {
             setFormData(prev => ({
@@ -143,68 +186,126 @@ const SignUp = () => {
 
         if (name === 'id') {
             setIsIdChecked(false);
+            setFieldErrors(prev => ({
+                ...prev,
+                id: false
+            }));
         }
+
+        if (name === 'password') {
+            setFieldErrors(prev => ({
+                ...prev,
+                password: value.length > 0 && !validatePassword(value)
+            }));
+        }
+    };
+
+    const handlePasswordBlur = () => {
+        if (!formData.password) return;
+        if (!validatePassword(formData.password)) {
+            setFieldErrors(prev => ({ ...prev, password: true }));
+            openMessageModal("숫자 6자리를 입력해주세요.", 'error', 'password');
+            return;
+        }
+        setFieldErrors(prev => ({ ...prev, password: false }));
+    };
+
+    const ensureIdVerifiedBeforeNext = () => {
+        if (!formData.id) {
+            setFieldErrors(prev => ({ ...prev, id: true }));
+            openMessageModal("아이디를 입력해주세요.", 'error', 'id');
+            return false;
+        }
+        if (!validateUserId(formData.id)) {
+            setFieldErrors(prev => ({ ...prev, id: true }));
+            openMessageModal("아이디는 영문과 숫자를 모두 포함해 4자리 이상이어야 합니다.", 'error', 'id');
+            return false;
+        }
+        if (!isIdChecked) {
+            openMessageModal("중복 확인 버튼을 눌러주세요.", 'error', 'id');
+            return false;
+        }
+        return true;
+    };
+
+    const handleIdBlur = (e) => {
+        if (e?.relatedTarget === duplicateCheckBtnRef.current || e?.relatedTarget === passwordInputRef.current) {
+            return;
+        }
+        if (!formData.id) return;
+        if (!validateUserId(formData.id)) {
+            setFieldErrors(prev => ({ ...prev, id: true }));
+            openMessageModal("아이디는 영문과 숫자를 모두 포함해 4자리 이상이어야 합니다.", 'error', 'id');
+            return;
+        }
+        if (!isIdChecked) {
+            openMessageModal("중복 확인 버튼을 눌러주세요.", 'error', 'id');
+            return;
+        }
+        setFieldErrors(prev => ({ ...prev, id: false }));
+    };
+
+    const handleBlockedNextFocus = (e) => {
+        if (ensureIdVerifiedBeforeNext()) return;
+        e.target.blur();
+    };
+
+    const handlePhoneBlur = () => {
+        const phoneDigits = formData.phone.replace(/[^0-9]/g, '');
+        if (phoneDigits.length > 0 && phoneDigits.length !== 11) {
+            setFieldErrors(prev => ({ ...prev, phone: true }));
+            openMessageModal("휴대전화번호는 11자리를 입력해주세요.", 'error', 'phone');
+            return;
+        }
+        setFieldErrors(prev => ({ ...prev, phone: false }));
     };
 
     // Duplicate Check Handler
     const handleDuplicateCheck = async () => {
         if (!formData.id) {
-            setErrorMessage("아이디를 입력해주세요.");
-            setShowError(true);
+            setFieldErrors(prev => ({ ...prev, id: true }));
+            openMessageModal("아이디를 입력해주세요.", 'error', 'id');
             return;
         }
 
         // 아이디 형식 검증 (영문+숫자 포함, 4글자 이상)
         if (!validateUserId(formData.id)) {
-            setErrorMessage("아이디는 영문자와 숫자를 포함하여 4글자 이상이어야 합니다.");
-            setShowError(true);
+            setFieldErrors(prev => ({ ...prev, id: true }));
+            openMessageModal("아이디는 영문과 숫자를 모두 포함해 4자리 이상이어야 합니다.", 'error', 'id');
             return;
         }
 
         try {
             const result = await authAPI.checkDuplicate(formData.id);
-            
+
             console.log("서버에서 온 진짜 값:", result);
 
             const isDuplicate = result.data; // 서버에서 중복 여부를 나타내는 필드명에 맞게 수정 필요
-            
+
             if (isDuplicate === false) { // 중복이 아니라면 (사용 가능)
                 setIsIdChecked(true);
-                alert("사용 가능한 아이디입니다.");
+                setFieldErrors(prev => ({ ...prev, id: false }));
+                openMessageModal("사용가능한 아이디입니다.", 'info');
             } else { // 중복이 맞다면 (true)
-                setErrorMessage("이미 존재하는 아이디입니다.");
-                setShowError(true);
+                setFieldErrors(prev => ({ ...prev, id: true }));
+                openMessageModal("이미 사용중인 아이디입니다.", 'error', 'id');
                 setIsIdChecked(false);
             }
         } catch (error) {
             // authAPI.checkDuplicate에서 던져진 에러를 여기서 처리
             // 에러 발생 시 아이디 중복 확인이 완료되지 않았으므로 isIdChecked는 false
             // 사용자에게는 실패 메시지를 보여줍니다.
-            setErrorMessage(error.message || "아이디 중복 확인에 실패했습니다.");
-            setShowError(true);
+            openMessageModal(error.message || "아이디 중복 확인에 실패했습니다.", 'error', 'id');
             setIsIdChecked(false); // 에러 발생 시 중복확인 상태 초기화
         }
     };
 
     // Terms Handlers
-    const handleAllAgree = () => {
-        const newState = !terms.all;
+    const handleRequiredTermsToggle = () => {
+        const next = !(terms.term1 && terms.term2);
         setTerms({
-            all: newState,
-            term1: newState,
-            term2: newState
-        });
-    };
-
-    const handleTermToggle = (key) => {
-        setTerms(prev => {
-            const newTerms = { ...prev, [key]: !prev[key] };
-            if (newTerms.term1 && newTerms.term2) {
-                newTerms.all = true;
-            } else {
-                newTerms.all = false;
-            }
-            return newTerms;
+            term1: next,
+            term2: next
         });
     };
 
@@ -286,64 +387,60 @@ const SignUp = () => {
     const handleSignUp = async () => {
         // 1. 아이디 검증
         if (!formData.id) {
-            setErrorMessage("아이디를 입력해주세요.");
-            setShowError(true);
+            setFieldErrors(prev => ({ ...prev, id: true }));
+            openMessageModal("아이디를 입력해주세요.", 'error', 'id');
             return;
         }
         if (!validateUserId(formData.id)) {
-            setErrorMessage("아이디는 영문자와 숫자를 포함하여 4글자 이상이어야 합니다.");
-            setShowError(true);
+            setFieldErrors(prev => ({ ...prev, id: true }));
+            openMessageModal("아이디는 영문과 숫자를 모두 포함해 4자리 이상이어야 합니다.", 'error', 'id');
             return;
         }
+        setFieldErrors(prev => ({ ...prev, id: false }));
+
         if (!isIdChecked) {
-            setErrorMessage("아이디 중복확인을 해주세요.");
-            setShowError(true);
+            openMessageModal("중복 확인 버튼을 눌러주세요.", 'error', 'id');
             return;
         }
 
         // 2. 비밀번호 검증 (숫자 6자리)
         if (!formData.password) {
-            setErrorMessage("비밀번호를 입력해주세요.");
-            setShowError(true);
+            setFieldErrors(prev => ({ ...prev, password: true }));
+            openMessageModal("숫자 6자리를 입력해주세요.", 'error', 'password');
             return;
         }
-        const passwordRegex = /^\d{6}$/;
-        if (!passwordRegex.test(formData.password)) {
-            setErrorMessage("비밀번호는 숫자 6자리여야 합니다.");
-            setShowError(true);
+        if (!validatePassword(formData.password)) {
+            setFieldErrors(prev => ({ ...prev, password: true }));
+            openMessageModal("숫자 6자리를 입력해주세요.", 'error', 'password');
             return;
         }
+        setFieldErrors(prev => ({ ...prev, password: false }));
 
         // 3. 이름 검증
         if (!formData.name) {
-            setErrorMessage("이름을 입력해주세요.");
-            setShowError(true);
+            openMessageModal("이름을 입력해주세요.", 'error', 'name');
             return;
         }
 
-        // 4. 휴대전화번호 검증 (11자리)
+        // 4. 휴대전화번호 검증 (선택 입력, 입력 시 11자리)
         const phoneNumbers = formData.phone.replace(/[^0-9]/g, '');
-        console.log("Debug Phone:", formData.phone);
-        console.log("Debug Stripped:", phoneNumbers);
-        console.log("Debug Length:", phoneNumbers.length);
 
-        if (phoneNumbers.length !== 11) {
-            setErrorMessage("휴대전화번호는 11자리 숫자여야 합니다.");
-            setShowError(true);
+        if (phoneNumbers.length > 0 && phoneNumbers.length !== 11) {
+            setFieldErrors(prev => ({ ...prev, phone: true }));
+            openMessageModal("휴대전화번호는 11자리를 입력해주세요.", 'error', 'phone');
             return;
         }
+        setFieldErrors(prev => ({ ...prev, phone: false }));
 
         // 5. 장애인 복지카드 등록 확인 (필수)
         if (!cardData) {
-            setErrorMessage("장애인 복지카드를 등록해주세요.");
-            setShowError(true);
+            openMessageModal("장애인 복지카드를 등록해주세요.", 'error');
             return;
         }
 
         // 6. 약관 동의 확인
         if (!terms.term1 || !terms.term2) {
-            setErrorMessage("필수 약관에 동의해주세요.");
-            setShowError(true);
+            openMessageModal("필수 이용약관 동의에 동의해야 합니다.", 'error');
             return;
         }
 
@@ -383,13 +480,12 @@ const SignUp = () => {
         } catch (error) {
             console.error('SignUp Error:', error);
             if (error.message.includes('중복') || error.message.includes('존재')) {
-                setErrorMessage("이미 존재하는 아이디입니다.");
+                openMessageModal("이미 사용중인 아이디입니다.", 'error', 'id');
             } else if (error.message === 'Failed to fetch') {
-                setErrorMessage("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+                openMessageModal("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.", 'error');
             } else {
-                setErrorMessage(error.message || "회원가입에 실패했습니다.");
+                openMessageModal(error.message || "회원가입에 실패했습니다.", 'error');
             }
-            setShowError(true);
         }
     };
 
@@ -402,7 +498,7 @@ const SignUp = () => {
                         src={logo}
                         alt="Logo"
                         className="signup-logo-image"
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/main')}
                         style={{ cursor: 'pointer' }}
                     />
                 </div>
@@ -411,23 +507,28 @@ const SignUp = () => {
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
                         <input
+                            ref={idInputRef}
                             type="text"
                             name="id"
                             placeholder="아이디"
-                            className="signup-input input-id"
+                            className={`signup-input input-id ${fieldErrors.id ? 'input-invalid' : ''}`}
                             value={formData.id}
                             onChange={handleInputChange}
+                            onBlur={handleIdBlur}
                         />
-                        <button className="check-btn" onClick={handleDuplicateCheck}>중복확인</button>
+                        <button ref={duplicateCheckBtnRef} className="check-btn" onClick={handleDuplicateCheck}>중복확인</button>
                     </div>
                     <div className="input-row">
                         <input
+                            ref={passwordInputRef}
                             type="password"
                             name="password"
                             placeholder="비밀번호(숫자 6자리)"
-                            className="signup-input input-password"
+                            className={`signup-input input-password ${fieldErrors.password ? 'input-invalid' : ''}`}
                             value={formData.password}
                             onChange={handleInputChange}
+                            onFocus={handleBlockedNextFocus}
+                            onBlur={handlePasswordBlur}
                             maxLength={6}
                         />
                     </div>
@@ -437,6 +538,7 @@ const SignUp = () => {
                 <div className="form-group-outline">
                     <div className="input-row border-bottom">
                         <input
+                            ref={nameInputRef}
                             type="text"
                             name="name"
                             placeholder="이름"
@@ -447,12 +549,14 @@ const SignUp = () => {
                     </div>
                     <div className="input-row">
                         <input
+                            ref={phoneInputRef}
                             type="tel"
                             name="phone"
                             placeholder="휴대전화번호"
-                            className="signup-input input-phone"
+                            className={`signup-input input-phone ${fieldErrors.phone ? 'input-invalid' : ''}`}
                             value={formData.phone}
                             onChange={handleInputChange}
+                            onBlur={handlePhoneBlur}
                             maxLength={13}
                         />
                     </div>
@@ -461,7 +565,7 @@ const SignUp = () => {
                 {/* Disability Card Section (메인 화면) */}
                 <div className="form-group-outline card-section">
                     <div className="input-row header-row">
-                        <span className="label card-label">장애인 복지카드 등록</span>
+                        <span className="label card-label">{cardData ? '장애인 복지카드 정보' : '장애인 복지카드 등록'}</span>
                     </div>
 
                     {/* 카드가 등록되었으면 정보 표시, 아니면 카메라 아이콘 표시 */}
@@ -504,23 +608,25 @@ const SignUp = () => {
 
                 {/* Terms Section */}
                 <div className="form-group-outline terms-section">
-                    <div className="term-row" onClick={handleAllAgree}>
-                        <div className={`check-circle ${terms.all ? 'checked' : ''}`}>
-                            {terms.all && '✓'}
+                    <div className="term-row single-term-row" onClick={handleRequiredTermsToggle}>
+                        <div className={`check-circle ${terms.term1 && terms.term2 ? 'checked' : ''}`}>
+                            {terms.term1 && terms.term2 && '✓'}
                         </div>
-                        <span className="term-text bold">전체 동의하기</span>
-                    </div>
-                    <div className="term-row" onClick={() => handleTermToggle('term1')}>
-                        <div className={`check-circle ${terms.term1 ? 'checked' : ''}`}>
-                            {terms.term1 && '✓'}
-                        </div>
-                        <span className="term-text">[필수] 이용약관 동의</span>
-                    </div>
-                    <div className="term-row" onClick={() => handleTermToggle('term2')}>
-                        <div className={`check-circle ${terms.term2 ? 'checked' : ''}`}>
-                            {terms.term2 && '✓'}
-                        </div>
-                        <span className="term-text">[필수] 개인정보 수집 및 이용 동의</span>
+                        <span className="term-text-a">
+                            [필수] 이용약관 동의 및
+                            <br />
+                            개인정보 수집 동의
+                        </span>
+                        <button
+                            type="button"
+                            className="terms-view-btn"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowTermsModal(true);
+                            }}
+                        >
+                            보기&gt;
+                        </button>
                     </div>
                 </div>
 
@@ -533,7 +639,10 @@ const SignUp = () => {
             {showCamera && (
                 <div className="modal-overlay">
                     {/* 모달 박스 하나로 감싸서 디자인 유지! */}
-                    <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className={`modal-box ${modalStep === 'form' ? 'card-info-modal-box' : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
 
                         {/* 닫기 버튼 */}
                         <div className="modal-close-btn" onClick={handleModalClose}>
@@ -639,10 +748,41 @@ const SignUp = () => {
             {/* Error Message Modal */}
             {
                 showError && (
-                    <div className="modal-overlay" onClick={() => setShowError(false)}>
+                    <div className="modal-overlay">
                         <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
-                            <div className="error-message">{errorMessage}</div>
-                            <button className="error-confirm-btn" onClick={() => setShowError(false)}>확인</button>
+                            <div className={`signup-error-message ${messageType === 'error' ? 'is-error' : 'is-info'}`}>{errorMessage}</div>
+                            <button className="error-confirm-btn" onClick={handleMessageConfirm}>확인</button>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Terms Policy Modal */}
+            {
+                showTermsModal && (
+                    <div className="policy-modal-overlay">
+                        <div className="policy-modal-box" onClick={(e) => e.stopPropagation()}>
+                            <button type="button" className="policy-modal-close" onClick={() => setShowTermsModal(false)}>×</button>
+                            <div className="policy-modal-title">이용약관 및 개인정보 수집 동의</div>
+
+                            <div className="policy-modal-content">
+                                <p>환영합니다!</p>
+                                <p>
+                                    HearBe는 누구나 평등하게 쇼핑을 즐길 수 있도록 돕는 서비스입니다.<br />
+                                    자유롭게 이용하시고, 불편한 점이나 아이디어가 있다면 언제든 공유해주세요.<br />
+                                    서로 배려하는 마음으로 함께 만들어가는 공간입니다.
+                                </p>
+                                <p>&lt;개인정보 수집 및 이용 안내&gt;</p>
+                                <p>
+                                    회원가입 시 입력한 아이디, 이름, 이메일은<br />
+                                    개인 맞춤 서비스 제공을 위한 용도로만 사용되며,<br />
+                                    모든 정보는 HearBe 내부에서 안전하게 관리되고 외부에 공유되지 않습니다.
+                                </p>
+                            </div>
+
+                            <button type="button" className="policy-confirm-btn" onClick={() => setShowTermsModal(false)}>
+                                확인
+                            </button>
                         </div>
                     </div>
                 )
@@ -652,14 +792,31 @@ const SignUp = () => {
             {
                 showSuccess && (
                     <div className="modal-overlay" onClick={() => { }}>
-                        <div className="error-modal-box" onClick={(e) => e.stopPropagation()}>
-                            <div className="success-icon">🎉</div>
-                            <div className="error-message">회원가입이 완료되었습니다!</div>
+                        <div className="error-modal-box" onClick={(e) => e.stopPropagation()} style={{ padding: '3rem', borderRadius: '1.5rem', textAlign: 'center' }}>
+                            <div className="success-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                                <PartyPopper size={80} color="#FACC15" />
+                            </div>
+                            <div className="signup-error-message" style={{ color: '#FACC15', fontSize: '2rem', fontWeight: '800', marginBottom: '1rem' }}>
+                                가입완료!
+                            </div>
+                            <p style={{ color: '#cbd5e1', fontSize: '1.2rem', marginBottom: '2rem' }}>
+                                HearBe 회원이 되신 것을 축하드립니다.
+                            </p>
                             <button
                                 className="error-confirm-btn"
                                 onClick={() => navigate('/A/login')}
+                                style={{
+                                    backgroundColor: '#FACC15',
+                                    color: '#1e293b',
+                                    padding: '1rem 2rem',
+                                    fontSize: '1.4rem',
+                                    borderRadius: '1rem',
+                                    border: 'none',
+                                    fontWeight: '800',
+                                    width: '100%'
+                                }}
                             >
-                                로그인하러 가기
+                                확인
                             </button>
                         </div>
                     </div>

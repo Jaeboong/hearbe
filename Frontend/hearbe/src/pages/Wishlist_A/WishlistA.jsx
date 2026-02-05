@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, Heart } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import { cartAPI } from '../../services/cartAPI';
@@ -28,9 +28,9 @@ const WishlistA = () => {
     const menuItems = [
         { id: 'profile', label: '회원정보', path: '/A/member-info' },
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
+        { id: 'card', label: (<>장애인 복지카드<br />변경</>), path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -45,7 +45,7 @@ const WishlistA = () => {
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            window.location.href = 'http://localhost:5173/';
+            navigate('/main');
         }
     };
 
@@ -100,37 +100,6 @@ const WishlistA = () => {
         }
     };
 
-    const handleDeleteItem = async (mallName, itemId) => {
-        try {
-            await wishlistAPI.deleteWishlist(itemId);
-            setWishlistData(prev => ({
-                ...prev,
-                [mallName]: prev[mallName].filter(item => item.id !== itemId)
-            }));
-        } catch (err) {
-            console.error('Failed to delete wishlist item:', err);
-            alert(err.message || '삭제에 실패했습니다.');
-        }
-    };
-
-    const handleDeleteAll = async (mallName) => {
-        const items = wishlistData[mallName] || [];
-        if (items.length === 0) {
-            return;
-        }
-
-        try {
-            await Promise.all(items.map(item => wishlistAPI.deleteWishlist(item.id)));
-            setWishlistData(prev => ({
-                ...prev,
-                [mallName]: []
-            }));
-        } catch (err) {
-            console.error('Failed to delete wishlist items:', err);
-            alert(err.message || '삭제에 실패했습니다.');
-        }
-    };
-
     const handleAddToCart = async (item) => {
         try {
             await cartAPI.addCart({
@@ -155,7 +124,7 @@ const WishlistA = () => {
                 src={logoA}
                 alt="Logo"
                 className="wishlist-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
@@ -190,7 +159,10 @@ const WishlistA = () => {
 
                 {/* Main Content */}
                 <main className="wishlist-main">
-                    <h2 className="content-title">찜한 상품</h2>
+                    <h2 className="content-title">
+                        <Heart size={40} color="#FFF064" fill="#FFF064" />
+                        찜한 상품
+                    </h2>
 
                     {/* 로딩 상태 */}
                     {isLoading && (
@@ -224,39 +196,33 @@ const WishlistA = () => {
                                     <div key={mallName} className="mall-section">
                                         <div className="mall-header">
                                             <h3 className="mall-name">{mallName}</h3>
-                                            <button
-                                                className="delete-all-btn"
-                                                onClick={() => handleDeleteAll(mallName)}
-                                            >
-                                                전체 삭제
-                                            </button>
                                         </div>
 
                                         <div className="items-list">
                                             {items.map(item => (
-                                                <div key={item.id} className="wishlist-item">
-                                                    <div className="item-checkbox">
-                                                        <input type="checkbox" />
-                                                    </div>
-                                                    <img src={item.image} alt={item.name} className="item-image" />
-                                                    <div className="item-details">
-                                                        <div className="item-date">{item.date}</div>
-                                                        <div className="item-name">{item.name}</div>
-                                                        <div className="item-price">{item.price}</div>
-                                                    </div>
-                                                    <div className="item-actions">
-                                                        <button
-                                                            className="add-cart-btn"
-                                                            onClick={() => handleAddToCart(item)}
-                                                        >
-                                                            장바구니 담기
-                                                        </button>
-                                                        <button
-                                                            className="delete-btn"
-                                                            onClick={() => handleDeleteItem(mallName, item.id)}
-                                                        >
-                                                            삭제
-                                                        </button>
+                                                <div
+                                                    key={item.id}
+                                                    className="wishlist-item-wrapper"
+                                                    onClick={() => item.url && window.open(item.url, '_blank', 'noopener,noreferrer')}
+                                                    style={{ cursor: item.url ? 'pointer' : 'default' }}
+                                                >
+                                                    <div className="wishlist-item">
+                                                        <img src={item.image} alt={item.name} className="item-image" />
+                                                        <div className="item-details">
+                                                            <div className="item-name">{item.name}</div>
+                                                            <div className="item-price-a">{item.price}</div>
+                                                        </div>
+                                                        <div className="item-actions">
+                                                            <button
+                                                                className="add-cart-btn"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleAddToCart(item);
+                                                                }}
+                                                            >
+                                                                상품 조회
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))}
@@ -268,6 +234,10 @@ const WishlistA = () => {
                     )}
                 </main>
             </div>
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

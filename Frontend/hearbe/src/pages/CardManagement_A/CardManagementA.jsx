@@ -1,6 +1,6 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, CreditCard } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import iconCamera from '../../assets/icon-camera.png';
 import iconCard from '../../assets/icon-card.png';
@@ -204,8 +204,8 @@ const CardManagementA = () => {
     const menuItems = [
         { id: 'profile', label: '회원정보', path: '/A/member-info' },
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
     ];
 
@@ -221,7 +221,7 @@ const CardManagementA = () => {
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            window.location.href = 'http://localhost:5173/';
+            navigate('/main');
         }
     };
 
@@ -231,7 +231,7 @@ const CardManagementA = () => {
                 src={logoA}
                 alt="Logo"
                 className="cardmgmt-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
@@ -266,7 +266,10 @@ const CardManagementA = () => {
 
                 {/* Main Content */}
                 <main className="cardmgmt-main">
-                    <h2 className="content-title">장애인 복지카드 변경하기</h2>
+                    <h2 className="content-title">
+                        <CreditCard size={40} color="#FFF064" />
+                        장애인 복지카드 변경하기
+                    </h2>
 
                     {/* Current Card Display */}
                     <div className="current-card-display">
@@ -394,6 +397,10 @@ const CardManagementA = () => {
                     </div>
                 </div>
             )}
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

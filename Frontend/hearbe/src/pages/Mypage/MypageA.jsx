@@ -44,7 +44,7 @@ const Mypage = () => {
                     src={logoA}
                     alt="Logo"
                     className="mypage-logo-left"
-                    onClick={() => window.location.assign('/')}
+                    onClick={() => navigate('/main')}
                 />
 
                 <div className="page-title">마이페이지</div>

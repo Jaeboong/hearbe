@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, ShoppingCart } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
@@ -64,8 +64,8 @@ const CartA = () => {
     const menuItems = [
         { id: 'profile', label: '회원정보', path: '/A/member-info' },
         { id: 'orders', label: '주문내역', path: '/A/order-history' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
         { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
     ];
 
@@ -85,16 +85,8 @@ const CartA = () => {
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
             localStorage.removeItem('user_name');
-            navigate('/');
+            navigate('/main');
         }
-    };
-
-    const handleItemCheckout = item => {
-        if (item.url) {
-            window.open(item.url, '_blank', 'noopener,noreferrer');
-            return;
-        }
-        alert('결제할 링크가 없습니다.');
     };
 
     return (
@@ -103,7 +95,7 @@ const CartA = () => {
                 src={logoA}
                 alt="Logo"
                 className="cart-logo-left"
-                onClick={() => window.location.assign('/')}
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
@@ -138,7 +130,10 @@ const CartA = () => {
 
                 {/* Main Content */}
                 <main className="cart-main">
-                    <h2 className="content-title">장바구니</h2>
+                    <h2 className="content-title">
+                        <ShoppingCart size={40} color="#FFF064" />
+                        장바구니
+                    </h2>
 
                     {isLoading && <div className="empty-cart">장바구니를 불러오는 중입니다.</div>}
                     {!isLoading && error && (
@@ -146,8 +141,12 @@ const CartA = () => {
                     )}
 
                     {/* Cart by Mall */}
-                    {Object.entries(cartData).map(([mallName, items]) => (
-                        items.length > 0 && (
+                    {Object.entries(cartData).map(([mallName, items]) => {
+                        // Calculate totals for this mall
+                        const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                        const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+
+                        return items.length > 0 && (
                             <div key={mallName} className="cart-mall-section">
                                 <div className="cart-mall-header">
                                     <h3 className="cart-mall-name">{mallName}</h3>
@@ -155,26 +154,40 @@ const CartA = () => {
 
                                 <div className="cart-items-list">
                                     {items.map(item => (
-                                        <div key={item.id} className="cart-item">
-                                            <img src={item.image} alt={item.name} className="cart-item-image" />
-                                            <div className="cart-item-details">
-                                                <div className="cart-item-name">{item.name}</div>
-                                                <div className="cart-item-price">{item.price.toLocaleString()}원</div>
-                                            </div>
-                                            <div className="cart-item-actions">
-                                                <button
-                                                    className="cart-item-pay-btn"
-                                                    onClick={() => handleItemCheckout(item)}
-                                                >
-                                                    결제하기
-                                                </button>
+                                        <div
+                                            key={item.id}
+                                            className="cart-item-wrapper"
+                                            onClick={() => item.url && window.open(item.url, '_blank', 'noopener,noreferrer')}
+                                            style={{ cursor: item.url ? 'pointer' : 'default' }}
+                                        >
+                                            <div className="cart-item">
+                                                <img src={item.image} alt={item.name} className="cart-item-image" />
+                                                <div className="cart-item-details">
+                                                    <div className="cart-item-name">{item.name}</div>
+                                                    <div className="cart-item-price">{item.price.toLocaleString()}원</div>
+                                                </div>
+                                                <div className="cart-item-quantity">
+                                                    <span className="quantity-text">{item.quantity}개</span>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* Summary Box */}
+                                <div className="cart-mall-summary">
+                                    <div className="summary-item">
+                                        <span className="summary-label-a">총 담은 수량:</span>
+                                        <span className="summary-value">{totalQuantity}개</span>
+                                    </div>
+                                    <div className="summary-item">
+                                        <span className="summary-label-a">주문 예상 금액:</span>
+                                        <span className="summary-value">{totalPrice.toLocaleString()}원</span>
+                                    </div>
+                                </div>
                             </div>
-                        )
-                    ))}
+                        );
+                    })}
 
                     {!isLoading && Object.values(cartData).every(items => items.length === 0) && (
                         <div className="empty-cart">
@@ -183,6 +196,10 @@ const CartA = () => {
                     )}
                 </main>
             </div>
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

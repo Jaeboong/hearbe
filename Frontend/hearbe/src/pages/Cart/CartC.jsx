@@ -122,13 +122,13 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
     const handleLogout = async () => {
         try {
             await authAPI.logout();
-            navigate('/');
+            navigate('/main');
         } catch (error) {
             console.error('Logout failed:', error);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 
@@ -194,18 +194,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                                         <div className="mall-footer">
                                             <div className="mall-summary-detail">
                                                 <div className="summary-row">
-                                                    <span className="summary-label">총 주문 수량 :</span>
+                                                    <span className="summary-label">총 담은 수량 :</span>
                                                     <span className="summary-value">{mallTotalItems}개</span>
                                                 </div>
                                                 <div className="summary-row highlight">
-                                                    <span className="summary-label">총 결제금액 :</span>
+                                                    <span className="summary-label">주문 예상 금액 :</span>
                                                     <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
                                                 </div>
                                             </div>
-                                            <button className="mall-pay-button" onClick={() => alert(`${mallName} 결제 페이지로 이동합니다.`)}>
-                                                <span>결제하기</span>
-                                                <ArrowLeft className="rotate-180" />
-                                            </button>
+
                                         </div>
                                     </section>
                                 );
@@ -344,18 +341,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                                             <div className="mall-footer">
                                                 <div className="mall-summary-detail">
                                                     <div className="summary-row">
-                                                        <span className="summary-label">총 주문 수량 :</span>
+                                                        <span className="summary-label">총 담은 수량 :</span>
                                                         <span className="summary-value">{mallTotalItems}개</span>
                                                     </div>
                                                     <div className="summary-row highlight">
-                                                        <span className="summary-label">총 결제금액 :</span>
+                                                        <span className="summary-label">주문 예상 금액 :</span>
                                                         <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
                                                     </div>
                                                 </div>
-                                                <button className="mall-pay-button" onClick={() => alert(`${mallName} 결제 페이지로 이동합니다.`)}>
-                                                    <span>결제하기</span>
-                                                    <ArrowLeft className="rotate-180" />
-                                                </button>
+
                                             </div>
                                         </section>
                                     );
