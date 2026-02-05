@@ -14,6 +14,7 @@ class TextRouter:
         self,
         session_manager,
         payment_keypad,
+        login_status,
         login_autofill,
         order_detail_handler,
         flow_handler,
@@ -26,6 +27,7 @@ class TextRouter:
     ):
         self._session = session_manager
         self._payment_keypad = payment_keypad
+        self._login_status = login_status
         self._login_autofill = login_autofill
         self._order_detail = order_detail_handler
         self._flow_handler = flow_handler
@@ -44,6 +46,11 @@ class TextRouter:
 
         if self._payment_keypad:
             handled = await self._payment_keypad.handle_user_text(session_id, text)
+            if handled:
+                return None
+
+        if self._login_status:
+            handled = await self._login_status.handle_user_text(session_id, text)
             if handled:
                 return None
 

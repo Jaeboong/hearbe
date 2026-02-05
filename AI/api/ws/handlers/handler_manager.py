@@ -17,6 +17,8 @@ from .mcp_handler import MCPHandler
 from .dom_fallback import DomFallbackManager
 from .payment_keypad import PaymentKeypadManager
 from .login_autofill import LoginAutofillManager
+from .login_status import LoginStatusManager
+from .command_queue import CommandQueueManager
 from .page_extract_manager import PageExtractManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
@@ -44,9 +46,15 @@ class HandlerManager:
         self._session = session_manager
         self._tts = TTSGenerator()
 
+        self._command_queue = CommandQueueManager(sender)
         self._action_feedback = ActionFeedbackManager(sender)
         self._failure_notifier = ToolFailureNotifier(sender)
-        self._login_guard = LoginGuard(session_manager, sender, self._action_feedback)
+        self._login_guard = LoginGuard(
+            session_manager,
+            sender,
+            self._action_feedback,
+            command_queue=self._command_queue,
+        )
         self._login_feedback = LoginFeedbackManager(session_manager, sender)
         self._dom_fallback = DomFallbackManager(
             sender=sender,
@@ -56,6 +64,10 @@ class HandlerManager:
             login_feedback=self._login_feedback,
         )
         self._payment_keypad = PaymentKeypadManager(
+            sender=sender,
+            session_manager=session_manager,
+        )
+        self._login_status = LoginStatusManager(
             sender=sender,
             session_manager=session_manager,
         )
@@ -83,10 +95,13 @@ class HandlerManager:
             login_guard=self._login_guard,
             login_feedback=self._login_feedback,
             payment_keypad=self._payment_keypad,
+            login_status=self._login_status,
             login_autofill=self._login_autofill,
             order_detail_handler=self._order_detail,
             page_extract=self._page_extract,
+            command_queue=self._command_queue,
         )
+        self._login_status.set_enqueue(self._text_handler.enqueue_text)
         self._audio_handler = AudioHandler(
             asr_service=asr_service,
             sender=sender,
@@ -99,22 +114,26 @@ class HandlerManager:
             failure_notifier=self._failure_notifier,
             login_guard=self._login_guard,
             login_feedback=self._login_feedback,
-            dom_fallback=self._dom_fallback
+            dom_fallback=self._dom_fallback,
+            command_queue=self._command_queue,
         )
 
     async def create_session(self, session_id: str):
         await self._audio_handler.create_session(session_id)
         await self._text_handler.create_session(session_id)
+        self._command_queue.create_session(session_id)
 
     async def cleanup_session(self, session_id: str):
         await self._audio_handler.cleanup_session(session_id)
         await self._text_handler.cleanup_session(session_id)
+        self._command_queue.cleanup_session(session_id)
         self._action_feedback.clear_pending(session_id)
         self._login_guard.clear_pending(session_id)
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._mcp_handler.cleanup_session(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._login_status.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
 
@@ -141,12 +160,14 @@ class HandlerManager:
         self._login_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
+        self._login_status.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
 
     async def handle_interrupt(self, session_id: str):
         await self._audio_handler.clear_audio(session_id)
         await self._text_handler.interrupt(session_id)
+        self._command_queue.interrupt(session_id)
         if self._session:
             self._session.set_context(session_id, "interrupt_ts", time.time())
             try:
@@ -168,7 +189,13 @@ class HandlerManager:
             await self._sender.cancel_tts(session_id)
 
     async def handle_mcp_result(self, session_id: str, data: dict):
+        tool_name = data.get("tool_name")
+        arguments = data.get("arguments") or {}
+        await self._command_queue.handle_mcp_result(session_id, tool_name, arguments)
         handled = await self._payment_keypad.handle_mcp_result(session_id, data)
+        if handled:
+            return
+        handled = await self._login_status.handle_mcp_result(session_id, data)
         if handled:
             return
         handled = await self._login_autofill.handle_mcp_result(session_id, data)

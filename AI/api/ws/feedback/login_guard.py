@@ -22,10 +22,11 @@ class PendingLoginAction:
 class LoginGuard:
     """Defers protected actions until login status is checked."""
 
-    def __init__(self, session_manager, sender, action_feedback):
+    def __init__(self, session_manager, sender, action_feedback, command_queue=None):
         self._session = session_manager
         self._sender = sender
         self._action_feedback = action_feedback
+        self._command_queue = command_queue
 
     def prepare_guard(self, session_id: str, commands: List[MCPCommand], response_text: str, current_url: str) -> Optional[List[MCPCommand]]:
         if not commands:
@@ -64,16 +65,24 @@ class LoginGuard:
 
         # Unknown -> proceed with original commands
         if logged_in is None or logged_in is True:
-            await self._sender.send_tool_calls(session_id, pending.commands)
             pending_msg = self._action_feedback.register_commands(
                 session_id,
                 pending.commands,
                 current_url or ""
             )
-            if pending_msg:
-                await self._sender.send_tts_response(session_id, pending_msg)
-            elif pending.response_text:
-                await self._sender.send_tts_response(session_id, pending.response_text)
+            response_text = pending_msg or pending.response_text
+            if self._command_queue:
+                await self._command_queue.enqueue_batch(
+                    session_id,
+                    pending.commands,
+                    response_text,
+                    current_url or "",
+                    front=True,
+                )
+            else:
+                await self._sender.send_tool_calls(session_id, pending.commands)
+                if response_text:
+                    await self._sender.send_tts_response(session_id, response_text)
             self._session.set_context(session_id, "pending_login_action", None)
             return True
 
