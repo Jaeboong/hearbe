@@ -47,4 +47,30 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 echo [SUCCESS] Build completed. Output is available in the 'dist/MCPDesktop' directory.
+
+REM ---------------------------------------------------------------------------
+REM Post-build: Create ZIP archive and copy to Frontend public folder
+REM ---------------------------------------------------------------------------
+echo [INFO] Creating ZIP archive...
+IF EXIST "dist\MCPDesktop.zip" del /Q "dist\MCPDesktop.zip"
+REM Using tar (built-in Windows 10+) to avoid PowerShell execution policy issues
+tar -a -c -f "dist\MCPDesktop.zip" -C "dist" "MCPDesktop"
+
+IF %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Failed to create ZIP archive.
+    pause
+    exit /b %ERRORLEVEL%
+)
+
+echo [INFO] Copying ZIP to Frontend public folder...
+IF NOT EXIST "..\Frontend\hearbe\public\downloads" mkdir "..\Frontend\hearbe\public\downloads"
+copy /Y "dist\MCPDesktop.zip" "..\Frontend\hearbe\public\downloads\MCPDesktop.zip"
+
+IF %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Failed to copy ZIP to Frontend.
+    pause
+    exit /b %ERRORLEVEL%
+)
+
+echo [SUCCESS] MCPDesktop.zip is ready at Frontend/hearbe/public/downloads/
 pause
