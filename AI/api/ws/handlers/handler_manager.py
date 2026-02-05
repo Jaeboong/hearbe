@@ -231,6 +231,9 @@ class HandlerManager:
         # On login page entry, trigger autofill probe (no user text required).
         if page_type == "login":
             await self._login_autofill.handle_page_update(session_id, url, previous_url)
+        # On main page entry, check if user is logged in and redirect to appropriate mall.
+        elif page_type == "main":
+            await self._login_autofill.handle_main_page_update(session_id, url)
 
     async def handle_invalid_message(self, session_id: str, error: str):
         await self._sender.send_error(session_id, error)

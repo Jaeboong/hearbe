@@ -86,6 +86,19 @@ class LoginAutofillManager:
         # Check existing session before autofill probe
         return await self._start_session_check(session_id, url)
 
+    async def handle_main_page_update(self, session_id: str, url: str) -> bool:
+        """Handle main page entry - redirect logged-in users to appropriate mall."""
+        logger.info(
+            "login_autofill handle_main_page_update: session=%s url=%s",
+            session_id, url,
+        )
+        if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
+            logger.info("login_autofill main skip: CTX_SESSION_CHECK_PENDING is True")
+            return True
+
+        # Check existing session and redirect if logged in
+        return await self._start_session_check(session_id, url)
+
     async def _start_session_check(self, session_id: str, url: str) -> bool:
         """Check if user already has a valid session in localStorage."""
         self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, True)
