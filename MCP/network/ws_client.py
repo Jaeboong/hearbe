@@ -332,12 +332,29 @@ class WSClient:
         """TTS 청크 처리"""
         is_final = data.get("is_final", False)
         audio_hex = data.get("audio", "")
+        text = data.get("text") or ""
+        tts_id = data.get("tts_id") or ""
+        segment_index = data.get("segment_index")
+        segment_total = data.get("segment_total")
+
+        if text:
+            seg_label = ""
+            if isinstance(segment_index, int) and isinstance(segment_total, int) and segment_total > 0:
+                seg_label = f" [{segment_index + 1}/{segment_total}]"
+            logger.info(f"TTS text{seg_label}: {text}")
         
         if audio_hex:
             # TODO: TTS 오디오 재생 구현
             await publish(
                 EventType.TTS_AUDIO_RECEIVED,
-                data={"audio": bytes.fromhex(audio_hex), "is_final": is_final},
+                data={
+                    "audio": bytes.fromhex(audio_hex),
+                    "is_final": is_final,
+                    "text": text,
+                    "tts_id": tts_id,
+                    "segment_index": segment_index,
+                    "segment_total": segment_total,
+                },
                 source="network.ws_client"
             )
     
