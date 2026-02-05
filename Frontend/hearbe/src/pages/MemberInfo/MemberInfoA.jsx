@@ -242,7 +242,12 @@ const MemberInfoA = () => {
                                     <div className="member-col-right">
                                         <div className="password-wrapper">
                                             <span className="member-value">{userData.password}</span>
-                                            <button className="password-change-btn">변경하기</button>
+                                            <button
+                                                className="password-change-btn"
+                                                onClick={() => navigate('/A/changePassword')}
+                                            >
+                                                변경하기
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
