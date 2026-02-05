@@ -61,16 +61,26 @@ class LoginAutofillManager:
         return await self._start_probe(session_id, current_url, source="text")
 
     async def handle_page_update(self, session_id: str, url: str, previous_url: Optional[str] = None) -> bool:
-        if get_page_type(url) != "login":
+        page_type = get_page_type(url)
+        logger.info(
+            "login_autofill handle_page_update: session=%s url=%s page_type=%s previous_url=%s",
+            session_id, url, page_type, previous_url,
+        )
+        if page_type != "login":
+            logger.info("login_autofill skip: page_type is not login")
             return False
         if previous_url and get_page_type(previous_url) == "login":
+            logger.info("login_autofill skip: previous_url was also login")
             return False
         if self._session.get_context(session_id, CTX_PENDING):
+            logger.info("login_autofill skip: CTX_PENDING is True")
             return True
         if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
+            logger.info("login_autofill skip: CTX_SESSION_CHECK_PENDING is True")
             return True
         last_url = self._session.get_context(session_id, CTX_LAST_URL)
         if last_url == url:
+            logger.info("login_autofill skip: same as last_url")
             return False
 
         # Check existing session before autofill probe
