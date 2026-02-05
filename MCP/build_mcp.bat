@@ -28,14 +28,14 @@ REM --name: Specify the name of the executable and output directory.
 REM --onedir: Create a bundled directory containing the executable and dependencies.
 REM --noconsole: Disable the terminal window for GUI-based applications.
 REM --collect-all: Ensure all submodules and data for 'playwright' are included.
-REM --add-data: Bundle files/directories (.env, Chrome extension) into the build.
+REM --add-data: Bundle files/directories (config.env, Chrome extension) into the build.
 REM ---------------------------------------------------------------------------
 pyinstaller -y --clean ^
     --name MCPDesktop ^
     --onedir ^
     --noconsole ^
     --collect-all playwright ^
-    --add-data ".env;." ^
+    --add-data "config.env;." ^
     --add-data "..\Frontend\hearbe-extension;hearbe-extension" ^
     main.py
 

@@ -118,14 +118,18 @@ class ConfigManager:
 
     def _load_env(self):
         """환경 변수 로드"""
-        # 현재 파일의 부모 디렉토리(MCP/)에서 .env 파일 찾기
+        # 현재 파일의 부모 디렉토리(MCP/)에서 설정 파일 찾기
         current_dir = Path(__file__).parent.parent
         exe_dir = Path(sys.executable).parent
 
         # 우선순위: exe 옆 -> _internal -> 프로젝트 루트
+        # config.env 우선 (Windows Defender가 .env 삭제하는 문제 방지)
         candidates = [
+            exe_dir / "config.env",
+            exe_dir / "_internal" / "config.env",
             exe_dir / ".env",
             exe_dir / "_internal" / ".env",
+            current_dir / "config.env",
             current_dir / ".env",
         ]
 
