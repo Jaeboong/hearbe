@@ -6,7 +6,7 @@ import MainLanding from '../pages/MainLanding';
 import BrandLanding from '../pages/BrandLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
-import SplinePage from '../Audio/SplinePage';
+import AudioPage from '../Audio/AudioPage';
 
 // [A형 페이지 컴포넌트]
 import LoginA from '../pages/Login/LoginA';
@@ -101,7 +101,7 @@ function AppContent() {
       />
 
       {/* Spline Test Page */}
-      <Route path="/spline-test" element={<SplinePage />} />
+      <Route path="/spline-test" element={<AudioPage />} />
 
       {/* Type A Routes */}
       <Route

@@ -190,12 +190,12 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
               title: '고대비 쇼핑',
               desc: '고대비 모드로 쇼핑',
               tags: ['#고대비', '#저시력'],
-              bgColor: '#171C28',
+              bgColor: '#141C29',
               textColor: '#FFF064',
-              labelColor: '#171C28',
+              labelColor: '#141C29',
               badgeBg: '#FFF064',
               btnBg: '#FFF064',
-              arrowColor: '#171C28',
+              arrowColor: '#141C29',
               icon: <Eye size={32} color="#FFF064" />,
               iconLarge: <Eye size={240} color="#FFF064" opacity={0.1} />
 
