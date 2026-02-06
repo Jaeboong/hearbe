@@ -23,14 +23,66 @@ from .context_models import PageContext, get_page_context
 def _format_site_urls(site) -> str:
     if not site:
         return ""
-    urls = []
-    for key in ("home", "cart", "mypage", "login"):
-        url = site.get_url(key)
-        if url:
-            urls.append(f"- {key}: {url}")
-    if not urls:
+    urls_dict = getattr(site, "urls", {}) or {}
+    if not isinstance(urls_dict, dict) or not urls_dict:
         return ""
-    return "\n".join(["## Site URLs"] + urls)
+
+    # Keep commonly referenced URLs first, then list the rest (sorted) for platform-specific flows.
+    preferred = ("home", "main", "login", "cart", "mypage")
+    ordered_items = []
+    seen = set()
+    for key in preferred:
+        url = urls_dict.get(key) or site.get_url(key)
+        if url:
+            ordered_items.append((key, url))
+            seen.add(key)
+    for key in sorted(urls_dict.keys()):
+        if key in seen:
+            continue
+        url = urls_dict.get(key) or site.get_url(key)
+        if url:
+            ordered_items.append((key, url))
+
+    if not ordered_items:
+        return ""
+    return "\n".join(["## Site URLs"] + [f"- {k}: {u}" for k, u in ordered_items])
+
+
+def _build_login_constraints(site_id: str, page_type: str) -> str:
+    # Keep login constraints scoped to login pages only to avoid bleeding platform-specific rules
+    # into unrelated contexts (e.g., Hearbe mall pages).
+    if page_type != "login":
+        return ""
+
+    if site_id == "coupang":
+        return (
+            "## Login constraints\n"
+            "- When the user expresses login intent, go to the login page without asking extra questions.\n"
+            "- Default method is email + password.\n"
+            "- If the user simply says \"login\" on the login page, proceed with email + password (do not ask the method).\n"
+            "- Only ask which method to use when the user has not specified a method and has just arrived on the login page.\n"
+            "- If the user asks for phone login, switch to the phone login tab and request the phone number (OTP is via SMS only).\n"
+            "- After entering OTP, click otp_submit_button (e.g., #loginWithSmsCode) if available.\n"
+            "- Available methods: (1) email + password, (2) phone number + OTP.\n"
+            "- Prefer concrete actions over follow-up questions when selectors exist.\n"
+            "- Use only tools from the Available commands list; do not invent tools like 'submit_login'.\n"
+            "- To submit login, click the login button selector (e.g., login_button/submit_button or button[type='submit']).\n"
+        )
+
+    if site_id == "hearbe":
+        return (
+            "## Login constraints\n"
+            "- This is Hearbe (first-party) login. Use email + password only.\n"
+            "- Prefer using provided selectors (email_input, password_input, login_button/submit_button).\n"
+            "- If credentials are already filled by the browser, just click submit.\n"
+            "- Use only tools from the Available commands list; do not invent tools.\n"
+        )
+
+    return (
+        "## Login constraints\n"
+        "- Use email + password by default.\n"
+        "- Use only tools from the Available commands list.\n"
+    )
 
 
 def build_system_prompt(
@@ -79,19 +131,8 @@ def build_system_prompt(
     )
     url_context_section = format_url_context(current_url, previous_url)
     site_urls_section = _format_site_urls(site)
-    login_constraints = (
-        "## Login constraints\n"
-        "- When the user expresses login intent, go to the login page without asking extra questions.\n"
-        "- Default method is email + password.\n"
-        "- If the user simply says \"login\" on the login page, proceed with email + password (do not ask the method).\n"
-        "- Only ask which method to use when the user has not specified a method and has just arrived on the login page.\n"
-        "- If the user asks for phone login, switch to the phone login tab and request the phone number (OTP is via SMS only).\n"
-        "- After entering OTP, click otp_submit_button (e.g., #loginWithSmsCode) if available.\n"
-        "- Available methods: (1) email + password, (2) phone number + OTP.\n"
-        "- Prefer concrete actions over follow-up questions when selectors exist.\n"
-        "- Use only tools from the Available commands list; do not invent tools like 'submit_login'.\n"
-        "- To submit login, click the login button selector (e.g., login_button/submit_button or button[type='submit']).\n"
-    )
+    site_id = getattr(site, "site_id", "") if site else ""
+    login_constraints = _build_login_constraints(site_id, page_context.page_type)
 
     output_example = json.dumps(
         {

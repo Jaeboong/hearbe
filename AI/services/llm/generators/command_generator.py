@@ -19,6 +19,7 @@ from ..rules.orderdetail import OrderDetailRule
 from ..rules.cart import CartRule
 from ..rules.login import LoginRule
 from ..rules.order_list import OrderListRule
+from ..rules.hearbe_nav import HearbeNavRule
 from ..rules.checkout import CheckoutRule
 from ..rules.generic import GenericClickRule
 
@@ -50,6 +51,7 @@ class CommandGenerator:
         # 규칙 인스턴스 생성
         self.rules: list[BaseRule] = [
             SiteAccessRule(self.site_manager),
+            HearbeNavRule(self.site_manager),
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
             OrderDetailRule(self.site_manager),

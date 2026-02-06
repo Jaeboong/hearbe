@@ -27,7 +27,7 @@ class LoginRule(BaseRule):
         target_site = current_site or detect_target_site(text, self.site_manager, current_site)
         phone = _extract_phone_number(text)
         if phone and get_page_type(current_url) != "login":
-            commands = build_login_page_commands(target_site)
+            commands = build_login_page_commands(target_site, current_url=current_url)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -39,7 +39,7 @@ class LoginRule(BaseRule):
             return None
 
         if any(kw in text for kw in LOGIN_SUBMIT_TRIGGERS):
-            commands = build_login_page_commands(target_site)
+            commands = build_login_page_commands(target_site, current_url=current_url)
             return RuleResult(
                 matched=True,
                 commands=commands,
@@ -47,7 +47,7 @@ class LoginRule(BaseRule):
                 rule_name="login",
             )
 
-        commands = build_login_page_commands(target_site)
+        commands = build_login_page_commands(target_site, current_url=current_url)
         return RuleResult(
             matched=True,
             commands=commands,
