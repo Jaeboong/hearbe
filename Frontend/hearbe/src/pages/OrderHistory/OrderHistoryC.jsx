@@ -87,7 +87,7 @@ export default function OrderHistoryC({ onHome }) {
         }
     };
 
-    const fetchOrders = async () => {
+    async function fetchOrders() {
         try {
             setIsLoading(true);
             setError(null);
@@ -97,18 +97,30 @@ export default function OrderHistoryC({ onHome }) {
                 const ordersByDate = {};
                 response.data.orders.forEach(order => {
                     const dateKey = formatOrderDate(order.ordered_at);
-                    if (!ordersByDate[dateKey]) {
-                        ordersByDate[dateKey] = { date: dateKey, orderUrls: [], items: [], platforms: new Set() };
-                    }
-                    if (order.order_url) {
-                        ordersByDate[dateKey].orderUrls.push(order.order_url);
-                    }
                     const mallName = resolvePlatformName(order);
-                    ordersByDate[dateKey].platforms.add(mallName);
+
+                    if (!ordersByDate[dateKey]) {
+                        ordersByDate[dateKey] = {
+                            date: dateKey,
+                            platforms: {}
+                        };
+                    }
+
+                    if (!ordersByDate[dateKey].platforms[mallName]) {
+                        ordersByDate[dateKey].platforms[mallName] = {
+                            mall: mallName,
+                            orderUrls: [],
+                            items: []
+                        };
+                    }
+
+                    if (order.order_url) {
+                        ordersByDate[dateKey].platforms[mallName].orderUrls.push(order.order_url);
+                    }
 
                     if (order.items && order.items.length > 0) {
                         order.items.forEach(item => {
-                            ordersByDate[dateKey].items.push({
+                            ordersByDate[dateKey].platforms[mallName].items.push({
                                 id: `${order.order_id}-${item.name}-${item.url || ''}`,
                                 name: item.name,
                                 price: `${item.price.toLocaleString()}원`,
@@ -123,14 +135,16 @@ export default function OrderHistoryC({ onHome }) {
                         });
                     }
                 });
-                const sortedGroups = Object.values(ordersByDate).map(group => ({
-                    ...group,
-                    platforms: Array.from(group.platforms)
+
+                const sortedGroups = Object.values(ordersByDate).map(dateGroup => ({
+                    date: dateGroup.date,
+                    platformGroups: Object.values(dateGroup.platforms)
                 })).sort((a, b) => {
                     if (a.date === '날짜 미상') return 1;
                     if (b.date === '날짜 미상') return -1;
                     return new Date(b.date) - new Date(a.date);
                 });
+
                 setOrders(sortedGroups);
             }
         } catch (err) {
@@ -213,71 +227,71 @@ export default function OrderHistoryC({ onHome }) {
                                     주문 내역이 없습니다.
                                 </div>
                             ) : (
-                                orders.map((group, idx) => {
-                                    const detailUrl = getOrderDetailUrl(group);
-                                    const platformLabel = group.platforms && group.platforms.length > 0
-                                        ? (group.platforms.length === 1
-                                            ? group.platforms[0]
-                                            : `${group.platforms[0]} 외 ${group.platforms.length - 1}곳`)
-                                        : '플랫폼';
-                                    return (
-                                        <div key={idx} className="mall-order-group">
-                                            <div className="mall-order-header">
-                                                <div className="mall-header-title-container">
-                                                    <div className="mall-order-indicator"></div>
-                                                    <div className="mall-header-text">
-                                                        <h2 className="mall-header-name">{platformLabel}</h2>
-                                                        <div className="mall-header-date">{group.date}</div>
-                                                    </div>
-                                                </div>
-                                                <div className="order-group-actions">
-                                                    <button
-                                                        className="btn-outline-sm cursor-pointer"
-                                                        onClick={() => detailUrl && window.open(detailUrl, '_blank')}
-                                                        disabled={!detailUrl}
-                                                    >
-                                                        주문 상세 조회
-                                                    </button>
-                                                </div>
+                                <div className="orders-list-c">
+                                    {orders.map((dateGroup, dateIdx) => (
+                                        <div key={dateIdx} className="date-group-c">
+                                            {/* Date Header */}
+                                            <div className="date-header-c">
+                                                <div className="date-indicator-c"></div>
+                                                <h3 className="date-title-c">{dateGroup.date} 주문</h3>
                                             </div>
-                                            <div className="group-items">
-                                                {group.items.map((item) => (
-                                                    <div key={item.id} className="item-row-card">
-                                                        <div className="item-row-left">
-                                                            <div className="item-thumb">
-                                                                {item.imgUrl ? (
-                                                                    <img src={item.imgUrl} alt={item.name} className="order-item-image" />
-                                                                ) : (
-                                                                    item.icon
-                                                                )}
-                                                            </div>
-                                                            <div className="oh-item-info">
-                                                                <div className="oh-item-name">{item.name}</div>
-                                                                <div className="oh-item-price">{item.price}</div>
-                                                            </div>
-                                                        </div>
-                                                        <span className="oh-item-qty">{item.quantity}</span>
-                                                        <div className="order-item-actions-container">
+
+                                            {/* Platform Sections */}
+                                            {dateGroup.platformGroups.map((platformGroup, platformIdx) => {
+                                                const detailUrl = platformGroup.orderUrls && platformGroup.orderUrls.length > 0 ? platformGroup.orderUrls[0] : '';
+                                                return (
+                                                    <div key={platformIdx} className="platform-section-c">
+                                                        <div className="platform-header-c">
+                                                            <div className="platform-name-c">{platformGroup.mall}</div>
                                                             <button
-                                                                className="btn-outline-sm order-item-action-btn cursor-pointer"
-                                                                onClick={() => item.productUrl && window.open(item.productUrl, '_blank')}
+                                                                className="btn-outline-sm cursor-pointer"
+                                                                onClick={() => detailUrl && window.open(detailUrl, '_blank')}
+                                                                disabled={!detailUrl}
                                                             >
-                                                                상품 조회
-                                                            </button>
-                                                            <button
-                                                                className="btn-fill-sm order-item-deliver-btn cursor-pointer"
-                                                                onClick={() => item.deliverUrl && window.open(item.deliverUrl, '_blank')}
-                                                                disabled={!item.deliverUrl}
-                                                            >
-                                                                배송 조회
+                                                                주문 상세 조회
                                                             </button>
                                                         </div>
+                                                        <div className="group-items">
+                                                            {platformGroup.items.map((item) => (
+                                                                <div key={item.id} className="item-row-card">
+                                                                    <div className="item-row-left">
+                                                                        <div className="item-thumb">
+                                                                            {item.imgUrl ? (
+                                                                                <img src={item.imgUrl} alt={item.name} className="order-item-image" />
+                                                                            ) : (
+                                                                                item.icon
+                                                                            )}
+                                                                        </div>
+                                                                        <div className="oh-item-info">
+                                                                            <div className="oh-item-name">{item.name}</div>
+                                                                            <div className="oh-item-price">{item.price}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <span className="oh-item-qty">{item.quantity}</span>
+                                                                    <div className="order-item-actions-container">
+                                                                        <button
+                                                                            className="btn-outline-sm order-item-action-btn cursor-pointer"
+                                                                            onClick={() => item.productUrl && window.open(item.productUrl, '_blank')}
+                                                                        >
+                                                                            상품 조회
+                                                                        </button>
+                                                                        <button
+                                                                            className="btn-fill-sm order-item-deliver-btn cursor-pointer"
+                                                                            onClick={() => item.deliverUrl && window.open(item.deliverUrl, '_blank')}
+                                                                            disabled={!item.deliverUrl}
+                                                                        >
+                                                                            배송 조회
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                );
+                                            })}
                                         </div>
-                                    )
-                                })
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </section>

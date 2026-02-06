@@ -255,7 +255,7 @@ const OrderHistoryA = () => {
                                         {/* Date Header */}
                                         <div className="date-header-main-a">
                                             <div className="date-indicator-a"></div>
-                                            <h2 className="date-title-a">{dateGroup.date}</h2>
+                                            <h2 className="date-title-a">{dateGroup.date} 주문</h2>
                                         </div>
 
                                         {/* Platform Sections within this date */}
