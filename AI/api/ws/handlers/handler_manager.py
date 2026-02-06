@@ -261,6 +261,17 @@ class HandlerManager:
         if previous_url and previous_url != url:
             self._session.set_context(session_id, "previous_url", previous_url)
         session.current_url = url
+
+        # Announce successful login even when the navigation is observed via
+        # page-update (not only via MCP tool result URL changes).
+        suppress_login_tts = False
+        if self._session:
+            until = self._session.get_context(session_id, "tts_suppress_until", 0)
+            if until and time.time() < float(until):
+                suppress_login_tts = True
+        if self._login_feedback and not suppress_login_tts:
+            await self._login_feedback.maybe_announce_login_success(session_id, previous_url, url)
+
         site = get_current_site(url)
         page_type = get_page_type(url)
         logger.info("handle_page_update: site=%s page_type=%s", site.name if site else None, page_type)

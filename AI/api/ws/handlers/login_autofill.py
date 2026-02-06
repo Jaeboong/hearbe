@@ -28,6 +28,8 @@ CTX_ATTEMPT = "login_autofill_attempt"
 CTX_LAST_URL = "login_autofill_last_url"
 CTX_SESSION_CHECK_PENDING = "login_autofill_session_check_pending"
 CTX_SESSION_CHECK_URL = "login_autofill_session_check_url"
+CTX_AUTOFILL_USED = "login_autofill_used"
+CTX_FINALIZED = "login_autofill_finalized"
 
 MAX_ATTEMPTS = 2
 FOCUS_WAIT_MS = 300
@@ -58,6 +60,11 @@ class LoginAutofillManager:
         if not _is_login_intent(text):
             return False
 
+        # If we're already submitting login, ignore repeated "login" intents.
+        if self._session.get_context(session_id, "login_submit_pending"):
+            logger.info("login_autofill skip: login_submit_pending is True (coupang)")
+            return True
+
         if self._session.get_context(session_id, CTX_PENDING):
             return True
 
@@ -73,6 +80,9 @@ class LoginAutofillManager:
             logger.info("login_autofill skip: page_type is not login")
             return False
         if _is_coupang_login_url(url):
+            if self._session.get_context(session_id, "login_submit_pending"):
+                logger.info("login_autofill skip: login_submit_pending is True (coupang page)")
+                return True
             if previous_url and get_page_type(previous_url) == "login":
                 logger.info("login_autofill skip: previous_url was also login (coupang)")
                 return False
@@ -305,8 +315,12 @@ class LoginAutofillManager:
         self._session.set_context(session_id, CTX_LAST_URL, None)
         self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, None)
         self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
+        self._session.set_context(session_id, CTX_AUTOFILL_USED, None)
+        self._session.set_context(session_id, CTX_FINALIZED, None)
 
     async def _maybe_finalize(self, session_id: str) -> bool:
+        if self._session.get_context(session_id, CTX_FINALIZED):
+            return True
         email_filled = self._session.get_context(session_id, CTX_EMAIL_FILLED)
         pass_filled = self._session.get_context(session_id, CTX_PASS_FILLED)
         if email_filled is None or pass_filled is None:
@@ -324,6 +338,8 @@ class LoginAutofillManager:
                 email_filled,
                 pass_filled,
             )
+            self._session.set_context(session_id, CTX_AUTOFILL_USED, True)
+            self._session.set_context(session_id, CTX_FINALIZED, True)
             await self._send_login_click(session_id, current_url)
             return True
 
@@ -337,6 +353,9 @@ class LoginAutofillManager:
             )
             self._session.set_context(session_id, CTX_ATTEMPT, attempt + 1)
             self._session.set_context(session_id, CTX_PENDING, True)
+            # Reset for the next attempt so we don't accidentally finalize with stale values.
+            self._session.set_context(session_id, CTX_EMAIL_FILLED, None)
+            self._session.set_context(session_id, CTX_PASS_FILLED, None)
             email_args = self._session.get_context(session_id, CTX_EMAIL_ARGS)
             pass_args = self._session.get_context(session_id, CTX_PASS_ARGS)
             if email_args and pass_args:
@@ -369,6 +388,7 @@ class LoginAutofillManager:
             email_filled,
             pass_filled,
         )
+        self._session.set_context(session_id, CTX_FINALIZED, True)
         await self._sender.send_tts_response(session_id, self._tts.build_login_guidance())
         return True
 
@@ -386,6 +406,7 @@ class LoginAutofillManager:
         self._session.set_context(session_id, CTX_PASS_ARGS, pass_args)
         self._session.set_context(session_id, CTX_EMAIL_FILLED, None)
         self._session.set_context(session_id, CTX_PASS_FILLED, None)
+        self._session.set_context(session_id, CTX_FINALIZED, None)
         self._session.set_context(session_id, CTX_ATTEMPT, 1)
         self._session.set_context(session_id, CTX_PENDING, True)
         self._session.set_context(session_id, CTX_LAST_URL, current_url)
