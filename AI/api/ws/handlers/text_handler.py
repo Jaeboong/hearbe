@@ -7,9 +7,11 @@ Coordinates text processing pipeline and delegates to specialized handlers.
 
 import asyncio
 import logging
+import re
 from typing import Dict, Any
 
 from core.interfaces import ASRResult
+from core.korean_numbers import extract_ordinal_index
 from .search_query_handler import SearchQueryHandler
 from .command_pipeline import CommandPipeline
 from .text_ingress.text_queue import TextQueueManager
@@ -22,6 +24,44 @@ from .text_session.interrupt_manager import InterruptManager
 from services.llm.sites.site_manager import get_page_type
 
 logger = logging.getLogger(__name__)
+
+
+_SEARCH_SELECT_HINTS = ("선택", "열어", "클릭", "눌러", "골라", "고르")
+_SEARCH_READ_HINTS = ("읽어", "들려", "보여", "요약")
+
+_BARE_ORDINAL_RE = re.compile(r"^\\s*[가-힣0-9]+\\s*(?:번째|번)\\s*(?:상품)?\\s*(?:이요|요)?\\s*$")
+
+
+def _is_bare_ordinal_utterance(text: str) -> bool:
+    """
+    True only for short ordinal-only utterances like "1번", "첫번째", "2번이요".
+    """
+    if not text:
+        return False
+    if extract_ordinal_index(text) is None:
+        return False
+    return bool(_BARE_ORDINAL_RE.match(text))
+
+
+def _is_search_quick_select(text: str) -> bool:
+    """
+    Detect selection requests that should not be blocked by auto-extract.
+
+    When the user is on a search page and asks to select an item (e.g., "1번 선택"),
+    we can click by selector without needing extracted search_results first. In that
+    case, forcing ensure_context would trigger auto-announce TTS and delay the action.
+    """
+    value = (text or "").strip()
+    if not value:
+        return False
+    if any(hint in value for hint in _SEARCH_READ_HINTS):
+        return False
+    if any(hint in value for hint in _SEARCH_SELECT_HINTS):
+        return True
+    if _is_bare_ordinal_utterance(value):
+        return True
+    return False
+
 
 class TextHandler:
     """
@@ -210,22 +250,24 @@ class TextHandler:
 
             if session and self._page_extract:
                 page_type = get_page_type(session.current_url or "")
-                triggered = await self._page_extract.ensure_context(
-                    session_id,
-                    session.current_url,
-                    session
-                )
-                if triggered:
-                    retries = 0
-                    if self._session:
-                        retries = self._session.get_context(session_id, "auto_extract_retry", 0)
-                    if retries < 1:
+                skip_auto_extract = page_type == "search" and _is_search_quick_select(text)
+                if not skip_auto_extract:
+                    triggered = await self._page_extract.ensure_context(
+                        session_id,
+                        session.current_url,
+                        session
+                    )
+                    if triggered:
+                        retries = 0
                         if self._session:
-                            self._session.set_context(session_id, "auto_extract_retry", retries + 1)
-                        asyncio.create_task(self._requeue_after_delay(session_id, text, delay_sec=1.6))
-                        return
-                    if self._session:
-                        self._session.set_context(session_id, "auto_extract_retry", 0)
+                            retries = self._session.get_context(session_id, "auto_extract_retry", 0)
+                        if retries < 1:
+                            if self._session:
+                                self._session.set_context(session_id, "auto_extract_retry", retries + 1)
+                            asyncio.create_task(self._requeue_after_delay(session_id, text, delay_sec=1.6))
+                            return
+                        if self._session:
+                            self._session.set_context(session_id, "auto_extract_retry", 0)
 
             if self._session:
                 self._session.set_context(session_id, "auto_extract_retry", 0)
