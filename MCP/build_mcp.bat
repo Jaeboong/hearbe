@@ -21,7 +21,7 @@ IF /I "%~1"=="-v" (
 )
 
 IF "%APP_VERSION%"=="" (
-    set /p APP_VERSION=[INPUT] 버전명을 입력하세요 (예: 1.2.0): 
+    set /p APP_VERSION=[INPUT] 버전명을 입력하세요 ^(예: 1.2.0^): 
 )
 
 IF "%APP_VERSION%"=="" (
