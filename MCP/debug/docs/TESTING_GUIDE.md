@@ -7,7 +7,7 @@ This guide documents how to run MCP scripted-input tests without ASR, and how to
 ```
 $env:DEBUG_SCRIPTED_INPUT="1"
 $env:DEBUG_SCRIPTED_INPUT_FILE="C:\ssafy\공통\MCP\debug\scripted_input.txt"
-$env:DEBUG_SCRIPTED_INPUT_DELAY_MS="7000"
+$env:DEBUG_SCRIPTED_INPUT_DELAY_MS="12000"
 .\venv\Scripts\python.exe .\main.py
 ```
 

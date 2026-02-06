@@ -45,6 +45,7 @@ class TextHandler:
         login_feedback=None,
         payment_keypad=None,
         login_status=None,
+        login_challenge=None,
         login_autofill=None,
         order_detail_handler=None,
         page_extract=None,
@@ -60,6 +61,7 @@ class TextHandler:
         self._login_feedback = login_feedback
         self._payment_keypad = payment_keypad
         self._login_status = login_status
+        self._login_challenge = login_challenge
         self._login_autofill = login_autofill
         self._order_detail = order_detail_handler
         self._page_extract = page_extract
@@ -92,6 +94,7 @@ class TextHandler:
             session_manager=session_manager,
             payment_keypad=payment_keypad,
             login_status=login_status,
+            login_challenge=login_challenge,
             login_autofill=login_autofill,
             order_detail_handler=order_detail_handler,
             flow_handler=self._flow_handler,

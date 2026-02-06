@@ -10,7 +10,8 @@ from core.interfaces import MCPCommand
 from services.llm.sites.site_manager import get_site_manager, SiteConfig
 
 
-COUPANG_PRENAV_TERMS = ("마이페이지", "주문내역", "장바구니", "쿠팡")
+# Only explicit Coupang terms should trigger Coupang pre-navigation.
+COUPANG_PRENAV_TERMS = ("마이쿠팡", "쿠팡")
 NAV_TOOLS = {"goto", "navigate_to_url"}
 
 

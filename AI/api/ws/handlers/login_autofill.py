@@ -13,7 +13,7 @@ import re
 from typing import Any, Dict, Optional
 
 from core.interfaces import MCPCommand
-from services.llm.sites.site_manager import get_page_type, get_selector
+from services.llm.sites.site_manager import get_current_site, get_page_type, get_selector
 from services.llm.generators.tts_generator import TTSGenerator
 
 logger = logging.getLogger(__name__)
@@ -51,6 +51,9 @@ class LoginAutofillManager:
         current_url = session.current_url or ""
         if get_page_type(current_url) != "login":
             return False
+        if not _is_coupang_login_url(current_url):
+            logger.info("login_autofill skip: not coupang login url (text)")
+            return False
 
         if not _is_login_intent(text):
             return False
@@ -68,6 +71,24 @@ class LoginAutofillManager:
         )
         if page_type != "login":
             logger.info("login_autofill skip: page_type is not login")
+            return False
+        if _is_coupang_login_url(url):
+            if previous_url and get_page_type(previous_url) == "login":
+                logger.info("login_autofill skip: previous_url was also login (coupang)")
+                return False
+            if self._session.get_context(session_id, CTX_PENDING):
+                logger.info("login_autofill skip: CTX_PENDING is True (coupang)")
+                return True
+            if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
+                logger.info("login_autofill skip: CTX_SESSION_CHECK_PENDING is True (coupang)")
+                return True
+            last_url = self._session.get_context(session_id, CTX_LAST_URL)
+            if last_url == url:
+                logger.info("login_autofill skip: same as last_url (coupang)")
+                return False
+            return await self._start_probe(session_id, url, source="page")
+        if not _is_hearbe_url(url):
+            logger.info("login_autofill skip: login page not heabe or coupang")
             return False
         if previous_url and get_page_type(previous_url) == "login":
             logger.info("login_autofill skip: previous_url was also login")
@@ -92,6 +113,12 @@ class LoginAutofillManager:
             "login_autofill handle_main_page_update: session=%s url=%s",
             session_id, url,
         )
+        if self._session.get_context(session_id, "token_recovery_in_flight"):
+            logger.info("login_autofill main skip: token recovery in flight")
+            return False
+        if not _is_hearbe_url(url):
+            logger.info("login_autofill main skip: not heabe url")
+            return False
         if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
             logger.info("login_autofill main skip: CTX_SESSION_CHECK_PENDING is True")
             return True
@@ -164,6 +191,15 @@ class LoginAutofillManager:
         user_type = result.get("user_type")
         check_url = self._session.get_context(session_id, CTX_SESSION_CHECK_URL) or ""
 
+        if self._session.get_context(session_id, "token_recovery_in_flight"):
+            logger.info(
+                "login session check skip redirect: session=%s token recovery in flight (url=%s)",
+                session_id,
+                check_url,
+            )
+            self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
+            return False
+
         if logged_in and user_type:
             # Redirect based on userType
             redirect_url = self._get_redirect_url(user_type, check_url)
@@ -189,12 +225,59 @@ class LoginAutofillManager:
             )
             return True
 
-        # No session found, proceed with autofill probe
+        page_type = get_page_type(check_url)
+        if page_type == "login":
+            if _is_coupang_login_url(check_url):
+                logger.info(
+                    "login session not found: session=%s on coupang login, starting autofill probe",
+                    session_id,
+                )
+                return await self._start_probe(session_id, check_url, source="page")
+            logger.info(
+                "login session not found: session=%s on login page, no autofill (hearbe)",
+                session_id,
+            )
+            return False
+
+        login_url = self._resolve_login_url(check_url, user_type=None)
+        if login_url and login_url != check_url:
+            logger.info(
+                "login session not found: session=%s redirecting to login page=%s",
+                session_id,
+                login_url,
+            )
+            await self._sender.send_tool_calls(
+                session_id,
+                [
+                    MCPCommand(
+                        tool_name="navigate_to_url",
+                        arguments={"url": login_url},
+                        description="redirect to login page",
+                    )
+                ],
+            )
+            return True
+
         logger.info(
-            "login session not found: session=%s, starting autofill probe",
+            "login session not found: session=%s no login redirect available (url=%s)",
             session_id,
+            check_url,
         )
-        return await self._start_probe(session_id, check_url, source="page")
+        return False
+
+    def _resolve_login_url(self, current_url: str, user_type: Optional[str]) -> Optional[str]:
+        """Resolve login URL for Hearbe site based on user type or current path."""
+        site = get_current_site(current_url)
+        urls = site.urls if site else {}
+        if user_type == "BLIND":
+            return urls.get("login_a") or urls.get("login_b") or urls.get("login_c")
+        if user_type == "LOW_VISION":
+            return urls.get("login_b") or urls.get("login_c") or urls.get("login_a")
+        if user_type == "GENERAL":
+            return urls.get("login_c") or urls.get("login_b") or urls.get("login_a")
+
+        # Default to GENERAL login
+        return urls.get("login_c") or urls.get("login_b") or urls.get("login_a")
 
     def _get_redirect_url(self, user_type: str, current_url: str) -> str:
         """Get redirect URL based on userType."""
@@ -290,6 +373,9 @@ class LoginAutofillManager:
         return True
 
     async def _start_probe(self, session_id: str, current_url: str, source: str) -> bool:
+        if not _is_coupang_login_url(current_url):
+            logger.info("login_autofill probe skip: not coupang login url")
+            return False
         email_selector = get_selector(current_url, "email_input") or "#login-email-input"
         password_selector = get_selector(current_url, "password_input") or "#login-password-input"
 
@@ -415,3 +501,21 @@ def _args_match(expected: Optional[Dict[str, Any]], actual: Dict[str, Any]) -> b
         if actual.get(key) != value:
             return False
     return True
+
+
+def _is_coupang_login_url(url: str) -> bool:
+    if not url:
+        return False
+    lowered = url.lower()
+    return "login.coupang.com" in lowered and "/login/login.pang" in lowered
+
+
+def _is_hearbe_url(url: str) -> bool:
+    if not url:
+        return False
+    lowered = url.lower()
+    return (
+        "i14d108.p.ssafy.io" in lowered
+        or "localhost" in lowered
+        or "127.0.0.1" in lowered
+    )
