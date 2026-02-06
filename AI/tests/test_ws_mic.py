@@ -9,6 +9,13 @@ Records audio from microphone and streams to WebSocket server.
 Press Ctrl+C to stop recording and get final result.
 """
 
+if __name__ != "__main__":
+    # This file is an interactive script, not a unit test. Avoid failing pytest
+    # collection when optional audio deps (pyaudio) are missing.
+    import pytest
+
+    pytest.skip("interactive microphone script (skipped during pytest)", allow_module_level=True)
+
 import asyncio
 import argparse
 import json

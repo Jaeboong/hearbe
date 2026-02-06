@@ -28,6 +28,8 @@ CTX_ATTEMPT = "login_autofill_attempt"
 CTX_LAST_URL = "login_autofill_last_url"
 CTX_SESSION_CHECK_PENDING = "login_autofill_session_check_pending"
 CTX_SESSION_CHECK_URL = "login_autofill_session_check_url"
+CTX_SESSION_CHECK_SOURCE = "login_autofill_session_check_source"
+CTX_SESSION_CHECK_PREVIOUS_URL = "login_autofill_session_check_previous_url"
 CTX_AUTOFILL_USED = "login_autofill_used"
 CTX_FINALIZED = "login_autofill_finalized"
 
@@ -115,7 +117,12 @@ class LoginAutofillManager:
             return False
 
         # Check existing session before autofill probe
-        return await self._start_session_check(session_id, url)
+        return await self._start_session_check(
+            session_id,
+            url,
+            source="login_page",
+            previous_url=previous_url,
+        )
 
     async def handle_main_page_update(self, session_id: str, url: str) -> bool:
         """Handle main page entry - redirect logged-in users to appropriate mall."""
@@ -134,12 +141,25 @@ class LoginAutofillManager:
             return True
 
         # Check existing session and redirect if logged in
-        return await self._start_session_check(session_id, url)
+        return await self._start_session_check(
+            session_id,
+            url,
+            source="main_page",
+            previous_url=None,
+        )
 
-    async def _start_session_check(self, session_id: str, url: str) -> bool:
+    async def _start_session_check(
+        self,
+        session_id: str,
+        url: str,
+        source: str = "",
+        previous_url: Optional[str] = None,
+    ) -> bool:
         """Check if user already has a valid session in localStorage."""
         self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, True)
         self._session.set_context(session_id, CTX_SESSION_CHECK_URL, url)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_SOURCE, source or "")
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL, previous_url or "")
 
         logger.info(
             "login session check start: session=%s url=%s",
@@ -200,6 +220,13 @@ class LoginAutofillManager:
         logged_in = result.get("logged_in", False)
         user_type = result.get("user_type")
         check_url = self._session.get_context(session_id, CTX_SESSION_CHECK_URL) or ""
+        check_source = self._session.get_context(session_id, CTX_SESSION_CHECK_SOURCE) or ""
+        check_previous_url = self._session.get_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL) or ""
+
+        # Clear per-check metadata to avoid reuse across fast page bounces.
+        self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_SOURCE, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL, None)
 
         if self._session.get_context(session_id, "token_recovery_in_flight"):
             logger.info(
@@ -207,12 +234,42 @@ class LoginAutofillManager:
                 session_id,
                 check_url,
             )
-            self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
             return False
 
         if logged_in and user_type:
             # Redirect based on userType
             redirect_url = self._get_redirect_url(user_type, check_url)
+            session = self._session.get_session(session_id) if self._session else None
+            current_url = session.current_url if session else ""
+
+            # If we're already on the target page (common during frontend redirect bounces),
+            # avoid redundant navigation and confusing TTS.
+            if current_url and redirect_url and current_url == redirect_url:
+                logger.info(
+                    "login session found: session=%s user_type=%s already_on_redirect_url=%s source=%s - skip redirect/tts",
+                    session_id,
+                    user_type,
+                    redirect_url,
+                    check_source or "missing",
+                )
+                return False
+
+            # Hearbe login-page entry is sometimes a frontend auth redirect (e.g. token check).
+            # In that bounce case, avoid confusing "already logged in" TTS and redundant redirects.
+            if check_source == "login_page" and _is_hearbe_url(check_url):
+                already_left_login = bool(
+                    current_url and current_url != check_url and get_page_type(current_url) != "login"
+                )
+                if already_left_login:
+                    logger.info(
+                        "login session found (hearbe bounce): session=%s user_type=%s current_url=%s prev_url=%s - skip redirect/tts",
+                        session_id,
+                        user_type,
+                        current_url,
+                        check_previous_url or "missing",
+                    )
+                    return False
+
             logger.info(
                 "login session found: session=%s user_type=%s redirect=%s",
                 session_id,
@@ -229,10 +286,11 @@ class LoginAutofillManager:
                     )
                 ],
             )
-            await self._sender.send_tts_response(
-                session_id,
-                "이미 로그인되어 있습니다. 쇼핑몰 페이지로 이동합니다.",
-            )
+            if not (check_source == "login_page" and _is_hearbe_url(check_url)):
+                await self._sender.send_tts_response(
+                    session_id,
+                    "이미 로그인되어 있습니다. 쇼핑몰 페이지로 이동합니다.",
+                )
             return True
 
         page_type = get_page_type(check_url)
@@ -315,6 +373,8 @@ class LoginAutofillManager:
         self._session.set_context(session_id, CTX_LAST_URL, None)
         self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, None)
         self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_SOURCE, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL, None)
         self._session.set_context(session_id, CTX_AUTOFILL_USED, None)
         self._session.set_context(session_id, CTX_FINALIZED, None)
 

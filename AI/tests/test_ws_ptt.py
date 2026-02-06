@@ -9,6 +9,13 @@ Hold SPACE to record, release to send.
 Audio is auto-sent every 3 seconds while holding.
 """
 
+if __name__ != "__main__":
+    # This file is an interactive script, not a unit test. Avoid failing pytest
+    # collection when optional deps (pyaudio/keyboard) are missing.
+    import pytest
+
+    pytest.skip("interactive push-to-talk script (skipped during pytest)", allow_module_level=True)
+
 import asyncio
 import argparse
 import json

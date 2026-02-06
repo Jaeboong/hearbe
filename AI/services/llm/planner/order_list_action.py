@@ -10,6 +10,7 @@ from typing import Optional, Dict, Any, List
 import re
 
 from core.interfaces import MCPCommand, LLMResponse, SessionState
+from core.korean_datetime import format_date_for_tts
 from core.korean_numbers import extract_ordinal_index
 from services.llm.sites.site_manager import get_page_type
 
@@ -109,7 +110,7 @@ def _build_order_list_summary_text(items: List[Dict[str, Any]]) -> str:
     lines = []
     for idx, order in enumerate(items[:max_read], start=1):
         title = order.get("title") or "상품"
-        ordered_at = order.get("ordered_at") or ""
+        ordered_at = format_date_for_tts(order.get("ordered_at") or order.get("orderedAt") or "")
         status = order.get("status") or ""
         total_price = order.get("total_price") or ""
 

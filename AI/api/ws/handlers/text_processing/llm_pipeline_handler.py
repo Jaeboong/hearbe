@@ -8,6 +8,7 @@ import logging
 import time
 
 from core.interfaces import IntentType
+from core.korean_numbers import extract_ordinal_index
 from services.llm.planner.selection.option_select import coerce_option_clicks, is_option_request
 from services.llm.feedback.fast_ack import FastAckGenerator
 from services.llm.generators.tts_text_generator import TTSTextGenerator
@@ -53,6 +54,19 @@ class LLMPipelineHandler:
             context = session.context
             intent = await self._nlu.analyze_intent(text, context)
             resolved_text = await self._nlu.resolve_reference(text, context)
+
+        # Debugging: track what text the planner actually sees and how ordinals are parsed.
+        # We only log when reference resolution changed text or when an ordinal is detected,
+        # to avoid spamming logs for every utterance.
+        ordinal_idx = extract_ordinal_index(resolved_text)
+        if resolved_text != text or ordinal_idx is not None:
+            logger.info(
+                "Input normalized: session=%s raw_text='%s' resolved_text='%s' ordinal_index=%s",
+                session_id,
+                (text or "")[:200],
+                (resolved_text or "")[:200],
+                ordinal_idx,
+            )
 
         if not self._llm:
             return ""
