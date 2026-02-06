@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion as _motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, PartyPopper } from 'lucide-react';
@@ -114,39 +114,17 @@ ${termContents.privacy}`;
   };
 
   const handleCheckUsername = async () => {
-    // 1. 길이 검사 (4자 이상)
-    if (!formData.username || formData.username.length < 4) {
+    // validation.js의 공통 검증 로직 사용
+    const idError = validateUsername(formData.username);
+    if (idError) {
       Swal.fire({
         icon: 'warning',
-        text: '아이디는 4자 이상 입력해주세요.',
+        text: idError,
         confirmButtonColor: '#7c3aed',
         confirmButtonText: '확인'
       });
       return;
     }
-
-    // 2. 영문 + 숫자 포함 검사
-    const hasLetter = /[a-zA-Z]/.test(formData.username);
-    const hasNumber = /[0-9]/.test(formData.username);
-
-    if (!hasLetter || !hasNumber) {
-      Swal.fire({
-        icon: 'warning',
-        text: '아이디는 영문과 숫자를 모두 포함해야 합니다.',
-        confirmButtonColor: '#7c3aed',
-        confirmButtonText: '확인'
-      });
-      return;
-    }
-
-    // 기존 usernameError check는 위 로직으로 대체되었으므로 제거하거나 기본적인 것만 유지할 수 있지만,
-    // 여기서는 사용자가 요청한 규칙이 우선이므로 위 로직 통과 후 다른 검증(예: 공백 등)은 validateUsername에 맡기되
-    // 위 에러들과 중복되지 않게 처리하거나 바로 중복확인으로 넘어감.
-    // 하지만 validateUsername에는 길이 체크등이 있어서 그냥 여기 로직만 통과하면 중복체크로 넘어가도 무방하지만
-    // validateUsername이 '아이디를 입력해주세요' 등을 리턴하므로 안전하게 호출하되, 위 조건들에 걸리지 않는 에러만 처리.
-
-    // 단순화: 위 조건 통과하면 바로 API 호출 시도 (validateUsername은 submit시에 한번 더 체크됨)
-
 
     try {
       const apiResponse = await authAPI.checkDuplicate(formData.username);
@@ -551,4 +529,3 @@ ${termContents.privacy}`;
     </div>
   );
 }
-

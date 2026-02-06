@@ -229,6 +229,7 @@ export default function MemberInfoC({ onHome }) {
                                 key={item.id}
                                 onClick={() => navigate(item.path)}
                                 className={`mp-sidebar-item cursor-pointer ${item.id === 'member-info' ? 'active' : ''}`}
+                                style={{ justifyContent: 'center', textAlign: 'center' }}
                             >
                                 <span className="label">{item.label}</span>
                             </button>

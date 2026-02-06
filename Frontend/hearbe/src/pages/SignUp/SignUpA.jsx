@@ -16,6 +16,7 @@ import {
 import Swal from 'sweetalert2';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
+import { validateUsername } from '../../utils/validation';
 import './SignUpA.css';
 
 // Utility Functions
@@ -24,14 +25,8 @@ const formatPhoneNumber = (value) => {
     const limited = numbers.slice(0, 11);
     if (limited.length <= 3) return limited;
     if (limited.length <= 7) return `${limited.slice(0, 3)}-${limited.slice(3)}`;
-    return `${limited.slice(0, 3)}-${limited.slice(3, 7)}-${limited.slice(7)}`;
-};
-
-const validateUserId = (userId) => {
-    if (userId.length < 4) return false;
-    const hasLetter = /[a-zA-Z]/.test(userId);
-    const hasNumber = /[0-9]/.test(userId);
-    return hasLetter && hasNumber;
+    return `${limited.slice(0, 3)}-${limited.slice(3, 7)}-
+    ${limited.slice(7)}`;
 };
 
 const validatePassword = (password) => /^\d{6}$/.test(password);
@@ -123,10 +118,11 @@ const SignUp = () => {
     };
 
     const handleDuplicateCheck = async () => {
-        if (!validateUserId(formData.id)) {
+        const idError = validateUsername(formData.id);
+        if (idError) {
             Swal.fire({
                 icon: 'warning',
-                text: '아이디는 영문과 숫자를 모두 포함해 4자리 이상이어야 합니다.',
+                text: idError,
                 confirmButtonText: '확인'
             });
             return;

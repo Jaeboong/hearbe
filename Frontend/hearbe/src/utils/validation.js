@@ -18,6 +18,14 @@ export const validateUsername = (username) => {
         return '아이디는 영문, 숫자만 사용 가능합니다.';
     }
 
+    // 영문과 숫자가 모두 포함되어야 함
+    const hasLetter = /[a-zA-Z]/.test(username);
+    const hasNumber = /[0-9]/.test(username);
+
+    if (!hasLetter || !hasNumber) {
+        return '아이디는 영문과 숫자를 모두 포함해야 합니다.';
+    }
+
     return null; // 에러 없음
 };
 
