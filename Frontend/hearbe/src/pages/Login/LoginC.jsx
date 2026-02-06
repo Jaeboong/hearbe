@@ -14,6 +14,8 @@ export default function LoginC() {
     const [rememberLogin, setRememberLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
+
+
     useEffect(() => {
         // 이미 로그인 되어있는지 확인
         const token = localStorage.getItem('accessToken');
@@ -56,13 +58,7 @@ export default function LoginC() {
         try {
             const response = await authAPI.login(loginId, loginPassword);
 
-            // 토큰을 localStorage에 저장 (다른 페이지에서 사용하기 위해)
-            if (response.data && response.data.accessToken) {
-                localStorage.setItem('accessToken', response.data.accessToken);
-            }
-            if (response.data && response.data.refreshToken) {
-                localStorage.setItem('refreshToken', response.data.refreshToken);
-            }
+
 
             // 로그인 유지 체크 시 아이디/비밀번호 저장
             if (rememberLogin) {
@@ -86,10 +82,19 @@ export default function LoginC() {
         } catch (error) {
             console.error("Login failed:", error);
             if (!isAuto) {
+                let errorMessage = error.message || "로그인에 실패했습니다.";
+
+                // 에러 상태나 메시지에 따른 사용자 맞춤 메시지 매핑
+                if (error.status === 404 || errorMessage.includes('존재하지') || errorMessage.includes('아이디')) {
+                    errorMessage = "회원이 아닙니다. \n회원가입을 진행해주세요.";
+                } else if (error.status === 401 || errorMessage.includes('비밀번호')) {
+                    errorMessage = "아이디 또는 비밀번호가 틀립니다.";
+                }
+
                 Swal.fire({
                     icon: 'error',
                     title: '로그인 실패',
-                    text: error.message || "아이디 또는 비밀번호가 일치하지 않습니다.",
+                    text: errorMessage,
                     confirmButtonColor: '#7c3aed',
                     confirmButtonText: '확인'
                 });
@@ -156,9 +161,7 @@ export default function LoginC() {
                 </div>
             </main>
 
-            <footer className="landing-footer">
-                <p>© 2026 HearBe. All rights reserved.</p>
-            </footer>
+
         </div>
     );
 }

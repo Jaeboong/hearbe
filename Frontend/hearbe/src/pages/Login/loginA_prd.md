@@ -98,3 +98,30 @@ LoginA.jsx의 하드코딩된 로컬 스토리지 인증 방식을 백엔드 API
 - 요청 payload가 명세와 일치하는지 확인
 - 응답에 토큰이 포함되어 있는지 확인
 - 콘솔에 에러가 없는지 확인
+
+## 토큰 갱신 API 명세
+
+### 엔드포인트
+- 경로: `/auth/refresh`
+- 메서드: POST
+
+### 요청 형식
+```json
+{
+  "refreshToken": "<저장된 refreshToken>"
+}
+```
+
+### 응답 형식
+성공 (200):
+```json
+{
+  "code": 200,
+  "message": "성공적으로 처리되었습니다.",
+  "data": {
+    "accessToken": "새로운 accessToken",
+    "refreshToken": "새로운 refreshToken",
+    "message": "토큰 재발급 성공"
+  }
+}
+```

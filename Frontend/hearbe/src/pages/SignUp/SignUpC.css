@@ -1,10 +1,12 @@
 .signup-c-container {
+    height: 100vh;
     min-height: 100vh;
     background-color: #f8fafc;
     font-family: 'Pretendard', sans-serif;
     color: #1e293b;
     position: relative;
-    overflow-x: hidden;
+    overflow: hidden;
+    /* 전체 페이지 스크롤 방지 */
     display: flex;
     flex-direction: column;
 }
@@ -36,22 +38,33 @@
 .signup-c-main {
     display: flex;
     justify-content: center;
-    padding: 2rem 1rem 4rem;
+    align-items: center;
+    padding: 20px;
     flex: 1;
+    height: 100%;
 }
 
 .signup-card-c {
     background: white;
-    width: 100%;
-    max-width: 600px;
-    /* Reduced */
-    padding: 3rem 3rem;
-    /* Reduced */
-    border-radius: 40px;
-    /* Adjusted radius slightly */
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+    width: 90%;
+    max-width: 500px;
+    padding: 40px 50px;
+    border-radius: 32px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
     text-align: center;
     z-index: 1;
+    max-height: 95vh;
+    overflow-y: auto;
+    /* 내용 넘침 시 내부 스크롤 */
+    scrollbar-width: none;
+    /* Firefox 스크롤바 숨김 */
+    display: flex;
+    flex-direction: column;
+}
+
+.signup-card-c::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari 스크롤바 숨김 */
 }
 
 .signup-logo-section-c {
@@ -64,13 +77,12 @@
 
 /* Logo centering */
 .signup-logo-c {
-    height: 120px;
-    /* Reduced */
+    height: 70px;
+    /* 로고 크기 축소 (LoginC와 동일) */
     width: auto;
     object-fit: contain;
     display: block;
-    margin: 0 auto 2rem auto;
-    /* Reduced bottom margin */
+    margin: 0 auto 20px auto;
 }
 
 .password-requirements-c {
@@ -82,27 +94,26 @@
 }
 
 .signup-title-c {
-    font-size: 48px;
+    font-size: 32px;
     font-weight: 800;
     color: #1e293b;
+    margin-bottom: 10px;
 }
 
 .signup-form-c {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    /* Reduced slightly */
+    gap: 16px;
+    width: 100%;
 }
 
 .signup-input-c {
     width: 100%;
-    padding: 1.4rem 1.6rem;
-    /* Reduced */
+    padding: 14px 20px;
+    /* 패딩 축소 */
     border: 1.5px solid #f1f5f9;
     border-radius: 16px;
-    /* Adjusted */
-    font-size: 1.2rem;
-    /* Reduced */
+    font-size: 15px;
     outline: none;
     background-color: white;
     color: #1e293b;
@@ -120,7 +131,7 @@
 .input-section-c {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
 }
 
 .gray-bg-c {
@@ -137,21 +148,20 @@
 .input-with-button-c .signup-input-c {
     width: 100%;
     padding-right: 6.5rem;
-    /* Make space for the button inside */
 }
 
 /* Button inside the input */
 .check-duplicate-btn-c {
     position: absolute;
-    right: 0.6rem;
+    right: 0.5rem;
     top: 50%;
     transform: translateY(-50%);
     height: auto;
-    padding: 0.8rem 1.4rem;
+    padding: 0.6rem 1rem;
     background-color: #f3f4f6;
     border: none;
-    border-radius: 14px;
-    font-size: 1.2rem;
+    border-radius: 12px;
+    font-size: 13px;
     font-weight: 700;
     color: #4b5563;
     cursor: pointer;
@@ -186,10 +196,16 @@
     justify-content: center;
 }
 
+.pw-toggle-c svg {
+    width: 20px;
+    height: 20px;
+}
+
 .form-divider-c {
     border: none;
-    border-top: 2px solid #8b5cf6;
-    margin: 8px 0;
+    border-top: 2px solid #f1f5f9;
+    /* 구분선 색상 연하게 */
+    margin: 4px 0;
 }
 
 /* 비밀번호 재확인 위의 실선 제거 */
@@ -201,18 +217,18 @@
 
 .terms-container-c {
     background-color: #f8fafc;
-    padding: 1rem;
+    padding: 12px 16px;
     border-radius: 12px;
     text-align: left;
-    margin-top: 0.5rem;
+    margin-top: 0;
 }
 
 .terms-item-c {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     color: #64748b;
-    font-size: 1.2rem;
+    font-size: 13px;
     font-weight: 500;
 }
 
@@ -225,24 +241,23 @@
 }
 
 .terms-item-c input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     accent-color: #8b5cf6;
     cursor: pointer;
 }
 
 .signup-submit-btn-c {
-    margin-top: 1rem;
-    /* Further reduced */
-    padding: 1.4rem;
+    margin-top: 10px;
+    padding: 16px;
     background-color: #8b5cf6;
     color: white;
     border: none;
-    border-radius: 20px;
-    font-size: 1.4rem;
+    border-radius: 16px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.25);
+    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.25);
     transition: all 0.2s;
 }
 
@@ -271,40 +286,40 @@
 
 .modal-content-c {
     background: white;
-    padding: 4rem;
-    border-radius: 40px;
+    padding: 3rem;
+    border-radius: 32px;
     width: 90%;
-    max-width: 600px;
+    max-width: 480px;
     text-align: center;
 }
 
 .modal-icon-c {
-    font-size: 5rem;
-    margin-bottom: 1.5rem;
+    font-size: 4rem;
+    margin-bottom: 1rem;
 }
 
 .modal-title-c {
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 800;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     color: #1e293b;
 }
 
 .modal-desc-c {
     color: #64748b;
-    line-height: 1.6;
-    margin-bottom: 3rem;
-    font-size: 1.3rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
 }
 
 .modal-btn-c {
     width: 100%;
-    padding: 1.4rem;
+    padding: 1.2rem;
     background-color: #8b5cf6;
     color: white;
     border: none;
-    border-radius: 20px;
-    font-size: 1.6rem;
+    border-radius: 16px;
+    font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
@@ -389,14 +404,14 @@
 .checkbox-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .terms-view-btn-c {
     background: none;
     border: none;
     color: #94a3b8;
-    font-size: 1rem;
+    font-size: 12px;
     cursor: pointer;
     text-decoration: underline;
     padding: 0 5px;
@@ -414,10 +429,10 @@
 
 /* Term Modal Specifics */
 .term-modal-c {
-    padding: 2.5rem !important;
+    padding: 2rem !important;
     /* Override default padding */
     text-align: left !important;
-    max-width: 500px !important;
+    max-width: 480px !important;
     display: flex;
     flex-direction: column;
     max-height: 80vh;
@@ -427,13 +442,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .term-title {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #1e293b;
     margin: 0;
@@ -442,7 +457,7 @@
 .close-btn-c {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     cursor: pointer;
     color: #94a3b8;
 }
@@ -451,14 +466,14 @@
     flex: 1;
     overflow-y: auto;
     background-color: #f8fafc;
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 12px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     border: 1px solid #e2e8f0;
 }
 
 .term-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 1.6;
     color: #4b5563;
     margin: 0;
@@ -470,26 +485,25 @@
 .password-conditions-text-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     margin-top: 0;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     padding-left: 0;
-    /* Removed padding */
     text-align: left;
 }
 
 .pw-condition-text {
     margin: 0;
-    font-size: 15px;
+    font-size: 12px;
     /* Increased */
     color: #94a3b8;
     /* Default Gray */
     transition: color 0.2s;
     font-weight: 600;
     /* Bold */
-    margin-left: 10px;
+    margin-left: 5px;
     /* Consistent alignment */
-    margin-top: 8px;
+    margin-top: 4px;
 }
 
 .pw-condition-text.satisfied {
@@ -507,8 +521,20 @@
     display: block;
     text-align: left;
     color: #ef4444;
-    font-size: 15px;
+    font-size: 12px;
     font-weight: 600;
-    margin-top: 8px;
-    margin-left: 10px;
+    margin-top: 4px;
+    margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+    .signup-card-c {
+        padding: 30px 20px;
+        width: 95%;
+        /* Slightly wider on mobile for Signup */
+    }
+
+    .signup-logo-c {
+        height: 50px;
+    }
 }

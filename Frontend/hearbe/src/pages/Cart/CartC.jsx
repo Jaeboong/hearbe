@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Home, User, LogOut } from 'lucide-react';
+import { ShoppingCart, Store, User, LogOut } from 'lucide-react';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
 import '../MyPage/MyPageC.css';
-import '../Wishlist_C/WishlistC.css';
-import '../SelectMall/SelectMallC.css';
 import './CartC.css';
 import logoC from '../../assets/logoC.png';
 
@@ -122,13 +120,13 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
     const handleLogout = async () => {
         try {
             await authAPI.logout();
-            navigate('/');
+            navigate('/main');
         } catch (error) {
             console.error('Logout failed:', error);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            navigate('/');
+            navigate('/main');
         }
     };
 
@@ -194,18 +192,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                                         <div className="mall-footer">
                                             <div className="mall-summary-detail">
                                                 <div className="summary-row">
-                                                    <span className="summary-label">총 주문 수량 :</span>
+                                                    <span className="summary-label">총 담은 수량 :</span>
                                                     <span className="summary-value">{mallTotalItems}개</span>
                                                 </div>
                                                 <div className="summary-row highlight">
-                                                    <span className="summary-label">총 결제금액 :</span>
+                                                    <span className="summary-label">주문 예상 금액 :</span>
                                                     <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
                                                 </div>
                                             </div>
-                                            <button className="mall-pay-button" onClick={() => alert(`${mallName} 결제 페이지로 이동합니다.`)}>
-                                                <span>결제하기</span>
-                                                <ArrowLeft className="rotate-180" />
-                                            </button>
+
                                         </div>
                                     </section>
                                 );
@@ -223,17 +218,17 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
             {/* Header */}
             <header className="mall-header-c">
                 <div className="header-left-c">
-                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/')}>
-                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '70px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
-                        <div className="nav-icon-c"><Home size={24} /></div>
-                        <span>홈</span>
+                    <button className="nav-item-c cursor-pointer" onClick={onHome || (() => navigate('/C/mall'))}>
+                        <div className="nav-icon-c"><Store size={24} /></div>
+                        <span>쇼핑몰</span>
                     </button>
-                    <button className="nav-item-c" onClick={handleLogout}>
+                    <button className="nav-item-c cursor-pointer" onClick={handleLogout}>
                         <div className="nav-icon-c"><LogOut size={24} /></div>
                         <span>로그아웃</span>
                     </button>
@@ -259,24 +254,9 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                             <button
                                 key={item.id}
                                 onClick={() => navigate(item.path)}
-                                className={`mp-sidebar-item ${item.id === 'cart' ? 'active' : ''}`}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    fontSize: '1.85rem',
-                                    width: '100%',
-                                    padding: '1.4rem 2rem',
-                                    color: item.id === 'cart' ? '#7c3aed' : '#9ca3af',
-                                    background: item.id === 'cart' ? 'white' : 'transparent',
-                                    border: 'none',
-                                    fontWeight: item.id === 'cart' ? '800' : '600',
-                                    boxShadow: item.id === 'cart' ? '0 4px 15px rgba(0, 0, 0, 0.03)' : 'none',
-                                    borderRadius: '1rem',
-                                    cursor: 'pointer'
-                                }}
+                                className={`mp-sidebar-item cursor-pointer ${item.id === 'cart' ? 'active' : ''}`}
                             >
-                                <span className="label" style={{ fontSize: 'inherit' }}>{item.label}</span>
+                                <span className="label">{item.label}</span>
                             </button>
                         ))}
                     </div>
@@ -285,27 +265,23 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                 {/* Main Content */}
                 <main className="mypage-content">
                     <section className="dashboard-card full-height">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                            <div style={{
-                                width: '50px', height: '50px', borderRadius: '1rem',
-                                backgroundColor: '#f3e8ff', color: '#7c3aed',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}>
+                        <div className="cart-content-title-row">
+                            <div className="cart-content-title-icon">
                                 <ShoppingCart size={28} />
                             </div>
                             <h2 className="card-title-lg" style={{ marginBottom: 0 }}>장바구니</h2>
                         </div>
-                        <div className="wishlist-content">
+                        <div className="cart-content-body">
                             {isLoading ? (
-                                <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
+                                <div className="cart-status-message">
                                     장바구니를 불러오는 중...
                                 </div>
                             ) : error ? (
-                                <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#e53e3e', fontSize: '2rem', fontWeight: 'bold' }}>
+                                <div className="cart-status-message cart-error">
                                     {error}
                                 </div>
                             ) : cartItems.length === 0 ? (
-                                <div className="wishlist-status-message" style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '3rem', color: '#888', fontSize: '2rem', fontWeight: 'bold' }}>
+                                <div className="cart-status-message">
                                     장바구니에 담긴 상품이 없습니다.
                                 </div>
                             ) : (
@@ -344,18 +320,15 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
                                             <div className="mall-footer">
                                                 <div className="mall-summary-detail">
                                                     <div className="summary-row">
-                                                        <span className="summary-label">총 주문 수량 :</span>
+                                                        <span className="summary-label">총 담은 수량 :</span>
                                                         <span className="summary-value">{mallTotalItems}개</span>
                                                     </div>
                                                     <div className="summary-row highlight">
-                                                        <span className="summary-label">총 결제금액 :</span>
+                                                        <span className="summary-label">주문 예상 금액 :</span>
                                                         <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
                                                     </div>
                                                 </div>
-                                                <button className="mall-pay-button" onClick={() => alert(`${mallName} 결제 페이지로 이동합니다.`)}>
-                                                    <span>결제하기</span>
-                                                    <ArrowLeft className="rotate-180" />
-                                                </button>
+
                                             </div>
                                         </section>
                                     );

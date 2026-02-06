@@ -6,6 +6,7 @@ import MainLanding from '../pages/MainLanding';
 import BrandLanding from '../pages/BrandLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
+import SplinePage from '../Audio/SplinePage';
 
 // [A형 페이지 컴포넌트]
 import LoginA from '../pages/Login/LoginA';
@@ -58,8 +59,12 @@ function AppContent() {
       navigate('/C/login');
     } else if (mode === 'sharing') {
       navigate('/S/join');
-    } else {
+    } else if (mode === 'big') {
+      // Type B (big text) -> Original Type A Login
       navigate('/A/login');
+    } else {
+      // Type A (audio) -> Spline Page
+      navigate('/spline-test');
     }
   };
 
@@ -81,7 +86,7 @@ function AppContent() {
       <Route path="/intro" element={<Intro />} />
 
       {/* 인트로 완료 후 브랜드 소개 페이지 */}
-      <Route path="/welcome" element={<BrandLanding />} />
+      <Route path="/guide" element={<BrandLanding />} />
 
       {/* 메인 랜딩 페이지 (쇼핑 모드 선택 전용) */}
       <Route
@@ -94,6 +99,9 @@ function AppContent() {
           />
         }
       />
+
+      {/* Spline Test Page */}
+      <Route path="/spline-test" element={<SplinePage />} />
 
       {/* Type A Routes */}
       <Route
@@ -230,7 +238,7 @@ function AppContent() {
       />
       <Route
         path="/C/findPassword"
-        element={<FindPasswordC mode="common" onBack={() => navigate(-1)} />}
+        element={<FindPasswordC mode="common" onBack={() => navigate('/C/login')} />}
       />
       <Route
         path="/C/mall"

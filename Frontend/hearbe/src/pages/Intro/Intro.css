@@ -97,7 +97,7 @@
 /* Spline 오브젝트 레이어 하향 조정 */
 .object-section {
     position: absolute;
-    top: 10%;
+    top: 20%;
     /* 위쪽 여백 조절 */
     left: 0;
     width: 100%;
@@ -108,6 +108,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transform: scale(0.7);
 }
 
 .abstract-orb {

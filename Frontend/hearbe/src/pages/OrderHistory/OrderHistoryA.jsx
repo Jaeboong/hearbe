@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, Package } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { orderAPI } from '../../services/orderAPI';
 import { authAPI } from '../../services/authAPI';
@@ -25,11 +25,11 @@ const OrderHistoryA = () => {
     };
 
     const menuItems = [
-        { id: 'profile', label: '회원정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문내역', path: '/A/order-history' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
+        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -44,7 +44,7 @@ const OrderHistoryA = () => {
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            window.location.href = 'http://localhost:5173/';
+            navigate('/main');
         }
     };
 
@@ -118,7 +118,11 @@ const OrderHistoryA = () => {
         if (deliverUrl) {
             window.open(deliverUrl, '_blank', 'noopener,noreferrer');
         } else {
-            alert('배송 조회 정보가 없습니다.');
+            Swal.fire({
+                icon: 'info',
+                text: '배송 조회 정보가 없습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -126,7 +130,11 @@ const OrderHistoryA = () => {
         if (orderUrl) {
             window.open(orderUrl, '_blank', 'noopener,noreferrer');
         } else {
-            alert('상세 조회 정보가 없습니다.');
+            Swal.fire({
+                icon: 'info',
+                text: '상세 조회 정보가 없습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -149,19 +157,19 @@ const OrderHistoryA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="orderhistory-logo-left"
-                onClick={() => window.location.assign('/')}
+                className="orderhistory-logo-left cursor-pointer"
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
-                        <Home size={72} />
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
+                        <Home size={56} />
                         <span>홈</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
-                        <LogOut size={72} />
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
+                        <LogOut size={56} />
                         <span>로그아웃</span>
                     </button>
                 </div>
@@ -170,115 +178,126 @@ const OrderHistoryA = () => {
             <div className="orderhistory-content">
                 {/* Sidebar */}
                 <aside className="orderhistory-sidebar">
-                    <nav className="sidebar-nav">
-                        {menuItems.map(item => (
-                            <div
-                                key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''}`}
-                                onClick={() => navigate(item.path)}
-                            >
-                                {item.label}
-                            </div>
-                        ))}
-                    </nav>
+                    <div className="sidebar-menu-card">
+                        <nav className="sidebar-nav">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
+                                    onClick={() => navigate(item.path)}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
                 </aside>
 
                 {/* Main Content */}
                 <main className="orderhistory-main">
-                    <h2 className="content-title">주문내역</h2>
+                    <div className="content-card">
+                        <h2 className="content-title">
+                            <Package size={64} color="#FFF064" />
+                            주문 내역
+                        </h2>
 
-                    {/* 로딩 상태 */}
-                    {isLoading && (
-                        <div className="loading-state">
-                            <div className="spinner"></div>
-                            <p>주문내역을 불러오는 중...</p>
-                        </div>
-                    )}
+                        {/* 로딩 상태 */}
+                        {isLoading && (
+                            <div className="loading-state">
+                                <div className="spinner"></div>
+                                <p>주문 내역을 불러오는 중...</p>
+                            </div>
+                        )}
 
-                    {/* 에러 상태 */}
-                    {!isLoading && error && (
-                        <div className="error-state">
-                            <p className="error-message">주문내역을 불러오지 못했습니다.</p>
-                            <p className="error-detail">{error}</p>
-                            <button className="retry-btn" onClick={handleRetry}>
-                                다시 시도
-                            </button>
-                        </div>
-                    )}
+                        {/* 에러 상태 */}
+                        {!isLoading && error && (
+                            <div className="error-state">
+                                <p className="error-message">주문 내역을 불러오지 못했습니다.</p>
+                                <p className="error-detail">{error}</p>
+                                <button className="retry-btn cursor-pointer" onClick={handleRetry}>
+                                    다시 시도
+                                </button>
+                            </div>
+                        )}
 
-                    {/* 빈 상태 */}
-                    {!isLoading && !error && Object.keys(orderData).length === 0 && (
-                        <div className="empty-orders">
-                            주문내역이 없습니다.
-                        </div>
-                    )}
+                        {/* 빈 상태 */}
+                        {!isLoading && !error && Object.keys(orderData).length === 0 && (
+                            <div className="empty-orders">
+                                주문 내역이 없습니다.
+                            </div>
+                        )}
 
-                    {/* 주문내역 데이터 */}
-                    {!isLoading && !error && Object.keys(orderData).length > 0 && (
-                        <>
-                            {Object.entries(orderData).map(([mallName, orderGroups]) => (
-                                <div key={mallName} className="mall-section">
-                                    <div className="mall-header">
-                                        <h3 className="mall-name">{mallName}</h3>
-                                    </div>
+                        {/* 주문 내역 데이터 */}
+                        {!isLoading && !error && Object.keys(orderData).length > 0 && (
+                            <>
+                                {Object.entries(orderData).map(([mallName, orderGroups]) => (
+                                    <div key={mallName} className="mall-section">
+                                        <div className="mall-header">
+                                            <h3 className="mall-name">{mallName}</h3>
+                                        </div>
 
-                                    <div className="orders-list">
-                                        {orderGroups.map((group, index) => (
-                                            <div key={`${group.orderId}-${index}`} className="order-group">
-                                                <div className="order-date-header">
-                                                    {formatDate(group.datetime)}
-                                                </div>
+                                        <div className="orders-list">
+                                            {orderGroups.map((group, index) => (
+                                                <div key={`${group.orderId}-${index}`} className="order-group">
+                                                    <div className="order-date-header">
+                                                        {formatDate(group.datetime)}
+                                                    </div>
 
-                                                <div className="order-details">
-                                                    <div className="order-items">
-                                                        {group.orders.map((order, orderIndex) => (
-                                                            <div key={`${order.id}-${orderIndex}`} className="order-item">
-                                                                <img
-                                                                    src={order.image}
-                                                                    alt={order.name}
-                                                                    className="order-item-image"
-                                                                    onError={(e) => {
-                                                                        e.target.src = 'https://via.placeholder.com/80';
-                                                                    }}
-                                                                />
-                                                                <div className="order-item-info">
-                                                                    <div className="order-item-name">{order.name}</div>
-                                                                    <div className="order-item-meta">
-                                                                        {order.price.toLocaleString()}원, {order.quantity}개
+                                                    <div className="order-details">
+                                                        <div className="order-items">
+                                                            {group.orders.map((order, orderIndex) => (
+                                                                <div key={`${order.id}-${orderIndex}`} className="order-item">
+                                                                    <img
+                                                                        src={order.image}
+                                                                        alt={order.name}
+                                                                        className="order-item-image"
+                                                                        onError={(e) => {
+                                                                            e.target.src = 'https://via.placeholder.com/80';
+                                                                        }}
+                                                                    />
+                                                                    <div className="order-item-info">
+                                                                        <div className="order-item-name">{order.name}</div>
+                                                                        <div className="order-item-meta">
+                                                                            {order.price.toLocaleString()}원, {order.quantity}개
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                    <div className="order-actions">
-                                                        <button
-                                                            className={`track-delivery-btn ${!group.orderUrl ? 'disabled' : ''}`}
-                                                            onClick={() => handleOrderDetail(group.orderUrl)}
-                                                            disabled={!group.orderUrl}
-                                                        >
-                                                            상세 조회
-                                                        </button>
-                                                        <button
-                                                            className={`track-delivery-btn ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
-                                                            onClick={() => {
-                                                                const deliverUrl = group.orders.find(o => o.deliverUrl)?.deliverUrl;
-                                                                handleTrackDelivery(deliverUrl);
-                                                            }}
-                                                            disabled={!group.orders.some(o => o.deliverUrl)}
-                                                        >
-                                                            배송조회
-                                                        </button>
+                                                            ))}
+                                                        </div>
+                                                        <div className="order-actions">
+                                                            <button
+                                                                className={`track-delivery-btn cursor-pointer ${!group.orderUrl ? 'disabled' : ''}`}
+                                                                onClick={() => handleOrderDetail(group.orderUrl)}
+                                                                disabled={!group.orderUrl}
+                                                            >
+                                                                상세 조회
+                                                            </button>
+                                                            <button
+                                                                className={`track-delivery-btn cursor-pointer ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
+                                                                onClick={() => {
+                                                                    const deliverUrl = group.orders.find(o => o.deliverUrl)?.deliverUrl;
+                                                                    handleTrackDelivery(deliverUrl);
+                                                                }}
+                                                                disabled={!group.orders.some(o => o.deliverUrl)}
+                                                            >
+                                                                배송조회
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </>
-                    )}
+                                ))}
+                            </>
+                        )}
+                    </div>
                 </main>
             </div>
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

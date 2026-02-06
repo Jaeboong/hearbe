@@ -1,7 +1,7 @@
 // 공통 주문내역 API
 // A형과 C형에서 공통으로 사용
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+import { apiClient, API_BASE_URL } from './apiClient.js';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -76,7 +76,7 @@ export const orderAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/orders/me`, {
+            const response = await apiClient(`${API_BASE_URL}/orders/me`, {
                 method: 'GET',
                 headers: {
                     ...getAuthHeader(),
@@ -90,6 +90,35 @@ export const orderAPI = {
                 throw new Error('네트워크 연결을 확인해주세요.');
             }
             console.error('getOrders API Error:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * 주문 생성 (결제 완료 후 주문 내역 저장)
+     * POST /orders
+     * @param {Object} orderData - 주문 데이터 (platform_id, order_url, items 등)
+     * @returns {Promise<Object>} 생성된 주문 결과
+     */
+    createOrder: async (orderData) => {
+        try {
+            const token = getAuthToken();
+            if (!token) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
+            const response = await apiClient(`${API_BASE_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...getAuthHeader(),
+                },
+                body: JSON.stringify(orderData),
+            });
+
+            return await handleResponse(response);
+        } catch (error) {
+            console.error('createOrder API Error:', error);
             throw error;
         }
     },

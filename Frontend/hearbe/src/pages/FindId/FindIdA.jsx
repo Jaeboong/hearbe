@@ -1,22 +1,24 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logoA from '../../assets/logoA.png';
+import {
+    Fingerprint,
+    Camera,
+    X,
+    ChevronRight,
+    CreditCard,
+    ArrowLeft
+} from 'lucide-react';
+import Swal from 'sweetalert2';
+import logo from '../../assets/logoA.png';
 import iconCamera from '../../assets/icon-camera.png';
 import { authAPI } from '../../services/authAPI';
 import './FindIdA.css';
 
 const FindIdA = () => {
     const navigate = useNavigate();
-    const [showCamera, setShowCamera] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [modalStep, setModalStep] = useState('camera'); // camera | form
-    const [resultModal, setResultModal] = useState(null); // success | fail | null
-    const [cameraError, setCameraError] = useState('');
-    const [foundId, setFoundId] = useState('');
-    const [formError, setFormError] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isOcrLoading, setIsOcrLoading] = useState(false);
-    const [recognizedCardNumber, setRecognizedCardNumber] = useState('');
-    const [welfareCard, setWelfareCard] = useState({
+    const [cardForm, setCardForm] = useState({
         card_company: '',
         card_number: '',
         expiration_date: '',
@@ -24,6 +26,28 @@ const FindIdA = () => {
     });
     const videoRef = useRef(null);
     const [stream, setStream] = useState(null);
+    const [cameraError, setCameraError] = useState('');
+
+    const handleOpen = () => {
+        setModalStep('camera');
+        setShowModal(true);
+    };
+
+    const handleClose = () => {
+        setShowModal(false);
+        stopCamera();
+    };
+
+    const handleSnap = () => {
+        // Mocking OCR results for Type A behavior
+        setCardForm({
+            card_company: '신한카드',
+            card_number: '1234-5678-9012-3456',
+            expiration_date: '01/28',
+            cvc: '123'
+        });
+        setModalStep('form');
+    };
 
     const startCamera = async () => {
         try {
@@ -35,6 +59,7 @@ const FindIdA = () => {
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
             }
+            setCameraError('');
         } catch (err) {
             console.error('Error accessing camera:', err);
             setCameraError('카메라 접근이 차단되었습니다. 브라우저 권한을 확인해주세요.');
@@ -49,307 +74,173 @@ const FindIdA = () => {
     };
 
     useEffect(() => {
-        if (showCamera && modalStep === 'camera') {
+        if (showModal && modalStep === 'camera') {
             startCamera();
         } else {
             stopCamera();
         }
-        return () => {
-            stopCamera();
-        };
-    }, [showCamera, modalStep]);
+        return () => stopCamera();
+    }, [showModal, modalStep]);
 
-    useEffect(() => {
-        if (stream && videoRef.current) {
-            videoRef.current.muted = true;
-            videoRef.current.srcObject = stream;
-            videoRef.current.play().catch(() => {});
-        }
-    }, [stream]);
-
-    const openCamera = () => {
-        setCameraError('');
-        setFormError('');
-        setResultModal(null);
-        setModalStep('camera');
-        setShowCamera(true);
-    };
-
-    const handleSnap = () => {
-        // 카드 인식 결과 임시 하드코딩
-        setIsOcrLoading(true);
-        setFormError('');
-        setTimeout(() => {
-            const recognized = {
-                card_company: '신한카드',
-                card_number: '1234-5678-9012-3456',
-                expiration_date: '01/28',
-                cvc: '123'
-            };
-            setRecognizedCardNumber(recognized.card_number.replace(/[^0-9]/g, ''));
-            setWelfareCard(recognized);
-            setIsOcrLoading(false);
-            setShowCamera(true);
-            setModalStep('form');
-            setResultModal(null);
-        }, 1200);
-    };
-
-    const handleWelfareInputChange = (e) => {
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
         if (name === 'card_number') {
             const digits = value.replace(/[^0-9]/g, '').slice(0, 16);
-            const formatted =
-                digits.length <= 4
-                    ? digits
-                    : digits.length <= 8
-                        ? `${digits.slice(0, 4)}-${digits.slice(4)}`
-                        : digits.length <= 12
-                            ? `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8)}`
-                            : `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8, 12)}-${digits.slice(12)}`;
-            setWelfareCard((prev) => ({ ...prev, [name]: formatted }));
+            const formatted = digits.match(/.{1,4}/g)?.join('-') || digits;
+            setCardForm((prev) => ({ ...prev, [name]: formatted }));
             return;
         }
-        if (name === 'expiration_date') {
-            const digits = value.replace(/[^0-9]/g, '').slice(0, 4);
-            const formatted = digits.length <= 2 ? digits : `${digits.slice(0, 2)}/${digits.slice(2)}`;
-            setWelfareCard((prev) => ({ ...prev, [name]: formatted }));
-            return;
-        }
-        if (name === 'cvc') {
-            const digits = value.replace(/[^0-9]/g, '').slice(0, 3);
-            setWelfareCard((prev) => ({ ...prev, [name]: digits }));
-            return;
-        }
-        setWelfareCard((prev) => ({ ...prev, [name]: value }));
+        setCardForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmitFindId = async () => {
-        const { card_company, card_number, expiration_date, cvc } = welfareCard;
-        if (!card_company || !card_number || !expiration_date || !cvc) {
-            setFormError('복지카드 정보를 모두 입력해주세요.');
+        if (!cardForm.card_company || !cardForm.card_number || !cardForm.expiration_date || !cardForm.cvc) {
+            Swal.fire({
+                icon: 'warning',
+                text: '복지카드 정보를 모두 입력해주세요.',
+                confirmButtonText: '확인'
+            });
             return;
         }
-        const expPattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
-        if (!expPattern.test(expiration_date)) {
-            setFormError('유효기간은 MM/YY 형식으로 입력해주세요.');
-            return;
-        }
-        const cardPattern = /^\d{4}-\d{4}-\d{4}-\d{4}$/;
-        if (!cardPattern.test(card_number)) {
-            setFormError('카드번호는 0000-0000-0000-0000 형식으로 입력해주세요.');
-            return;
-        }
-        const cvcPattern = /^\d{3}$/;
-        if (!cvcPattern.test(cvc)) {
-            setFormError('CVC는 3자리 숫자여야 합니다.');
-            return;
-        }
-        const normalizedCardNumber = card_number.replace(/\s+/g, '');
-        const normalizedCardDigits = normalizedCardNumber.replace(/[^0-9]/g, '');
-        if (recognizedCardNumber && normalizedCardDigits !== recognizedCardNumber) {
-            setFormError('인식된 카드 번호와 일치하지 않습니다.');
-            return;
-        }
-        const normalizedCompany = card_company.trim();
-        const normalizedCvc = cvc.replace(/\s+/g, '');
 
-        setIsSubmitting(true);
-        setFormError('');
         try {
             const response = await authAPI.findIdByWelfareCard({
-                card_company: normalizedCompany,
-                card_number: normalizedCardNumber,
-                expiration_date,
-                cvc: normalizedCvc
+                card_company: cardForm.card_company.trim(),
+                card_number: cardForm.card_number.trim(),
+                expiration_date: cardForm.expiration_date.trim(),
+                cvc: cardForm.cvc.trim()
             });
-            const username =
-                response?.data?.username ||
-                response?.data?.userId ||
-                response?.data?.id ||
-                response?.username ||
-                response?.id ||
-                'hs123';
-            setFoundId(username);
-            setShowCamera(false);
-            setModalStep('camera');
-            setResultModal(username ? 'success' : 'fail');
-        } catch {
-            setFoundId('');
-            setShowCamera(false);
-            setModalStep('camera');
-            setResultModal('fail');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
-    const handleRetry = () => {
-        setResultModal(null);
-        setModalStep('camera');
-        setShowCamera(true);
+            if (response.code === 200 && response.data) {
+                Swal.fire({
+                    icon: 'success',
+                    text: `아이디 찾기 성공: 귀하의 아이디는 ${response.data} 입니다.`,
+                    confirmButtonText: '확인'
+                });
+                navigate('/A/login');
+            } else {
+                throw new Error('일치하는 회원 정보가 없습니다.');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '정보 확인 중 오류가 발생했습니다.',
+                confirmButtonText: '확인'
+            });
+        }
     };
 
     return (
-        <div className="findid-container">
-            <img
-                src={logoA}
-                alt="Logo"
-                className="findid-logo"
-                onClick={() => navigate('/')}
-            />
-
-            <div className="findid-box">
-                <h1 className="findid-title">아이디 찾기</h1>
-                <p className="findid-desc">
-                    장애인 복지 카드를 촬영하여
-                    <br />
-                    아이디를 찾을 수 있습니다.
-                </p>
-
-                <div className="findid-card" onClick={openCamera}>
-                    <div className="findid-card-title">장애인 복지카드 촬영하기</div>
-                    <img src={iconCamera} alt="Camera" className="findid-camera-icon" />
-                </div>
-            </div>
-
-            {showCamera && (
-                <div className="findid-modal-overlay" onClick={() => setShowCamera(false)}>
-                    <div className="findid-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="findid-modal-close" onClick={() => setShowCamera(false)}>
-                            X
-                        </div>
-                        <div className="findid-modal-scroll">
-                            {modalStep === 'camera' ? (
-                                <>
-                                    <div className="findid-modal-title">카드 촬영</div>
-                                    <div className="findid-modal-desc">장애인 복지카드를 촬영해주세요.</div>
-
-                                    <div className="findid-modal-camera-area">
-                                        {isOcrLoading ? (
-                                            <div className="findid-ocr-loading">
-                                                <div className="findid-spinner"></div>
-                                                <div className="findid-ocr-text">카드 인식 중 ...</div>
-                                                <div className="findid-ocr-subtext">잠시만 기다려주세요</div>
-                                            </div>
-                                        ) : stream ? (
-                                            <video ref={videoRef} autoPlay playsInline muted className="findid-modal-video"></video>
-                                        ) : (
-                                            <>
-                                                <div className="findid-modal-camera-text">{cameraError || '카메라 연결 중...'}</div>
-                                                <img src={iconCamera} alt="Camera" className="findid-modal-camera-icon" />
-                                            </>
-                                        )}
-                                    </div>
-
-                                    {stream && !isOcrLoading && (
-                                        <div className="findid-shutter-button" onClick={handleSnap}>
-                                            <div className="findid-shutter-inner"></div>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <div className="findid-card-form-box">
-                                        <div className="findid-card-form-header">
-                                            <span>장애인 복지카드 정보</span>
-                                        </div>
-
-                                        <div className="findid-modal-desc">
-                                            {formError ? formError : '인식된 정보를 확인해주세요.'}
-                                        </div>
-
-                                        <div className="findid-form-field">
-                                            <label>카드사</label>
-                                            <input
-                                                type="text"
-                                                name="card_company"
-                                                value={welfareCard.card_company}
-                                                onChange={handleWelfareInputChange}
-                                                className="findid-modal-input"
-                                            />
-                                        </div>
-                                        <div className="findid-form-field">
-                                            <label>복지카드 번호</label>
-                                            <input
-                                                type="text"
-                                                name="card_number"
-                                                value={welfareCard.card_number}
-                                                onChange={handleWelfareInputChange}
-                                                className="findid-modal-input"
-                                            />
-                                        </div>
-                                        <div className="findid-form-row">
-                                            <div className="findid-form-field half">
-                                                <label>유효기간</label>
-                                                <input
-                                                    type="text"
-                                                    name="expiration_date"
-                                                    value={welfareCard.expiration_date}
-                                                    onChange={handleWelfareInputChange}
-                                                    className="findid-modal-input"
-                                                    placeholder="MM/YY"
-                                                />
-                                            </div>
-                                            <div className="findid-form-field half">
-                                                <label>CVC</label>
-                                                <input
-                                                    type="text"
-                                                    name="cvc"
-                                                    value={welfareCard.cvc}
-                                                    onChange={handleWelfareInputChange}
-                                                    className="findid-modal-input"
-                                                    placeholder="000"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="findid-card-btns">
-                                            <button className="findid-retake-btn" onClick={() => setModalStep('camera')}>
-                                                다시 촬영
-                                            </button>
-                                            <button
-                                                className="findid-confirm-btn"
-                                                onClick={handleSubmitFindId}
-                                                disabled={isSubmitting}
-                                            >
-                                                {isSubmitting ? '조회 중...' : '확인'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
+        <div className="findid-a-page-new">
+            <main className="findid-a-content-new">
+                <div className="findid-a-card-new">
+                    <div className="findid-a-header-new">
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            className="findid-logo-a-new cursor-pointer"
+                            onClick={() => navigate('/main')}
+                        />
+                        <h1 className="findid-title-a-new">아이디 찾기</h1>
+                        <p className="findid-subtitle-a-new">등록된 복지카드를 촬영하여 아이디를 찾을 수 있습니다.</p>
                     </div>
-                </div>
-            )}
 
-            {resultModal === 'success' && (
-                <div className="findid-modal-overlay" onClick={() => setResultModal(null)}>
-                    <div className="findid-result-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="findid-result-title">카드 정보가 확인되었습니다</div>
-                        <div className="findid-result-desc">아이디 : {foundId}</div>
-                        <button
-                            className="findid-result-btn"
-                            onClick={() => {
-                                setResultModal(null);
-                                navigate('/A/login');
-                            }}
-                        >
-                            확인
+                    <div className="findid-trigger-box-a-new" onClick={handleOpen}>
+                        <div className="trigger-icon-area-a-new">
+                            <Camera size={80} color="#141C29" />
+                        </div>
+                        <div className="trigger-text-area-a-new">
+                            <span className="trigger-main-text-a-new">복지카드 촬영하기</span>
+                            <span className="trigger-sub-text-a-new">빛 반사에 유의하여 촬영해 주세요.</span>
+                        </div>
+                        <ChevronRight size={40} color="#FFF064" />
+                    </div>
+
+                    <div className="findid-footer-a-new">
+                        <button className="back-to-login-a-new" onClick={() => navigate('/A/login')}>
+                            <ArrowLeft size={24} /> 로그인 페이지로 돌아가기
                         </button>
                     </div>
                 </div>
-            )}
+            </main>
 
-            {resultModal === 'fail' && (
-                <div className="findid-modal-overlay" onClick={() => setResultModal(null)}>
-                    <div className="findid-result-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="findid-result-title">카드 정보가 없습니다</div>
-                        <div className="findid-result-desc">다시 촬영하시겠습니까?</div>
-                        <div className="findid-result-actions">
-                            <button className="findid-retake-btn" onClick={handleRetry}>다시 촬영</button>
-                            <button className="findid-result-btn" onClick={() => setResultModal(null)}>취소</button>
-                        </div>
+            {showModal && (
+                <div className="findid-modal-overlay-a-new" onClick={handleClose}>
+                    <div className="findid-modal-box-a-new" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close-a-new" onClick={handleClose}><X size={48} /></button>
+
+                        {modalStep === 'camera' ? (
+                            <div className="camera-modal-content-a-new">
+                                <h2 className="modal-title-a-new">카드 촬영</h2>
+                                <p className="modal-subtitle-a-new">복지카드 앞면을 가이드 영역에 맞춰주세요.</p>
+                                <div className="camera-view-a-new">
+                                    {stream ? (
+                                        <video ref={videoRef} autoPlay playsInline muted />
+                                    ) : (
+                                        <div className="camera-placeholder-a-new">
+                                            {cameraError || '카메라를 준비 중입니다...'}
+                                        </div>
+                                    )}
+                                    <div className="camera-guide-a-new" />
+                                </div>
+                                {stream && (
+                                    <button className="shutter-btn-a-new" onClick={handleSnap}>
+                                        <div className="shutter-inner-a-new" />
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="form-modal-content-a-new">
+                                <h2 className="modal-title-a-new">카드 정보 확인</h2>
+                                <p className="modal-subtitle-a-new">인식된 정보가 여권/신분증과 일치하는지 확인해 주세요.</p>
+                                <div className="modal-form-a-new">
+                                    <div className="modal-input-group-a-new">
+                                        <label>카드사</label>
+                                        <input
+                                            type="text"
+                                            name="card_company"
+                                            value={cardForm.card_company}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="modal-input-group-a-new">
+                                        <label>카드번호</label>
+                                        <input
+                                            type="text"
+                                            name="card_number"
+                                            value={cardForm.card_number}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className="modal-input-row-a-new">
+                                        <div className="modal-input-group-a-new half">
+                                            <label>유효기간</label>
+                                            <input
+                                                type="text"
+                                                name="expiration_date"
+                                                value={cardForm.expiration_date}
+                                                onChange={handleInputChange}
+                                                placeholder="MM/YY"
+                                            />
+                                        </div>
+                                        <div className="modal-input-group-a-new half">
+                                            <label>CVC</label>
+                                            <input
+                                                type="text"
+                                                name="cvc"
+                                                value={cardForm.cvc}
+                                                onChange={handleInputChange}
+                                                maxLength={3}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="modal-btn-group-a-new">
+                                        <button className="modal-secondary-btn-a-new" onClick={() => setModalStep('camera')}>다시 촬영</button>
+                                        <button className="modal-primary-btn-a-new" onClick={handleSubmitFindId}>아이디 찾기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

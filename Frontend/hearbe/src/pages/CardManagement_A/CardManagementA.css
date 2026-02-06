@@ -1,6 +1,6 @@
 .cardmgmt-container {
     min-height: 100vh;
-    background-color: #232A39;
+    background-color: #141C29;
     padding: 0;
     padding-top: 10px;
     padding-right: 10px;
@@ -10,9 +10,9 @@
 
 .cardmgmt-logo-left {
     position: absolute;
-    top: clamp(12px, 3vw, 24px);
-    left: clamp(12px, 3vw, 24px);
-    width: clamp(210px, 35vw, 380px);
+    top: 25px;
+    left: 40px;
+    width: 320px;
     height: auto;
     cursor: pointer;
     z-index: 10;
@@ -32,44 +32,53 @@
 
 .cardmgmt-container .cardmgmt-content {
     display: flex;
-    gap: clamp(30px, 5vw, 60px);
-    width: min(90rem, 90vw);
+    gap: 40px;
+    width: 100%;
+    max-width: 1200px;
     min-height: 80vh;
     margin: 0 auto;
-    padding: 40px;
+    padding: 20px 40px 60px;
     box-sizing: border-box;
-    min-width: 680px;
+    flex: 1;
 }
 
-/* Sidebar */
+/* Sidebar Navigation - C형 스타일 카드화 */
 .cardmgmt-sidebar {
-    flex: 0 0 clamp(200px, 25vw, 300px);
-    border: none;
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.sidebar-title {
-    font-size: clamp(32px, 5vw, 48px);
-    font-weight: 900;
-    color: #FFF064;
-    margin-bottom: clamp(30px, 5vw, 50px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+.sidebar-menu-card {
+    background-color: #141C29;
+    border: 4px solid #FFF064;
+    border-radius: 30px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 2vw, 16px);
+    gap: 10px;
 }
 
 .sidebar-item {
-    font-size: clamp(18px, 3vw, 28px);
-    font-weight: bold;
+    font-size: 32px;
+    font-weight: 950;
     color: #FFF064;
-    padding: clamp(12px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
-    border-radius: clamp(8px, 2vw, 12px);
+    padding: 20px 24px;
+    border-radius: 20px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    transition: all 0.2s;
+    font-family: 'Pretendard', sans-serif;
+    text-align: left;
+    border: none;
+    background: transparent;
+    line-height: 1.3;
 }
 
 .sidebar-item:hover {
@@ -77,36 +86,52 @@
 }
 
 .sidebar-item.active {
-    background-color: #171C28;
-    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    background-color: #FFF064;
+    color: #141C29;
 }
 
-/* Main Content */
+/* Main Content - 카드 형태로 묶음 */
 .cardmgmt-main {
-    flex: 1.3;
-    width: min(772px, 90vw);
-    height: min(1030px, 90vh);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.content-card {
+    background-color: #141C29;
+    border: 4px solid #FFF064;
+    border-radius: 40px;
+    padding: 40px;
     box-sizing: border-box;
+    width: 100%;
 }
 
 .content-title {
-    font-size: clamp(28px, 4.5vw, 42px);
-    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 48px;
+    font-weight: 950;
     color: #FFF064;
-    margin-bottom: clamp(30px, 5vw, 50px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    margin-bottom: 30px;
+    font-family: 'Pretendard', sans-serif;
 }
 
 /* Current Card Display */
 .current-card-display {
     background-color: #141C29;
     padding: clamp(20px, 4vw, 40px);
-    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    border: clamp(3px, 0.4vw, 6px) solid #FFF064;
     border-radius: clamp(12px, 2vw, 16px);
     display: flex;
     flex-direction: column;
     gap: clamp(16px, 3vw, 24px);
     margin-bottom: clamp(30px, 5vw, 50px);
+    width: 100%;
+    max-width: 800px;
+    margin-left: 0;
+    margin-right: auto;
 }
 
 .card-info-row {
@@ -137,7 +162,7 @@
     font-weight: bold;
     color: #FFF064;
     opacity: 0.8;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .card-value {
@@ -147,12 +172,16 @@
     padding-left: clamp(8px, 1.5vw, 12px);
     border-bottom: clamp(1px, 0.2vw, 2px) solid #FFF064;
     padding-bottom: clamp(8px, 1.5vw, 12px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 /* Change Button */
 .change-card-btn {
     width: 100%;
+    max-width: 800px;
+    display: block;
+    margin-left: 0;
+    margin-right: auto;
     padding: clamp(16px, 3vw, 24px);
     background-color: #FFF064;
     color: #1E2A3A;
@@ -161,7 +190,7 @@
     font-size: clamp(20px, 4vw, 32px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     transition: opacity 0.2s;
 }
 
@@ -229,7 +258,7 @@
     font-weight: 900;
     color: #FFF064;
     text-align: center;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .card-modal-desc {
@@ -237,7 +266,7 @@
     font-weight: bold;
     color: #FFF064;
     text-align: center;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 /* Camera Area */
@@ -267,7 +296,7 @@
     font-weight: bold;
     color: #FFF064;
     margin-bottom: clamp(10px, 2vw, 20px);
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .card-camera-icon {
@@ -318,7 +347,7 @@
     font-size: clamp(24px, 5.5vw, 38px);
     font-weight: 900;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .small-card-icon {
@@ -336,7 +365,7 @@
     font-size: clamp(16px, 3vw, 24px);
     font-weight: bold;
     color: #FFF064;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .card-modal-input {
@@ -349,7 +378,7 @@
     color: #FFF064;
     font-size: clamp(18px, 4vw, 28px);
     font-weight: bold;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     outline: none;
 }
 
@@ -379,7 +408,7 @@
     font-size: clamp(18px, 4vw, 28px);
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     border: none;
     transition: opacity 0.2s;
     box-shadow: none;
@@ -416,7 +445,6 @@
     .cardmgmt-container .cardmgmt-content {
         width: 100%;
         height: auto;
-        padding: 32px 100px;
     }
 
     .cardmgmt-main {
@@ -449,7 +477,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: clamp(6px, 1vw, 12px) 0 clamp(12px, 2.5vw, 24px);
+    padding: 20px 40px 0;
+    margin-bottom: 30px;
 }
 
 .mypage-topbar-title {
@@ -460,28 +489,28 @@
     font-weight: 900;
     color: #FFF064;
     margin: 0;
-    font-family: 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .mypage-topbar-actions {
     display: flex;
-    gap: clamp(8px, 1.6vw, 14px);
+    gap: 30px;
 }
 
 .topbar-action {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
+    gap: 6px;
     background: transparent;
     border: none;
     color: #FFF064;
-    padding: clamp(8px, 1.6vw, 14px);
-    border-radius: 0.75rem;
-    font-size: clamp(18px, 3vw, 26px);
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 21px;
     font-weight: 900;
     cursor: pointer;
-    font-family: 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .topbar-action:hover {

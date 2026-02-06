@@ -1,9 +1,19 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logoA from '../../assets/logoA.png';
+import {
+    Lock,
+    Camera,
+    X,
+    ChevronRight,
+    CreditCard,
+    ArrowLeft,
+    ShieldCheck
+} from 'lucide-react';
+import Swal from 'sweetalert2';
+import logo from '../../assets/logoA.png';
 import iconCamera from '../../assets/icon-camera.png';
-import './FindPasswordA.css';
 import { authAPI } from '../../services/authAPI';
+import './FindPasswordA.css';
 
 const FindPasswordA = () => {
     const navigate = useNavigate();
@@ -20,21 +30,23 @@ const FindPasswordA = () => {
     const [cameraError, setCameraError] = useState('');
 
     const handleOpen = () => {
-        setCardForm({
-            card_company: '신한카드',
-            card_number: '1234-5678-9012-3456',
-            expiration_date: '01/28',
-            cvc: '123'
-        });
         setModalStep('camera');
         setShowModal(true);
     };
 
     const handleClose = () => {
         setShowModal(false);
+        stopCamera();
     };
 
     const handleSnap = () => {
+        // Mocking OCR results for Type A behavior
+        setCardForm({
+            card_company: '신한카드',
+            card_number: '1234-5678-9012-3456',
+            expiration_date: '01/28',
+            cvc: '123'
+        });
         setModalStep('form');
     };
 
@@ -68,44 +80,15 @@ const FindPasswordA = () => {
         } else {
             stopCamera();
         }
-        return () => {
-            stopCamera();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        return () => stopCamera();
     }, [showModal, modalStep]);
-
-    useEffect(() => {
-        if (stream && videoRef.current) {
-            videoRef.current.muted = true;
-            videoRef.current.srcObject = stream;
-            videoRef.current.play().catch(() => {});
-        }
-    }, [stream]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         if (name === 'card_number') {
             const digits = value.replace(/[^0-9]/g, '').slice(0, 16);
-            const formatted =
-                digits.length <= 4
-                    ? digits
-                    : digits.length <= 8
-                        ? `${digits.slice(0, 4)}-${digits.slice(4)}`
-                        : digits.length <= 12
-                            ? `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8)}`
-                            : `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8, 12)}-${digits.slice(12)}`;
+            const formatted = digits.match(/.{1,4}/g)?.join('-') || digits;
             setCardForm((prev) => ({ ...prev, [name]: formatted }));
-            return;
-        }
-        if (name === 'expiration_date') {
-            const digits = value.replace(/[^0-9]/g, '').slice(0, 4);
-            const formatted = digits.length <= 2 ? digits : `${digits.slice(0, 2)}/${digits.slice(2)}`;
-            setCardForm((prev) => ({ ...prev, [name]: formatted }));
-            return;
-        }
-        if (name === 'cvc') {
-            const digits = value.replace(/[^0-9]/g, '').slice(0, 3);
-            setCardForm((prev) => ({ ...prev, [name]: digits }));
             return;
         }
         setCardForm((prev) => ({ ...prev, [name]: value }));
@@ -113,7 +96,11 @@ const FindPasswordA = () => {
 
     const handleVerify = async () => {
         if (!cardForm.card_company || !cardForm.card_number || !cardForm.expiration_date || !cardForm.cvc) {
-            alert('복지카드 정보를 모두 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '복지카드 정보를 모두 입력해주세요.',
+                confirmButtonText: '확인'
+            });
             return;
         }
         try {
@@ -125,10 +112,15 @@ const FindPasswordA = () => {
             });
             const isVerified = verifyResponse?.code === 200;
             if (!isVerified) {
-                alert('해당 정보가 없습니다.');
-                return;
+                throw new Error('해당 정보가 없습니다.');
             }
-            alert('인증이 되었습니다.');
+
+            Swal.fire({
+                icon: 'success',
+                text: '인증 완료. 비밀번호 재설정 페이지로 이동합니다.',
+                confirmButtonText: '확인'
+            });
+
             localStorage.setItem('welfare_verified', 'true');
             localStorage.setItem('welfare_card', JSON.stringify({
                 card_company: cardForm.card_company.trim(),
@@ -136,112 +128,129 @@ const FindPasswordA = () => {
                 expiration_date: cardForm.expiration_date.trim(),
                 cvc: cardForm.cvc.trim()
             }));
+
             setShowModal(false);
             navigate('/A/changePassword');
+
         } catch (error) {
-            alert(error.message || '해당 정보가 없습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '인증에 실패했습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
     return (
-        <div className="findpw-container">
-            <img
-                src={logoA}
-                alt="Logo"
-                className="findpw-logo"
-                onClick={() => navigate('/')}
-            />
+        <div className="findpw-a-page-new">
+            <main className="findpw-a-content-new">
+                <div className="findpw-a-card-new">
+                    <div className="findpw-a-header-new">
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            className="findpw-logo-a-new cursor-pointer"
+                            onClick={() => navigate('/main')}
+                        />
+                        <h1 className="findpw-title-a-new">비밀번호 재설정</h1>
+                        <p className="findpw-subtitle-a-new">안전한 서비스 이용을 위해 복지카드 촬영을 통한 본인 인증이 필요합니다.</p>
+                    </div>
 
-            <div className="findpw-box">
-                <h1 className="findpw-title">비밀번호 변경</h1>
-                <p className="findpw-desc">
-                    장애인 복지 카드를 촬영하여
-                    <br />
-                    비밀번호를 변경할 수 있습니다.
-                </p>
+                    <div className="findpw-trigger-box-a-new" onClick={handleOpen}>
+                        <div className="trigger-icon-area-a-new">
+                            <ShieldCheck size={80} color="#141C29" />
+                        </div>
+                        <div className="trigger-text-area-a-new">
+                            <span className="trigger-main-text-a-new">복지카드 촬영하기</span>
+                            <span className="trigger-sub-text-a-new">인증 후 비밀번호를 재설정할 수 있습니다.</span>
+                        </div>
+                        <ChevronRight size={40} color="#FFF064" />
+                    </div>
 
-                <div className="findpw-card" onClick={handleOpen}>
-                    <div className="findpw-card-title">장애인 복지카드 촬영하기</div>
-                    <img src={iconCamera} alt="Camera" className="findpw-camera-icon" />
+                    <div className="findpw-footer-a-new">
+                        <button className="back-to-login-a-new" onClick={() => navigate('/A/login')}>
+                            <ArrowLeft size={24} /> 로그인 페이지로 돌아가기
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </main>
 
             {showModal && (
-                <div className="findpw-modal-overlay" onClick={handleClose}>
-                    <div className="findpw-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="findpw-modal-close" onClick={handleClose}>X</div>
+                <div className="findpw-modal-overlay-a-new" onClick={handleClose}>
+                    <div className="findpw-modal-box-a-new" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close-a-new" onClick={handleClose}><X size={48} /></button>
+
                         {modalStep === 'camera' ? (
-                            <>
-                                <div className="findpw-modal-title">카드 촬영</div>
-                                <div className="findpw-modal-desc">장애인 복지카드를 촬영해주세요.</div>
-                                <div className="findpw-modal-camera-area">
+                            <div className="camera-modal-content-a-new">
+                                <h2 className="modal-title-a-new">카드 촬영</h2>
+                                <p className="modal-subtitle-a-new">복지카드를 수평에 맞춰 촬영해 주세요.</p>
+                                <div className="camera-view-a-new">
                                     {stream ? (
-                                        <video ref={videoRef} autoPlay playsInline muted className="findpw-modal-video"></video>
+                                        <video ref={videoRef} autoPlay playsInline muted />
                                     ) : (
-                                        <>
-                                            <div className="findpw-modal-camera-text">{cameraError || '카메라 연결 중...'}</div>
-                                            <img src={iconCamera} alt="Camera" className="findpw-modal-camera-icon" />
-                                        </>
+                                        <div className="camera-placeholder-a-new">
+                                            {cameraError || '카메라를 준비 중입니다...'}
+                                        </div>
                                     )}
+                                    <div className="camera-guide-a-new" />
                                 </div>
                                 {stream && (
-                                    <div className="findpw-shutter-button" onClick={handleSnap}>
-                                        <div className="findpw-shutter-inner"></div>
-                                    </div>
+                                    <button className="shutter-btn-a-new" onClick={handleSnap}>
+                                        <div className="shutter-inner-a-new" />
+                                    </button>
                                 )}
-                            </>
+                            </div>
                         ) : (
-                            <>
-                                <div className="findpw-modal-title">카드 정보 인증 확인</div>
-                                <div className="findpw-modal-desc">복지카드 정보를 입력해주세요.</div>
-
-                                <div className="findpw-form-field">
-                                    <label>카드사</label>
-                                    <input
-                                        type="text"
-                                        name="card_company"
-                                        value={cardForm.card_company}
-                                        onChange={handleInputChange}
-                                        className="findpw-modal-input"
-                                    />
-                                </div>
-                                <div className="findpw-form-field">
-                                    <label>복지카드 번호</label>
-                                    <input
-                                        type="text"
-                                        name="card_number"
-                                        value={cardForm.card_number}
-                                        onChange={handleInputChange}
-                                        className="findpw-modal-input"
-                                        placeholder="0000-0000-0000-0000"
-                                    />
-                                </div>
-                                <div className="findpw-form-row">
-                                    <div className="findpw-form-field half">
-                                        <label>유효기간</label>
+                            <div className="form-modal-content-a-new">
+                                <h2 className="modal-title-a-new">카드 정보 인증</h2>
+                                <p className="modal-subtitle-a-new">인식된 정보가 정확한지 확인 후 인증하기를 눌러주세요.</p>
+                                <div className="modal-form-a-new">
+                                    <div className="modal-input-group-a-new">
+                                        <label>카드사</label>
                                         <input
                                             type="text"
-                                            name="expiration_date"
-                                            value={cardForm.expiration_date}
+                                            name="card_company"
+                                            value={cardForm.card_company}
                                             onChange={handleInputChange}
-                                            className="findpw-modal-input"
-                                            placeholder="MM/YY"
                                         />
                                     </div>
-                                    <div className="findpw-form-field half">
-                                        <label>CVC</label>
+                                    <div className="modal-input-group-a-new">
+                                        <label>카드번호</label>
                                         <input
                                             type="text"
-                                            name="cvc"
-                                            value={cardForm.cvc}
+                                            name="card_number"
+                                            value={cardForm.card_number}
                                             onChange={handleInputChange}
-                                            className="findpw-modal-input"
-                                            placeholder="000"
                                         />
                                     </div>
+                                    <div className="modal-input-row-a-new">
+                                        <div className="modal-input-group-a-new half">
+                                            <label>유효기간</label>
+                                            <input
+                                                type="text"
+                                                name="expiration_date"
+                                                value={cardForm.expiration_date}
+                                                onChange={handleInputChange}
+                                                placeholder="MM/YY"
+                                            />
+                                        </div>
+                                        <div className="modal-input-group-a-new half">
+                                            <label>CVC</label>
+                                            <input
+                                                type="text"
+                                                name="cvc"
+                                                value={cardForm.cvc}
+                                                onChange={handleInputChange}
+                                                maxLength={3}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="modal-btn-group-a-new">
+                                        <button className="modal-secondary-btn-a-new" onClick={() => setModalStep('camera')}>다시 촬영</button>
+                                        <button className="modal-primary-btn-a-new" onClick={handleVerify}>인증하기</button>
+                                    </div>
                                 </div>
-                                <button className="findpw-confirm-btn" onClick={handleVerify}>인증하기</button>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>
