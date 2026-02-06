@@ -82,15 +82,21 @@ class OrderDetailApiSender:
             )
             return
 
+        order_url = self._session.get_context(session_id, CTX_ORDER_DETAIL_LAST_URL) or ""
         client = OrderClient(jwt_token=token)
-        result = await client.create_order(items=items, platform_id=COUPANG_PLATFORM_ID)
+        result = await client.create_order(
+            items=items,
+            platform_id=COUPANG_PLATFORM_ID,
+            order_url=order_url,
+        )
         if result.get("success"):
             self._session.set_context(session_id, CTX_ORDER_DETAIL_API_SENT_ID, order_id)
             logger.info(
-                "Order API sent: session=%s order_id=%s items=%d",
+                "Order API sent: session=%s order_id=%s items=%d order_url=%s",
                 session_id,
                 order_id,
                 len(items),
+                order_url or "missing",
             )
             return
 
