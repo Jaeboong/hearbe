@@ -34,7 +34,7 @@ class CartRule(BaseRule):
 
         # 장바구니 이동
         if any(kw in text for kw in CART_GO_TRIGGERS) or text == "장바구니":
-            commands = build_go_to_cart_commands(current_site)
+            commands = build_go_to_cart_commands(current_site, current_url=current_url)
             matched_rule = "go_to_cart" if current_site else "go_to_cart_fallback"
             return RuleResult(
                 matched=True,

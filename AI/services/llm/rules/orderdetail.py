@@ -9,7 +9,7 @@ from typing import Optional
 
 from . import BaseRule, RuleResult
 from ..context.context_rules import GeneratedCommand
-from ..sites.site_manager import get_selector, get_page_type
+from ..sites.site_manager import get_selector, get_page_type, get_current_site
 
 
 class OrderDetailRule(BaseRule):
@@ -17,6 +17,8 @@ class OrderDetailRule(BaseRule):
 
     def check(self, text: str, current_url: str, current_site) -> Optional[RuleResult]:
         if not text:
+            return None
+        if not _is_coupang_site(current_url, current_site):
             return None
 
         page_type = get_page_type(current_url) if current_url else None
@@ -102,6 +104,13 @@ def _build_click(selector: Optional[str], fallback_text: str) -> list[GeneratedC
             description=f"{fallback_text} 텍스트 클릭",
         )
     ]
+
+
+def _is_coupang_site(current_url: str, current_site) -> bool:
+    if current_site and getattr(current_site, "site_id", "") == "coupang":
+        return True
+    site = get_current_site(current_url) if current_url else None
+    return bool(site and getattr(site, "site_id", "") == "coupang")
 
 
 __all__ = ["OrderDetailRule"]

@@ -21,12 +21,25 @@ export default function Intro() {
     const [hasStarted, setHasStarted] = useState(false); // 시작 화면 제어
     const [splineFailed, setSplineFailed] = useState(false);
     const splineLoadedRef = React.useRef(false);
+    const [hasStarted, setHasStarted] = useState(false); // 시작 화면 제어
+    const [splineFailed, setSplineFailed] = useState(false);
+    const splineLoadedRef = React.useRef(false);
     const navigate = useNavigate();
 
     // 오디오와 타이머 객체 관리 (중복 실행 방지)
     const audioRef = React.useRef(null);
     const timerRef = React.useRef(null);
     const isMountedRef = React.useRef(true);
+
+    // Spline 로딩 타임아웃: 일정 시간 내 로드 안 되면 fallback 표시
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (!splineLoadedRef.current) {
+                setSplineFailed(true);
+            }
+        }, 8000);
+        return () => clearTimeout(timeout);
+    }, []);
 
     // Spline 로딩 타임아웃: 일정 시간 내 로드 안 되면 fallback 표시
     useEffect(() => {
@@ -49,6 +62,7 @@ export default function Intro() {
     };
 
     // 스페이스바, 탭키로 시작 및 다음 단계 이동
+    // 스페이스바, 탭키로 시작 및 다음 단계 이동
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === ' ' || e.code === 'Tab' || e.key === 'Tab') {
@@ -70,7 +84,9 @@ export default function Intro() {
     }, [hasStarted, navigate, currentStep]);
 
     // 스텝 변경 및 오디오 재생 로직
+    // 스텝 변경 및 오디오 재생 로직
     useEffect(() => {
+        if (!hasStarted || isTransitioning) return;
         if (!hasStarted || isTransitioning) return;
 
         // Strict Mode 중복 실행 방지
@@ -100,111 +116,156 @@ export default function Intro() {
         }
 
         // 각 페이지의 duration만큼 유지 후 다음으로 이동
+        // 각 페이지의 duration만큼 유지 후 다음으로 이동
         timerRef.current = setTimeout(() => {
             timerRef.current = null;
             handleNext();
         }, STEPS[currentStep].duration);
+    }, STEPS[currentStep].duration);
 
-        return () => {
-            // cleanup
-            isMountedRef.current = false;
+    return () => {
+        // cleanup
+        isMountedRef.current = false;
 
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-                timerRef.current = null;
-            }
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+        }
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
 
-            // cleanup 후 다시 mounted 상태로
-            setTimeout(() => {
-                isMountedRef.current = true;
-            }, 0);
-        };
-    }, [currentStep, hasStarted, isTransitioning]);
+        // cleanup 후 다시 mounted 상태로
+        setTimeout(() => {
+            isMountedRef.current = true;
+        }, 0);
+    };
+}, [currentStep, hasStarted, isTransitioning]);
 
-    // 시작 화면
-    if (!hasStarted) {
-        return (
-            <div className="intro-container" style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                cursor: 'pointer'
-            }} onClick={handleStart}>
-                <div style={{ textAlign: 'center', color: 'white' }}>
-                    <h1 style={{
-                        fontSize: '4rem',
-                        fontWeight: 'bold',
-                        marginBottom: '2rem',
-                        animation: 'pulse 2s infinite'
-                    }}>
-                        HearBe 서비스 시작하기
-                    </h1>
-                    <p style={{ fontSize: '1.5rem', opacity: 0.9 }}>
-                        스페이스바 또는 화면을 클릭하여 시작하세요
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
+// 시작 화면
+if (!hasStarted) {
     return (
-        <div className="intro-container">
-            <button
-                className="fixed top-10 right-10 z-50 cursor-pointer px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/60 text-[14px] font-semibold hover:bg-white/20 hover:text-white transition-all duration-300 shadow-sm"
-                onClick={() => navigate('/guide')}
-            >
-                skip
-            </button>
-
-            <AnimatePresence>
-                {isTransitioning && (
-                    <motion.div className="transition-overlay" initial={{ scale: 0 }} animate={{ scale: 4 }} transition={{ duration: 0.8 }} />
-                )}
-            </AnimatePresence>
-
-            <div className="text-section">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentStep}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <h1 className="main-copy">{STEPS[currentStep].title}</h1>
-                        <p className="sub-copy">{STEPS[currentStep].desc}</p>
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-
-            <div className="object-section">
-                {splineFailed ? (
-                    <div className="abstract-orb" />
-                ) : (
-                    <Spline
-                        scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
-                        onError={() => setSplineFailed(true)}
-                        onLoad={(splineApp) => {
-                            if (splineApp) {
-                                splineLoadedRef.current = true;
-                            } else {
-                                setSplineFailed(true);
-                            }
-                        }}
-                    />
-                )}
-            </div>
-
-            <div className="action-section">
-                <div className="dot-indicator">
-                    {STEPS.map((_, i) => <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />)}
-                </div>
+        <div className="intro-container" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            cursor: 'pointer'
+        }} onClick={handleStart}>
+            <div style={{ textAlign: 'center', color: 'white' }}>
+                <h1 style={{
+                    fontSize: '4rem',
+                    fontWeight: 'bold',
+                    marginBottom: '2rem',
+                    animation: 'pulse 2s infinite'
+                }}>
+                    HearBe 서비스 시작하기
+                </h1>
+                <p style={{ fontSize: '1.5rem', opacity: 0.9 }}>
+                    스페이스바 또는 화면을 클릭하여 시작하세요
+                </p>
             </div>
         </div>
     );
+}
+    }, [currentStep, hasStarted, isTransitioning]);
+
+// 시작 화면
+if (!hasStarted) {
+    return (
+        <div className="intro-container" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            cursor: 'pointer'
+        }} onClick={handleStart}>
+            <div style={{ textAlign: 'center', color: 'white' }}>
+                <h1 style={{
+                    fontSize: '4rem',
+                    fontWeight: 'bold',
+                    marginBottom: '2rem',
+                    animation: 'pulse 2s infinite'
+                }}>
+                    HearBe 서비스 시작하기
+                </h1>
+                <p style={{ fontSize: '1.5rem', opacity: 0.9 }}>
+                    스페이스바 또는 화면을 클릭하여 시작하세요
+                </p>
+            </div>
+        </div>
+    );
+}
+
+return (
+    <div className="intro-container">
+        <button
+            className="fixed top-10 right-10 z-50 cursor-pointer px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/60 text-[14px] font-semibold hover:bg-white/20 hover:text-white transition-all duration-300 shadow-sm"
+            onClick={() => navigate('/guide')}
+        >
+            skip
+        </button>
+
+        <AnimatePresence>
+            {isTransitioning && (
+                <motion.div className="transition-overlay" initial={{ scale: 0 }} animate={{ scale: 4 }} transition={{ duration: 0.8 }} />
+            )}
+        </AnimatePresence>
+
+        <div className="text-section">
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={currentStep}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <h1 className="main-copy">{STEPS[currentStep].title}</h1>
+                    <p className="sub-copy">{STEPS[currentStep].desc}</p>
+                </motion.div>
+            </AnimatePresence>
+        </div>
+
+        <div className="object-section">
+            {splineFailed ? (
+                <div className="abstract-orb" />
+            ) : (
+                <Spline
+                    scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
+                    onError={() => setSplineFailed(true)}
+                    onLoad={(splineApp) => {
+                        if (splineApp) {
+                            splineLoadedRef.current = true;
+                        } else {
+                            setSplineFailed(true);
+                        }
+                    }}
+                />
+            )}
+            {splineFailed ? (
+                <div className="abstract-orb" />
+            ) : (
+                <Spline
+                    scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
+                    onError={() => setSplineFailed(true)}
+                    onLoad={(splineApp) => {
+                        if (splineApp) {
+                            splineLoadedRef.current = true;
+                        } else {
+                            setSplineFailed(true);
+                        }
+                    }}
+                />
+            )}
+        </div>
+
+        <div className="action-section">
+            <div className="dot-indicator">
+                {STEPS.map((_, i) => <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />)}
+            </div>
+        </div>
+    </div>
+);
 }

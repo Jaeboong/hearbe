@@ -69,10 +69,11 @@ async def test_digit_input_triggers_keypad_detection_on_checkout():
     sender = FakeSender()
     manager = PaymentKeypadManager(sender=sender, session_manager=FakeSessionManager(session))
 
-    handled = await manager.handle_user_text("s1", "5870")
+    # PIN is 6 digits (2nd password). Shorter inputs should be rejected.
+    handled = await manager.handle_user_text("s1", "587000")
     assert handled is True
     assert session.context.get(CTX_ARMED) is True
-    assert session.context.get(CTX_PENDING_DIGITS) == ["5", "8", "7", "0"]
+    assert session.context.get(CTX_PENDING_DIGITS) == ["5", "8", "7", "0", "0", "0"]
     assert sender.tool_calls
     _, commands = sender.tool_calls[-1]
     assert commands[0].tool_name == "wait_for_selector"
@@ -132,9 +133,11 @@ async def test_ocr_mapping_sets_context(monkeypatch):
 
     fake_module = types.ModuleType("services.ocr.payment.keypad_mapper")
     fake_module.map_keypad_image = fake_map_keypad_image
+    fake_module.is_ocr_instance_ready = lambda: True
     monkeypatch.setitem(sys.modules, "services.ocr.payment.keypad_mapper", fake_module)
 
-    shot_b64 = base64.b64encode(b"img").decode("utf-8")
+    # Avoid triggering the "empty_or_small_image" guard in the handler.
+    shot_b64 = base64.b64encode(b"x" * 2048).decode("utf-8")
     await manager._run_ocr("s3", shot_b64, ["0", "1"])
 
     assert session.context.get(CTX_MAPPING) == {"0": "0", "1": "1"}

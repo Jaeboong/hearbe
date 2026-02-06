@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class CartItemUpdateRequestDto {
+public class CartItemUpdateRequest {
 
     @JsonProperty("quantity")
     @Min(value = 1, message = "수량은 최소 1개 이상이어야 합니다.")

@@ -5,13 +5,11 @@ import com.ssafy.d108.backend.entity.Order;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
@@ -25,6 +23,9 @@ public class OrderResponse {
     @JsonProperty("ordered_at")
     private LocalDateTime orderedAt;
 
+    @JsonProperty("order_url")
+    private String orderUrl;
+
     @JsonProperty("items")
     private List<OrderItemResponse> items;
 
@@ -33,6 +34,7 @@ public class OrderResponse {
                 order.getId(),
                 "PAID", // Default for now
                 order.getCreatedAt(),
+                order.getOrderDetailUrl(),
                 items);
     }
 }

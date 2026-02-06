@@ -22,6 +22,8 @@ class LoginFeedbackManager:
     def clear_pending(self, session_id: str):
         if self._session:
             self._session.set_context(session_id, "login_submit_pending", False)
+            # Keep this flag short-lived; only relevant to the next successful navigation.
+            self._session.set_context(session_id, "login_autofill_used", False)
 
     def mark_login_submit_pending(self, session_id: str, commands, current_url: str):
         if not self._session or not commands:
@@ -76,7 +78,12 @@ class LoginFeedbackManager:
         if not self._session.get_context(session_id, "login_submit_pending", False):
             return
 
-        tts = self._tts.build_login_success(current_url)
+        # Clear pending first to prevent duplicate announcements if multiple
+        # sources (e.g., MCP tool result + page update) detect the navigation.
+        auto = bool(self._session.get_context(session_id, "login_autofill_used", False))
+        self._session.set_context(session_id, "login_submit_pending", False)
+        self._session.set_context(session_id, "login_autofill_used", False)
+
+        tts = self._tts.build_login_autofill_success(current_url) if auto else self._tts.build_login_success(current_url)
         if tts:
             await self._sender.send_tts_response(session_id, tts)
-        self._session.set_context(session_id, "login_submit_pending", False)

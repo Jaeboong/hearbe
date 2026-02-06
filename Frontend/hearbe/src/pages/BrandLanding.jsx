@@ -78,6 +78,7 @@ const BrandLanding = () => {
         {
             id: 'speciality',
             audioSrc: guideAudio1,
+            audioSrc: guideAudio1,
             duration: 8000,
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 shrink-0">
@@ -136,6 +137,8 @@ const BrandLanding = () => {
         },
         {
             id: 'how-to',
+            audioSrc: guideAudio2,
+            duration: 17000,
             audioSrc: guideAudio2,
             duration: 17000,
             content: (
@@ -222,6 +225,7 @@ const BrandLanding = () => {
 
 
 
+
     // Audio와 화면 전환 동기화 로직
     useEffect(() => {
 
@@ -242,6 +246,14 @@ const BrandLanding = () => {
             }
         };
 
+        // 마지막 단계가 아니면 타이머 설정 (각 단계별 duration 적용)
+        // 마지막 단계는 자동 넘김 없이 사용자가 스페이스바로 넘김
+        if (currentStep < totalSteps - 1) {
+            timerRef.current = setTimeout(() => {
+                timerRef.current = null;
+                handleMove();
+            }, stepData.duration);
+        }
         // 마지막 단계가 아니면 타이머 설정 (각 단계별 duration 적용)
         // 마지막 단계는 자동 넘김 없이 사용자가 스페이스바로 넘김
         if (currentStep < totalSteps - 1) {
@@ -277,13 +289,24 @@ const BrandLanding = () => {
             }, 0);
         };
     }, [currentStep, navigate]);
+}, [currentStep, navigate]);
 
-    // Spacebar로 다음 단계로 이동 (모든 단계에서)
-    useEffect(() => {
+// Spacebar로 다음 단계로 이동 (모든 단계에서)
+// Spacebar로 다음 단계로 이동 (모든 단계에서)
+useEffect(() => {
 
-        const handleKeyDown = (e) => {
+
+    const handleKeyDown = (e) => {
+        if (e.code === 'Space' || e.key === ' ') {
             if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();
+
+                // 마지막 단계면 메인으로, 아니면 다음 단계로
+                if (currentStep === totalSteps - 1) {
+                    goToMain();
+                } else {
+                    setCurrentStep(prev => prev + 1);
+                }
 
                 // 마지막 단계면 메인으로, 아니면 다음 단계로
                 if (currentStep === totalSteps - 1) {
@@ -298,76 +321,80 @@ const BrandLanding = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [currentStep]);
 
-    const handleNext = () => {
-        if (currentStep < totalSteps - 1) setCurrentStep(prev => prev + 1);
-    };
+const handleNext = () => {
+    if (currentStep < totalSteps - 1) setCurrentStep(prev => prev + 1);
+};
 
-    const handlePrev = () => {
-        if (currentStep > 0) setCurrentStep(prev => prev - 1);
-    };
-
-
+const handlePrev = () => {
+    if (currentStep > 0) setCurrentStep(prev => prev - 1);
+};
 
 
-    return (
-        <div className="relative w-full h-screen overflow-hidden bg-white selection:bg-purple-200">
-            <WaveBackground />
 
-            {/* Header */}
-            <header className="fixed top-0 left-0 right-0 z-50 bg-transparent h-32 flex items-center">
-                <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
-                    <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" onClick={() => setCurrentStep(0)} />
-                    <button
-                        onClick={goToMain}
-                        className="cursor-pointer absolute top-10 right-10 px-6 py-2 rounded-full bg-gray-100/80 backdrop-blur-sm border border-gray-200 text-gray-500 text-[14px] font-semibold hover:bg-gray-200 hover:text-gray-800 transition-all duration-300 z-50 shadow-sm"
-                    >
-                        skip
-                    </button>
+
+
+return (
+    <div className="relative w-full h-screen overflow-hidden bg-white selection:bg-purple-200">
+        <WaveBackground />
+
+        {/* Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-transparent h-32 flex items-center">
+            <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
+                <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" onClick={() => setCurrentStep(0)} />
+                <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" onClick={() => setCurrentStep(0)} />
+                <button
+                    onClick={goToMain}
+                    className="cursor-pointer absolute top-10 right-10 px-6 py-2 rounded-full bg-gray-100/80 backdrop-blur-sm border border-gray-200 text-gray-500 text-[14px] font-semibold hover:bg-gray-200 hover:text-gray-800 transition-all duration-300 z-50 shadow-sm"
+                >
+                    skip
+                </button>
+            </div>
+        </header>
+
+        {/* Slider Container */}
+        <div
+            className="flex w-full h-full transition-transform duration-1000 ease-in-out will-change-transform"
+            style={{ transform: `translateX(-${currentStep * 100}vw)` }}
+        >
+            {GUIDE_STEPS.map((step, index) => (
+                <div key={step.id}>
+                    {step.content}
                 </div>
-            </header>
+            ))}
+        </div>
 
-            {/* Slider Container */}
-            <div
-                className="flex w-full h-full transition-transform duration-1000 ease-in-out will-change-transform"
-                style={{ transform: `translateX(-${currentStep * 100}vw)` }}
+        {/* Bottom Controls */}
+        <div className="fixed bottom-12 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50">
+            <button
+                onClick={handlePrev}
+                disabled={currentStep === 0}
+                className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
+                className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
             >
-                {GUIDE_STEPS.map((step, index) => (
-                    <div key={step.id}>
-                        {step.content}
-                    </div>
+                <ChevronDown className="rotate-90" size={20} />
+            </button>
+
+            <div className="flex gap-3">
+                {Array.from({ length: totalSteps }).map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setCurrentStep(i)}
+                        className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${i === currentStep ? 'w-12 bg-purple-600' : 'w-2 bg-gray-300 hover:bg-purple-300'}`}
+                    />
                 ))}
             </div>
 
-            {/* Bottom Controls */}
-            <div className="fixed bottom-12 left-1/2 transform -translate-x-1/2 flex items-center gap-6 z-50">
-                <button
-                    onClick={handlePrev}
-                    disabled={currentStep === 0}
-                    className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
-                >
-                    <ChevronDown className="rotate-90" size={20} />
-                </button>
-
-                <div className="flex gap-3">
-                    {Array.from({ length: totalSteps }).map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => setCurrentStep(i)}
-                            className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${i === currentStep ? 'w-12 bg-purple-600' : 'w-2 bg-gray-300 hover:bg-purple-300'}`}
-                        />
-                    ))}
-                </div>
-
-                <button
-                    onClick={handleNext}
-                    disabled={currentStep === totalSteps - 1}
-                    className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === totalSteps - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
-                >
-                    <ChevronRight size={20} />
-                </button>
-            </div>
+            <button
+                onClick={handleNext}
+                disabled={currentStep === totalSteps - 1}
+                className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === totalSteps - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
+                className={`cursor-pointer p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gray-600 transition-all ${currentStep === totalSteps - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white hover:text-purple-600 hover:scale-110 shadow-lg'}`}
+            >
+                <ChevronRight size={20} />
+            </button>
         </div>
-    );
+    </div>
+);
 };
 
 export default BrandLanding;

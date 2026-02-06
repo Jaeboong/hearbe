@@ -259,26 +259,86 @@ def build_add_to_cart_commands(site: Optional[SiteConfig], current_url: str = ""
     return [build_click_text_command("장바구니", "장바구니 버튼 찾아서 클릭")]
 
 
-def build_go_to_cart_commands(site: Optional[SiteConfig]) -> List[GeneratedCommand]:
+def build_go_to_cart_commands(site: Optional[SiteConfig], current_url: str = "") -> List[GeneratedCommand]:
     """장바구니 이동 명령 시퀀스 생성"""
     if site:
         cart_url = site.get_url("cart")
         if cart_url:
             return [build_goto_command(cart_url, "장바구니 페이지 이동")]
 
+        # Hearbe uses typed routes (/A|B|C/...), but does not expose a single "cart" URL.
+        # Resolve a best-effort cart URL based on the current path segment.
+        if getattr(site, "site_id", "") == "hearbe":
+            resolved = _resolve_hearbe_typed_url(site, "/cart", current_url=current_url)
+            if resolved:
+                return [build_goto_command(resolved, "장바구니 페이지 이동")]
+
     # 폴백
     return [build_click_text_command("장바구니", "장바구니 버튼 클릭")]
 
 
-def build_login_page_commands(site: Optional[SiteConfig]) -> List[GeneratedCommand]:
+def build_login_page_commands(site: Optional[SiteConfig], current_url: str = "") -> List[GeneratedCommand]:
     """로그인 페이지 이동 명령 생성"""
     if site:
         login_url = site.get_url("login")
         if login_url:
             return [build_goto_command(login_url, "로그인 페이지 이동")]
 
+        if getattr(site, "site_id", "") == "hearbe":
+            # Hearbe typed login pages: /A|B|C/login
+            resolved = _resolve_hearbe_typed_url(site, "/login", current_url=current_url)
+            if resolved:
+                return [build_goto_command(resolved, "로그인 페이지 이동")]
+
     # 폴백
     return [build_click_text_command("로그인", "로그인 버튼 클릭")]
+
+
+def _resolve_hearbe_typed_url(site: SiteConfig, typed_path_suffix: str, current_url: str = "") -> Optional[str]:
+    """
+    Resolve Hearbe typed URL by best-effort:
+    1) If current_url is a Hearbe typed route, reuse its type segment (A/B/C).
+    2) Otherwise default to C (GENERAL) because it is the common mode in this project.
+    """
+    from urllib.parse import urlparse
+
+    # Pick type from current URL if present.
+    resolved_type = "C"
+    if current_url:
+        try:
+            path = urlparse(current_url).path or ""
+        except Exception:
+            path = ""
+        if path.startswith("/A/"):
+            resolved_type = "A"
+        elif path.startswith("/B/"):
+            resolved_type = "B"
+        elif path.startswith("/C/"):
+            resolved_type = "C"
+
+    # Build base URL from any configured URL (prefer home).
+    base_source = site.get_url("home") or site.get_url("intro")
+    if not base_source and site.urls:
+        base_source = next(iter(site.urls.values()))
+    if not base_source:
+        return None
+
+    try:
+        parsed = urlparse(base_source)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+    except Exception:
+        return None
+
+    return f"{base_url}/{resolved_type}{typed_path_suffix}"
+
+
+def resolve_hearbe_typed_url(site: SiteConfig, typed_path_suffix: str, current_url: str = "") -> Optional[str]:
+    """
+    Public wrapper for Hearbe typed routes.
+
+    Keep typed-route URL logic in one place so platform rules don't duplicate parsing.
+    """
+    return _resolve_hearbe_typed_url(site, typed_path_suffix, current_url=current_url)
 
 
 def build_login_submit_commands() -> List[GeneratedCommand]:

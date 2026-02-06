@@ -5,7 +5,8 @@ import com.ssafy.d108.backend.entity.Order;
 import com.ssafy.d108.backend.entity.OrderItem;
 import com.ssafy.d108.backend.entity.Platform;
 import com.ssafy.d108.backend.entity.User;
-import com.ssafy.d108.backend.global.exception.UserNotFoundException;
+import com.ssafy.d108.backend.global.exception.BusinessException;
+import com.ssafy.d108.backend.global.response.ErrorCode;
 import com.ssafy.d108.backend.order.dto.OrderCreateRequest;
 import com.ssafy.d108.backend.order.dto.OrderItemResponse;
 import com.ssafy.d108.backend.order.dto.OrderListResponse;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,17 +38,17 @@ public class OrderService {
     @Transactional
     public OrderResponse createOrder(Integer userId, OrderCreateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Platform platform = platformRepository.findById(request.getPlatformId().intValue())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 플랫폼입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLATFORM_NOT_FOUND));
 
         // 1. Order 생성
         Order order = new Order();
         order.setUser(user);
-        // orderDetailUrl은 첫 번째 아이템의 URL 사용 (또는 null)
-        if (!request.getItems().isEmpty() && request.getItems().get(0).getUrl() != null) {
-            order.setOrderDetailUrl(request.getItems().get(0).getUrl());
+        // orderDetailUrl은 request의 order_url 사용
+        if (request.getOrderUrl() != null) {
+            order.setOrderDetailUrl(request.getOrderUrl());
         }
 
         // Save Order

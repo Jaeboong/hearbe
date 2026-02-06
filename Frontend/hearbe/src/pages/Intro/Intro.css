@@ -98,6 +98,7 @@
 .object-section {
     position: absolute;
     top: 20%;
+    top: 20%;
     /* 위쪽 여백 조절 */
     left: 0;
     width: 100%;

@@ -127,10 +127,13 @@ export default function InitialSetup({ onComplete }) {
                             HearBe는 음성 명령으로 쇼핑을 돕습니다.<br />
                             원활한 사용을 위해 마이크 권한을 허용해 주세요.
                         </p>
-                        <div className="btn-group">
-                            <button onClick={() => handleMicPermission(false)} className="btn-secondary-setup">건너뛰기</button>
-                            <button onClick={() => handleMicPermission(true)} className="btn-primary-setup">권한 허용하기</button>
-                        </div>
+                        <div className="flex gap-4 w-full">
+                            <button onClick={() => handleMicPermission(false)} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">거부</button>
+                            <button onClick={() => handleMicPermission(true)} className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg cursor-pointer" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>활성화</button>
+                            <div className="btn-group">
+                                <button onClick={() => handleMicPermission(false)} className="btn-secondary-setup">건너뛰기</button>
+                                <button onClick={() => handleMicPermission(true)} className="btn-primary-setup">권한 허용하기</button>
+                            </div>
                     </motion.div>
                 )}
 
