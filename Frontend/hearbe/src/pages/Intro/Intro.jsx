@@ -1,47 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import Spline from '@splinetool/react-spline';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Spline from '@splinetool/react-spline';
 import './Intro.css';
 
-import introAudio1 from '../../assets/Intro/intro1.wav';
-import introAudio2 from '../../assets/Intro/intro2.wav';
-import introAudio3 from '../../assets/Intro/intro3.wav';
+// 오디오 파일 경로
+import guideAudio1 from '../../assets/audio/guide/intro_guide_1.mp3';
+import guideAudio2 from '../../assets/audio/guide/intro_guide_2.mp3';
+import guideAudio3 from '../../assets/audio/guide/intro_guide_3.mp3';
 
 const STEPS = [
-    { title: "목소리만으로 완성하는 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1, duration: 5000 },
-    { title: "보이지 않아도, 스스로 선택하는 쇼핑", desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.", audioSrc: introAudio2, duration: 5000 },
-    { title: "HearBe와 함께 시작해요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3, duration: 5000 },
+    {
+        title: "소리로 쇼핑하는 세상",
+        desc: "HearBe와 함께라면 쇼핑이 즐거워집니다.",
+        audio: guideAudio1,
+        duration: 4000
+    },
+    {
+        title: "당신의 목소리로",
+        desc: "찾고 싶은 상품을 말해보세요.",
+        audio: guideAudio2,
+        duration: 4000
+    },
+    {
+        title: "가장 쉬운 시작",
+        desc: "지금 바로 HearBe를 경험해보세요.",
+        audio: guideAudio3,
+        duration: 4000
+    }
 ];
 
-export default function Intro() {
+const Intro = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [hasStarted, setHasStarted] = useState(false); // 시작 화면 제어
+    const [hasStarted, setHasStarted] = useState(false);
     const [splineFailed, setSplineFailed] = useState(false);
-    const splineLoadedRef = React.useRef(false);
-    const [hasStarted, setHasStarted] = useState(false); // 시작 화면 제어
-    const [splineFailed, setSplineFailed] = useState(false);
-    const splineLoadedRef = React.useRef(false);
+    const splineLoadedRef = useRef(false);
     const navigate = useNavigate();
 
-    // 오디오와 타이머 객체 관리 (중복 실행 방지)
-    const audioRef = React.useRef(null);
-    const timerRef = React.useRef(null);
-    const isMountedRef = React.useRef(true);
+    // 오디오와 타이머 객체 관리
+    const audioRef = useRef(null);
+    const timerRef = useRef(null);
+    const isMountedRef = useRef(true);
 
-    // Spline 로딩 타임아웃: 일정 시간 내 로드 안 되면 fallback 표시
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            if (!splineLoadedRef.current) {
-                setSplineFailed(true);
-            }
-        }, 8000);
-        return () => clearTimeout(timeout);
-    }, []);
-
-    // Spline 로딩 타임아웃: 일정 시간 내 로드 안 되면 fallback 표시
+    // Spline 로딩 타임아웃
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (!splineLoadedRef.current) {
@@ -54,14 +56,23 @@ export default function Intro() {
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-        setTimeout(() => navigate('/guide'), 850);
+        setTimeout(() => {
+            navigate('/main');
+        }, 8000);
+    };
+
+    const handleNext = () => {
+        if (currentStep < STEPS.length - 1) {
+            setCurrentStep(prev => prev + 1);
+        } else {
+            goToMain();
+        }
     };
 
     const handleStart = () => {
         setHasStarted(true);
     };
 
-    // 스페이스바, 탭키로 시작 및 다음 단계 이동
     // 스페이스바, 탭키로 시작 및 다음 단계 이동
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -70,202 +81,132 @@ export default function Intro() {
                 if (!hasStarted) {
                     handleStart();
                 } else {
-                    // 다음 단계로 이동 (마지막 단계면 메인으로)
-                    if (currentStep < STEPS.length - 1) {
-                        setCurrentStep(prev => prev + 1);
-                    } else {
-                        navigate('/guide');
-                    }
+                    handleNext();
                 }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [hasStarted, navigate, currentStep]);
+    }, [hasStarted, currentStep]);
 
-    // 스텝 변경 및 오디오 재생 로직
     // 스텝 변경 및 오디오 재생 로직
     useEffect(() => {
         if (!hasStarted || isTransitioning) return;
-        if (!hasStarted || isTransitioning) return;
 
-        // Strict Mode 중복 실행 방지
-        if (timerRef.current) {
-            return; // 이미 타이머가 돌고 있으면 추가 실행 안 함
-        }
-
-        const handleNext = () => {
-            if (!isMountedRef.current) return; // 언마운트됐으면 무시
-
-            if (currentStep < STEPS.length - 1) {
-                setCurrentStep(prev => prev + 1);
-            } else {
-                goToMain();
-            }
-        };
-
-        // 새 오디오 설정
-        const audio = new Audio(STEPS[currentStep].audioSrc);
-        audioRef.current = audio;
-
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.warn(`Audio Auto-play blocked.`);
-            });
-        }
-
-        // 각 페이지의 duration만큼 유지 후 다음으로 이동
-        // 각 페이지의 duration만큼 유지 후 다음으로 이동
-        timerRef.current = setTimeout(() => {
-            timerRef.current = null;
-            handleNext();
-        }, STEPS[currentStep].duration);
-    }, STEPS[currentStep].duration);
-
-    return () => {
-        // cleanup
-        isMountedRef.current = false;
-
+        // 이전 오디오 중지 및 새로 재생
         if (audioRef.current) {
             audioRef.current.pause();
             audioRef.current = null;
         }
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
-        }
 
-        // cleanup 후 다시 mounted 상태로
-        setTimeout(() => {
-            isMountedRef.current = true;
-        }, 0);
-    };
-}, [currentStep, hasStarted, isTransitioning]);
+        const audio = new Audio(STEPS[currentStep].audio);
+        audioRef.current = audio;
+        audio.play().catch(e => console.log("Audio play deferred:", e));
 
-// 시작 화면
-if (!hasStarted) {
-    return (
-        <div className="intro-container" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            cursor: 'pointer'
-        }} onClick={handleStart}>
-            <div style={{ textAlign: 'center', color: 'white' }}>
-                <h1 style={{
-                    fontSize: '4rem',
-                    fontWeight: 'bold',
-                    marginBottom: '2rem',
-                    animation: 'pulse 2s infinite'
-                }}>
-                    HearBe 서비스 시작하기
-                </h1>
-                <p style={{ fontSize: '1.5rem', opacity: 0.9 }}>
-                    스페이스바 또는 화면을 클릭하여 시작하세요
-                </p>
-            </div>
-        </div>
-    );
-}
+        // 타이머 설정
+        if (timerRef.current) clearTimeout(timerRef.current);
+
+        timerRef.current = setTimeout(() => {
+            if (isMountedRef.current) {
+                handleNext();
+            }
+        }, STEPS[currentStep].duration);
+
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+            }
+        };
     }, [currentStep, hasStarted, isTransitioning]);
 
-// 시작 화면
-if (!hasStarted) {
+    // 시작 화면
+    if (!hasStarted) {
+        return (
+            <div className="intro-container start-screen" onClick={handleStart}>
+                <div className="start-content">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="start-title"
+                    >
+                        HearBe 서비스 시작하기
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.7 }}
+                        transition={{ delay: 0.5 }}
+                        className="start-hint"
+                    >
+                        스페이스바 또는 화면을 클릭하여 시작하세요
+                    </motion.p>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="intro-container" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            cursor: 'pointer'
-        }} onClick={handleStart}>
-            <div style={{ textAlign: 'center', color: 'white' }}>
-                <h1 style={{
-                    fontSize: '4rem',
-                    fontWeight: 'bold',
-                    marginBottom: '2rem',
-                    animation: 'pulse 2s infinite'
-                }}>
-                    HearBe 서비스 시작하기
-                </h1>
-                <p style={{ fontSize: '1.5rem', opacity: 0.9 }}>
-                    스페이스바 또는 화면을 클릭하여 시작하세요
-                </p>
+        <div className="intro-container">
+            <button
+                className="skip-btn"
+                onClick={() => navigate('/guide')}
+            >
+                skip
+            </button>
+
+            <AnimatePresence>
+                {isTransitioning && (
+                    <motion.div
+                        className="transition-overlay"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 4 }}
+                        transition={{ duration: 0.8 }}
+                    />
+                )}
+            </AnimatePresence>
+
+            <div className="text-section">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentStep}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h1 className="main-copy">{STEPS[currentStep].title}</h1>
+                        <p className="sub-copy">{STEPS[currentStep].desc}</p>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+
+            <div className="object-section">
+                {splineFailed ? (
+                    <div className="abstract-orb" />
+                ) : (
+                    <Spline
+                        scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
+                        onLoad={() => {
+                            splineLoadedRef.current = true;
+                        }}
+                        onError={() => setSplineFailed(true)}
+                    />
+                )}
+            </div>
+
+            <div className="action-section">
+                <div className="dot-indicator">
+                    {STEPS.map((_, i) => (
+                        <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />
+                    ))}
+                </div>
             </div>
         </div>
     );
-}
+};
 
-return (
-    <div className="intro-container">
-        <button
-            className="fixed top-10 right-10 z-50 cursor-pointer px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/60 text-[14px] font-semibold hover:bg-white/20 hover:text-white transition-all duration-300 shadow-sm"
-            onClick={() => navigate('/guide')}
-        >
-            skip
-        </button>
-
-        <AnimatePresence>
-            {isTransitioning && (
-                <motion.div className="transition-overlay" initial={{ scale: 0 }} animate={{ scale: 4 }} transition={{ duration: 0.8 }} />
-            )}
-        </AnimatePresence>
-
-        <div className="text-section">
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.8 }}
-                >
-                    <h1 className="main-copy">{STEPS[currentStep].title}</h1>
-                    <p className="sub-copy">{STEPS[currentStep].desc}</p>
-                </motion.div>
-            </AnimatePresence>
-        </div>
-
-        <div className="object-section">
-            {splineFailed ? (
-                <div className="abstract-orb" />
-            ) : (
-                <Spline
-                    scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
-                    onError={() => setSplineFailed(true)}
-                    onLoad={(splineApp) => {
-                        if (splineApp) {
-                            splineLoadedRef.current = true;
-                        } else {
-                            setSplineFailed(true);
-                        }
-                    }}
-                />
-            )}
-            {splineFailed ? (
-                <div className="abstract-orb" />
-            ) : (
-                <Spline
-                    scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
-                    onError={() => setSplineFailed(true)}
-                    onLoad={(splineApp) => {
-                        if (splineApp) {
-                            splineLoadedRef.current = true;
-                        } else {
-                            setSplineFailed(true);
-                        }
-                    }}
-                />
-            )}
-        </div>
-
-        <div className="action-section">
-            <div className="dot-indicator">
-                {STEPS.map((_, i) => <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />)}
-            </div>
-        </div>
-    </div>
-);
-}
+export default Intro;
