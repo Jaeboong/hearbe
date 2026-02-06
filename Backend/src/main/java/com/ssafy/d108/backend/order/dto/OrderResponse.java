@@ -25,6 +25,9 @@ public class OrderResponse {
     @JsonProperty("ordered_at")
     private LocalDateTime orderedAt;
 
+    @JsonProperty("order_url")
+    private String orderUrl;
+
     @JsonProperty("items")
     private List<OrderItemResponse> items;
 
@@ -33,6 +36,7 @@ public class OrderResponse {
                 order.getId(),
                 "PAID", // Default for now
                 order.getCreatedAt(),
+                order.getOrderDetailUrl(),
                 items);
     }
 }
