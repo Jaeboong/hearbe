@@ -51,6 +51,16 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
         { id: 'ssg', name: 'SSG.COM', desc: '', color: '#ffb100', initial: 'S', logo: ssgLogo, logoSize: 240, url: 'https://www.ssg.com' },
     ];
 
+    const [isScrolled, setIsScrolled] = React.useState(false);
+
+    React.useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const handleSelect = (mall) => {
         // Open shopping mall in new tab
         window.open(mall.url, '_blank');
@@ -59,7 +69,7 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     return (
         <div className="select-mall-page-c">
             {/* Header 섹션 (디자인 통일) */}
-            <header className="mall-header-c">
+            <header className={`mall-header-c ${isScrolled ? 'scrolled' : ''}`}>
                 <div className="header-left-c">
                     <img
                         src={logoC}
@@ -72,15 +82,15 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
 
                 <div className="header-right-c">
 
-                    <button className="nav-item-c" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
+                    <button className="nav-item-c cursor-pointer" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
-                    <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
+                    <button className="nav-item-c cursor-pointer" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
                     </button>
-                    <button className="nav-item-c" onClick={handleLogout}>
+                    <button className="nav-item-c cursor-pointer" onClick={handleLogout}>
                         <div className="nav-icon-c"><LogOut size={24} /></div>
                         <span>로그아웃</span>
                     </button>
@@ -100,7 +110,7 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                     {malls.map((mall, index) => (
                         <div
                             key={mall.id}
-                            className="mall-card-new-c"
+                            className="mall-card-new-c cursor-pointer"
                             onClick={() => handleSelect(mall)}
                         >
                             <div className="card-top-row-c">
@@ -132,7 +142,7 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                 <p>© 2026 HearBe. All rights reserved.</p>
             </footer>
 
-            <div className="floating-question-c">?</div>
+            <div className="floating-question-c cursor-pointer">?</div>
         </div >
     );
 };

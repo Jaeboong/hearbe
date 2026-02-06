@@ -1,14 +1,14 @@
-﻿import React, { useState } from 'react';
+﻿﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2 } from 'lucide-react';
+import { motion as _motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2, PartyPopper } from 'lucide-react';
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
 import Swal from 'sweetalert2';
 import logoC from '../../assets/logoC.png'; // C형 로고로 변경
 import './SignUpC.css';
 
-export default function SignUpC({ onBack }) {
+export default function SignUpC() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
@@ -82,19 +82,44 @@ ${termContents.privacy}`;
     }
   };
 
+  const [matchMessage, setMatchMessage] = useState('');
+  const [matchValid, setMatchValid] = useState(false);
+
+  const handlePasswordCheck = () => {
+    if (!confirmPassword) {
+      setMatchMessage('');
+      setMatchValid(false);
+      return;
+    }
+
+    if (formData.password === confirmPassword) {
+      setMatchMessage('비밀번호가 일치합니다.');
+      setMatchValid(true);
+    } else {
+      setMatchMessage('비밀번호가 일치하지 않습니다.');
+      setMatchValid(false);
+    }
+  };
+
   const handleConfirmPasswordChange = (value) => {
     setConfirmPassword(value);
     if (errors.confirmPassword) {
       setErrors({ ...errors, confirmPassword: null });
     }
+    // 입력 중에도 메시지 초기화 혹은 실시간 체크를 원한다면 여기서 호출 가능
+    // 하지만 LoginC와 동일하게 onBlur/onMouseLeave에서만 메시지 뜨게 하려면 여기서는 메시지 초기화만
+    if (matchMessage) {
+      setMatchMessage('');
+    }
   };
 
   const handleCheckUsername = async () => {
-    const usernameError = validateUsername(formData.username);
-    if (usernameError) {
+    // validation.js의 공통 검증 로직 사용
+    const idError = validateUsername(formData.username);
+    if (idError) {
       Swal.fire({
         icon: 'warning',
-        text: usernameError,
+        text: idError,
         confirmButtonColor: '#7c3aed',
         confirmButtonText: '확인'
       });
@@ -141,14 +166,56 @@ ${termContents.privacy}`;
   // 하지만 호환성을 위해 남겨두거나 삭제하고 JSX에서 setAgreements 직접 호출
 
 
+  const handleEmailBlur = () => {
+    if (!formData.email) return; // 빈 값일 때는 에러 표시 안 함 (선택 사항)
+
+    if (!formData.email.includes('@')) {
+      setErrors((prev) => ({ ...prev, email: '@포함한 유효한 이메일을 입력해주세요' }));
+      return;
+    }
+
+    // 간단한 도메인 체크를 포함한 정규식 (최소한 . 뒤에 2글자 이상)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      setErrors((prev) => ({ ...prev, email: '유효한 이메일을 입력해주세요' }));
+      return;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const usernameError = validateUsername(formData.username);
     const passwordError = validatePassword(formData.password);
     const confirmPasswordError = validatePasswordConfirm(formData.password, confirmPassword);
-    const emailError = validateEmail(formData.email);
+    // emailError는 아래에서 별도로 처리하거나 validateEmail 결과 사용
     const nameError = validateName(formData.name);
+
+    // 이메일 정밀 검사
+    if (!formData.email.includes('@')) {
+      Swal.fire({
+        icon: 'warning',
+        text: '@를 포함하여 이메일을 작성해주세요.',
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      Swal.fire({
+        icon: 'warning',
+        text: '올바른 이메일 주소를 입력해주세요.', // 도메인 포함 여부 등 포괄적 메시지
+        confirmButtonColor: '#7c3aed',
+        confirmButtonText: '확인'
+      });
+      return;
+    }
+
+    // validateEmail 결과도 확인 (혹시 모를 다른 케이스)
+    const emailError = validateEmail(formData.email);
+
 
     if (!isUsernameChecked || !isUsernameAvailable) {
       Swal.fire({
@@ -241,7 +308,13 @@ ${termContents.privacy}`;
       <main className="signup-c-main">
         <div className="signup-card-c">
           <div className="signup-header-c"> {/* 로고 이미지 사용 */}
-            <img src={logoC} alt="HearBe Logo" className="signup-logo-c" style={{ marginBottom: '20px' }} />
+            <img
+              src={logoC}
+              alt="HearBe Logo"
+              className="signup-logo-c"
+              style={{ marginBottom: '20px', cursor: 'pointer' }}
+              onClick={() => navigate('/main')}
+            />
             <div className="header-title-group-c" style={{ display: 'none' }}>
               <div className="title-icon-c">
                 <User size={32} />
@@ -267,7 +340,7 @@ ${termContents.privacy}`;
                   <button
                     type="button"
                     onClick={handleCheckUsername}
-                    className={`check-duplicate-btn-c ${isUsernameChecked && isUsernameAvailable ? 'checked' : ''}`}
+                    className={`check-duplicate-btn-c cursor-pointer ${isUsernameChecked && isUsernameAvailable ? 'checked' : ''}`}
                   >
                     {isUsernameChecked && isUsernameAvailable ? '확인완료' : '중복확인'}
                   </button>
@@ -290,7 +363,7 @@ ${termContents.privacy}`;
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="pw-toggle-c"
+                    className="pw-toggle-c cursor-pointer"
                   >
                     {showPassword ? <EyeOff size={32} color="#94A3B8" /> : <Eye size={32} color="#94A3B8" />}
                   </button>
@@ -326,6 +399,8 @@ ${termContents.privacy}`;
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                    onMouseLeave={handlePasswordCheck}
+                    onBlur={handlePasswordCheck}
                     placeholder="비밀번호 재확인"
                     className="signup-input-c gray-bg-c"
                   />
@@ -337,6 +412,19 @@ ${termContents.privacy}`;
                     {showConfirmPassword ? <EyeOff size={32} color="#94A3B8" /> : <Eye size={32} color="#94A3B8" />}
                   </button>
                 </div>
+                {matchMessage && (
+                  <div style={{ textAlign: 'left', marginTop: '8px', paddingLeft: '5px' }}>
+                    <p
+                      className={`pw-condition-text ${matchValid ? 'satisfied' : 'unsatisfied'}`}
+                      style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <span style={{ fontSize: matchValid ? '14px' : '8px', lineHeight: '1' }}>
+                        {matchValid ? '✓' : '●'}
+                      </span>
+                      {matchMessage}
+                    </p>
+                  </div>
+                )}
                 {errors.confirmPassword && <span className="error-text-c">{errors.confirmPassword}</span>}
               </div >
             </div >
@@ -359,6 +447,7 @@ ${termContents.privacy}`;
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
+                  onBlur={handleEmailBlur}
                   placeholder="이메일(example@gmail.com)"
                   className="signup-input-c"
                 />
@@ -377,14 +466,13 @@ ${termContents.privacy}`;
                   />
                   <label htmlFor="all" style={{ fontWeight: 'bold' }}>[필수] 이용약관 및 개인정보 수집 동의</label>
                 </div>
-                <button type="button" className="terms-view-btn-c" onClick={() => openTermModal('terms')}>보기 &gt;</button>
+                <button type="button" className="terms-view-btn-c cursor-pointer" onClick={() => openTermModal('terms')}>보기 &gt;</button>
               </div>
             </div>
 
             <button
               type="submit"
-              className={`signup-submit-btn-c ${isFormValid ? '' : 'disabled'}`}
-              disabled={!isFormValid}
+              className="signup-submit-btn-c cursor-pointer"
             >
               회원 가입
             </button>
@@ -395,7 +483,7 @@ ${termContents.privacy}`;
       <AnimatePresence>
         {isModalOpen && (
           <div className="modal-overlay-c">
-            <motion.div
+            <_motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -406,16 +494,16 @@ ${termContents.privacy}`;
               <p className="modal-desc-c">
                 HearBe 회원이 되신 것을 축하드립니다.
               </p>
-              <button onClick={() => { setIsModalOpen(false); navigate('/C/login'); }} className="modal-btn-c">
+              <button onClick={() => { setIsModalOpen(false); navigate('/C/login'); }} className="modal-btn-c cursor-pointer">
                 확인
               </button>
-            </motion.div>
+            </_motion.div>
           </div>
         )}
 
         {termModalState.isOpen && (
           <div className="modal-overlay-c" onClick={() => closeTermModal(false)}>
-            <motion.div
+            <_motion.div
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
@@ -424,23 +512,20 @@ ${termContents.privacy}`;
             >
               <div className="term-modal-header">
                 <h3 className="term-title">{termModalState.title}</h3>
-                <button onClick={() => closeTermModal(false)} className="close-btn-c">✕</button>
+                <button onClick={() => closeTermModal(false)} className="close-btn-c cursor-pointer">✕</button>
               </div>
               <div className="term-scroll-box">
                 <p className="term-text whitespace-pre-line">{termModalState.content}</p>
               </div>
-              <button onClick={() => closeTermModal(true)} className="modal-btn-c term-confirm-btn">
+              <button onClick={() => closeTermModal(true)} className="modal-btn-c term-confirm-btn cursor-pointer">
                 확인
               </button>
-            </motion.div>
+            </_motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      <footer className="landing-footer">
-        <p>© 2026 HearBe. All rights reserved.</p>
-      </footer>
+
     </div>
   );
 }
-

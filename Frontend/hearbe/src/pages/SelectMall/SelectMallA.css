@@ -1,192 +1,170 @@
-﻿:root {
-    --color-bg-main: #1E2A3A;
-    --color-bg-card: #141C29;
-    --color-accent: #FFF064;
-
-    /* 폰트 변수 */
-    --font-main: 'KoddiUD OnGothic', sans-serif;
-}
-
-/* 기본 셋업 */
-.mall-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+﻿.select-mall-a-container {
     min-height: 100vh;
-    background-color: var(--color-bg-main);
-    color: var(--color-accent);
-    font-family: var(--font-main);
+    width: 100%;
+    background-color: #141C29;
+    color: #FFF064;
+    font-family: 'Pretendard', sans-serif;
     position: relative;
-    overflow-x: hidden;
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     padding: 0;
-    padding-top: 10px;
-    padding-right: 10px;
     margin: 0;
+    box-sizing: border-box;
 }
 
-.mall-logo-left {
+.select-mall-a-logo {
     position: absolute;
-    top: clamp(12px, 3vw, 24px);
-    left: clamp(12px, 3vw, 24px);
-    width: clamp(210px, 35vw, 380px);
+    top: 25px;
+    left: 40px;
+    width: 320px;
     height: auto;
-    cursor: pointer;
     z-index: 10;
-    pointer-events: auto;
 }
 
-/* --- Header Section --- */
-.mypage-topbar {
-    position: relative;
+.select-mall-a-header {
+    width: 100%;
     display: flex;
-    align-items: center;
     justify-content: flex-end;
-    padding: clamp(12px, 3vw, 32px);
+    padding: 20px 40px 0;
 }
 
-.mypage-topbar-actions {
+.header-actions-a {
     display: flex;
-    gap: clamp(12px, 3vw, 32px);
-    margin-left: auto;
+    gap: 30px;
 }
 
-.topbar-action {
+.header-btn-a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
     background: transparent;
     border: none;
-    color: var(--color-accent);
-    padding: clamp(8px, 1.6vw, 14px);
-    border-radius: 0.75rem;
-    font-size: clamp(18px, 3vw, 26px);
+    color: #FFF064;
     font-weight: 900;
-    cursor: pointer;
-    font-family: var(--font-main);
+    font-size: 21px;
+    gap: 6px;
+    padding: 10px 15px;
+    border-radius: 20px;
+    transition: background 0.2s;
 }
 
-.topbar-action:hover {
-    background-color: rgba(255, 240, 100, 0.12);
+.header-btn-a:hover {
+    background: rgba(255, 240, 100, 0.1);
 }
 
-/* --- Content Section --- */
-.mall-content {
+.select-mall-a-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px 40px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+
+.mall-list-a {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.mall-item-a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 30px 45px;
+    background: rgba(255, 240, 100, 0.03);
+    border: 4px solid #FFF064;
+    border-radius: 36px;
+    gap: 35px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.mall-item-a:hover {
+    transform: scale(1.02);
+    background: rgba(255, 240, 100, 0.08);
+}
+
+.mall-num-a {
+    width: 85px;
+    height: 85px;
+    min-width: 85px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    font-weight: 950;
+    color: #141C29;
+}
+
+.mall-info-a {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    padding: clamp(10px, 2vw, 20px) 0;
-    min-width: 680px;
-}
-
-.mall-scroll-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 18vw, 260px), 1fr));
-    justify-items: center;
     align-items: center;
-    gap: clamp(16px, 3vw, 40px);
-    padding: clamp(20px, 6vh, 60px) clamp(12px, 3vw, 32px);
+    gap: 30px;
 }
 
-.mall-card-wrapper {
-    width: min(100%, clamp(180px, 22vw, 340px));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    cursor: pointer;
-}
-
-.mall-square-box {
-    width: clamp(180px, 22vw, 340px);
-    height: clamp(260px, 32vw, 460px);
-    background-color: #141C29;
-    border: clamp(3px, 0.8vw, 8px) solid var(--color-accent);
-    border-radius: clamp(16px, 4vw, 40px);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
-    padding: clamp(10px, 2vw, 20px) 0 clamp(20px, 5vw, 40px);
-    box-sizing: border-box;
-}
-
-.mall-card-wrapper:hover .mall-square-box {
-    transform: scale(1.05);
-    box-shadow: 0 0 2vw rgba(255, 240, 100, 0.2);
-}
-
-.mall-number {
-    position: relative;
-    top: auto;
-    left: auto;
-    transform: none;
-    font-size: clamp(80px, 20vw, 160px);
-    font-weight: 900;
-    color: var(--color-accent);
-    text-shadow: none;
-    z-index: 10;
-    line-height: 1;
-    margin-bottom: clamp(10px, 2vw, 20px);
-    font-family: var(--font-main);
-}
-
-/* Naver Specific */
-.naver-box {
-    background-color: var(--color-bg-card);
-    border-color: var(--color-accent);
-}
-
-/* Coupang Specific */
-.coupang-box {
-    background-color: var(--color-bg-card);
-    border-color: var(--color-accent);
-}
-
-.mall-11st-box {
-    border-color: var(--color-accent);
-}
-
-.mall-emart-box {
-    border-color: var(--color-accent);
-}
-
-.mall-11st-box .mall-logo-img {
-    width: clamp(78px, 12vw, 170px);
-    height: clamp(78px, 12vw, 170px);
-}
-
-.mall-emart-box .mall-logo-img {
-    width: clamp(118px, 17vw, 236px);
-    height: clamp(118px, 17vw, 236px);
-}
-
-.mall-logo-img {
-    width: clamp(110px, 16vw, 220px);
-    height: clamp(110px, 16vw, 220px);
+.mall-logo-img-a {
+    height: 65px;
+    max-width: 240px;
     object-fit: contain;
-    max-width: 70%;
-    max-height: 60%;
 }
 
-.mall-logo-placeholder {
-    font-size: clamp(30px, 7vw, 60px);
+.mall-name-a {
+    font-size: 42px;
     font-weight: 900;
-    color: var(--color-accent);
-    text-align: center;
-    word-break: keep-all;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: clamp(12px, 3vw, 24px);
-    border-radius: clamp(8px, 2vw, 16px);
-    min-width: clamp(90px, 22vw, 180px);
 }
 
-/* --- Mic Icon --- */
-.mic-icon {
-    display: none;
+.mall-arrow-a {
+    font-size: 60px;
+    font-weight: 950;
+    opacity: 0.7;
+}
+
+.select-mall-a-footer {
+    text-align: center;
+    padding: 60px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgba(255, 240, 100, 0.6);
+    background-color: #141C29;
+    /* 배경색 일치 */
+    border: none !important;
+    /* 선 제거 */
+}
+
+@media (max-width: 768px) {
+    .select-mall-a-logo {
+        position: static;
+        margin: 20px auto;
+        display: block;
+    }
+
+    .select-mall-a-header {
+        justify-content: center;
+    }
+
+    .mall-item-a {
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .mall-num-a {
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+        font-size: 40px;
+    }
+
+    .mall-logo-img-a {
+        height: 50px;
+    }
+
+    .mall-name-a {
+        font-size: 28px;
+    }
 }

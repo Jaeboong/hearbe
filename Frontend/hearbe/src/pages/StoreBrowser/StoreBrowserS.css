@@ -431,3 +431,44 @@
         opacity: 1;
     }
 }
+
+@media (max-width: 768px) {
+    .join-modal-s {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .digit-s {
+        font-size: 36px;
+        width: 32px;
+    }
+
+    .back-button-circle-s {
+        top: 20px;
+        left: 20px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .top-sharing-info-s {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .bottom-sharing-actions-s {
+        bottom: 1.5rem;
+        padding: 8px;
+    }
+
+    .share-action-btn-s {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+
+    /* 모바일에서는 참가자 패널을 하단이나 다른 곳으로 옮기거나 축소해야 할 수 있음 - 일단은 우측 상단 유지하되 크기 축소 */
+    .participants-panel-s {
+        top: 4rem;
+        right: 1rem;
+        width: 140px;
+        padding: 1rem;
+    }
+}
