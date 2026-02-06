@@ -48,6 +48,11 @@ function AppContent() {
   const [selectedMode, setSelectedMode] = useState('audio');
   const [micPermissionGranted, setMicPermissionGranted] = useState(false);
   const [showInitialSetup, setShowInitialSetup] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('app') === 'mcp') {
+      localStorage.setItem('hearbe_mcp_setup_completed', 'true');
+      return false;
+    }
     return localStorage.getItem('hearbe_mcp_setup_completed') !== 'true';
   });
   const modeSelectionRef = useRef(null);
