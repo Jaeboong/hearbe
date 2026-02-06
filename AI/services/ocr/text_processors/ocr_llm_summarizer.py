@@ -28,11 +28,6 @@ except ImportError:
     )
 
 try:
-    from .utils import compute_summary_hash, load_summary_cache, save_summary_cache
-except ImportError:
-    from utils import compute_summary_hash, load_summary_cache, save_summary_cache
-
-try:
     from dotenv import load_dotenv
     env_path = Path(__file__).parent / ".env"
     load_dotenv(dotenv_path=env_path)
@@ -142,8 +137,10 @@ def _build_prompt(texts: List[str], product_type: ProductType, size_table: str =
         "2. **상세 설명**: \"이 제품은 [소재/스펙]이고, [주요 특징]이 돋보이는 제품이에요. [용도/상황]에 쓰기 좋을 것 같아요.\"\n"
         "3. **사이즈(의류만)**: 의류/신발이고 SIZE 표가 있다면, **모든 사이즈의 실측 치수를 자세히** 설명하세요.\n"
         "   - 예: \"사이즈는 M(허리 34, 엉덩이 67, 허벅지 38, 밑단 24.5, 총장 103), L(허리 36, 엉덩이 69, 허벅지 39.5, 밑단 25.5, 총장 105), XL(허리 38, 엉덩이 72, 허벅지 41, 밑단 26.5, 총장 107), 2XL(허리 40, 엉덩이 75, 허벅지 42.5, 밑단 27.5, 총장 108)로 나와요.\"\n"
-        "4. **사용/관리**: \"[세탁법/사용법/조리법]도 간단해요. [내용]하면 된답니다.\" (정보 있을 때만)\n"
-        "5. **안전 챙김**: \"아, 그리고 [주의사항/알레르기/정격전압] 정보가 있으니 꼼꼼히 확인해 주세요!\" (없으면 생략)\n\n"
+        "4. **사용/관리**: OCR 텍스트에 세탁법, 사용법, 조리법 등이 **명시적으로 적혀 있을 때만** 해당 내용을 그대로 전달하세요. "
+        "**⚠️ 텍스트에 관련 내용이 없으면 이 항목을 반드시 생략하세요. 절대로 추측하거나 일반 상식으로 채워 넣지 마세요.**\n"
+        "5. **안전 챙김**: OCR 텍스트에 주의사항, 알레르기, 정격전압 등이 **명시적으로 적혀 있을 때만** 전달하세요. "
+        "**텍스트에 없으면 반드시 생략하세요.**\n\n"
         "**출력 JSON 형식:**\n"
         "{\n"
         "  \"product_type\": \"자동 감지한 제품군\",\n"
@@ -270,25 +267,10 @@ def summarize_texts(
     if product_type is None:
         product_type = detect_product_type(texts)
 
-    summary_hash = None
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-    if use_cache:
-        summary_hash = compute_summary_hash(
-            texts=texts,
-            product_type=product_type.value,
-            model=model,
-            prompt_version=prompt_version,
-        )
-        cached = load_summary_cache(summary_hash)
-        if cached:
-            return cached
-
     prompt = _build_prompt(texts, product_type, size_table)
 
     summary = _call_openai(prompt)
-    if use_cache and summary_hash:
-        save_summary_cache(summary_hash, summary)
-    
+
     return summary
 
 
