@@ -32,6 +32,31 @@ def _summarize_commands(commands: List[Any]) -> List[Dict[str, Any]]:
     return summary
 
 
+def _compact_product_detail(detail: Dict[str, Any]) -> Dict[str, Any]:
+    if not isinstance(detail, dict):
+        return {}
+    compact = {
+        "name": detail.get("name") or detail.get("title") or detail.get("product_name") or "",
+        "price": detail.get("price") or detail.get("final_price") or detail.get("sale_price") or "",
+        "original_price": detail.get("original_price") or "",
+        "discount_rate": detail.get("discount_rate") or "",
+        "delivery": detail.get("delivery") or detail.get("rocket_delivery") or "",
+        "options": detail.get("options") or {},
+    }
+    options_list = detail.get("options_list")
+    if isinstance(options_list, dict):
+        selected = []
+        for key, items in options_list.items():
+            if not isinstance(items, list):
+                continue
+            picked = next((item for item in items if isinstance(item, dict) and item.get("selected")), None)
+            if picked:
+                selected.append({"key": key, "name": picked.get("name"), "price": picked.get("price")})
+        if selected:
+            compact["selected_options"] = selected
+    return compact
+
+
 class TTSTextGenerator:
     """
     Generate a concise spoken response for TTS using a separate LLM request.
@@ -81,6 +106,9 @@ class TTSTextGenerator:
                 "search_results_count": len(session_context.get("search_results") or []),
                 "previous_url": session_context.get("previous_url") or "",
             }
+            product_detail = session_context.get("product_detail")
+            if isinstance(product_detail, dict):
+                context_hint["product_detail"] = _compact_product_detail(product_detail)
             payload["context_hint"] = context_hint
 
         system_prompt = (

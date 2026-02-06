@@ -81,6 +81,11 @@ class ChromeLauncher:
             else:
                 logger.warning(f"Extension path not found or not a directory: {extension_path}")
 
+        # Navigate to home URL on startup
+        if self._config.home_url:
+            args.append(self._config.home_url)
+            logger.info(f"Chrome will open to: {self._config.home_url}")
+
         return args
 
     async def start(self) -> bool:

@@ -69,13 +69,14 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
         <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
           <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm" onClick={() => navigate('/welcome')} />
           <div className="flex items-center gap-4">
-            <button
-              onClick={onOpenSetup}
-              className="px-10 py-5 rounded-full font-extrabold text-2xl text-white flex items-center gap-3 shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1"
+            <a
+              href="/downloads/MCPDesktop.zip"
+              download
+              className="px-10 py-5 rounded-full font-extrabold text-2xl text-white flex items-center gap-3 shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1 no-underline"
               style={{ background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)' }}
             >
               <Download size={24} /> 설정 도우미
-            </button>
+            </a>
           </div>
         </div>
       </header>

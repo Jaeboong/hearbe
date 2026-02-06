@@ -19,7 +19,8 @@ class PageContext:
     selectors: Dict[str, str]
 
 
-COMMON_ACTIONS = ["navigate", "scroll", "click", "go_to_cart", "go_to_order_list"]
+# Make search available from any page to allow "search from cart" flows.
+COMMON_ACTIONS = ["navigate", "scroll", "click", "go_to_cart", "go_to_order_list", "search"]
 
 PAGE_SPECIFIC_ACTIONS = {
     "home": ["search", "login"],

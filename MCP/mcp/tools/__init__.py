@@ -70,6 +70,8 @@ class BrowserTools(
             "get_visible_buttons": self.get_visible_buttons,
             "get_attribute_list": self.get_attribute_list,
             "check_login_status": self.check_login_status,
+            "get_user_session": self.get_user_session,
+            "get_user_type": self.get_user_type,
             "get_pages": self.get_pages,
             "wait_for_new_page": self.wait_for_new_page,
             "wait_for_selector": self.wait_for_selector,

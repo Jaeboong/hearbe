@@ -80,3 +80,78 @@ class BrowserStateMixin:
         except Exception as e:
             logger.error(f"Login status check failed: {e}")
             return {"success": False, "error": str(e)}
+
+    async def get_user_session(self) -> Dict[str, Any]:
+        """
+        Get user session info from localStorage.
+
+        Returns:
+            {"success": bool, "logged_in": bool, "user_type": str|None, "user_id": str|None, ...}
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        script = """
+          () => {
+            const accessToken = localStorage.getItem('accessToken');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('user_id');
+            const username = localStorage.getItem('username');
+            const userName = localStorage.getItem('user_name');
+
+            return {
+              logged_in: !!accessToken,
+              access_token: accessToken,
+              user_type: userType,
+              user_id: userId,
+              username: username,
+              user_name: userName
+            };
+          }
+        """
+
+        try:
+            result = await page.evaluate(script)
+            if isinstance(result, dict):
+                return {"success": True, **result}
+            return {"success": True, "logged_in": False}
+        except Exception as e:
+            logger.error(f"Get user session failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def get_user_type(self) -> Dict[str, Any]:
+        """
+        Get user type from localStorage.
+
+        Returns:
+            {"success": bool, "user_type": str|None, "path_prefix": str}
+            path_prefix: "A" for BLIND, "B" for LOW_VISION, "C" for GENERAL
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        script = """
+          () => {
+            const userType = localStorage.getItem('userType');
+            let pathPrefix = null;
+            if (userType === 'BLIND') pathPrefix = 'A';
+            else if (userType === 'LOW_VISION') pathPrefix = 'B';
+            else if (userType === 'GENERAL') pathPrefix = 'C';
+
+            return {
+              user_type: userType,
+              path_prefix: pathPrefix
+            };
+          }
+        """
+
+        try:
+            result = await page.evaluate(script)
+            if isinstance(result, dict):
+                return {"success": True, **result}
+            return {"success": True, "user_type": None, "path_prefix": None}
+        except Exception as e:
+            logger.error(f"Get user type failed: {e}")
+            return {"success": False, "error": str(e)}
