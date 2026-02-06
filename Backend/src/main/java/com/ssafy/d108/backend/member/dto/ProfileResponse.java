@@ -5,13 +5,11 @@ import com.ssafy.d108.backend.entity.User;
 import com.ssafy.d108.backend.entity.enums.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class ProfileResponse {
 
@@ -39,22 +37,22 @@ public class ProfileResponse {
     public static ProfileResponse rom(User user, Profile profile) { // Keeping typo 'rom' as is to avoid breaking
                                                                     // callers if any
         ProfileResponse response = new ProfileResponse();
-        response.setUserId(Long.valueOf(user.getId()));
-        response.setUsername(user.getName());
-        response.setEmail(user.getEmail());
-        response.setUserType(user.getUserType());
-        response.setPhoneNumber(user.getPhoneNumber());
+        response.userId = Long.valueOf(user.getId());
+        response.username = user.getName();
+        response.email = user.getEmail();
+        response.userType = user.getUserType();
+        response.phoneNumber = user.getPhoneNumber();
 
         if (profile != null) {
-            response.setGender(profile.getGender());
-            response.setBirthDate(profile.getBirthDate());
-            response.setHeight(profile.getHeight());
-            response.setWeight(profile.getWeight());
-            response.setTopSize(profile.getTopSize());
-            response.setBottomSize(profile.getBottomSize());
-            response.setShoeSize(profile.getShoeSize());
-            response.setAllergies(profile.getAllergies());
-            response.setEtcAllergy(profile.getEtcAllergy());
+            response.gender = profile.getGender();
+            response.birthDate = profile.getBirthDate();
+            response.height = profile.getHeight();
+            response.weight = profile.getWeight();
+            response.topSize = profile.getTopSize();
+            response.bottomSize = profile.getBottomSize();
+            response.shoeSize = profile.getShoeSize();
+            response.allergies = profile.getAllergies();
+            response.etcAllergy = profile.getEtcAllergy();
         }
         return response;
     }

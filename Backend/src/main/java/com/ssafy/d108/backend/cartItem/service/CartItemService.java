@@ -29,7 +29,7 @@ public class CartItemService {
      * 장바구니 아이템 추가
      */
     @Transactional
-    public CartItemCreateResponseDto addCartItem(Integer userId, CartItemRequestDto requestDto) {
+    public CartItemCreateResponse addCartItem(Integer userId, CartItemRequest requestDto) {
         User user = findUserById(userId);
         Platform platform = platformRepository.findById(requestDto.getPlatformId().intValue())
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLATFORM_NOT_FOUND)); // 공통 에러코드 사용 권장
@@ -37,17 +37,17 @@ public class CartItemService {
         CartItem cartItem = createCartItemEntity(user, platform, requestDto);
         CartItem savedItem = cartItemRepository.save(cartItem);
 
-        return new CartItemCreateResponseDto(savedItem.getId(), "장바구니 추가 완료");
+        return new CartItemCreateResponse(savedItem.getId(), "장바구니 추가 완료");
     }
 
     /**
      * 내 장바구니 목록 조회
      */
-    public CartItemListResponseDto getCartItems(Integer userId) {
+    public CartItemListResponse getCartItems(Integer userId) {
         User user = findUserById(userId);
         List<CartItem> items = cartItemRepository.findAllByUser(user);
 
-        List<CartItemListResponseDto.CartItemDetail> itemDetails = items.stream()
+        List<CartItemListResponse.CartItemDetail> itemDetails = items.stream()
                 .map(this::convertToDetailDto)
                 .collect(Collectors.toList());
 
@@ -62,11 +62,11 @@ public class CartItemService {
      * 장바구니 아이템 수량 수정
      */
     @Transactional
-    public CartItemUpdateResponseDto updateQuantity(Integer cartItemId, CartItemUpdateRequestDto requestDto) {
+    public CartItemUpdateResponse updateQuantity(Integer cartItemId, CartItemUpdateRequest requestDto) {
         CartItem cartItem = findCartItemById(cartItemId);
         cartItem.setQuantity(requestDto.getQuantity());
 
-        return new CartItemUpdateResponseDto(Long.valueOf(cartItem.getId()), "수량이 변경되었습니다.");
+        return new CartItemUpdateResponse(Long.valueOf(cartItem.getId()), "수량이 변경되었습니다.");
     }
 
     /**
@@ -101,7 +101,7 @@ public class CartItemService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
     }
 
-    private CartItem createCartItemEntity(User user, Platform platform, CartItemRequestDto dto) {
+    private CartItem createCartItemEntity(User user, Platform platform, CartItemRequest dto) {
         CartItem cartItem = new CartItem();
         cartItem.setUser(user);
         cartItem.setPlatform(platform);
@@ -113,16 +113,16 @@ public class CartItemService {
         return cartItem;
     }
 
-    private CartItemListResponseDto buildListResponse(List<CartItemListResponseDto.CartItemDetail> details, int totalPrice) {
-        CartItemListResponseDto response = new CartItemListResponseDto();
+    private CartItemListResponse buildListResponse(List<CartItemListResponse.CartItemDetail> details, int totalPrice) {
+        CartItemListResponse response = new CartItemListResponse();
         response.setCartItems(details);
         response.setTotalCount(details.size());
         response.setTotalPrice(totalPrice);
         return response;
     }
 
-    private CartItemListResponseDto.CartItemDetail convertToDetailDto(CartItem item) {
-        CartItemListResponseDto.CartItemDetail detail = new CartItemListResponseDto.CartItemDetail();
+    private CartItemListResponse.CartItemDetail convertToDetailDto(CartItem item) {
+        CartItemListResponse.CartItemDetail detail = new CartItemListResponse.CartItemDetail();
         detail.setCartItemId(Long.valueOf(item.getId()));
         detail.setPlatformId(Long.valueOf(item.getPlatform().getId()));
         detail.setName(item.getName());
