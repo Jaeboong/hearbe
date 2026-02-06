@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Eye, EyeOff, User, Lock, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, User, Lock, Check } from 'lucide-react';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './LoginA.css';
@@ -157,7 +157,7 @@ const Login = () => {
                                     onChange={(e) => setRememberLogin(e.target.checked)}
                                 />
                                 <span className="checkmark-a-new">
-                                    {rememberLogin && <CheckCircle2 size={24} className="checked-icon" />}
+                                    {rememberLogin && <Check size={28} strokeWidth={4} className="checked-icon" />}
                                 </span>
                                 <span className="label-text-a-new">로그인 유지</span>
                             </label>

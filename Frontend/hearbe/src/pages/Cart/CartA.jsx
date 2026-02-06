@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut, ShoppingCart } from 'lucide-react';
+import { Store, LogOut, ShoppingCart } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
@@ -102,8 +102,8 @@ const CartA = () => {
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
                     <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
-                        <Home size={56} />
-                        <span>홈</span>
+                        <Store size={56} />
+                        <span>쇼핑몰</span>
                     </button>
                     <button className="topbar-action cursor-pointer" onClick={handleLogout}>
                         <LogOut size={56} />

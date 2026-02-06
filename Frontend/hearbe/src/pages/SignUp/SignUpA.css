@@ -28,13 +28,15 @@
 }
 
 .signup-logo-a-new {
-    height: 100px;
+    height: 150px;
     margin-bottom: 24px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .signup-title-a-new {
-    font-size: 44px;
-    /* 52px -> 44px */
+    font-size: 52px;
     font-weight: 950;
     color: #FFF064;
     margin-bottom: 10px;
@@ -60,8 +62,7 @@
 }
 
 .input-label-a-new {
-    font-size: 24px;
-    /* 28px -> 24px */
+    font-size: 32px;
     font-weight: 900;
     color: #FFF064;
     padding-left: 10px;
@@ -107,12 +108,10 @@
 
 .check-btn-a-new {
     padding: 0 28px;
-    background-color: transparent;
-    color: #FFF064;
-    border: 3px solid #FFF064;
+    background-color: #FFF064;
+    color: #141C29;
     border-radius: 20px;
-    font-size: 24px;
-    /* 26px -> 24px */
+    font-size: 32px;
     font-weight: 800;
     cursor: pointer;
 }
@@ -418,7 +417,5 @@
         padding: 40px 20px;
     }
 
-    .signup-title-a-new {
-        font-size: 36px;
-    }
+
 }

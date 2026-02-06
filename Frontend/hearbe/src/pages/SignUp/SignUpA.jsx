@@ -7,7 +7,7 @@ import {
     Smartphone,
     Camera,
     CreditCard,
-    CheckCircle2,
+    Check,
     ChevronRight,
     X,
     Eye,
@@ -349,7 +349,7 @@ const SignUp = () => {
 
                         {/* Phone Section */}
                         <div className="input-section-a-new">
-                            <label className="input-label-a-new">휴대전화번호</label>
+                            <label className="input-label-a-new">휴대전화번호 (선택)</label>
                             <div className="input-icon-wrapper-a-new">
                                 <Smartphone size={32} />
                                 <input
@@ -395,7 +395,7 @@ const SignUp = () => {
                                     onChange={(e) => setTerms({ term1: e.target.checked, term2: e.target.checked })}
                                 />
                                 <span className="terms-checkmark-a-new">
-                                    {(terms.term1 && terms.term2) && <CheckCircle2 size={44} />}
+                                    {(terms.term1 && terms.term2) && <Check size={44} strokeWidth={4} />}
                                 </span>
                                 <span className="terms-label-text-a-new">[필수] 이용약관 및 개인정보 동의</span>
                             </label>
