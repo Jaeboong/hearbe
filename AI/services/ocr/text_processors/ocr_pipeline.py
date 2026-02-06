@@ -105,7 +105,7 @@ def _select_texts_by_importance(
 def process_product_image(
     image_path: str,
     output_dir: str = "output",
-    save_result: bool = True,
+    save_result: bool = False,
     verbose: bool = True,
     use_cache: bool = True
 ) -> Dict:
@@ -168,7 +168,7 @@ def process_multiple_images(
     image_paths: List[str],
     output_dir: str = "output",
     max_workers: int = 4,
-    save_result: bool = True,
+    save_result: bool = False,
     verbose: bool = True,
     use_cache: bool = True
 ) -> Dict:
@@ -266,7 +266,7 @@ def process_product_from_urls(
     site: str = "auto",
     output_dir: str = "output",
     max_workers: int = 4,
-    save_result: bool = True,
+    save_result: bool = False,
     verbose: bool = True,
     use_cache: bool = True
 ) -> Dict:
