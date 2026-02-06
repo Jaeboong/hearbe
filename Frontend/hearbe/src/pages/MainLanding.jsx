@@ -146,6 +146,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
           {/* Spacer for mobile layout harmony if needed, or just rely on flex-col */}
           <div className="hidden md:block w-full h-24 pointer-events-none"></div>
 
+          {/* Type S Button (Shared Shopping - Perfectly Integrated) */}
           {/* Type S Button (Moved from Card) */}
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -171,9 +172,9 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             mode={{
               id: 'audio',
               label: 'TYPE A',
-              title: '음성·큰글씨 쇼핑',
+              title: '음성 전용 쇼핑',
               desc: '듣고 말하는 가장 쉬운 쇼핑',
-              tags: ['#음성안내', '#큰글자'],
+              tags: ['#음성안내', '#대화형'],
               bgColor: 'linear-gradient(135deg, #6D28D9 0%, #4C1D95 100%)', // Deep Violet
               textColor: '#FFFFFF',
               icon: <Volume2 size={32} />,
@@ -181,15 +182,15 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             }}
           />
 
-          {/* Type B (New) */}
+          {/* Type B (High Contrast) */}
           <ModeCard
             onSelect={handleModeSelect}
             mode={{
               id: 'big',
               label: 'TYPE B',
               title: '고대비 쇼핑',
-              desc: '고대비 모드로 쇼핑',
-              tags: ['#고대비', '#저시력'],
+              desc: '저시력 사용자를 위한 크고 선명한 고대비 화면',
+              tags: ['#고대비', '#큰글자'],
               bgColor: '#171C28',
               textColor: '#FFF064',
               labelColor: '#171C28',

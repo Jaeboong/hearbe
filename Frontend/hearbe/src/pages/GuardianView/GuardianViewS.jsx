@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 import { usePeerView } from '../../hooks/peerjs/usePeerView';
 import GuardianJoinModal from '../../components/ShareCode/GuardianJoinModal';
+import logoC from '../../assets/logoC.png';
 import './GuardianViewS.css';
 
 /**
@@ -66,12 +68,22 @@ const GuardianViewS = () => {
     return (
         <div className="guardian-view-container">
             {/* 헤더 */}
-            <div className="guardian-header">
-                <h1>🛡️ 공유 쇼핑</h1>
-                <button className="leave-button cursor-pointer" onClick={handleLeave}>
-                    나가기
+            <header className="guardian-header-c">
+                <div className="header-left-c">
+                    <img
+                        src={logoC}
+                        alt="HearBe Logo"
+                        className="header-logo-c"
+                        onClick={() => navigate('/main')}
+                        style={{ height: '50px', cursor: 'pointer', objectFit: 'contain' }}
+                    />
+                    <span className="header-title-c">실시간 화면 공유</span>
+                </div>
+                <button className="leave-button-c cursor-pointer" onClick={handleLeave}>
+                    <LogOut size={18} />
+                    <span>연결 종료</span>
                 </button>
-            </div>
+            </header>
 
             {/* 비디오 */}
             <div className="video-container">

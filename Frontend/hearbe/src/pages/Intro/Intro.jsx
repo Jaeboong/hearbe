@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Spline from '@splinetool/react-spline';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import './Intro.css';
 
 import introAudio1 from '../../assets/Intro/intro1.wav';
@@ -9,9 +10,9 @@ import introAudio2 from '../../assets/Intro/intro2.wav';
 import introAudio3 from '../../assets/Intro/intro3.wav';
 
 const STEPS = [
-    { title: "목소리만으로 완성하는 새로운 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1, duration: 5000 },
+    { title: "목소리만으로 완성하는 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1, duration: 5000 },
     { title: "보이지 않아도, 스스로 선택하는 쇼핑", desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.", audioSrc: introAudio2, duration: 5000 },
-    { title: "검색부터 결제까지, HearBe와 함께 시작해보세요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3, duration: 5000 },
+    { title: "HearBe와 함께 시작해요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3, duration: 5000 },
 ];
 
 export default function Intro() {
@@ -40,7 +41,7 @@ export default function Intro() {
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-        setTimeout(() => navigate('/main'), 850);
+        setTimeout(() => navigate('/guide'), 850);
     };
 
     const handleStart = () => {
@@ -59,7 +60,7 @@ export default function Intro() {
                     if (currentStep < STEPS.length - 1) {
                         setCurrentStep(prev => prev + 1);
                     } else {
-                        navigate('/main');
+                        navigate('/guide');
                     }
                 }
             }
@@ -153,7 +154,12 @@ export default function Intro() {
 
     return (
         <div className="intro-container">
-            <button className="skip-btn cursor-pointer" onClick={() => navigate('/main')}>메인으로</button>
+            <button
+                className="fixed top-10 right-10 z-50 cursor-pointer px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/60 text-[14px] font-semibold hover:bg-white/20 hover:text-white transition-all duration-300 shadow-sm"
+                onClick={() => navigate('/guide')}
+            >
+                skip
+            </button>
 
             <AnimatePresence>
                 {isTransitioning && (
