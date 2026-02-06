@@ -5,9 +5,9 @@ import { Mic, Eye, Command, ArrowRight, ChevronRight, ChevronDown, Download } fr
 import '../App.css';
 import '../index.css'
 import logoC from '../assets/logoC.png';
-import guideAudio1 from '../assets/Guide/guide1.wav';
-import guideAudio2 from '../assets/Guide/guide2.wav';
-import guideAudio3 from '../assets/Guide/guide3.wav';
+import guideAudio1 from '../assets/audio/guide/brand_guide_1.wav';
+import guideAudio2 from '../assets/audio/guide/brand_guide_2.wav';
+import guideAudio3 from '../assets/audio/guide/brand_guide_3.wav';
 
 
 const WaveBackground = () => (

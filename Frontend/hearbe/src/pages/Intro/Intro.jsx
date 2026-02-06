@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import './Intro.css';
 
-import introAudio1 from '../../assets/Intro/intro1.wav';
-import introAudio2 from '../../assets/Intro/intro2.wav';
-import introAudio3 from '../../assets/Intro/intro3.wav';
+import introAudio1 from '../../assets/audio/intro/intro_guide_1.wav';
+import introAudio2 from '../../assets/audio/intro/intro_guide_2.wav';
+import introAudio3 from '../../assets/audio/intro/intro_guide_3.wav';
 
 const STEPS = [
     { title: "목소리만으로 완성하는 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1, duration: 5000 },
