@@ -78,6 +78,8 @@ class TokenManager:
             refresh_token=refresh_token,
             source="get_user_session",
         )
+        if self._session:
+            self._session.set_context(session_id, CTX_TOKEN_RECOVERY_IN_FLIGHT, None)
         return access_token, refresh_token
 
     def update_tokens(
@@ -103,8 +105,8 @@ class TokenManager:
             logger.info(
                 "Token updated: session=%s access_token=%s refresh_token=%s source=%s",
                 session_id,
-                "present" if bool(access_token) else "missing",
-                "present" if bool(refresh_token) else "missing",
+                _format_token(access_token) if access_token else "missing",
+                _format_token(refresh_token) if refresh_token else "missing",
                 source or "unknown",
             )
 
@@ -277,3 +279,13 @@ def _normalize_token(token: Optional[str]) -> str:
         token = token[7:].strip()
     return token
 
+
+def _format_token(token: Optional[str]) -> str:
+    if not token:
+        return ""
+    if os.getenv("LOG_TOKEN_FULL", "").strip() == "1":
+        return token
+    # Default: show prefix/suffix only to reduce leakage.
+    if len(token) <= 12:
+        return token
+    return f"{token[:6]}...{token[-6:]}"

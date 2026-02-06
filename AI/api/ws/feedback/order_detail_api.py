@@ -5,6 +5,7 @@ Order detail API sender using centralized token manager.
 
 import asyncio
 import logging
+import os
 from typing import Any, Dict, Optional
 
 from api.order.order_client import OrderClient, COUPANG_PLATFORM_ID
@@ -58,7 +59,7 @@ class OrderDetailApiSender:
             "Order API send start: session=%s order_id=%s token=%s",
             session_id,
             order_id,
-            "present" if bool(token) else "missing",
+            _format_token(token) if token else "missing",
         )
         if not token:
             if self._tokens:
@@ -120,3 +121,13 @@ class OrderDetailApiSender:
             return
         self._session.set_context(session_id, CTX_ORDER_DETAIL_API_SENT_ID, None)
         self._session.set_context(session_id, CTX_ORDER_DETAIL_API_PENDING_ID, None)
+
+
+def _format_token(token: Optional[str]) -> str:
+    if not token:
+        return ""
+    if os.getenv("LOG_TOKEN_FULL", "").strip() == "1":
+        return token
+    if len(token) <= 12:
+        return token
+    return f"{token[:6]}...{token[-6:]}"
