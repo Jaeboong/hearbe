@@ -39,6 +39,9 @@ class TokenManager:
         self._session = session_manager
         self._backend_base = os.getenv("BACKEND_BASE_URL", "https://i14d108.p.ssafy.io").rstrip("/")
         self._main_url = os.getenv("MAIN_PAGE_URL", "https://i14d108.p.ssafy.io/main")
+        self._general_url = os.getenv("GENERAL_URL", "").strip()
+        self._blind_url = os.getenv("BLIND_URL", "").strip()
+        self._low_vision_url = os.getenv("LOW_VISION_URL", "").strip()
 
     def cleanup_session(self, session_id: str) -> None:
         if not self._session:
@@ -72,6 +75,9 @@ class TokenManager:
             return "", ""
         access_token = result.get("access_token") or result.get("accessToken") or ""
         refresh_token = result.get("refresh_token") or result.get("refreshToken") or ""
+        user_type = result.get("user_type") or result.get("userType") or ""
+        if user_type and self._session:
+            self._session.set_context(session_id, "user_type", str(user_type))
         self.update_tokens(
             session_id,
             access_token=access_token,
@@ -206,16 +212,17 @@ class TokenManager:
             session = self._session.get_session(session_id)
             return_url = session.current_url if session else None
 
+        recovery_url = self._resolve_recovery_url(session_id)
         commands = [
             MCPCommand(
                 tool_name="navigate_to_url",
-                arguments={"url": self._main_url},
-                description="refresh access token on main page",
+                arguments={"url": recovery_url},
+                description="refresh access token on user page",
             ),
             MCPCommand(
                 tool_name="wait",
                 arguments={"ms": 1200},
-                description="wait for main page to load",
+                description="wait for token page to load",
             ),
             MCPCommand(
                 tool_name="get_user_session",
@@ -223,7 +230,7 @@ class TokenManager:
                 description="get user session from localStorage",
             ),
         ]
-        if return_url and return_url != self._main_url:
+        if return_url and return_url != recovery_url:
             commands.extend(
                 [
                     MCPCommand(
@@ -240,8 +247,9 @@ class TokenManager:
             )
         await self._sender.send_tool_calls(session_id, commands)
         logger.info(
-            "Token recovery requested: session=%s return_url=%s reason=%s",
+            "Token recovery requested: session=%s recovery_url=%s return_url=%s reason=%s",
             session_id,
+            recovery_url,
             return_url or "missing",
             reason or "unknown",
         )
@@ -267,6 +275,24 @@ class TokenManager:
             if token:
                 return token
         return ""
+
+    def _resolve_recovery_url(self, session_id: str) -> str:
+        if not self._session:
+            return self._main_url
+        user_type_raw = self._session.get_context(session_id, "user_type") or self._session.get_context(
+            session_id, "userType"
+        )
+        user_type = str(user_type_raw or "").strip().upper()
+        if user_type == "BLIND" and self._blind_url:
+            return self._blind_url
+        if user_type in ("GENERAL", "NORMAL") and self._general_url:
+            return self._general_url
+        if user_type in ("LOW_VISION", "LOWVISION", "B") and self._low_vision_url:
+            return self._low_vision_url
+        # Fallback to general URL first, then legacy MAIN_PAGE_URL.
+        if self._general_url:
+            return self._general_url
+        return self._main_url
 
 
 def _normalize_token(token: Optional[str]) -> str:

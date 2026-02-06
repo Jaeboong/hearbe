@@ -68,11 +68,13 @@ class OrderItem:
 class OrderCreateRequest:
     """Request body for POST /orders matching backend OrderCreateRequest."""
     platform_id: int
+    order_url: Optional[str] = None
     items: List[OrderItem] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "platform_id": self.platform_id,
+            "order_url": self.order_url,
             "items": [item.to_dict() for item in self.items],
         }
 
@@ -253,6 +255,7 @@ class OrderClient:
         self,
         items: List[OrderItem],
         platform_id: int = COUPANG_PLATFORM_ID,
+        order_url: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Create order via backend API.
@@ -260,6 +263,7 @@ class OrderClient:
         Args:
             items: List of OrderItem to create
             platform_id: Platform ID (1 = Coupang)
+            order_url: Source order detail page URL
 
         Returns:
             API response dict with success status and data/error
@@ -271,7 +275,7 @@ class OrderClient:
                 "error": "JWT token not found. User needs to login first.",
             }
 
-        request = OrderCreateRequest(platform_id=platform_id, items=items)
+        request = OrderCreateRequest(platform_id=platform_id, order_url=order_url, items=items)
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",

@@ -25,6 +25,9 @@ public class OrderCreateRequest {
     @NotNull(message = "플랫폼 ID는 필수입니다.")
     private Long platformId;
 
+    @JsonProperty("order_url")
+    private String orderUrl;
+
     @Valid
     @NotEmpty(message = "주문 아이템은 최소 1개 이상이어야 합니다.")
     private List<OrderItemDto> items;
