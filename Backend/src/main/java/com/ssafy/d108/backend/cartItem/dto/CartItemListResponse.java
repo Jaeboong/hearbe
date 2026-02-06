@@ -1,6 +1,8 @@
 package com.ssafy.d108.backend.cartItem.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CartItemListResponseDto {
+public class CartItemListResponse {
 
     @JsonProperty("cart_items")
     private List<CartItemDetail> cartItems;
@@ -24,6 +26,7 @@ public class CartItemListResponseDto {
     @Getter
     @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class CartItemDetail {
 
         @JsonProperty("cart_item_id")
