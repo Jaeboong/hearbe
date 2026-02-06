@@ -46,9 +46,9 @@ public class OrderService {
         // 1. Order 생성
         Order order = new Order();
         order.setUser(user);
-        // orderDetailUrl은 첫 번째 아이템의 URL 사용 (또는 null)
-        if (!request.getItems().isEmpty() && request.getItems().get(0).getUrl() != null) {
-            order.setOrderDetailUrl(request.getItems().get(0).getUrl());
+        // orderDetailUrl은 request의 order_url 사용
+        if (request.getOrderUrl() != null) {
+            order.setOrderDetailUrl(request.getOrderUrl());
         }
 
         // Save Order
