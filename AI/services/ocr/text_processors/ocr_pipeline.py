@@ -1,11 +1,14 @@
 # OCR 전체 처리 파이프라인
 import argparse
+import logging
 import os
 import re
 import shutil
 import time
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+logger = logging.getLogger(__name__)
 
 try:
     from .korean_ocr import process_image, process_images_parallel
@@ -26,18 +29,7 @@ try:
         list_supported_sites,
     )
     from .table_reconstructor import reconstruct_size_table
-    from .utils import (
-        save_json,
-        compute_image_hash,
-        load_cache,
-        save_cache,
-        update_cache_metadata,
-        get_cache_stats,
-        compute_imageset_hash,
-        compute_urllist_hash,
-        load_pipeline_cache,
-        save_pipeline_cache,
-    )
+    from .utils import save_json
 except ImportError:
     from korean_ocr import process_image, process_images_parallel
     from ocr_text_preprocessor import filter_texts, preprocess_ocr_texts, extract_rec_texts_from_data
@@ -57,18 +49,7 @@ except ImportError:
         list_supported_sites,
     )
     from table_reconstructor import reconstruct_size_table
-    from utils import (
-        save_json,
-        compute_image_hash,
-        load_cache,
-        save_cache,
-        update_cache_metadata,
-        get_cache_stats,
-        compute_imageset_hash,
-        compute_urllist_hash,
-        load_pipeline_cache,
-        save_pipeline_cache,
-    )
+    from utils import save_json
 
 
 def _summary_only(summary: Dict) -> Dict:
@@ -129,17 +110,6 @@ def process_product_image(
     use_cache: bool = True
 ) -> Dict:
     start_time = time.time()
-    image_hash = None
-
-    if use_cache:
-        image_hash = compute_image_hash(image_path)
-        cached_summary = load_cache(image_hash)
-
-        if cached_summary:
-            update_cache_metadata(hit=True)
-            return cached_summary
-        else:
-            update_cache_metadata(hit=False)
 
     ocr_result = process_image(image_path, output_dir=output_dir, save_vis=False, save_ocr_json=False)
     ocr_count = ocr_result.get("total_count", len(ocr_result.get("rec_texts", [])))
@@ -167,6 +137,16 @@ def process_product_image(
         if original_boxes:
             size_table_text = reconstruct_size_table(original_texts, original_boxes, original_scores)
 
+    # [DEBUG] 필터링된 텍스트 & 사이즈 테이블을 output에 JSON 저장
+    if save_result:
+        base_name = Path(image_path).stem
+        debug_data = {
+            "filtered_texts": filtered_texts,
+            "size_table": size_table_text,
+            "product_type": product_type.value,
+        }
+        save_json(debug_data, os.path.join(output_dir, f"{base_name}_debug.json"))
+
     summary = summarize_texts(
         filtered_texts,
         product_type,
@@ -181,14 +161,6 @@ def process_product_image(
     summary["filtered_count"] = len(filtered_texts)
     summary["processing_time"] = round(elapsed_time, 2)
 
-    if save_result:
-        base_name = Path(image_path).stem
-        output_path = os.path.join(output_dir, f"{base_name}_summary.json")
-        save_json(_summary_only(summary), output_path)
-
-    if use_cache and image_hash:
-        save_cache(image_hash, summary)
-
     return summary
 
 
@@ -201,13 +173,6 @@ def process_multiple_images(
     use_cache: bool = True
 ) -> Dict:
     start_time = time.time()
-    pipeline_hash = None
-
-    if use_cache:
-        pipeline_hash = compute_imageset_hash(image_paths)
-        cached_result = load_pipeline_cache(pipeline_hash)
-        if cached_result:
-            return cached_result
 
     ocr_results = process_images_parallel(
         image_paths,
@@ -262,6 +227,16 @@ def process_multiple_images(
             if size_boxes:
                 size_table_text = reconstruct_size_table(size_texts, size_boxes, size_scores)
 
+    # [DEBUG] 필터링된 텍스트 & 사이즈 테이블을 output에 JSON 저장
+    if save_result and image_paths:
+        first_name = Path(image_paths[0]).stem
+        debug_data = {
+            "filtered_texts": filtered_texts,
+            "size_table": size_table_text,
+            "product_type": product_type.value,
+        }
+        save_json(debug_data, os.path.join(output_dir, f"{first_name}_debug.json"))
+
     summary = summarize_texts(
         filtered_texts,
         product_type,
@@ -283,9 +258,6 @@ def process_multiple_images(
         output_path = os.path.join(output_dir, f"{first_name}_merged_summary.json")
         save_json(_summary_only(summary), output_path)
 
-    if use_cache and pipeline_hash:
-        save_pipeline_cache(pipeline_hash, summary)
-
     return summary
 
 
@@ -299,7 +271,6 @@ def process_product_from_urls(
     use_cache: bool = True
 ) -> Dict:
     start_time = time.time()
-    pipeline_hash = None
 
     filtered_urls = filter_product_images(image_urls, site=site)
 
@@ -311,12 +282,6 @@ def process_product_from_urls(
             "source_urls": image_urls,
             "error": "no_images_after_filter"
         }
-
-    if use_cache:
-        pipeline_hash = compute_urllist_hash(filtered_urls, site)
-        cached_result = load_pipeline_cache(pipeline_hash)
-        if cached_result:
-            return cached_result
 
     download_dir = os.path.join(output_dir, "downloaded")
     local_paths = download_images(
@@ -352,9 +317,6 @@ def process_product_from_urls(
     result["site"] = site if site != "auto" else detect_site(filtered_urls[0]) if filtered_urls else "unknown"
     result["total_processing_time"] = round(elapsed_time, 2)
 
-    if use_cache and pipeline_hash:
-        save_pipeline_cache(pipeline_hash, result)
-
     return result
 
 
@@ -373,7 +335,6 @@ def main() -> int:
     parser.add_argument("--workers", "-w", type=int, default=4)
     parser.add_argument("--site", "-s", default="auto", choices=["auto", "coupang", "naver"])
     parser.add_argument("--no-save", action="store_true")
-    parser.add_argument("--no-cache", action="store_true", help="캐시 사용 안 함")
     parser.add_argument("--quiet", "-q", action="store_true")
 
     args = parser.parse_args()
@@ -385,7 +346,7 @@ def main() -> int:
                 output_dir=args.output_dir,
                 save_result=not args.no_save,
                 verbose=False,
-                use_cache=not args.no_cache
+                use_cache=False
             )
         elif args.inputs:
             result = process_multiple_images(
@@ -394,7 +355,7 @@ def main() -> int:
                 max_workers=args.workers,
                 save_result=not args.no_save,
                 verbose=False,
-                use_cache=not args.no_cache
+                use_cache=False
             )
         else:
             result = process_product_from_urls(
@@ -404,7 +365,7 @@ def main() -> int:
                 max_workers=args.workers,
                 save_result=not args.no_save,
                 verbose=False,
-                use_cache=not args.no_cache
+                use_cache=False
             )
 
         if args.output:
