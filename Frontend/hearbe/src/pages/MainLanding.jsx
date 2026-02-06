@@ -1,7 +1,8 @@
-import { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Volume2, Download, ArrowRight, Share2, Layout, Zap, Settings, Info, BookOpen, Eye } from 'lucide-react';
+import Spline from '@splinetool/react-spline';
 import '../App.css';
 import '../index.css'
 import logoC from '../assets/logoC.png';
@@ -73,7 +74,8 @@ const ModeCard = ({ mode, onSelect }) => (
 
 const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
   const navigate = useNavigate();
-
+  const [isVoiceIntroVisible, setIsVoiceIntroVisible] = useState(false);
+  const [splineFailed, setSplineFailed] = useState(false);
   return (
     // Main Container
     <div className="w-full min-h-screen overflow-y-auto overflow-x-hidden bg-white flex flex-col items-center justify-start relative">

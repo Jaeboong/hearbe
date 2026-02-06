@@ -273,6 +273,112 @@
     box-shadow: 0 8px 20px rgba(109, 40, 217, 0.35);
 }
 
+/* Voice Intro Overlay */
+.voice-intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #0f0d15;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.intro-text-section {
+    position: absolute;
+    top: 15%;
+    text-align: center;
+    z-index: 1000;
+    width: 100%;
+    pointer-events: none;
+}
+
+.intro-title {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    background: linear-gradient(90deg, #d8b4fe 0%, #ffffff 50%, #d8b4fe 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShine 7s linear infinite;
+}
+
+.intro-desc {
+    font-size: 1.5rem;
+    color: #a78bfa;
+    opacity: 0.8;
+}
+
+.orb-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: scale(0.8);
+}
+
+.abstract-orb {
+    width: 60vw;
+    height: 60vw;
+    max-width: 600px;
+    max-height: 600px;
+    background: radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.8), rgba(0, 0, 0, 0) 70%);
+    border-radius: 50%;
+    box-shadow: 0 0 100px rgba(139, 92, 246, 0.3), inset 0 0 60px rgba(196, 181, 253, 0.4);
+    filter: blur(40px);
+    animation: orbFloat 10s ease-in-out infinite alternate;
+    opacity: 0.8;
+}
+
+@keyframes orbFloat {
+    0% {
+        transform: translateY(0) scale(1);
+        filter: blur(40px) hue-rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-50px) scale(1.1);
+        filter: blur(50px) hue-rotate(15deg);
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+        filter: blur(40px) hue-rotate(0deg);
+    }
+}
+
+@keyframes textShine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+.close-intro-btn {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 99px;
+    cursor: pointer;
+    z-index: 2000;
+    transition: all 0.3s;
+}
+
+.close-intro-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .mode-list {

@@ -6,6 +6,7 @@ import MainLanding from '../pages/MainLanding';
 import BrandLanding from '../pages/BrandLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
+import SplinePage from '../pages/SplinePage';
 
 // [A형 페이지 컴포넌트]
 import LoginA from '../pages/Login/LoginA';
@@ -58,8 +59,12 @@ function AppContent() {
       navigate('/C/login');
     } else if (mode === 'sharing') {
       navigate('/S/join');
-    } else {
+    } else if (mode === 'big') {
+      // Type B (big text) -> Original Type A Login
       navigate('/A/login');
+    } else {
+      // Type A (audio) -> Spline Page
+      navigate('/spline-test');
     }
   };
 
@@ -94,6 +99,9 @@ function AppContent() {
           />
         }
       />
+
+      {/* Spline Test Page */}
+      <Route path="/spline-test" element={<SplinePage />} />
 
       {/* Type A Routes */}
       <Route
