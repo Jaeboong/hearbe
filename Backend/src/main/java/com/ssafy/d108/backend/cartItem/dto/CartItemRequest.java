@@ -13,7 +13,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class CartItemRequestDto {
+public class CartItemRequest {
 
     @JsonProperty("platform_id")
     @NotNull(message = "플랫폼 ID는 필수입니다.")

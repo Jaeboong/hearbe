@@ -130,7 +130,6 @@ def test_build_thank_you_tts():
     }
     tts = _build_thank_you_tts(info)
     assert "주문이 완료되었습니다." in tts
-    assert "주문번호는 21100169768698" in tts
     assert "6,390원" in tts
     assert "하나은행 로켓뱅크" in tts
 
@@ -185,7 +184,12 @@ async def test_handle_mcp_result_sends_tts_and_sets_context():
     )
     assert handled is True
     assert sender.tts
-    assert any(FOLLOW_UP_TTS in text for _, text in sender.tts)
+
+    # Follow-up question is removed; we auto-navigate to order detail.
+    assert not any(FOLLOW_UP_TTS in text for _, text in sender.tts)
+    assert sender.tool_calls
+    _, commands = sender.tool_calls[-1]
+    assert commands[0].tool_name == "click"
     assert session.context.get(CTX_THANK_YOU_ORDER_ID) == "21100169768698"
     assert session.context.get(CTX_THANK_YOU_CHECKOUT_ID) is None
 

@@ -27,6 +27,7 @@ from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
 from ..feedback.login_feedback import LoginFeedbackManager
 from ..feedback.order_detail_handler import OrderDetailHandler
+from ..feedback.hearbe_order_history_handler import HearbeOrderHistoryHandler
 from ..feedback.tool_failure_notifier import ToolFailureNotifier
 from ..auth.token_manager import TokenManager
 
@@ -90,6 +91,11 @@ class HandlerManager:
             session_manager=session_manager,
             token_manager=self._token_manager,
         )
+        self._hearbe_order_history = HearbeOrderHistoryHandler(
+            sender=sender,
+            session_manager=session_manager,
+            token_manager=self._token_manager,
+        )
         self._page_extract = PageExtractManager(
             sender=sender,
             session_manager=session_manager,
@@ -148,6 +154,7 @@ class HandlerManager:
         self._login_challenge.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
+        self._hearbe_order_history.cleanup_session(session_id)
         self._token_manager.cleanup_session(session_id)
 
     async def handle_audio_chunk(self, session_id: str, data: dict):
@@ -177,6 +184,7 @@ class HandlerManager:
         self._login_challenge.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
+        self._hearbe_order_history.cleanup_session(session_id)
         self._token_manager.cleanup_session(session_id)
 
     async def handle_interrupt(self, session_id: str):
@@ -201,6 +209,7 @@ class HandlerManager:
         self._login_autofill.cleanup_session(session_id)
         self._login_challenge.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
+        self._hearbe_order_history.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
 
@@ -261,6 +270,17 @@ class HandlerManager:
         if previous_url and previous_url != url:
             self._session.set_context(session_id, "previous_url", previous_url)
         session.current_url = url
+
+        # Announce successful login even when the navigation is observed via
+        # page-update (not only via MCP tool result URL changes).
+        suppress_login_tts = False
+        if self._session:
+            until = self._session.get_context(session_id, "tts_suppress_until", 0)
+            if until and time.time() < float(until):
+                suppress_login_tts = True
+        if self._login_feedback and not suppress_login_tts:
+            await self._login_feedback.maybe_announce_login_success(session_id, previous_url, url)
+
         site = get_current_site(url)
         page_type = get_page_type(url)
         logger.info("handle_page_update: site=%s page_type=%s", site.name if site else None, page_type)
@@ -269,6 +289,7 @@ class HandlerManager:
         await self._payment_keypad.handle_page_update(session_id, url)
         await self._login_challenge.handle_page_update(session_id, url)
         await self._order_detail.handle_page_update(session_id, url)
+        await self._hearbe_order_history.handle_page_update(session_id, url)
         await self._page_extract.handle_page_update(session_id, url, page_id)
 
         # On login page entry, trigger autofill probe (no user text required).

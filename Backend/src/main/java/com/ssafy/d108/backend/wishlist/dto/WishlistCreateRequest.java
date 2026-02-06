@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WishlistCreateRequestDto {
+@AllArgsConstructor
+public class WishlistCreateRequest {
 
     @JsonProperty("platform_id")
     @NotNull(message = "플랫폼 ID는 필수입니다.")

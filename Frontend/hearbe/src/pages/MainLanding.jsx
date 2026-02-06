@@ -7,6 +7,9 @@ import '../App.css';
 import '../index.css'
 import logoC from '../assets/logoC.png';
 
+const VOICE_PROGRAM_BASE_NAME = '음성지원프로그램';
+const VOICE_PROGRAM_LATEST_FILE = `${VOICE_PROGRAM_BASE_NAME}_latest.zip`;
+
 // 모드 선택 카드 컴포넌트
 const ModeCard = ({ mode, onSelect }) => (
   <motion.button
@@ -71,11 +74,34 @@ const ModeCard = ({ mode, onSelect }) => (
   </motion.button>
 );
 
-
 const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
   const navigate = useNavigate();
   const [isVoiceIntroVisible, setIsVoiceIntroVisible] = useState(false);
   const [splineFailed, setSplineFailed] = useState(false);
+  const [voiceProgramVersion, setVoiceProgramVersion] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetch('/downloads/voice-program-version.json', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!mounted || !data?.version) return;
+        setVoiceProgramVersion(data.version);
+      })
+      .catch(() => {
+        // Ignore metadata errors and fallback to latest alias.
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const voiceProgramDownloadFile = voiceProgramVersion
+    ? `${VOICE_PROGRAM_BASE_NAME}_${voiceProgramVersion}.zip`
+    : VOICE_PROGRAM_LATEST_FILE;
+
   return (
     // Main Container
     <div className="w-full min-h-screen overflow-y-auto overflow-x-hidden bg-white flex flex-col items-center justify-start relative">
@@ -120,7 +146,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             <motion.a
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              href="/downloads/MCPDesktop.zip"
+              href={encodeURI(`/downloads/${voiceProgramDownloadFile}`)}
               download
               className="p-2 md:p-3 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center relative group"
               title="음성 프로그램 다운로드"

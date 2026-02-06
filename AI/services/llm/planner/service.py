@@ -22,6 +22,7 @@ from .selection import select_from_results
 from services.llm.rules.product_option import handle_product_option_rule
 from .cart_action import handle_cart_action
 from .order_list_action import handle_order_list_action
+from .hearbe_order_history_action import handle_hearbe_order_history_action
 from .product_info_action import handle_product_info_action
 from .fallback import build_llm_fallback_response
 
@@ -104,6 +105,9 @@ class LLMPlanner(ILLMPlanner):
 
         # 1.5. Post-rule session-aware handlers
         if rule_result.matched_rule == "none":
+            hearbe_order_history_action = handle_hearbe_order_history_action(user_text, session)
+            if hearbe_order_history_action:
+                return hearbe_order_history_action
             cart_action = handle_cart_action(user_text, session)
             if cart_action:
                 return cart_action

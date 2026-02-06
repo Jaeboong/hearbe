@@ -29,7 +29,7 @@ public class WishlistService {
      * 찜 추가 (POST /wishlist)
      */
     @Transactional
-    public WishlistCreateResponseDto addWishlistItem(Integer userId, WishlistCreateRequestDto requestDto) {
+    public WishlistCreateResponse addWishlistItem(Integer userId, WishlistCreateRequest requestDto) {
         User user = findUserById(userId);
         Platform platform = platformRepository.findById(requestDto.getPlatformId().intValue())
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLATFORM_NOT_FOUND));
@@ -37,18 +37,18 @@ public class WishlistService {
         WishlistItem wishlistItem = createWishlistEntity(user, platform, requestDto);
         WishlistItem savedItem = wishlistRepository.save(wishlistItem);
 
-        return new WishlistCreateResponseDto(savedItem.getId(), savedItem.getCreatedAt().toString());
+        return new WishlistCreateResponse(savedItem.getId(), savedItem.getCreatedAt().toString());
     }
 
     /**
      * 찜 목록 조회 (GET /wishlist/{userId})
      */
-    public WishlistResponseDto getWishlistItems(Integer userId) {
+    public WishlistResponse getWishlistItems(Integer userId) {
         User user = findUserById(userId);
         List<WishlistItem> items = wishlistRepository.findAllByUser(user);
 
         // 1. 개별 아이템 상세 정보 리스트 변환
-        List<WishlistResponseDto.WishlistItemDetail> itemDetails = items.stream()
+        List<WishlistResponse.WishlistItemDetail> itemDetails = items.stream()
                 .map(this::convertToDetailDto)
                 .collect(Collectors.toList());
 
@@ -59,7 +59,7 @@ public class WishlistService {
                 .sum();
 
         // 3. 최종 Response 조립
-        WishlistResponseDto response = new WishlistResponseDto();
+        WishlistResponse response = new WishlistResponse();
         response.setItems(itemDetails);
         response.setTotalCount(totalCount);
         response.setTotalPrice(totalPrice);
@@ -85,7 +85,7 @@ public class WishlistService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 
-    private WishlistItem createWishlistEntity(User user, Platform platform, WishlistCreateRequestDto dto) {
+    private WishlistItem createWishlistEntity(User user, Platform platform, WishlistCreateRequest dto) {
         WishlistItem item = new WishlistItem();
         item.setUser(user);
         item.setPlatform(platform);
@@ -97,8 +97,8 @@ public class WishlistService {
     }
 
     // helper method 수정
-    private WishlistResponseDto.WishlistItemDetail convertToDetailDto(WishlistItem item) {
-        WishlistResponseDto.WishlistItemDetail detail = new WishlistResponseDto.WishlistItemDetail();
+    private WishlistResponse.WishlistItemDetail convertToDetailDto(WishlistItem item) {
+        WishlistResponse.WishlistItemDetail detail = new WishlistResponse.WishlistItemDetail();
         detail.setWishlistItemId(item.getId());
         detail.setProductName(item.getName());
         detail.setProductUrl(item.getUrl());

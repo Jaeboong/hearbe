@@ -5,6 +5,8 @@ Order list reader utilities.
 
 from typing import List, Dict, Any
 
+from core.korean_datetime import format_date_for_tts
+
 
 def build_order_list_read_tts(orders: List[Dict[str, Any]]) -> str:
     if not orders:
@@ -16,7 +18,7 @@ def build_order_list_read_tts(orders: List[Dict[str, Any]]) -> str:
     lines = []
     for idx, order in enumerate(orders[:max_read], start=1):
         title = order.get("title") or "상품"
-        ordered_at = order.get("ordered_at") or ""
+        ordered_at = format_date_for_tts(order.get("ordered_at") or order.get("orderedAt") or "")
         status = order.get("status") or ""
         total_price = order.get("total_price") or ""
 

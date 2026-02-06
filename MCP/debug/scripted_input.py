@@ -38,6 +38,14 @@ class ScriptedInputManager:
         except ValueError:
             return 12.0
 
+    def _get_start_delay(self) -> float:
+        # Give the app a short time to connect to the AI server / browser before
+        # sending the first scripted input line.
+        try:
+            return float(os.getenv("DEBUG_SCRIPTED_INPUT_START_DELAY_MS", "3000")) / 1000.0
+        except ValueError:
+            return 3.0
+
     async def start(self) -> bool:
         if not self.is_enabled():
             logger.info("Scripted input disabled (DEBUG_SCRIPTED_INPUT=false)")
@@ -71,6 +79,12 @@ class ScriptedInputManager:
 
     async def _run_script(self, input_path: Path):
         delay = self._get_delay()
+        start_delay = self._get_start_delay()
+        if start_delay > 0:
+            logger.info("Scripted input initial delay: %.2fs", start_delay)
+            await asyncio.sleep(start_delay)
+            if not self._running:
+                return
         try:
             lines = input_path.read_text(encoding="utf-8").splitlines()
         except Exception as e:
