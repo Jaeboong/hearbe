@@ -3,6 +3,29 @@
 ## 개요
 사용자 텍스트를 받아 TextRouter에서 먼저 분기 처리 후, LLMPipelineHandler에서 NLU 분석 → LLMPlanner(규칙 기반 + LLM 폴백)로 MCP 명령을 생성하는 파이프라인.
 
+## 핵심 진입 파일
+
+- `api/ws/handlers/text_processing/llm_pipeline_handler.py`
+- `services/llm/planner/service.py`
+
+### import 맵 (프로젝트 내부)
+
+`api/ws/handlers/text_processing/llm_pipeline_handler.py`
+- `core/interfaces.py`
+- `services/llm/planner/selection/option_select.py`
+
+`services/llm/planner/service.py`
+- `core/interfaces.py`
+- `services/llm/generators/command_generator.py`
+- `services/llm/generators/llm_generator.py`
+- `services/llm/generators/tts_text_generator.py`
+- `services/llm/planner/cart_action.py`
+- `services/llm/planner/fallback.py`
+- `services/llm/planner/routing.py`
+- `services/llm/planner/selection/__init__.py`
+- `services/llm/rules/product_option.py`
+- `services/llm/sites/site_manager.py`
+
 ## 핵심 포인트
 - TextRouter가 LLM 전에 SearchQueryHandler, ProductOptionRule, AiNextRouter를 먼저 체크
 - LLMPlanner 내부에서도 규칙 전에 select_from_results(), handle_product_option_rule() 먼저 체크
@@ -93,6 +116,7 @@
     │
     ├─ coerce_option_clicks() → 옵션 명령 보정
     ├─ FlowEngine.start_flow() → requires_flow=true이면 플로우 시작
+    ├─ allow_extract 판단 → SEARCH intent 또는 extract 명령 포함 시 허용
     │
     └─ CommandPipeline
         ├─ prepare_commands() → 로그인 가드, captcha 핸들러, 정규화

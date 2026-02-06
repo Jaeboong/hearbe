@@ -20,6 +20,7 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -45,19 +46,6 @@ class ProfileControllerTest {
         // Given
         Integer userId = 1;
 
-        // Mocking Authentication logic since we disabled filters but Controller expects
-        // Authentication
-        // Actually since we disabled filters, the Authentication object might be null
-        // or we need to inject it via request builder?
-        // Wait, ProfileController gets Authentication from arguments.
-        // If we duplicate the filter logic or easier: Mock the controller method call
-        // directly? No that defeats the purpose.
-        // We will pass Principal? No, the controller casts
-        // `authentication.getDetails()`.
-
-        // Strategy: Use a custom Authentication object and set it in SecurityContext
-        // manually or via `with(authentication(auth))`
-
         // Mock Request Body
         ProfileUpdateRequest request = new ProfileUpdateRequest();
         request.setHeight(180.5f);
@@ -65,27 +53,28 @@ class ProfileControllerTest {
         request.setAllergies(Set.of(Allergy.NUTS));
         request.setEtcAllergy("Peach");
 
-        // Mock Response
-        ProfileResponse response = new ProfileResponse();
-        response.setUserId(Long.valueOf(userId));
-        response.setHeight(180.5f);
-        response.setEtcAllergy("Peach");
+        // Mock Response - ProfileResponse is now immutable, use mock
+        ProfileResponse response = mock(ProfileResponse.class);
+        given(response.getUserId()).willReturn(Long.valueOf(userId));
+        given(response.getHeight()).willReturn(180.5f);
+        given(response.getEtcAllergy()).willReturn("Peach");
 
         given(profileService.updateProfile(eq(userId), any(ProfileUpdateRequest.class))).willReturn(response);
 
         // Security Context Setup
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("customUser", "password");
-        auth.setDetails(userId); // Important for ProfileController
+        auth.setDetails(userId); // Important: details must be Integer for SecurityUtil.getCurrentUserId()
 
         // When & Then
-        mockMvc.perform(put("/api/members/profile")
-                .principal(auth) // Injects Principal but Controller uses passed Authentication object
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+        mockMvc.perform(put("/members/profile")
                 .with(request1 -> {
-                    request1.setUserPrincipal(auth);
+                    // Set SecurityContext manually for SecurityUtil to work
+                    org.springframework.security.core.context.SecurityContextHolder.getContext()
+                            .setAuthentication(auth);
                     return request1;
                 })
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())

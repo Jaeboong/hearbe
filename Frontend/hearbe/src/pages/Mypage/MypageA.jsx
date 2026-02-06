@@ -11,11 +11,11 @@ const Mypage = () => {
     const [activeMenuId, setActiveMenuId] = useState(null);
 
     const requestedMenuItems = [
-        { id: 1, label: '회원정보', action: () => { } },
-        { id: 2, label: '주문내역', action: () => { } },
+        { id: 1, label: '회원 정보', action: () => { } },
+        { id: 2, label: '주문 내역', action: () => { } },
         { id: 3, label: '장바구니', action: () => navigate('/A/cart') },
         { id: 4, label: '찜한 상품', action: () => { } },
-        { id: 5, label: <>장애인 복지카드<br />변경</>, action: () => { } },
+        { id: 5, label: <>장애인 복지<br />카드 변경</>, action: () => { } },
     ];
 
     return (
@@ -23,15 +23,15 @@ const Mypage = () => {
             {/* 1. 상단 네비게이션 (홈/카트/마이)*/}
             <div className="top-nav-area">
                 <div className="header-nav">
-                    <div className="nav-item" onClick={() => navigate('/A/mall')}>
+                    <div className="nav-item cursor-pointer" onClick={() => navigate('/A/mall')}>
                         <img src={iconHome} alt="Home" className="nav-icon" />
                         <span>홈</span>
                     </div>
-                    <div className="nav-item" onClick={() => navigate('/A/cart')}>
+                    <div className="nav-item cursor-pointer" onClick={() => navigate('/A/cart')}>
                         <img src={iconCart} alt="Cart" className="nav-icon" />
                         <span>카트</span>
                     </div>
-                    <div className="nav-item" onClick={() => navigate('/A/mypage')}>
+                    <div className="nav-item cursor-pointer" onClick={() => navigate('/A/mypage')}>
                         <img src={iconUser} alt="My" className="nav-icon" />
                         <span>마이</span>
                     </div>
@@ -43,8 +43,8 @@ const Mypage = () => {
                 <img
                     src={logoA}
                     alt="Logo"
-                    className="mypage-logo-left"
-                    onClick={() => window.location.assign('/')}
+                    className="mypage-logo-left cursor-pointer"
+                    onClick={() => navigate('/main')}
                 />
 
                 <div className="page-title">마이페이지</div>
@@ -63,7 +63,7 @@ const Mypage = () => {
                 {requestedMenuItems.map((item) => (
                     <div
                         key={item.id}
-                        className={`menu-item ${activeMenuId === item.id ? 'active' : ''}`}
+                        className={`menu-item ${activeMenuId === item.id ? 'active' : ''} cursor-pointer`}
                         onClick={() => {
                             setActiveMenuId(item.id);
                             item.action();

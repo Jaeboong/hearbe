@@ -6,7 +6,9 @@ MCP result handler: HTML/OCR summary -> TTS
 import asyncio
 import json
 import logging
+import time
 from typing import Dict, Any, Optional, List
+from urllib.parse import urljoin
 
 from core.event_bus import EventType, publish
 from services.llm.sites.site_manager import get_page_type
@@ -40,6 +42,7 @@ class MCPHandler:
         login_guard=None,
         login_feedback=None,
         dom_fallback=None,
+        command_queue=None,
     ):
         self._sender = sender
         self._session = session_manager
@@ -48,6 +51,7 @@ class MCPHandler:
         self._login_guard = login_guard
         self._login_feedback = login_feedback
         self._dom_fallback = dom_fallback
+        self._command_queue = command_queue
         self._file_manager = TempFileManager()  # Manages temporary JSON files
         self._tts = TTSGenerator()
 
@@ -71,6 +75,7 @@ class MCPHandler:
             products = result.get("products")
         cart_items = None
         cart_summary = None
+        order_list = None
 
         page_url = None
         if isinstance(page_data, dict):
@@ -178,6 +183,17 @@ class MCPHandler:
             if isinstance(result, dict):
                 detail = result.get("detail") or result.get("product_detail")
                 if detail:
+                    if isinstance(detail, dict):
+                        detail = dict(detail)
+                        if detail_images:
+                            detail.setdefault("detail_images", detail_images)
+                        extracted_at = time.time()
+                        detail["_extracted_at"] = extracted_at
+                        self._session.set_context(
+                            session_id,
+                            "product_detail_received_at",
+                            extracted_at,
+                        )
                     self._session.set_context(session_id, "product_detail", detail)
                     self._save_product_detail_to_file(detail, session_id)
                     if isinstance(detail, dict) and detail.get("options_list"):
@@ -189,14 +205,46 @@ class MCPHandler:
                         )
                     if not suppress_outputs:
                         await self._maybe_handle_pending_option(session_id, session)
+                        pending = None
+                        if self._session:
+                            pending = self._session.get_context(session_id, "pending_product_info_read")
+                        if pending:
+                            pending_text = pending.get("text") if isinstance(pending, dict) else str(pending)
+                            pending_ts = pending.get("ts") if isinstance(pending, dict) else None
+                            if pending_ts and time.time() - float(pending_ts) > 30:
+                                pending_text = ""
+                            if pending_text:
+                                from services.llm.pipelines.read.product_info import handle_product_info_read
+                                read_response = handle_product_info_read(
+                                    pending_text,
+                                    session,
+                                    allow_action=True,
+                                )
+                                if read_response and read_response.text:
+                                    await self._sender.send_tts_response(
+                                        session_id,
+                                        read_response.text,
+                                    )
+                                    logger.info(
+                                        "Pending product info read delivered: session=%s",
+                                        session_id,
+                                    )
+                            if self._session:
+                                self._session.set_context(session_id, "pending_product_info_read", None)
                 if detail_images:
                     self._session.set_context(session_id, "detail_images", detail_images)
                 cart_items = result.get("cart_items")
                 cart_summary = result.get("cart_summary") or {}
+                order_list = result.get("order_list")
+                if order_list is None:
+                    order_list = result.get("orders")
                 if cart_items is not None:
                     self._session.set_context(session_id, "cart_items", cart_items)
                     self._session.set_context(session_id, "cart_summary", cart_summary)
                     self._save_cart_to_file(cart_items, cart_summary, session_id)
+                if order_list is not None:
+                    self._session.set_context(session_id, "order_list", order_list)
+                    self._save_order_list_to_file(order_list, session_id)
             previous_url = session.current_url
             if page_url:
                 if previous_url and previous_url != page_url:
@@ -209,9 +257,36 @@ class MCPHandler:
                         page_url
                     )
             if cart_items is not None:
-                if not suppress_outputs:
+                suppress_cart_tts = False
+                if handled and tool_name == "extract_cart":
+                    suppress_cart_tts = True
+                if session and self._session:
+                    until = self._session.get_context(session_id, "tts_suppress_until", 0)
+                    if until and time.time() < float(until):
+                        suppress_cart_tts = True
+                if not suppress_outputs and not suppress_cart_tts:
                     tts_text = self._tts.build_cart_summary(cart_items, cart_summary or {})
                     await self._sender.send_tts_response(session_id, tts_text)
+                return
+            if order_list is not None:
+                if not suppress_outputs:
+                    prompt_pending = False
+                    if self._session:
+                        prompt_pending = bool(
+                            self._session.get_context(session_id, "order_list_prompt_pending", False)
+                        )
+                    if not prompt_pending and self._session:
+                        self._session.set_context(session_id, "order_list_prompt_pending", True)
+                    if not prompt_pending:
+                        previous_url = None
+                        if self._session:
+                            previous_url = self._session.get_context(session_id, "previous_url")
+                        prev_type = get_page_type(previous_url) if previous_url else None
+                        if previous_url and page_url and previous_url != page_url and prev_type != "orderlist":
+                            tts_text = "주문 목록 페이지로 이동이 완료되었습니다. 주문 목록을 읽어드릴까요?"
+                        else:
+                            tts_text = "주문 목록을 읽어드릴까요?"
+                        await self._sender.send_tts_response(session_id, tts_text)
                 return
 
             if products:
@@ -339,6 +414,10 @@ class MCPHandler:
         모든 이미지를 한번에 OCR 처리 후 LLM 요약
         """
         try:
+            image_urls = _normalize_image_urls(image_urls, page_url)
+            if not image_urls:
+                logger.warning("OCR skipped: no valid image URLs after normalization")
+                return
             ocr_integrator = get_ocr_integrator()
             site = detect_site(page_url or "")
 
@@ -368,7 +447,16 @@ class MCPHandler:
 
             session = self._session.get_session(session_id) if self._session else None
             if session and self._session:
-                self._session.set_context(session_id, "ocr_result", ocr_result.to_dict())
+                ocr_payload = ocr_result.to_dict()
+                self._session.set_context(session_id, "ocr_result", ocr_payload)
+                detail = self._session.get_context(session_id, "product_detail")
+                if isinstance(detail, dict):
+                    updated = dict(detail)
+                    updated.setdefault("detail_images", image_urls)
+                    updated.setdefault("ocr_summary", ocr_payload.get("summary", []))
+                    updated.setdefault("ocr_keywords", ocr_payload.get("keywords", {}))
+                    updated.setdefault("ocr_product_type", ocr_payload.get("product_type"))
+                    self._session.set_context(session_id, "product_detail", updated)
 
             await self._sender.send_ocr_progress(session_id, "completed", 100, len(image_urls))
             logger.info(f"OCR 배치 처리 완료: {session_id}")
@@ -411,8 +499,46 @@ class MCPHandler:
             filename_prefix="cart"
         )
 
+    def _save_order_list_to_file(self, orders: List[Dict[str, Any]], session_id: str):
+        payload = {
+            "orders": orders or [],
+            "count": len(orders or []),
+        }
+        self._file_manager.save_json(
+            data=payload,
+            session_id=session_id,
+            category="order_list",
+            filename_prefix="order_list"
+        )
+
     def cleanup_session(self, session_id: str):
         self._file_manager.cleanup_session(session_id)
+
+
+def _normalize_image_urls(urls: List[str], base_url: Optional[str] = None) -> List[str]:
+    if not urls:
+        return []
+    seen = set()
+    normalized: List[str] = []
+    for raw in urls:
+        if not isinstance(raw, str):
+            continue
+        url = raw.strip()
+        if not url:
+            continue
+        if url.startswith(("data:", "blob:", "javascript:")):
+            continue
+        if url.startswith("//"):
+            url = f"https:{url}"
+        elif url.startswith("/") and base_url:
+            url = urljoin(base_url, url)
+        if not (url.startswith("http://") or url.startswith("https://")):
+            continue
+        if url in seen:
+            continue
+        seen.add(url)
+        normalized.append(url)
+    return normalized
 
 
 def _extract_request_ts(request_id: Optional[str]) -> Optional[float]:

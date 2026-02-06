@@ -8,6 +8,7 @@ from typing import Optional, Callable, List
 
 from core.interfaces import MCPCommand
 from .command_normalizers import normalize_login_phone_commands
+from .command_guards import apply_platform_guards
 
 logger = logging.getLogger(__name__)
 
@@ -15,11 +16,12 @@ logger = logging.getLogger(__name__)
 class CommandPipeline:
     """Prepare and dispatch tool commands with shared safeguards."""
 
-    def __init__(self, sender, action_feedback, login_guard=None, login_feedback=None):
+    def __init__(self, sender, action_feedback, login_guard=None, login_feedback=None, command_queue=None):
         self._sender = sender
         self._action_feedback = action_feedback
         self._login_guard = login_guard
         self._login_feedback = login_feedback
+        self._command_queue = command_queue
 
     def prepare_commands(
         self,
@@ -33,6 +35,7 @@ class CommandPipeline:
         if not allow_extract:
             commands = _filter_extract_commands(commands)
         commands = normalize_login_phone_commands(commands, current_url)
+        commands = apply_platform_guards(commands, current_url)
         if current_url and "login" in current_url:
             commands = [
                 MCPCommand(
@@ -62,6 +65,54 @@ class CommandPipeline:
 
         Returns the TTS text that was sent (if any).
         """
+        if self._command_queue:
+            if interrupted():
+                return None
+
+            if not commands:
+                return await self._command_queue.enqueue_batch(
+                    session_id,
+                    [],
+                    response_text,
+                    current_url,
+                    interrupted,
+                    wait=True,
+                )
+
+            guard_commands = None
+            if self._login_guard:
+                guard_commands = self._login_guard.prepare_guard(
+                    session_id,
+                    commands,
+                    response_text,
+                    current_url or ""
+                )
+            if guard_commands:
+                return await self._command_queue.enqueue_batch(
+                    session_id,
+                    guard_commands,
+                    "",
+                    current_url,
+                    interrupted,
+                    wait=True,
+                )
+
+            pending_msg = self._action_feedback.register_commands(
+                session_id,
+                commands,
+                current_url or ""
+            )
+            response_text = pending_msg or response_text
+
+            return await self._command_queue.enqueue_batch(
+                session_id,
+                commands,
+                response_text,
+                current_url,
+                interrupted,
+                wait=True,
+            )
+
         if not commands:
             return await self._send_response(session_id, response_text, interrupted)
 

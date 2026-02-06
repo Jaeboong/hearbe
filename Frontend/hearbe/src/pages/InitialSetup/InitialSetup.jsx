@@ -10,13 +10,7 @@ const STEPS = {
 };
 
 export default function InitialSetup({ onComplete }) {
-    const [currentStep, setCurrentStep] = useState(() => {
-        const setupCompleted = localStorage.getItem('hearbe_mcp_setup_completed');
-        if (setupCompleted === 'true') {
-            return STEPS.COMPLETED;
-        }
-        return STEPS.MCP_DOWNLOAD;
-    });
+    const [currentStep, setCurrentStep] = useState(STEPS.MCP_DOWNLOAD);
 
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
 
@@ -76,9 +70,9 @@ export default function InitialSetup({ onComplete }) {
                             음성 인식과 화면 공유 기능을 사용하려면<br />아래 프로그램을 설치해주세요.
                         </p>
                         <div className="flex gap-4 w-full">
-                            <button onClick={handleMcpDownload} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563]">나중에</button>
-                            <a href="/hearbe-mcp-server.exe" download onClick={handleMcpDownload}
-                                className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg no-underline flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>다운로드</a>
+                            <button onClick={handleMcpDownload} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">나중에</button>
+                            <a href="/downloads/MCPDesktop.zip" download onClick={handleMcpDownload}
+                                className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg no-underline flex items-center justify-center cursor-pointer" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>다운로드</a>
                         </div>
                     </div>
                 </motion.div>
@@ -101,13 +95,13 @@ export default function InitialSetup({ onComplete }) {
                             마이크 사용 권한을 허용하여 음성 기능을 활성화하시겠습니까?
                         </p>
                         <div className="flex gap-4 w-full">
-                            <button onClick={() => handleMicPermission(false)} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563]">거부</button>
-                            <button onClick={() => handleMicPermission(true)} className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>활성화</button>
+                            <button onClick={() => handleMicPermission(false)} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">거부</button>
+                            <button onClick={() => handleMicPermission(true)} className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg cursor-pointer" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>활성화</button>
                         </div>
                     </div>
                 </div>
             </div>
-        ); 
+        );
     }
 
     // --- 단계 3: 스피커 테스트 팝업 ---
@@ -124,10 +118,10 @@ export default function InitialSetup({ onComplete }) {
                         <p className="text-xl mb-6 text-[#6B7280]">
                             아래 버튼을 눌러 소리가 잘 들리는지 확인해주세요.
                         </p>
-                        <button onClick={playTestSound} className="mb-12 px-8 py-4 rounded-xl text-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563]">소리 듣기</button>
+                        <button onClick={playTestSound} className="mb-12 px-8 py-4 rounded-xl text-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">소리 듣기</button>
                         <div className="flex gap-4 w-full">
-                            <button onClick={handleSpeakerTest} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563]">안 들림</button>
-                            <button onClick={handleSpeakerTest} className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>잘 들림</button>
+                            <button onClick={handleSpeakerTest} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">안 들림</button>
+                            <button onClick={handleSpeakerTest} className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg cursor-pointer" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>잘 들림</button>
                         </div>
                     </div>
                 </div>

@@ -564,3 +564,10 @@ google-service-account.json
 docker
 
 MCP/temp_test_profile/**
+Frontend/hearbe/.env.production
+
+# Keep only one dummy file in frontend downloads directory
+!Frontend/hearbe/public/downloads/
+Frontend/hearbe/public/downloads/*
+!Frontend/hearbe/public/downloads/DOWNLOADS_DUMMY.txt
+!Frontend/hearbe/public/downloads/voice-program-version.json

@@ -3,20 +3,29 @@
 ## 개요
 서버에서 생성된 텍스트 응답을 Google Cloud TTS로 음성으로 변환하여 클라이언트에 스트리밍 전송하는 흐름.
 
+## 핵심 진입 파일
+
+- `api/ws/sender.py`
+
+### import 맵 (프로젝트 내부)
+
+- `core/interfaces.py`
+- `api/ws/models.py`
+- `api/ws/tts/tts_normalizer.py`
+
 ## Flow 다이어그램
 
 ```
 텍스트 응답 생성 (LLM/규칙/플로우)
 │
 ├─ [1] api/ws/sender.py → WSSender.send_tts_response()
-│   └─ 텍스트 정규화
+│   └─ URL 제거 → 줄바꿈 정규화 → TTSNormalizer 정규화
 │
-├─ [2] api/ws/tts/tts_normalizer.py → TTSNormalizer
+├─ [2] api/ws/tts/tts_normalizer.py → normalize_tts_text()
 │   └─ TTS 전 텍스트 정리
-│       ├─ 숫자 → 한국어 읽기 ("10만원" → "십만 원")
-│       ├─ 특수문자 제거/변환
-│       ├─ 약어 풀어쓰기
-│       └─ 긴 텍스트 문장 단위 분할
+│       ├─ 날짜 표기 "M/D" → "M월 D일" (배송/도착 맥락일 때만)
+│       ├─ 퍼센트/원/콤마 숫자 변환 (예: "10%" → "십퍼센트")
+│       └─ 단위 변환 (L, ml, kg, g, mg)
 │
 ├─ [3] services/tts/service.py → TTSService.synthesize_stream()
 │   ├─ Google Cloud Text-to-Speech API 호출
@@ -25,8 +34,8 @@
 │   └─ 청크 단위 스트리밍 반환
 │
 ├─ [4] api/ws/sender.py → 청크별 WebSocket 전송
-│   ├─ tts_chunk (바이너리 오디오)
-│   ├─ tts_chunk (바이너리 오디오)
+│   ├─ tts_chunk (JSON, audio=hex 문자열)
+│   ├─ tts_chunk (JSON, audio=hex 문자열)
 │   ├─ ...
 │   └─ tts_chunk (is_final: true)
 │

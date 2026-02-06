@@ -72,6 +72,14 @@ AVAILABLE_COMMANDS: Dict[str, Dict[str, Any]] = {
             '"description": "Scroll down"}'
         ),
     },
+    "extract_order_list": {
+        "description": "Extract order list items",
+        "args": {},
+        "example": (
+            '{"tool_name": "extract_order_list", "arguments": {}, '
+            '"description": "Extract order list"}'
+        ),
+    },
     "get_text": {
         "description": "Get text content from an element",
         "args": {

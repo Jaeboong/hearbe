@@ -1,0 +1,6 @@
+{
+  "page_type": "main",
+  "url_pattern": "/main",
+  "description": "Hearbe main page",
+  "selectors": {}
+}

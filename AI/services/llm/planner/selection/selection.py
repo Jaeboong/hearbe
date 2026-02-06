@@ -35,10 +35,12 @@ def select_from_results(
     ordinal_index = extract_ordinal_index(target)
     if ordinal_index is not None:
         if 0 <= ordinal_index < len(results):
+            item = results[ordinal_index] if isinstance(results[ordinal_index], dict) else {}
+            name = item.get("name") or item.get("title") or item.get("product_name")
+            if name:
+                session.context["last_mentioned_product"] = name
             commands = _build_click_nth_result_commands(session, ordinal_index)
             if not commands:
-                item = results[ordinal_index] if isinstance(results[ordinal_index], dict) else {}
-                name = item.get("name") or item.get("title") or item.get("product_name")
                 if name:
                     commands = [
                         MCPCommand(
@@ -84,6 +86,7 @@ def select_from_results(
 
     if not matched_name:
         return None
+    session.context["last_mentioned_product"] = matched_name
 
     commands = _build_click_nth_result_commands(session, matched_index) if matched_index is not None else None
     if not commands:

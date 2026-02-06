@@ -76,6 +76,9 @@ def format_product_detail_section(product_detail: Optional[Dict[str, Any]] = Non
         "option": product_detail.get("option"),
         "options": product_detail.get("options"),
         "options_list": product_detail.get("options_list"),
+        "ocr_summary": product_detail.get("ocr_summary"),
+        "ocr_keywords": product_detail.get("ocr_keywords"),
+        "ocr_product_type": product_detail.get("ocr_product_type"),
     }
     lines = ["## Product Detail (current)"]
     lines.append(json.dumps(detail, ensure_ascii=True))
@@ -108,9 +111,83 @@ def format_cart_items_section(
             "quantity": item.get("quantity"),
             "selected": item.get("selected"),
             "arrival": item.get("arrival"),
-            "selectors": build_cart_item_selectors(name, current_url) if name else {},
+            "selectors": build_cart_item_selectors(name, current_url, item.get("option")) if name else {},
         }
         lines.append(json.dumps(entry, ensure_ascii=True))
+    return "\n".join(lines)
+
+
+def format_order_detail_section(order_detail: Optional[Dict[str, Any]] = None) -> str:
+    if not order_detail:
+        return ""
+
+    order = order_detail.get("order") if isinstance(order_detail, dict) else {}
+    payment = order_detail.get("payment") if isinstance(order_detail, dict) else {}
+    delivery = order_detail.get("delivery") if isinstance(order_detail, dict) else {}
+    items = order_detail.get("items") if isinstance(order_detail, dict) else []
+    actions = order_detail.get("actions") if isinstance(order_detail, dict) else []
+    text = order_detail.get("text") if isinstance(order_detail, dict) else {}
+
+    detail = {
+        "order": {
+            "order_id": order.get("order_id"),
+            "title": order.get("title"),
+            "ordered_at": order.get("ordered_at"),
+        },
+        "payment": {
+            "total_payed_amount": payment.get("total_payed_amount"),
+            "total_order_amount": payment.get("total_order_amount"),
+            "total_product_price": payment.get("total_product_price"),
+            "main_pay_type": payment.get("main_pay_type"),
+            "bank_name": payment.get("bank_name"),
+            "paid_at": payment.get("paid_at"),
+        },
+        "delivery": {
+            "address": delivery.get("address"),
+            "address_main": delivery.get("address_main"),
+            "address_detail": delivery.get("address_detail"),
+            "zip_code": delivery.get("zip_code"),
+            "shipping_message": delivery.get("shipping_message"),
+        },
+        "items": items,
+        "actions": actions,
+        "text": text,
+    }
+    lines = ["## Order Detail (current)"]
+    lines.append(json.dumps(detail, ensure_ascii=True))
+    return "\n".join(lines)
+
+
+def format_order_list_section(order_list: Optional[Any] = None) -> str:
+    if not order_list:
+        return ""
+
+    items: List[Dict[str, Any]] = []
+    if isinstance(order_list, dict):
+        raw = order_list.get("orders") or order_list.get("items") or order_list.get("order_list")
+        if isinstance(raw, list):
+            items = [item for item in raw if isinstance(item, dict)]
+    elif isinstance(order_list, list):
+        items = [item for item in order_list if isinstance(item, dict)]
+
+    if not items:
+        return ""
+
+    lines = ["## Order List (current)"]
+    for idx, item in enumerate(items, start=1):
+        entry = {
+            "index": item.get("index") or idx,
+            "title": item.get("title") or item.get("product_name") or item.get("name"),
+            "ordered_at": item.get("ordered_at") or item.get("orderedAt"),
+            "status": item.get("status"),
+            "total_price": item.get("total_price"),
+            "detail_url": item.get("detail_url"),
+            "detail_selector": item.get("detail_selector"),
+        }
+        lines.append(json.dumps(entry, ensure_ascii=True))
+    lines.append("")
+    lines.append("## Order Selection Rule")
+    lines.append("- If user requests order detail, prefer detail_selector or detail_url for the matching order.")
     return "\n".join(lines)
 
 
@@ -130,17 +207,25 @@ def _wrap_is(selector: Optional[str]) -> str:
     return selector
 
 
-def _build_cart_item_root_selector(name: str, current_url: Optional[str]) -> str:
+def _build_cart_item_root_selector(name: str, current_url: Optional[str], option: Optional[str] = None) -> str:
     safe = name.replace('"', '\\"')
+    safe_option = (option or "").replace('"', '\\"').strip()
     item_selector = _wrap_is(get_selector(current_url, "cart_item")) if current_url else ""
     title_selector = _wrap_is(get_selector(current_url, "item_title")) if current_url else ""
     if item_selector and title_selector:
-        return f'{item_selector}:has({title_selector}:has-text("{safe}"))'
+        base = f'{item_selector}:has({title_selector}:has-text("{safe}"))'
+        if safe_option:
+            base = f'{base}:has-text("{safe_option}")'
+        return base
     return f'[id^="item_"]:has(a span:has-text("{safe}"))'
 
 
-def build_cart_item_selectors(name: str, current_url: Optional[str] = None) -> Dict[str, str]:
-    base = _build_cart_item_root_selector(name, current_url)
+def build_cart_item_selectors(
+    name: str,
+    current_url: Optional[str] = None,
+    option: Optional[str] = None,
+) -> Dict[str, str]:
+    base = _build_cart_item_root_selector(name, current_url, option)
     checkbox_selector = _wrap_is(get_selector(current_url, "item_checkbox")) if current_url else ""
     quantity_selector = _wrap_is(get_selector(current_url, "quantity_input")) if current_url else ""
     plus_selector = _wrap_is(get_selector(current_url, "quantity_plus")) if current_url else ""

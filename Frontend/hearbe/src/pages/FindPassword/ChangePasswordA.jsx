@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoA from '../../assets/logoA.png';
+import Swal from 'sweetalert2';
 import { authAPI } from '../../services/authAPI';
 import './ChangePasswordA.css';
 
@@ -11,22 +12,38 @@ const ChangePasswordA = () => {
 
     const handleSubmit = async () => {
         if (!password || !confirmPassword) {
-            alert('비밀번호를 입력해주세요.');
+            Swal.fire({
+                icon: 'warning',
+                text: '비밀번호를 입력해주세요.',
+                confirmButtonText: '확인'
+            });
             return;
         }
         if (password.length !== 6 || confirmPassword.length !== 6) {
-            alert('비밀번호는 숫자 6자리여야 합니다.');
+            Swal.fire({
+                icon: 'warning',
+                text: '비밀번호는 숫자 6자리여야 합니다.',
+                confirmButtonText: '확인'
+            });
             return;
         }
         if (password !== confirmPassword) {
-            alert('비밀번호가 일치하지 않습니다.');
+            Swal.fire({
+                icon: 'warning',
+                text: '비밀번호가 일치하지 않습니다.',
+                confirmButtonText: '확인'
+            });
             return;
         }
         try {
             const welfareVerified = localStorage.getItem('welfare_verified') === 'true';
             const storedCard = localStorage.getItem('welfare_card');
             if (!welfareVerified || !storedCard) {
-                alert('복지카드 인증이 필요합니다.');
+                Swal.fire({
+                    icon: 'error',
+                    text: '복지카드 인증이 필요합니다.',
+                    confirmButtonText: '확인'
+                });
                 return;
             }
             const welfareCard = JSON.parse(storedCard);
@@ -34,13 +51,25 @@ const ChangePasswordA = () => {
             if (response?.result === 'success') {
                 localStorage.removeItem('welfare_verified');
                 localStorage.removeItem('welfare_card');
-                alert('비밀번호가 변경되었습니다.');
+                Swal.fire({
+                    icon: 'success',
+                    text: '비밀번호가 변경되었습니다.',
+                    confirmButtonText: '확인'
+                });
                 navigate('/A/login');
                 return;
             }
-            alert(response?.message || '비밀번호 변경에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: response?.message || '비밀번호 변경에 실패했습니다.',
+                confirmButtonText: '확인'
+            });
         } catch (error) {
-            alert(error.message || '비밀번호 변경에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '비밀번호 변경에 실패했습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -50,7 +79,7 @@ const ChangePasswordA = () => {
                 src={logoA}
                 alt="Logo"
                 className="change-pw-logo"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/main')}
             />
             <div className="change-pw-card">
                 <h1 className="change-pw-title">비밀번호 변경</h1>

@@ -96,7 +96,7 @@ FLOW_DEFINITIONS: Dict[str, Dict[str, FlowDefinition]] = {
                 ),
                 FlowStep(
                     step_id="complete",
-                    prompt="결제가 완료되었습니다. 주문번호는 {order_id}입니다.",
+                    prompt="결제가 완료되었습니다.",
                     action="complete"
                 )
             ]

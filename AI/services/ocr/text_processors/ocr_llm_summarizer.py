@@ -176,9 +176,9 @@ def _build_prompt(texts: List[str], product_type: ProductType, size_table: str =
 
 
 def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
-    api_key = os.environ.get("GMS_KEY")
+    api_key = os.environ.get("GMS_API_KEY")
     if not api_key:
-        raise RuntimeError("GMS_KEY 환경변수가 설정되지 않았습니다.")
+        raise RuntimeError("GMS_API_KEY 환경변수가 설정되지 않았습니다.")
 
     model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"

@@ -190,21 +190,21 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
             <header className="mall-header-c">
                 <div className="header-left-c">
                     <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
-                        <img src={logoC} alt="HearBe Logo" style={{ height: '60px', objectFit: 'contain' }} />
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '70px', objectFit: 'contain' }} />
                     </div>
                 </div>
 
                 <div className="header-right-c">
 
-                    <button className="nav-item-c" onClick={onHome || (() => navigate('/C/mall'))}>
+                    <button className="nav-item-c cursor-pointer" onClick={onHome || (() => navigate('/C/mall'))}>
                         <div className="nav-icon-c"><Home size={24} /></div>
                         <span>홈</span>
                     </button>
-                    <button className="nav-item-c" onClick={() => setActiveTab('cart')} style={activeTab === 'cart' ? { background: '#f5f3ff', color: '#7c3aed', fontWeight: '800' } : {}}>
+                    <button className="nav-item-c cursor-pointer" onClick={() => setActiveTab('cart')} style={activeTab === 'cart' ? { background: '#f5f3ff', color: '#7c3aed', fontWeight: '800' } : {}}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
-                    <button className="nav-item-c active" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
+                    <button className="nav-item-c active cursor-pointer" onClick={onMyPage || (() => navigate('/C/member-info'))}> {/* 마이페이지 링크를 /C/member-info로 변경 */}
                         <div className="nav-icon-c"><User size={24} /></div>
                         <span>마이페이지</span>
                     </button>
@@ -236,9 +236,9 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                     display: 'flex',
                                     flexDirection: 'row',
                                     alignItems: 'center',
-                                    fontSize: '1.85rem', // User requested EVEN larger size
+                                    fontSize: '1.25rem', // 1.85rem -> 1.25rem Adjusted
                                     width: '100%',
-                                    padding: '1.4rem 2rem', /* 패딩 추가 확대 */
+                                    padding: '1rem 1.2rem',
                                     color: activeTab === item.id ? '#7c3aed' : '#9ca3af',
                                     background: activeTab === item.id ? 'white' : 'transparent',
                                     border: 'none',
@@ -312,7 +312,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                             <span className="row-label">비밀번호</span>
                                             <span className="row-value">********</span>
                                         </div>
-                                        <button className="small-action-btn">재설정하기</button>
+                                        <button className="small-action-btn cursor-pointer">재설정하기</button>
                                     </div>
                                     <div className="info-row-full">
                                         <div className="row-icon-circle"><Mail size={20} /></div>
@@ -323,7 +323,7 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                     </div>
                                 </div>
                             </section>
-                            <button className="withdraw-link">회원탈퇴</button>
+                            <button className="withdraw-link cursor-pointer">회원탈퇴</button>
                         </div>
                     )}
 
@@ -353,8 +353,8 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                                     <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0, color: '#111827' }}>{group.mall}</h2>
                                                 </div>
                                                 <div className="order-group-actions">
-                                                    <button className="btn-outline-sm">상세 조회</button>
-                                                    <button className="btn-fill-sm">배송 조회</button>
+                                                    <button className="btn-outline-sm cursor-pointer">상세 조회</button>
+                                                    <button className="btn-fill-sm cursor-pointer">배송 조회</button>
                                                 </div>
                                             </div>
                                             <div className="group-items">
@@ -364,8 +364,20 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                                             <div className="item-thumb">{item.icon}</div>
                                                             <div className="item-info-text">
                                                                 <div className="item-name-lg">{item.name}</div>
-                                                                <div className="item-meta-text">{item.date} · {item.quantity}</div>
                                                             </div>
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: '1.4rem',
+                                                            fontWeight: 'bold',
+                                                            color: '#374151',
+                                                            whiteSpace: 'nowrap',
+                                                            marginRight: '0.5rem'
+                                                        }}>
+                                                            {item.quantity}
+                                                        </div>
+                                                        <div className="item-row-actions order-item-actions-container">
+                                                            <button className="btn-outline-sm order-item-action-btn cursor-pointer">상품 조회</button>
+                                                            <button className="btn-fill-sm order-item-deliver-btn cursor-pointer">배송 조회</button>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -404,17 +416,17 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
 
                                             {/* Selection Toolbar */}
                                             <div className="selection-toolbar">
-                                                <button className="check-all-btn">
+                                                <button className="check-all-btn cursor-pointer">
                                                     <CheckSquare size={40} /> 전체선택
                                                 </button>
-                                                <button className="delete-selected-btn">선택삭제</button>
+                                                <button className="delete-selected-btn cursor-pointer">선택삭제</button>
                                             </div>
 
                                             <div className="group-items">
                                                 {group.items.map((item) => (
                                                     <div key={item.id} className="item-row-card">
                                                         <div className="item-row-left">
-                                                            <button className="check-item-btn"><CheckSquare size={40} color="#ddd" /></button>
+                                                            <button className="check-item-btn cursor-pointer"><CheckSquare size={40} color="#ddd" /></button>
                                                             <div className="item-thumb">
                                                                 {item.imgUrl ? (
                                                                     <img src={item.imgUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1rem' }} />
@@ -428,8 +440,8 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                                                             </div>
                                                         </div>
                                                         <div className="item-row-actions vertical">
-                                                            <button className="btn-outline-rounded">장바구니 담기</button>
-                                                            <button className="btn-text-grey">삭제</button>
+                                                            <button className="btn-outline-rounded cursor-pointer">장바구니 담기</button>
+                                                            <button className="btn-text-grey cursor-pointer">삭제</button>
                                                         </div>
                                                     </div>
                                                 ))}

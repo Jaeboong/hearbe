@@ -5,10 +5,28 @@
 1. CartRule (CommandGenerator 내부) — "장바구니에 담아줘", "장바구니 보여줘"
 2. cart_action.py (LLMPlanner에서 규칙 실패 후 호출) — 장바구니 페이지 내 조작 (선택/해제/수량변경)
 
+## 핵심 진입 파일
+
+- `services/llm/rules/cart.py`
+- `services/llm/planner/cart_action.py`
+
+### import 맵 (프로젝트 내부)
+
+`services/llm/rules/cart.py`
+- `services/llm/context/context_rules.py`
+- `services/llm/rules/__init__.py`
+- `services/llm/sites/site_manager.py`
+
+`services/llm/planner/cart_action.py`
+- `core/interfaces.py`
+- `core/korean_numbers.py`
+- `services/llm/planner/cart_item_matcher.py`
+- `services/llm/sites/site_manager.py`
+
 ## 핵심 포인트
 - 장바구니 담기 명령은 `click(장바구니 버튼 셀렉터) + wait` 조합
 - 장바구니 이동은 `goto(장바구니 URL)` 또는 `click_text("장바구니")` 폴백
-- 장바구니 페이지 조작(선택/해제/수량)은 CommandGenerator가 아닌 cart_action.py에서 별도 처리
+- 장바구니 페이지 조작(선택/해제/수량/삭제)은 CommandGenerator가 아닌 cart_action.py에서 별도 처리
 - 장바구니 내용 읽기는 MCPHandler에서 extract_cart 결과를 build_cart_summary_tts()로 포매팅
 
 ---
@@ -103,7 +121,8 @@
 └─ 기타 조작:
     ├─ "전체 선택" → click(select_all_checkbox)
     ├─ "1번 상품 선택" → click(해당 상품 체크박스)
-    └─ "1번 상품 해제" → click(해당 상품 체크박스)
+    ├─ "1번 상품 해제" → click(해당 상품 체크박스)
+    └─ "1번 상품 삭제" → delete 버튼 클릭 또는 선택 삭제 폴백
 ```
 
 ---

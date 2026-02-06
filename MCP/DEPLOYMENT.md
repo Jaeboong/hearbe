@@ -68,3 +68,48 @@ MCPDesktop/
 3. `MCPDesktop.exe` 실행
 
 → Chrome Extension 자동 로드 ✅
+
+---
+
+## ⚠️ Build Process Notes
+
+### Configuration File Naming
+
+The application uses `config.env` instead of `.env` for configuration.
+
+**Reason:** Windows Defender/SmartScreen may delete dot-prefixed files (`.env`) when running unsigned executables after security warnings.
+
+**Files involved:**
+- [config.env](MCP/config.env) - Configuration file (renamed from `.env`)
+- [core/config.py](MCP/core/config.py) - Loads `config.env` with priority over `.env`
+- [build_mcp.bat](MCP/build_mcp.bat) - Bundles `config.env` into the build
+
+### ZIP Archive Structure
+
+The build script uses Windows `tar` command to create the ZIP:
+
+```batch
+pushd "dist\MCPDesktop"
+tar -a -c -f "..\MCPDesktop.zip" MCPDesktop.exe _internal
+popd
+```
+
+**Why this approach:**
+- Avoids wrapper folder issue (zip should extract directly to `MCPDesktop.exe` + `_internal/`)
+- Avoids `./` prefix in paths that some archivers add
+- Uses built-in Windows 10+ `tar` instead of PowerShell (avoids execution policy issues)
+
+### Known Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Opens Google instead of target URL | `config.env` missing or Windows Defender deleted it | Ensure `config.env` exists with `HOME_URL` |
+| Extra wrapper folder after extraction | `tar` zipped the folder instead of contents | Use explicit file names in `tar` command |
+| `.env` disappears after security warning | Windows Defender blocks dot-prefixed files on unsigned exe | Use `config.env` naming |
+
+### Build Checklist
+
+- [ ] `config.env` contains correct `HOME_URL`
+- [ ] Virtual environment exists (`venv/`)
+- [ ] Chrome extension exists at `../Frontend/hearbe-extension/`
+- [ ] After build, verify ZIP structure with: `tar -tf dist\MCPDesktop.zip`

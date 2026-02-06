@@ -30,7 +30,7 @@
   color: #94a3b8;
   font-size: 0.875rem;
   font-weight: 500;
-  border-top: 1px solid #f1f5f9;
+  border-top: none;
   background: white;
   margin-top: auto;
   /* 공간이 남을 경우 맨 밑으로 이동 */
@@ -353,6 +353,26 @@
   font-size: 0.875rem;
   color: #9ca3af;
   font-weight: 700;
+}
+
+/* A형 전용 푸터 스타일 */
+.landing-footer-a {
+  width: 100%;
+  padding: 3rem 0;
+  text-align: center;
+  color: rgba(255, 240, 100, 0.7);
+  font-size: 1.5rem;
+  font-weight: 600;
+  background-color: #141C29;
+  /* 배경색 일치 */
+  border: none !important;
+  /* 선 제거 */
+  margin-top: auto;
+}
+
+.landing-footer-a p {
+  margin: 0;
+  color: rgba(255, 240, 100, 0.6);
 }
 
 @keyframes ping {

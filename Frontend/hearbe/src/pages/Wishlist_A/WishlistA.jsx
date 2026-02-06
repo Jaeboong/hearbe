@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, Heart } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import { cartAPI } from '../../services/cartAPI';
@@ -26,11 +26,11 @@ const WishlistA = () => {
     };
 
     const menuItems = [
-        { id: 'profile', label: '회원정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문내역', path: '/A/order-history' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
+        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
         { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'card', label: <>장애인 복지카드<br />변경</>, path: '/A/card-management' }
+        { id: 'cart', label: '장바구니', path: '/A/cart' },
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -45,7 +45,7 @@ const WishlistA = () => {
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
-            window.location.href = 'http://localhost:5173/';
+            navigate('/main');
         }
     };
 
@@ -100,37 +100,6 @@ const WishlistA = () => {
         }
     };
 
-    const handleDeleteItem = async (mallName, itemId) => {
-        try {
-            await wishlistAPI.deleteWishlist(itemId);
-            setWishlistData(prev => ({
-                ...prev,
-                [mallName]: prev[mallName].filter(item => item.id !== itemId)
-            }));
-        } catch (err) {
-            console.error('Failed to delete wishlist item:', err);
-            alert(err.message || '삭제에 실패했습니다.');
-        }
-    };
-
-    const handleDeleteAll = async (mallName) => {
-        const items = wishlistData[mallName] || [];
-        if (items.length === 0) {
-            return;
-        }
-
-        try {
-            await Promise.all(items.map(item => wishlistAPI.deleteWishlist(item.id)));
-            setWishlistData(prev => ({
-                ...prev,
-                [mallName]: []
-            }));
-        } catch (err) {
-            console.error('Failed to delete wishlist items:', err);
-            alert(err.message || '삭제에 실패했습니다.');
-        }
-    };
-
     const handleAddToCart = async (item) => {
         try {
             await cartAPI.addCart({
@@ -138,10 +107,18 @@ const WishlistA = () => {
                 productName: item.name,
                 imgUrl: item.image
             });
-            alert(`${item.name}을(를) 장바구니에 담았습니다.`);
+            Swal.fire({
+                icon: 'success',
+                text: `${item.name}을(를) 장바구니에 담았습니다.`,
+                confirmButtonText: '확인'
+            });
         } catch (err) {
             console.error('Failed to add to cart:', err);
-            alert(err.message || '장바구니 담기에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: err.message || '장바구니 담기에 실패했습니다.',
+                confirmButtonText: '확인'
+            });
         }
     };
 
@@ -154,19 +131,19 @@ const WishlistA = () => {
             <img
                 src={logoA}
                 alt="Logo"
-                className="wishlist-logo-left"
-                onClick={() => window.location.assign('/')}
+                className="wishlist-logo-left cursor-pointer"
+                onClick={() => navigate('/main')}
             />
 
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action" onClick={() => navigate('/A/mall')}>
-                        <Home size={72} />
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
+                        <Home size={56} />
                         <span>홈</span>
                     </button>
-                    <button className="topbar-action" onClick={handleLogout}>
-                        <LogOut size={72} />
+                    <button className="topbar-action cursor-pointer" onClick={handleLogout}>
+                        <LogOut size={56} />
                         <span>로그아웃</span>
                     </button>
                 </div>
@@ -175,99 +152,104 @@ const WishlistA = () => {
             <div className="wishlist-content">
                 {/* Sidebar */}
                 <aside className="wishlist-sidebar">
-                    <nav className="sidebar-nav">
-                        {menuItems.map(item => (
-                            <div
-                                key={item.id}
-                                className={`sidebar-item ${currentPath === item.path ? 'active' : ''}`}
-                                onClick={() => navigate(item.path)}
-                            >
-                                {item.label}
-                            </div>
-                        ))}
-                    </nav>
+                    <div className="sidebar-menu-card">
+                        <nav className="sidebar-nav">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    className={`sidebar-item cursor-pointer ${currentPath === item.path ? 'active' : ''}`}
+                                    onClick={() => navigate(item.path)}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
                 </aside>
 
                 {/* Main Content */}
                 <main className="wishlist-main">
-                    <h2 className="content-title">찜한 상품</h2>
+                    <div className="content-card">
+                        <h2 className="content-title">
+                            <Heart size={64} color="#FFF064" fill="#FFF064" />
+                            찜한 상품
+                        </h2>
 
-                    {/* 로딩 상태 */}
-                    {isLoading && (
-                        <div className="loading-state">
-                            <div className="spinner"></div>
-                            <p>찜한 상품을 불러오는 중...</p>
-                        </div>
-                    )}
+                        {/* 로딩 상태 */}
+                        {isLoading && (
+                            <div className="loading-state">
+                                <div className="spinner"></div>
+                                <p>찜한 상품을 불러오는 중...</p>
+                            </div>
+                        )}
 
-                    {/* 에러 상태 */}
-                    {!isLoading && error && (
-                        <div className="error-state">
-                            <p className="error-message">찜한 상품을 불러오지 못했습니다.</p>
-                            <p className="error-detail">{error}</p>
-                            <button className="retry-btn" onClick={handleRetry}>
-                                다시 시도
-                            </button>
-                        </div>
-                    )}
+                        {/* 에러 상태 */}
+                        {!isLoading && error && (
+                            <div className="error-state">
+                                <p className="error-message">찜한 상품을 불러오지 못했습니다.</p>
+                                <p className="error-detail">{error}</p>
+                                <button className="retry-btn cursor-pointer" onClick={handleRetry}>
+                                    다시 시도
+                                </button>
+                            </div>
+                        )}
 
-                    {/* 빈 상태 */}
-                    {!isLoading && !error && Object.keys(wishlistData).length === 0 ? (
-                        <div className="empty-wishlist">
-                            찜한 상품이 없습니다.
-                        </div>
-                    ) : (
-                        <>
-                            {/* Wishlist by Mall */}
-                            {Object.entries(wishlistData).map(([mallName, items]) => (
-                                items.length > 0 && (
-                                    <div key={mallName} className="mall-section">
-                                        <div className="mall-header">
-                                            <h3 className="mall-name">{mallName}</h3>
-                                            <button
-                                                className="delete-all-btn"
-                                                onClick={() => handleDeleteAll(mallName)}
-                                            >
-                                                전체 삭제
-                                            </button>
+                        {/* 빈 상태 */}
+                        {!isLoading && !error && Object.keys(wishlistData).length === 0 ? (
+                            <div className="empty-wishlist">
+                                찜한 상품이 없습니다.
+                            </div>
+                        ) : (
+                            <>
+                                {/* Wishlist by Mall */}
+                                {Object.entries(wishlistData).map(([mallName, items]) => (
+                                    items.length > 0 && (
+                                        <div key={mallName} className="mall-section">
+                                            <div className="mall-header">
+                                                <h3 className="mall-name">{mallName}</h3>
+                                            </div>
+
+                                            <div className="items-list">
+                                                {items.map(item => (
+                                                    <div
+                                                        key={item.id}
+                                                        className="wishlist-item-wrapper cursor-pointer"
+                                                        onClick={() => item.url && window.open(item.url, '_blank', 'noopener,noreferrer')}
+                                                        style={{ cursor: item.url ? 'pointer' : 'default' }}
+                                                    >
+                                                        <div className="wishlist-item">
+                                                            <img src={item.image} alt={item.name} className="item-image" />
+                                                            <div className="item-details">
+                                                                <div className="item-name">{item.name}</div>
+                                                                <div className="item-price-a">{item.price}</div>
+                                                            </div>
+                                                            <div className="item-actions">
+                                                                <button
+                                                                    className="add-cart-btn cursor-pointer"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleAddToCart(item);
+                                                                    }}
+                                                                >
+                                                                    상품 조회
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-
-                                        <div className="items-list">
-                                            {items.map(item => (
-                                                <div key={item.id} className="wishlist-item">
-                                                    <div className="item-checkbox">
-                                                        <input type="checkbox" />
-                                                    </div>
-                                                    <img src={item.image} alt={item.name} className="item-image" />
-                                                    <div className="item-details">
-                                                        <div className="item-date">{item.date}</div>
-                                                        <div className="item-name">{item.name}</div>
-                                                        <div className="item-price">{item.price}</div>
-                                                    </div>
-                                                    <div className="item-actions">
-                                                        <button
-                                                            className="add-cart-btn"
-                                                            onClick={() => handleAddToCart(item)}
-                                                        >
-                                                            장바구니 담기
-                                                        </button>
-                                                        <button
-                                                            className="delete-btn"
-                                                            onClick={() => handleDeleteItem(mallName, item.id)}
-                                                        >
-                                                            삭제
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )
-                            ))}
-                        </>
-                    )}
+                                    )
+                                ))}
+                            </>
+                        )}
+                    </div>
                 </main>
             </div>
+
+            <footer className="landing-footer-a">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
 };

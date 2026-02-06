@@ -84,6 +84,7 @@ class WSClient:
         event_bus.subscribe(EventType.AUDIO_READY, self._on_audio_ready)  # PTT 오디오
         event_bus.subscribe(EventType.HOTKEY_PRESSED, self._on_hotkey_pressed)
         event_bus.subscribe(EventType.PAGE_URL_UPDATED, self._on_page_url_updated)
+        event_bus.subscribe(EventType.TEXT_INPUT_READY, self._on_text_input_ready)
         event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
         logger.info("WSClient event handlers registered")
     
@@ -296,7 +297,7 @@ class WSClient:
             return
         
         logger.info(f"Received {len(commands)} tool call(s)")
-        
+
         for i, cmd in enumerate(commands):
             tool_name = cmd.get("tool_name")
             arguments = cmd.get("arguments", {})
@@ -331,12 +332,29 @@ class WSClient:
         """TTS 청크 처리"""
         is_final = data.get("is_final", False)
         audio_hex = data.get("audio", "")
+        text = data.get("text") or ""
+        tts_id = data.get("tts_id") or ""
+        segment_index = data.get("segment_index")
+        segment_total = data.get("segment_total")
+
+        if text:
+            seg_label = ""
+            if isinstance(segment_index, int) and isinstance(segment_total, int) and segment_total > 0:
+                seg_label = f" [{segment_index + 1}/{segment_total}]"
+            logger.info(f"TTS text{seg_label}: {text}")
         
         if audio_hex:
             # TODO: TTS 오디오 재생 구현
             await publish(
                 EventType.TTS_AUDIO_RECEIVED,
-                data={"audio": bytes.fromhex(audio_hex), "is_final": is_final},
+                data={
+                    "audio": bytes.fromhex(audio_hex),
+                    "is_final": is_final,
+                    "text": text,
+                    "tts_id": tts_id,
+                    "segment_index": segment_index,
+                    "segment_total": segment_total,
+                },
                 source="network.ws_client"
             )
     
@@ -409,6 +427,16 @@ class WSClient:
         await self.send_message(
             MessageType.INTERRUPT,
             {"reason": "hotkey"}
+        )
+
+    async def _on_text_input_ready(self, event):
+        """Send text input to server (bypass ASR)."""
+        text = (event.data or "").strip()
+        if not text:
+            return
+        await self.send_message(
+            MessageType.USER_INPUT,
+            {"text": text}
         )
 
     async def _on_page_url_updated(self, event):

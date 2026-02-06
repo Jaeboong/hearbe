@@ -3,8 +3,10 @@ import { useState, useRef } from 'react';
 
 // [페이지 컴포넌트]
 import MainLanding from '../pages/MainLanding';
+import BrandLanding from '../pages/BrandLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
+import SplinePage from '../Audio/SplinePage';
 
 // [A형 페이지 컴포넌트]
 import LoginA from '../pages/Login/LoginA';
@@ -55,8 +57,14 @@ function AppContent() {
     // 모드에 따라 분기 처리
     if (mode === 'common') {
       navigate('/C/login');
-    } else {
+    } else if (mode === 'sharing') {
+      navigate('/S/join');
+    } else if (mode === 'big') {
+      // Type B (big text) -> Original Type A Login
       navigate('/A/login');
+    } else {
+      // Type A (audio) -> Spline Page
+      navigate('/spline-test');
     }
   };
 
@@ -77,7 +85,10 @@ function AppContent() {
       {/* Intro 페이지 별도 경로 유지 */}
       <Route path="/intro" element={<Intro />} />
 
-      {/* 메인 랜딩 페이지 */}
+      {/* 인트로 완료 후 브랜드 소개 페이지 */}
+      <Route path="/guide" element={<BrandLanding />} />
+
+      {/* 메인 랜딩 페이지 (쇼핑 모드 선택 전용) */}
       <Route
         path="/main"
         element={
@@ -88,6 +99,9 @@ function AppContent() {
           />
         }
       />
+
+      {/* Spline Test Page */}
+      <Route path="/spline-test" element={<SplinePage />} />
 
       {/* Type A Routes */}
       <Route
@@ -224,7 +238,7 @@ function AppContent() {
       />
       <Route
         path="/C/findPassword"
-        element={<FindPasswordC mode="common" onBack={() => navigate(-1)} />}
+        element={<FindPasswordC mode="common" onBack={() => navigate('/C/login')} />}
       />
       <Route
         path="/C/mall"
@@ -299,7 +313,7 @@ function AppContent() {
       <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
       <Route path="/login-s" element={<Navigate to="/S/join" replace />} />
       <Route path="/S/guardian-view" element={<Navigate to="/S/join" replace />} />
-      <Route path="/S/join" element={<GuardianViewS />} />
+      <Route path="/S/join" element={<GuardianViewS />} caseSensitive={false} />
 
       {/* Fallback */}
 

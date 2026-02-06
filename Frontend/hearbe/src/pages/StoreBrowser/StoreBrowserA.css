@@ -228,7 +228,7 @@
     gap: 10px;
     color: #FFF064;
     font-size: 30px;
-    font-family: 'KoddiUD 온고딕', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
     cursor: pointer;
 }
 
@@ -356,7 +356,7 @@
     color: #FAFAFA;
     font-size: 35px;
     font-weight: bold;
-    font-family: 'KoddiUD \uc628\uace0\ub515', 'KoddiUD OnGothic', sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 
 .product-input::placeholder {
@@ -424,4 +424,10 @@
 
 .open-new-window-btn:active {
     transform: scale(0.95);
+}
+
+/* Hide "open in new tab" notice on share screen */
+.store-container.hide-new-tab-notice .iframe-blocked-message,
+.store-container.hide-new-tab-notice .open-new-window-btn {
+    display: none !important;
 }

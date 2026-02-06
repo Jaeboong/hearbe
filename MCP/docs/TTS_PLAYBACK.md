@@ -88,7 +88,11 @@ AI 서버에서 생성된 TTS 음성을 MCP 클라이언트에서 재생하는 �
   "data": {
     "audio": "hex_encoded_pcm_data",
     "is_final": false,
-    "sample_rate": 24000
+    "sample_rate": 24000,
+    "tts_id": "a1b2c3d4e5",
+    "text": "optional segment text (sent on first chunk of a segment)",
+    "segment_index": 0,
+    "segment_total": 5
   },
   "session_id": "uuid",
   "timestamp": "2026-01-26T12:00:00"
@@ -105,7 +109,12 @@ AI 서버에서 생성된 TTS 음성을 MCP 클라이언트에서 재생하는 �
   ```python
   {
       "audio": bytes,      # PCM audio data
-      "is_final": bool     # True if last chunk
+      "is_final": bool,    # True if last chunk for a segment
+      # optional metadata (if provided by server)
+      "text": str,
+      "tts_id": str,
+      "segment_index": int,
+      "segment_total": int,
   }
   ```
 

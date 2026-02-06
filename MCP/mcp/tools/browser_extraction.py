@@ -6,14 +6,49 @@
 
 import logging
 from typing import Any, Dict, Optional
+from urllib.parse import urljoin, urlparse
 
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
-from browser.extractors import extract_cart_dynamic
+from browser.extractors import (
+    extract_cart_dynamic,
+    extract_order_detail_dynamic,
+    extract_order_list_dynamic,
+)
 from browser.fallbacks.detail_fallback import apply_detail_option_fallback
 from browser.fallbacks.search_fallback import build_search_fallback_result
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
+
+
+def _pick_src_from_srcset(srcset: str) -> Optional[str]:
+    """Pick the most suitable URL from a srcset attribute."""
+    if not srcset:
+        return None
+    parts = [part.strip() for part in srcset.split(",") if part.strip()]
+    if not parts:
+        return None
+    # Prefer the last candidate (typically highest resolution).
+    candidate = parts[-1]
+    return candidate.split()[0] if candidate else None
+
+
+def _normalize_image_url(raw_url: str, base_url: str) -> Optional[str]:
+    if not raw_url:
+        return None
+    url = raw_url.strip()
+    if not url:
+        return None
+    if url.startswith(("data:", "blob:", "javascript:")):
+        return None
+    if url.startswith("//"):
+        url = f"https:{url}"
+    elif url.startswith("/") and base_url:
+        url = urljoin(base_url, url)
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        return None
+    return url
 
 
 class BrowserExtractionMixin:
@@ -118,7 +153,13 @@ class BrowserExtractionMixin:
             values = []
             for i in range(count):
                 item = locator.nth(i)
-                value = await item.get_attribute(attribute)
+                if attribute == "value":
+                    try:
+                        value = await item.input_value()
+                    except Exception:
+                        value = await item.get_attribute(attribute)
+                else:
+                    value = await item.get_attribute(attribute)
                 if value is None:
                     if include_empty:
                         values.append("")
@@ -300,15 +341,42 @@ class BrowserExtractionMixin:
                 img_locator = context.locator(image_selector) if context_type == "frame_locator" else context.locator(image_selector)
                 count = await img_locator.count()
                 max_items = min(count, image_limit) if image_limit > 0 else count
+                base_url = getattr(context, "url", None) or page.url or ""
+                seen = set()
+                attr_candidates = [image_attribute] if image_attribute else ["src"]
+                fallback_attrs = [
+                    "src",
+                    "data-src",
+                    "data-lazy-src",
+                    "data-original",
+                    "data-zoom",
+                    "data-image-src",
+                    "srcset",
+                    "data-srcset",
+                ]
+                for attr in fallback_attrs:
+                    if attr not in attr_candidates:
+                        attr_candidates.append(attr)
                 for i in range(max_items):
                     item = img_locator.nth(i)
-                    src = await item.get_attribute(image_attribute)
+                    src = None
+                    for attr in attr_candidates:
+                        value = await item.get_attribute(attr)
+                        if not value:
+                            continue
+                        if attr in ("srcset", "data-srcset"):
+                            value = _pick_src_from_srcset(value)
+                            if not value:
+                                continue
+                        src = value
+                        break
                     if not src:
                         continue
-                    src = src.strip()
-                    if src.startswith("//"):
-                        src = f"https:{src}"
-                    images.append(src)
+                    normalized = _normalize_image_url(src, base_url)
+                    if not normalized or normalized in seen:
+                        continue
+                    seen.add(normalized)
+                    images.append(normalized)
 
             # 동적 fallback: 옵션 필드가 없거나 실패한 경우
             if fallback_dynamic:
@@ -437,3 +505,43 @@ class BrowserExtractionMixin:
         except Exception as e:
             logger.error(f"Extract cart failed: {e}")
             return {"success": False, "error": str(e), "cart_items": []}
+
+    async def extract_order_detail(self) -> Dict[str, Any]:
+        """
+        Extract order detail data from order detail page.
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            data = await extract_order_detail_dynamic(page)
+            if not isinstance(data, dict) or not data:
+                return {"success": False, "error": "Not on order detail page", "page_url": page.url}
+            return {"success": True, "order_detail": data, "page_url": page.url}
+        except Exception as e:
+            logger.error(f"Extract order detail failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def extract_order_list(self) -> Dict[str, Any]:
+        """
+        Extract order list data from order list page.
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            data = await extract_order_list_dynamic(page)
+            if not isinstance(data, dict):
+                return {"success": False, "error": "Not on order list page", "page_url": page.url}
+            orders = data.get("orders") if isinstance(data, dict) else []
+            return {
+                "success": True,
+                "order_list": orders or [],
+                "count": data.get("count") if isinstance(data, dict) else len(orders or []),
+                "page_url": page.url,
+            }
+        except Exception as e:
+            logger.error(f"Extract order list failed: {e}")
+            return {"success": False, "error": str(e), "order_list": []}

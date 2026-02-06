@@ -110,7 +110,7 @@ const SharingViewerS = () => {
             </div>
 
             {/* 고정 뒤로가기 */}
-            <button onClick={handleLeave} className="back-button-circle-s">
+            <button onClick={handleLeave} className="back-button-circle-s cursor-pointer">
                 <ArrowLeft size={24} />
             </button>
 
@@ -157,7 +157,7 @@ const SharingViewerS = () => {
                 animate={{ y: 0, opacity: 1 }}
                 className="bottom-sharing-actions-s"
             >
-                <button onClick={handleLeave} className="share-action-btn-s purple-btn">
+                <button onClick={handleLeave} className="share-action-btn-s purple-btn cursor-pointer">
                     <X size={20} /> 공유 종료
                 </button>
             </motion.div>

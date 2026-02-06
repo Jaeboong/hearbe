@@ -37,8 +37,15 @@ body:has(.cart-container),
 body:has(.cardmgmt-container),
 body:has(.findid-container),
 body:has(.findpw-container),
-body:has(.store-browser-a) {
-  background-color: #1E2A3A !important;
+body:has(.store-browser-a),
+body:has(.store-container),
+body:has(.login-a-page-new),
+body:has(.signup-a-page-new),
+body:has(.findid-a-page-new),
+body:has(.findpw-a-page-new),
+body:has(.changepw-a-page-new),
+body:has(.select-mall-a-container) {
+  background-color: #141C29 !important;
 }
 
 #root {
@@ -48,6 +55,13 @@ body:has(.store-browser-a) {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* #root도 A형 배경을 따라가도록 설정 */
+body:has(.select-mall-a-container) #root,
+body:has(.login-a-page-new) #root,
+body:has(.signup-a-page-new) #root {
+  background-color: #141C29 !important;
 }
 
 /* ===== SweetAlert2 Custom Theme (HearBe Purple) ===== */
@@ -153,4 +167,152 @@ div:where(.swal2-icon).swal2-error {
 
 [class^='swal2-x-mark-line'] {
   background-color: #ef4444 !important;
+}
+
+/* ===== A-Type SweetAlert2 Theme (Navy & Yellow) ===== */
+/* body에 A형 관련 클래스들이 있을 때 팝업 스타일 변경 */
+body:has(.login-a-page-new) .swal2-popup,
+body:has(.signup-a-page-new) .swal2-popup,
+body:has(.findid-a-page-new) .swal2-popup,
+body:has(.findpw-a-page-new) .swal2-popup,
+body:has(.changepw-a-page-new) .swal2-popup,
+body:has(.mypage-container-a) .swal2-popup,
+body:has(.memberinfo-container) .swal2-popup,
+body:has(.orderhistory-container) .swal2-popup,
+body:has(.wishlist-container) .swal2-popup,
+body:has(.cart-container) .swal2-popup,
+body:has(.cardmgmt-container) .swal2-popup,
+body:has(.store-browser-a) .swal2-popup,
+body:has(.store-container) .swal2-popup,
+body:has(.select-mall-a-container) .swal2-popup {
+  background: #141C29 !important;
+  border: 4px solid #FFF064 !important;
+  color: #FFF064 !important;
+  border-radius: 40px !important;
+}
+
+body:has(.login-a-page-new) .swal2-title,
+body:has(.signup-a-page-new) .swal2-title,
+body:has(.findid-a-page-new) .swal2-title,
+body:has(.findpw-a-page-new) .swal2-title,
+body:has(.changepw-a-page-new) .swal2-title,
+body:has(.mypage-container-a) .swal2-title,
+body:has(.memberinfo-container) .swal2-title,
+body:has(.orderhistory-container) .swal2-title,
+body:has(.wishlist-container) .swal2-title,
+body:has(.cart-container) .swal2-title,
+body:has(.cardmgmt-container) .swal2-title,
+body:has(.store-browser-a) .swal2-title,
+body:has(.store-container) .swal2-title,
+body:has(.select-mall-a-container) .swal2-title {
+  color: #FFF064 !important;
+  font-weight: 950 !important;
+  font-size: 2.2rem !important;
+}
+
+body:has(.login-a-page-new) .swal2-html-container,
+body:has(.signup-a-page-new) .swal2-html-container,
+body:has(.findid-a-page-new) .swal2-html-container,
+body:has(.findpw-a-page-new) .swal2-html-container,
+body:has(.changepw-a-page-new) .swal2-html-container,
+body:has(.mypage-container-a) .swal2-html-container,
+body:has(.memberinfo-container) .swal2-html-container,
+body:has(.orderhistory-container) .swal2-html-container,
+body:has(.wishlist-container) .swal2-html-container,
+body:has(.cart-container) .swal2-html-container,
+body:has(.cardmgmt-container) .swal2-html-container,
+body:has(.store-browser-a) .swal2-html-container,
+body:has(.store-container) .swal2-html-container,
+body:has(.select-mall-a-container) .swal2-html-container {
+  color: #FFF064 !important;
+  font-weight: 800 !important;
+  font-size: 1.5rem !important;
+  line-height: 1.5 !important;
+}
+
+body:has(.login-a-page-new) .swal2-confirm,
+body:has(.signup-a-page-new) .swal2-confirm,
+body:has(.findid-a-page-new) .swal2-confirm,
+body:has(.findpw-a-page-new) .swal2-confirm,
+body:has(.changepw-a-page-new) .swal2-confirm,
+body:has(.mypage-container-a) .swal2-confirm,
+body:has(.memberinfo-container) .swal2-confirm,
+body:has(.orderhistory-container) .swal2-confirm,
+body:has(.wishlist-container) .swal2-confirm,
+body:has(.cart-container) .swal2-confirm,
+body:has(.cardmgmt-container) .swal2-confirm,
+body:has(.store-browser-a) .swal2-confirm,
+body:has(.store-container) .swal2-confirm,
+body:has(.select-mall-a-container) .swal2-confirm {
+  background: #FFF064 !important;
+  color: #141C29 !important;
+  font-weight: 950 !important;
+  border-radius: 20px !important;
+  font-size: 1.45rem !important;
+  padding: 16px 54px !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(255, 240, 100, 0.2) !important;
+}
+
+body:has(.login-a-page-new) .swal2-icon,
+body:has(.signup-a-page-new) .swal2-icon,
+body:has(.findid-a-page-new) .swal2-icon,
+body:has(.findpw-a-page-new) .swal2-icon,
+body:has(.changepw-a-page-new) .swal2-icon,
+body:has(.mypage-container-a) .swal2-icon,
+body:has(.memberinfo-container) .swal2-icon,
+body:has(.orderhistory-container) .swal2-icon,
+body:has(.wishlist-container) .swal2-icon,
+body:has(.cart-container) .swal2-icon,
+body:has(.cardmgmt-container) .swal2-icon,
+body:has(.store-browser-a) .swal2-icon,
+body:has(.store-container) .swal2-icon,
+body:has(.select-mall-a-container) .swal2-icon {
+  border-color: #FFF064 !important;
+  color: #FFF064 !important;
+}
+
+body:has(.login-a-page-new) .swal2-success-line,
+body:has(.signup-a-page-new) .swal2-success-line,
+body:has(.findid-a-page-new) .swal2-success-line,
+body:has(.findpw-a-page-new) .swal2-success-line,
+body:has(.changepw-a-page-new) .swal2-success-line,
+body:has(.mypage-container-a) .swal2-success-line,
+body:has(.memberinfo-container) .swal2-success-line,
+body:has(.orderhistory-container) .swal2-success-line,
+body:has(.wishlist-container) .swal2-success-line,
+body:has(.cart-container) .swal2-success-line,
+body:has(.cardmgmt-container) .swal2-success-line,
+body:has(.store-browser-a) .swal2-success-line,
+body:has(.store-container) .swal2-success-line,
+body:has(.select-mall-a-container) .swal2-success-line {
+  background-color: #FFF064 !important;
+}
+
+body:has(.login-a-page-new) .swal2-success-ring,
+body:has(.signup-a-page-new) .swal2-success-ring,
+body:has(.findid-a-page-new) .swal2-success-ring,
+body:has(.findpw-a-page-new) .swal2-success-ring,
+body:has(.changepw-a-page-new) .swal2-success-ring,
+body:has(.mypage-container-a) .swal2-success-ring,
+body:has(.memberinfo-container) .swal2-success-ring,
+body:has(.orderhistory-container) .swal2-success-ring,
+body:has(.wishlist-container) .swal2-success-ring,
+body:has(.cart-container) .swal2-success-ring,
+body:has(.cardmgmt-container) .swal2-success-ring,
+body:has(.store-browser-a) .swal2-success-ring,
+body:has(.store-container) .swal2-success-ring,
+body:has(.select-mall-a-container) .swal2-success-ring {
+  border-color: rgba(255, 240, 100, 0.3) !important;
+}
+
+/* ===== A형 푸터 스타일 보정 (배경색 일치 및 선 제거) ===== */
+.landing-footer-a,
+.select-mall-a-footer,
+footer.landing-footer-a,
+footer.select-mall-a-footer {
+  background-color: #141C29 !important;
+  border: none !important;
+  border-top: none !important;
+  box-shadow: none !important;
 }

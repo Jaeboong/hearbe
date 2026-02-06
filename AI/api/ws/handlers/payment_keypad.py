@@ -10,19 +10,21 @@ import asyncio
 import base64
 import logging
 import os
-import re
 from typing import Dict, Any, Optional, List
 
 from core.interfaces import MCPCommand
+from services.ocr.payment.pin_parser import PinParser
 from services.llm.sites.site_manager import get_page_type, get_selector
 from ..presenter.pages.checkout import (
     KEYPAD_PROMPT,
     KEYPAD_RETRY,
+    KEYPAD_LENGTH_INVALID,
     KEYPAD_NOT_READY,
     KEYPAD_FAIL,
     KEYPAD_FAIL_SIMPLE,
     KEYPAD_IMAGE_UNREADABLE,
 )
+from ..feedback.payment_post_handler import PaymentPostHandler
 
 logger = logging.getLogger(__name__)
 
@@ -45,24 +47,6 @@ CTX_ARMED = "payment_keypad_armed"
 CTX_PENDING_DIGITS = "payment_keypad_pending_digits"
 
 
-_KOR_DIGIT_MAP = {
-    "영": "0",
-    "공": "0",
-    "일": "1",
-    "하나": "1",
-    "이": "2",
-    "둘": "2",
-    "삼": "3",
-    "셋": "3",
-    "사": "4",
-    "넷": "4",
-    "오": "5",
-    "육": "6",
-    "륙": "6",
-    "칠": "7",
-    "팔": "8",
-    "구": "9",
-}
 
 
 class PaymentKeypadManager:
@@ -72,11 +56,13 @@ class PaymentKeypadManager:
         self._sender = sender
         self._session = session_manager
         self._ocr_tasks: Dict[str, asyncio.Task] = {}
+        self._post_handler = PaymentPostHandler(sender, session_manager)
 
     async def handle_page_update(self, session_id: str, current_url: str):
         """Reset or trigger detection when page changes."""
         if not current_url:
             return
+        await self._post_handler.handle_page_update(session_id, current_url)
         if get_page_type(current_url) != "checkout":
             self._reset_session(session_id, keep_armed=False)
             return
@@ -143,6 +129,9 @@ class PaymentKeypadManager:
             await self._maybe_start_ocr(session_id)
             return True
 
+        handled = await self._post_handler.handle_mcp_result(session_id, data)
+        if handled:
+            return True
         return False
 
     async def handle_user_text(self, session_id: str, text: str) -> bool:
@@ -164,8 +153,14 @@ class PaymentKeypadManager:
         )
         digits = _extract_digits(text)
         if not stage:
+            handled = await self._post_handler.handle_user_text(session_id, text)
+            if handled:
+                return True
             if digits and current_url and get_page_type(current_url) == "checkout":
                 self._set_context(session_id, CTX_ARMED, True)
+                if len(digits) != 6:
+                    await self._sender.send_tts_response(session_id, KEYPAD_LENGTH_INVALID)
+                    return True
                 self._set_context(session_id, CTX_PENDING_DIGITS, digits)
                 self._set_context(session_id, CTX_LAST_URL, current_url)
                 await self._maybe_trigger_detection(session_id, current_url)
@@ -175,6 +170,10 @@ class PaymentKeypadManager:
         if not digits:
             if self._get_context(session_id, CTX_AWAITING):
                 await self._sender.send_tts_response(session_id, KEYPAD_RETRY)
+            return True
+        if len(digits) != 6:
+            self._set_context(session_id, CTX_PENDING_DIGITS, None)
+            await self._sender.send_tts_response(session_id, KEYPAD_LENGTH_INVALID)
             return True
 
         mapping = self._get_context(session_id, CTX_MAPPING) or {}
@@ -192,6 +191,7 @@ class PaymentKeypadManager:
 
     def cleanup_session(self, session_id: str):
         self._reset_session(session_id, keep_armed=False)
+        self._post_handler.cleanup_session(session_id)
 
     async def _maybe_trigger_detection(self, session_id: str, current_url: str):
         if not self._get_context(session_id, CTX_ARMED):
@@ -274,25 +274,61 @@ class PaymentKeypadManager:
         self._ocr_tasks[session_id] = task
 
     async def _run_ocr(self, session_id: str, shot_b64: str, dom_keys: List[str]):
+        frame_selector = self._get_context(session_id, CTX_FRAME_SELECTOR)
         try:
             image_bytes = base64.b64decode(shot_b64)
-        except Exception:
+        except Exception as e:
+            logger.error(
+                "Keypad OCR failed: cause=invalid_base64 error=%s frame_selector=%s dom_keys=%d",
+                e,
+                frame_selector,
+                len(dom_keys or []),
+            )
+            await self._sender.send_tts_response(session_id, KEYPAD_IMAGE_UNREADABLE)
+            self._ocr_tasks.pop(session_id, None)
+            return
+        if not image_bytes or len(image_bytes) < 1024:
+            logger.error(
+                "Keypad OCR failed: cause=empty_or_small_image bytes=%d frame_selector=%s dom_keys=%d",
+                len(image_bytes or b""),
+                frame_selector,
+                len(dom_keys or []),
+            )
             await self._sender.send_tts_response(session_id, KEYPAD_IMAGE_UNREADABLE)
             self._ocr_tasks.pop(session_id, None)
             return
 
         device = os.getenv("OCR_DEVICE", "cpu")
         try:
-            from services.ocr.payment.keypad_mapper import map_keypad_image
+            from services.ocr.payment.keypad_mapper import map_keypad_image, is_ocr_instance_ready
+            logger.info(
+                "Keypad OCR start: device=%s bytes=%d dom_keys=%d frame_selector=%s ocr_ready=%s",
+                device,
+                len(image_bytes),
+                len(dom_keys or []),
+                frame_selector,
+                is_ocr_instance_ready(),
+            )
             result = await asyncio.to_thread(map_keypad_image, image_bytes, dom_keys, device)
         except Exception as e:
-            logger.error(f"Keypad OCR failed: {e}")
+            logger.error(
+                "Keypad OCR failed: cause=exception type=%s error=%s frame_selector=%s",
+                type(e).__name__,
+                e,
+                frame_selector,
+            )
             await self._sender.send_tts_response(session_id, KEYPAD_FAIL_SIMPLE)
             self._ocr_tasks.pop(session_id, None)
             return
 
         mapping = result.get("digit_to_key_mapping") if isinstance(result, dict) else None
         if not mapping:
+            logger.error(
+                "Keypad OCR failed: cause=no_mapping digits=%s dom_keys=%s frame_selector=%s",
+                result.get("digits") if isinstance(result, dict) else None,
+                result.get("dom_keys") if isinstance(result, dict) else None,
+                frame_selector,
+            )
             await self._sender.send_tts_response(session_id, KEYPAD_FAIL_SIMPLE)
             self._ocr_tasks.pop(session_id, None)
             return
@@ -425,39 +461,10 @@ def _args_match(expected: Dict[str, Any], actual: Dict[str, Any]) -> bool:
     return True
 
 
+
 def _extract_digits(text: str) -> List[str]:
-    if not text:
-        return []
-    digits = re.findall(r"\d", text)
-    if digits:
-        return digits
-    tokens = re.split(r"\s+", re.sub(r"[^\w가-힣]", " ", text))
-    results: List[str] = []
-    kor_keys = sorted(_KOR_DIGIT_MAP.keys(), key=len, reverse=True)
-    for token in tokens:
-        token = token.strip()
-        if not token:
-            continue
-        if token in _KOR_DIGIT_MAP:
-            results.append(_KOR_DIGIT_MAP[token])
-            continue
-        embedded = re.findall(r"\d", token)
-        if embedded:
-            results.extend(embedded)
-            continue
-        # Parse continuous Korean digit sequences (e.g., "육구칠일공공")
-        idx = 0
-        while idx < len(token):
-            matched = False
-            for key in kor_keys:
-                if token.startswith(key, idx):
-                    results.append(_KOR_DIGIT_MAP[key])
-                    idx += len(key)
-                    matched = True
-                    break
-            if not matched:
-                idx += 1
-    return results
+    result = PinParser().parse(text or "")
+    return result.digits
 
 
 def _get_key_selector(current_url: Optional[str], key: str) -> str:
