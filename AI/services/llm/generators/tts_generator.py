@@ -53,6 +53,10 @@ class TTSGenerator:
         from .tts_pages.login import build_login_success_tts
         return build_login_success_tts(current_url)
 
+    def build_login_autofill_success(self, current_url: str) -> str:
+        from .tts_pages.login import build_login_autofill_success_tts
+        return build_login_autofill_success_tts(current_url)
+
     def build_login_guidance(self) -> str:
         from .tts_pages.login import build_login_guidance_tts
         return build_login_guidance_tts()
