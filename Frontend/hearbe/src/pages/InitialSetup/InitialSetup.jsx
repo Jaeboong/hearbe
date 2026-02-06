@@ -9,16 +9,34 @@ const STEPS = {
     COMPLETED: 'completed',
 };
 
+const VOICE_PROGRAM_BASE_NAME = '음성지원프로그램';
+
 export default function InitialSetup({ onComplete }) {
     const [currentStep, setCurrentStep] = useState(STEPS.MCP_DOWNLOAD);
-
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
+    const [voiceProgramVersion, setVoiceProgramVersion] = useState('');
 
     useEffect(() => {
         if (currentStep === STEPS.COMPLETED) {
             onComplete(true);
         }
     }, [currentStep, onComplete]);
+
+    useEffect(() => {
+        let mounted = true;
+        fetch('/downloads/voice-program-version.json', { cache: 'no-store' })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (!mounted || !data?.version) return;
+                setVoiceProgramVersion(data.version);
+            })
+            .catch(() => {});
+        return () => { mounted = false; };
+    }, []);
+
+    const voiceProgramDownloadFile = voiceProgramVersion
+        ? `${VOICE_PROGRAM_BASE_NAME}_${voiceProgramVersion}.zip`
+        : null;
 
     const handleMcpDownload = () => {
         setCurrentStep(STEPS.MIC_PERMISSION);
@@ -71,8 +89,14 @@ export default function InitialSetup({ onComplete }) {
                         </p>
                         <div className="flex gap-4 w-full">
                             <button onClick={handleMcpDownload} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">나중에</button>
-                            <a href="/downloads/MCPDesktop.zip" download onClick={handleMcpDownload}
-                                className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg no-underline flex items-center justify-center cursor-pointer" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>다운로드</a>
+                            <a
+                                href={voiceProgramDownloadFile ? encodeURI(`/downloads/${voiceProgramDownloadFile}`) : undefined}
+                                download={!!voiceProgramDownloadFile}
+                                onClick={handleMcpDownload}
+                                aria-disabled={!voiceProgramDownloadFile}
+                                className={`flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg no-underline flex items-center justify-center ${voiceProgramDownloadFile ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'}`}
+                                style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}
+                            >다운로드</a>
                         </div>
                     </div>
                 </motion.div>

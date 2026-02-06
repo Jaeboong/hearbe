@@ -144,14 +144,16 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
 
             {/* 음성 프로그램 다운로드 */}
             <motion.a
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              href={encodeURI(`/downloads/${voiceProgramDownloadFile}`)}
-              download
-              className="p-2 md:p-3 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center relative group"
+              whileHover={voiceProgramVersion ? { scale: 1.1 } : {}}
+              whileTap={voiceProgramVersion ? { scale: 0.95 } : {}}
+              href={voiceProgramVersion ? encodeURI(`/downloads/${voiceProgramDownloadFile}`) : undefined}
+              download={!!voiceProgramVersion}
+              aria-disabled={!voiceProgramVersion}
+              className={`p-2 md:p-3 rounded-full transition-colors flex items-center justify-center relative group ${voiceProgramVersion ? 'hover:bg-gray-100' : 'opacity-40 cursor-not-allowed'}`}
               title="음성 프로그램 다운로드"
+              onClick={voiceProgramVersion ? undefined : (e) => e.preventDefault()}
             >
-              <Download className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
+              <Download className={`w-5 h-5 md:w-6 md:h-6 ${voiceProgramVersion ? 'text-gray-700' : 'text-gray-400'}`} />
               {/* 말풍선 */}
               <div className="absolute top-full mt-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                 음성 프로그램 다운로드
