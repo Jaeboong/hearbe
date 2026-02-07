@@ -13,6 +13,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import get_config, setup_logging
 from core.event_bus import event_bus, EventType, publish
@@ -172,6 +173,19 @@ class AIServer:
             version="1.0.0",
             lifespan=lifespan,
             debug=self.config.server.debug
+        )
+
+        origins = [
+            origin.strip()
+            for origin in self.config.server.cors_origins.split(",")
+            if origin.strip()
+        ] or ["*"]
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
         )
 
         # HTTP 라우터 등록

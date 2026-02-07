@@ -4,11 +4,12 @@ HTTP API 라우터
 인증, 헬스체크, 관리 API, ASR
 """
 
+import asyncio
 import logging
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Request
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 from core.config import get_config
 
@@ -59,6 +60,29 @@ class ASRResponse(BaseModel):
     confidence: float
     language: str
     duration: float
+
+
+class WelfareCardConfidence(BaseModel):
+    """복지카드 OCR 필드별 confidence"""
+    card_company: Optional[float] = None
+    card_number: Optional[float] = None
+    expiration_date: Optional[float] = None
+    cvc: Optional[float] = None
+
+
+class WelfareCardOCRResponse(BaseModel):
+    """복지카드 OCR 응답"""
+    card_company: Optional[str] = None
+    card_number: Optional[str] = None
+    expiration_date: Optional[str] = None
+    cvc: Optional[str] = None
+    confidence: WelfareCardConfidence
+    raw_text: List[str]
+
+
+def _extract_welfare_card_fields(image_data: bytes, device: str) -> Dict[str, Any]:
+    from services.ocr.welfare_card import extract_welfare_card_fields
+    return extract_welfare_card_fields(image_data=image_data, device=device)
 
 
 # ============================================================================
@@ -199,6 +223,77 @@ async def transcribe_audio(request: Request, file: UploadFile = File(...)):
 
 
 # ============================================================================
+# OCR API
+# ============================================================================
+
+@router.post("/ocr/welfare-card", response_model=WelfareCardOCRResponse)
+async def ocr_welfare_card(file: UploadFile = File(...)):
+    """
+    복지카드 사진 OCR (회원가입 자동완성 보조용)
+
+    multipart/form-data 업로드 이미지를 받아 카드 필드를 추출합니다.
+    """
+    config = get_config()
+
+    if config.ocr.provider.lower() != "paddleocr":
+        raise HTTPException(
+            status_code=503,
+            detail="OCR provider misconfigured. Set OCR_PROVIDER=paddleocr.",
+        )
+
+    if not file:
+        raise HTTPException(status_code=400, detail="File is required")
+
+    image_data = await file.read()
+    if not image_data:
+        raise HTTPException(status_code=400, detail="Empty file")
+
+    max_upload_mb = max(15, int(config.ocr.http_max_upload_mb))
+    max_bytes = max_upload_mb * 1024 * 1024
+    if len(image_data) > max_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large. Max upload size is {max_upload_mb}MB.",
+        )
+
+    timeout_seconds = float(max(30, min(60, int(config.ocr.http_timeout_seconds))))
+    logger.info(
+        "Welfare card OCR request: file=%s size=%d bytes timeout=%ss device=%s",
+        file.filename,
+        len(image_data),
+        int(timeout_seconds),
+        config.ocr.device,
+    )
+
+    try:
+        payload = await asyncio.wait_for(
+            asyncio.to_thread(
+                _extract_welfare_card_fields,
+                image_data,
+                config.ocr.device,
+            ),
+            timeout=timeout_seconds,
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=504,
+            detail=f"OCR timeout after {int(timeout_seconds)} seconds",
+        )
+    except ImportError as e:
+        logger.error("Welfare card OCR import failed: %s", e)
+        raise HTTPException(status_code=503, detail="PaddleOCR is not available")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Welfare card OCR failed: %s", e)
+        raise HTTPException(status_code=500, detail="Welfare card OCR failed")
+
+    return WelfareCardOCRResponse(**payload)
+
+
+# ============================================================================
 # 관리 API
 # ============================================================================
 
@@ -259,7 +354,7 @@ def create_app() -> FastAPI:
     )
 
     # CORS 설정
-    origins = config.server.cors_origins.split(",")
+    origins = [origin.strip() for origin in config.server.cors_origins.split(",") if origin.strip()] or ["*"]
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
