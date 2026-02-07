@@ -72,7 +72,6 @@
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    /* [수정]: filter 대신 text-shadow를 사용하여 사각형 잔상 버그 해결 */
     text-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
     animation: textShine 7s linear infinite;
     pointer-events: auto;
@@ -95,6 +94,7 @@
 /* Spline 오브젝트 레이어 하향 조정 */
 .object-section {
     position: absolute;
+    top: 20%;
     top: 20%;
     /* 위쪽 여백 조절 */
     left: 0;

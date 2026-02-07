@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import Spline from '@splinetool/react-spline';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
 import './Intro.css';
 
 import introAudio1 from '../../assets/audio/intro/intro_guide_1.wav';
@@ -11,13 +10,13 @@ import introAudio3 from '../../assets/audio/intro/intro_guide_3.wav';
 
 const STEPS = [
     {
-        title: "목소리만으로 완성하는 새로운 쇼핑 경험",
+        title: "목소리만으로 완성하는 쇼핑 경험",
         desc: "복잡한 화면 대신 당신의 목소리에 집중하는 스마트 쇼핑 파트너",
         audioSrc: introAudio1,
         duration: 4000
     },
     {
-        title: "보이지 않아도, 스스로 선택하는 즐거움",
+        title: "스스로 선택하는 즐거움",
         desc: "원하는 상품을 말해보세요. 당신의 목소리로 완벽한 쇼핑을 완성합니다.",
         audioSrc: introAudio2,
         duration: 4000
@@ -35,7 +34,7 @@ export default function Intro() {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [hasStarted, setHasStarted] = useState(false);
     const [splineFailed, setSplineFailed] = useState(false);
-    const splineLoadedRef = React.useRef(false);
+    const splineLoadedRef = useRef(false);
     const navigate = useNavigate();
 
     const audioRef = React.useRef(null);
@@ -54,8 +53,7 @@ export default function Intro() {
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-        // [프로세스 유지]: Intro -> Guide (BrandLanding) 흐름 유지
-        setTimeout(() => navigate('/guide'), 850);
+        setTimeout(() => navigate('/main'), 850);
     };
 
     const handleStart = () => {
@@ -79,7 +77,7 @@ export default function Intro() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [hasStarted, navigate, currentStep]);
+    }, [hasStarted, currentStep]);
 
     useEffect(() => {
         if (!hasStarted || isTransitioning) return;
@@ -106,8 +104,9 @@ export default function Intro() {
         }
 
         timerRef.current = setTimeout(() => {
-            timerRef.current = null;
-            handleNext();
+            if (isMountedRef.current) {
+                handleNext();
+            }
         }, STEPS[currentStep].duration);
 
         return () => {
@@ -147,17 +146,16 @@ export default function Intro() {
 
     return (
         <div className="intro-container">
-            {/* [디자인 우선]: 프리미엄 Skip 버튼 스타일 유지 */}
-            <button
-                className="fixed top-10 right-10 z-50 cursor-pointer px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/60 text-[14px] font-semibold hover:bg-white/20 hover:text-white transition-all duration-300 shadow-sm"
-                onClick={() => navigate('/guide')}
-            >
-                skip
-            </button>
+            <button className="skip-btn cursor-pointer" onClick={() => navigate('/main')}>메인으로</button>
 
             <AnimatePresence>
                 {isTransitioning && (
-                    <motion.div className="transition-overlay" initial={{ scale: 0 }} animate={{ scale: 4 }} transition={{ duration: 0.8 }} />
+                    <motion.div
+                        className="transition-overlay"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 4 }}
+                        transition={{ duration: 0.8 }}
+                    />
                 )}
             </AnimatePresence>
 
@@ -182,21 +180,19 @@ export default function Intro() {
                 ) : (
                     <Spline
                         scene="https://prod.spline.design/IaDdv3c70ekbtAdf/scene.splinecode"
-                        onError={() => setSplineFailed(true)}
-                        onLoad={(splineApp) => {
-                            if (splineApp) {
-                                splineLoadedRef.current = true;
-                            } else {
-                                setSplineFailed(true);
-                            }
+                        onLoad={() => {
+                            splineLoadedRef.current = true;
                         }}
+                        onError={() => setSplineFailed(true)}
                     />
                 )}
             </div>
 
             <div className="action-section">
                 <div className="dot-indicator">
-                    {STEPS.map((_, i) => <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />)}
+                    {STEPS.map((_, i) => (
+                        <div key={i} className={`dot ${i === currentStep ? 'active' : ''}`} />
+                    ))}
                 </div>
             </div>
         </div>

@@ -3,7 +3,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // API Service for Authentication
 export const authAPI = {
-    // 회원가입 API
     register: async (userData) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/regist`, {
@@ -14,11 +13,8 @@ export const authAPI = {
                 body: JSON.stringify(userData),
             });
 
-            console.log('Response status:', response.status);
-            console.log('Response ok:', response.ok);
 
             const text = await response.text();
-            console.log('Response text:', text);
 
             let data = {};
             if (text) { // 응답 본문이 있을 경우에만 JSON 파싱 시도
@@ -26,7 +22,6 @@ export const authAPI = {
                     // data는 { code: 201, message: "회원가입 완료", data: userId } 형태
                     data = text ? JSON.parse(text) : {};
                 } catch (e) {
-                    console.error('JSON parse error for response text:', e);
                     throw new Error('서버 응답 형식이 올바르지 않습니다. 응답: ' + text);
                 }
             }
@@ -37,7 +32,6 @@ export const authAPI = {
                 throw new Error(data.message || `회원가입에 실패했습니다. (상태: ${response.status})`);
             }
         } catch (error) {
-            console.error('Register API Error:', error);
             throw error;
         }
     },
@@ -53,20 +47,16 @@ export const authAPI = {
                 body: JSON.stringify({ username: userId }),
             });
 
-            console.log('Check Duplicate Response status:', response.status);
 
             const data = await response.json();
 
-            console.log('Check Duplicate Response data:', data);
 
             return data;
         } catch (error) {
-            console.error('Check Duplicate API Error:', error);
             throw new Error(error.message || '아이디 중복 확인 중 네트워크 오류가 발생했습니다.'); // 에러를 다시 던짐
         }
     },
 
-    // 로그인 API
     login: async (id, password) => {
         try {
             if (typeof id !== 'string' || typeof password !== 'string') {
@@ -88,14 +78,11 @@ export const authAPI = {
             });
 
             const text = await response.text();
-            console.log('Login Response status:', response.status);
-            console.log('Login Response text:', text);
 
             let data;
             try {
                 data = text ? JSON.parse(text) : {};
             } catch (e) {
-                console.error('JSON parse error:', e);
                 throw new Error('서버 응답 형식이 올바르지 않습니다.');
             }
 
@@ -105,7 +92,6 @@ export const authAPI = {
                 throw error;
             }
 
-            // 토큰 받아 사용자 정보 저장 (새로운 응답 구조: accessToken이 data 바로 아래)
             if (data.data && data.data.accessToken) {
                 localStorage.setItem('accessToken', data.data.accessToken);
             }
@@ -116,10 +102,8 @@ export const authAPI = {
             // user_id 저장
             if (data.data && data.data.id) {
                 localStorage.setItem('user_id', data.data.id);
-                // 가입할때의 username도 저장
                 localStorage.setItem('username', username);
             }
-            // 실제 이름(name) 저장
             if (data.data && data.data.name) {
                 localStorage.setItem('user_name', data.data.name);
             }
@@ -135,7 +119,6 @@ export const authAPI = {
         }
     },
 
-    // 사용자 프로필 조회 API
     getUserProfile: async () => {
         try {
             const token = localStorage.getItem('accessToken');
@@ -177,7 +160,6 @@ export const authAPI = {
             throw error;
         }
     },
-    // 이메일 인증번호 발송 API
     sendEmailVerification: async (email, username = null, name = null) => {
         try {
             const body = { email };
@@ -198,19 +180,15 @@ export const authAPI = {
         }
     },
 
-    // 비밀번호 재설정 API (C형 - 이메일 인증)
     resetPassword: async (email, newPassword) => {
-        console.log('resetPassword Request:', { email, newPassword });
         try {
             const response = await fetch(`${API_BASE_URL}/auth/resetPassword`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, newPassword }),
             });
-            console.log('resetPassword Response Status:', response.status);
 
             const data = await response.json();
-            console.log('resetPassword Response Data:', data);
 
             if (!response.ok) throw new Error(data.message || '비밀번호 재설정 실패');
             return data;
@@ -220,7 +198,6 @@ export const authAPI = {
         }
     },
 
-    // 이메일 인증번호 확인 API
     verifyEmailCode: async (email, code) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/email/verify`, {
@@ -237,7 +214,6 @@ export const authAPI = {
         }
     },
 
-    // 아이디 찾기 API (C형 - 이메일 인증)
     findId: async (name, email) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/findIdByEmail`, {
@@ -256,7 +232,6 @@ export const authAPI = {
 
 
 
-    // 토큰 갱신 API
     refreshToken: async () => {
         try {
             const refreshToken = localStorage.getItem('refreshToken');
@@ -264,7 +239,6 @@ export const authAPI = {
                 throw new Error('로그인 정보가 만료되었습니다. 다시 로그인해주세요.');
             }
 
-            console.log("🔄 토큰 갱신을 시도합니다...");
 
             const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
                 method: 'POST',
@@ -280,25 +254,20 @@ export const authAPI = {
                 throw new Error(data.message || '토큰 갱신에 실패했습니다.');
             }
 
-            // 새로운 토큰 저장
             if (data.data && data.data.accessToken) {
-                console.log("✅ Access Token 갱신 완료:", data.data.accessToken.substring(0, 10) + "...");
                 localStorage.setItem('accessToken', data.data.accessToken);
             }
             if (data.data && data.data.refreshToken) {
-                console.log("✅ Refresh Token 갱신 완료");
                 localStorage.setItem('refreshToken', data.data.refreshToken);
             }
 
             return data;
         } catch (error) {
             console.error('RefreshToken API Error:', error);
-            // 갱신 실패 시 로그아웃 처리가 필요할 수 있음 (호출부에서 처리 권장)
             throw error;
         }
     },
 
-    // 로그아웃 API
     logout: async () => {
         try {
             const token = localStorage.getItem('accessToken');
@@ -357,7 +326,6 @@ export const authAPI = {
         }
     },
 
-    // 회원탈퇴 API
     deleteAccount: async (password) => {
         try {
             const token = localStorage.getItem('accessToken');
@@ -383,7 +351,6 @@ export const authAPI = {
         }
     }
     ,
-    // 아이디 찾기 (복지카드) API
     findIdByWelfareCard: async (welfareCard) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/findId`, {
@@ -414,7 +381,6 @@ export const authAPI = {
         }
     }
     ,
-    // 비밀번호 변경(복지카드) API
     resetPasswordBlind: async (welfareCard, newPassword) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/resetPasswordBlind`, {
@@ -447,7 +413,6 @@ export const authAPI = {
             throw error;
         }
     },
-    // 복지카드 조회 API
     getWelfareCard: async () => {
         try {
             const token = localStorage.getItem('accessToken');
@@ -482,7 +447,6 @@ export const authAPI = {
             throw error;
         }
     },
-    // 복지카드 등록/수정 API
     updateWelfareCard: async (welfareCard) => {
         try {
             const token = localStorage.getItem('accessToken');
@@ -518,7 +482,6 @@ export const authAPI = {
             throw error;
         }
     },
-    // 복지카드 인증 확인 API
     verifyWelfareCard: async (welfareCard) => {
         try {
             const response = await fetch(`${API_BASE_URL}/welfare/verify`, {
@@ -551,20 +514,15 @@ export const authAPI = {
 };
 
 
-// 개발 환경에서 콘솔 테스트용 //
 if (import.meta.env.DEV) {
     window.authAPI = authAPI;
 
-    // 토큰 갱신 테스트 헬퍼 함수
     window.testTokenRefresh = () => {
-        console.log('=== 토큰 갱신 테스트 시작 ===');
 
         // 1. authAPI 로드 확인
-        console.log('✓ authAPI 로드됨:', !!authAPI);
 
         // 2. refreshToken 존재 확인
         const hasRefreshToken = !!localStorage.getItem('refreshToken');
-        console.log('✓ RefreshToken 존재:', hasRefreshToken ? '있음' : '없음');
 
         if (!hasRefreshToken) {
             console.error('❌ RefreshToken이 없습니다. 먼저 로그인해주세요.');
@@ -574,31 +532,21 @@ if (import.meta.env.DEV) {
         // 3. 현재 토큰 저장
         const oldAccessToken = localStorage.getItem('accessToken');
         const oldRefreshToken = localStorage.getItem('refreshToken');
-        console.log('이전 Access Token:', oldAccessToken?.substring(0, 30) + '...');
-        console.log('이전 Refresh Token:', oldRefreshToken?.substring(0, 30) + '...');
 
         // 4. 토큰 갱신 실행
         return authAPI.refreshToken()
             .then(result => {
-                console.log('✅ 갱신 성공:', result);
 
                 const newAccessToken = localStorage.getItem('accessToken');
                 const newRefreshToken = localStorage.getItem('refreshToken');
 
-                console.log('새 Access Token:', newAccessToken?.substring(0, 30) + '...');
-                console.log('새 Refresh Token:', newRefreshToken?.substring(0, 30) + '...');
-                console.log('Access Token 변경됨:', oldAccessToken !== newAccessToken);
-                console.log('Refresh Token 변경됨:', oldRefreshToken !== newRefreshToken);
-                console.log('=== 테스트 완료 ===');
 
                 return result;
             })
             .catch(error => {
                 console.error('❌ 갱신 실패:', error.message);
-                console.log('=== 테스트 실패 ===');
                 throw error;
             });
     };
 
-    console.log('💡 테스트 함수 사용법: testTokenRefresh()');
 }

@@ -29,7 +29,6 @@ const GuardianViewS = () => {
         if (code) {
             handleJoinSession(code);
         } else {
-            // 코드가 없으면 모달 띄우기
             setShowJoinModal(true);
         }
 
@@ -42,7 +41,6 @@ const GuardianViewS = () => {
         setActiveCode(code);
         setShowJoinModal(false);
 
-        // 세션 입장
         joinSession(code).catch((err) => {
             console.error('세션 입장 실패:', err);
             // alert(`연결 실패: ${err.message}`);
@@ -53,7 +51,6 @@ const GuardianViewS = () => {
         handleJoinSession(code);
     };
 
-    // 비디오 스트림 연결
     useEffect(() => {
         if (remoteStream && videoRef.current) {
             videoRef.current.srcObject = remoteStream;

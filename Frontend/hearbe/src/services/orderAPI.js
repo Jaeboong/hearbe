@@ -1,5 +1,5 @@
-// 공통 주문내역 API
-// A형과 C형에서 공통으로 사용
+// 주문내역 API
+// A형과 C형에서 공통 사용
 
 import { apiClient, API_BASE_URL } from './apiClient.js';
 
@@ -85,7 +85,7 @@ export const orderAPI = {
 
             return await handleResponse(response);
         } catch (error) {
-            // 네트워크 에러 처리
+            // Network error handling
             if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
                 throw new Error('네트워크 연결을 확인해주세요.');
             }

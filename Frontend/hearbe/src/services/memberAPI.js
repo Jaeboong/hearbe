@@ -1,5 +1,5 @@
-// 공통 회원 API
-// A형과 C형에서 공통으로 사용
+// 회원 API
+// A형과 C형에서 공통 사용
 
 import { apiClient, API_BASE_URL } from './apiClient.js';
 

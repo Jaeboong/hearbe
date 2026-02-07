@@ -19,10 +19,8 @@
   padding: 0 4rem;
   box-sizing: border-box;
   flex: 1;
-  /* 본문이 공간을 다 차지하게 하여 푸터를 아래로 밈 */
 }
 
-/* 통일된 푸터 스타일 */
 .landing-footer {
   width: 100%;
   padding: 3rem 0;
@@ -33,10 +31,8 @@
   border-top: none;
   background: white;
   margin-top: auto;
-  /* 공간이 남을 경우 맨 밑으로 이동 */
 }
 
-/* Header Styles */
 .landing-header {
   background-color: white;
   border-bottom: 1px solid #f1f1f1;
@@ -92,7 +88,6 @@
   background-color: #6d28d9;
 }
 
-/* Hero Section Styles */
 .hero-section {
   position: relative;
   border-radius: 4rem;
@@ -205,7 +200,6 @@
   transform: translateY(-3px);
 }
 
-/* Mode Card Styles */
 .mode-selection-area {
   scroll-margin-top: 8rem;
   padding-bottom: 8rem;
@@ -364,9 +358,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   background-color: #141C29;
-  /* 배경색 일치 */
   border: none !important;
-  /* 선 제거 */
   margin-top: auto;
 }
 
@@ -384,7 +376,6 @@
   }
 }
 
-/* How to Use Section */
 .how-to-use-section {
   display: flex;
   justify-content: center;
@@ -498,7 +489,6 @@
   color: #888;
 }
 
-/* Speciality Section Styles */
 .speciality-section {
   padding: 6rem 0;
   margin-bottom: 4rem;
@@ -692,7 +682,6 @@
   }
 }
 
-/* Responsive adjustments for speciality grid */
 @media (max-width: 1024px) {
   .speciality-grid {
     grid-template-columns: repeat(6, 1fr);

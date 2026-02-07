@@ -6,7 +6,7 @@ import logoC from '../../assets/logoC.png';
 import { authAPI } from '../../services/authAPI';
 import './LoginC.css';
 
-export default function LoginC() {
+const LoginC = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
@@ -17,14 +17,12 @@ export default function LoginC() {
 
 
     useEffect(() => {
-        // 이미 로그인 되어있는지 확인
         const token = localStorage.getItem('accessToken');
         if (token) {
             navigate('/C/mall');
             return;
         }
 
-        // 저장된 로그인 정보 확인 (자동 로그인)
         const savedId = localStorage.getItem('savedLoginId_C');
         const savedPassword = localStorage.getItem('savedLoginPassword_C');
         if (savedId) {
@@ -35,7 +33,6 @@ export default function LoginC() {
             setPassword(savedPassword);
             setRememberLogin(true);
         }
-        // 저장된 정보가 있으면 자동 로그인 시도
         if (savedId && savedPassword) {
             handleLogin(null, savedId, savedPassword, true);
         }
@@ -60,7 +57,6 @@ export default function LoginC() {
 
 
 
-            // 로그인 유지 체크 시 아이디/비밀번호 저장
             if (rememberLogin) {
                 localStorage.setItem('savedLoginId_C', loginId);
                 localStorage.setItem('savedLoginPassword_C', loginPassword);
@@ -69,7 +65,6 @@ export default function LoginC() {
                 localStorage.removeItem('savedLoginPassword_C');
             }
 
-            // 사용자 정보 저장
             if (response.data && response.data.id) {
                 localStorage.setItem('user_id', response.data.id);
                 localStorage.setItem('username', loginId);
@@ -84,7 +79,6 @@ export default function LoginC() {
             if (!isAuto) {
                 let errorMessage = error.message || "로그인에 실패했습니다.";
 
-                // 에러 상태나 메시지에 따른 사용자 맞춤 메시지 매핑
                 if (error.status === 404 || errorMessage.includes('존재하지') || errorMessage.includes('아이디')) {
                     errorMessage = "회원이 아닙니다. \n회원가입을 진행해주세요.";
                 } else if (error.status === 401 || errorMessage.includes('비밀번호')) {
@@ -164,4 +158,6 @@ export default function LoginC() {
 
         </div>
     );
-}
+};
+
+export default LoginC;
