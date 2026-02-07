@@ -13,9 +13,9 @@ import Swal from 'sweetalert2';
 import logo from '../../assets/logoA.png';
 import iconCamera from '../../assets/icon-camera.png';
 import { authAPI } from '../../services/authAPI';
-import './FindPasswordA.css';
+import './FindPasswordB.css';
 
-const FindPasswordA = () => {
+const FindPasswordB = () => {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [modalStep, setModalStep] = useState('camera'); // camera | form
@@ -130,7 +130,7 @@ const FindPasswordA = () => {
             }));
 
             setShowModal(false);
-            navigate('/A/changePassword');
+            navigate('/B/changePassword');
 
         } catch (error) {
             Swal.fire({
@@ -168,7 +168,7 @@ const FindPasswordA = () => {
                     </div>
 
                     <div className="findpw-footer-a-new">
-                        <button className="back-to-login-a-new" onClick={() => navigate('/A/login')}>
+                        <button className="back-to-login-a-new" onClick={() => navigate('/B/login')}>
                             <ArrowLeft size={24} /> 로그인 페이지로 돌아가기
                         </button>
                     </div>
@@ -259,4 +259,4 @@ const FindPasswordA = () => {
     );
 };
 
-export default FindPasswordA;
+export default FindPasswordB;

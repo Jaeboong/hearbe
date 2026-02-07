@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import logoA from '../../assets/logoA.png';
 import Swal from 'sweetalert2';
 import { authAPI } from '../../services/authAPI';
-import './ChangePasswordA.css';
+import './ChangePasswordB.css';
 
-const ChangePasswordA = () => {
+const ChangePasswordB = () => {
     const navigate = useNavigate();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -56,7 +56,7 @@ const ChangePasswordA = () => {
                     text: '비밀번호가 변경되었습니다.',
                     confirmButtonText: '확인'
                 });
-                navigate('/A/login');
+                navigate('/B/login');
                 return;
             }
             Swal.fire({
@@ -112,4 +112,4 @@ const ChangePasswordA = () => {
     );
 };
 
-export default ChangePasswordA;
+export default ChangePasswordB;

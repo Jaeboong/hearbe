@@ -12,9 +12,9 @@ import Swal from 'sweetalert2';
 import logo from '../../assets/logoA.png';
 import iconCamera from '../../assets/icon-camera.png';
 import { authAPI } from '../../services/authAPI';
-import './FindIdA.css';
+import './FindIdB.css';
 
-const FindIdA = () => {
+const FindIdB = () => {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [modalStep, setModalStep] = useState('camera'); // camera | form
@@ -117,7 +117,7 @@ const FindIdA = () => {
                     text: `아이디 찾기 성공: 귀하의 아이디는 ${response.data} 입니다.`,
                     confirmButtonText: '확인'
                 });
-                navigate('/A/login');
+                navigate('/B/login');
             } else {
                 throw new Error('일치하는 회원 정보가 없습니다.');
             }
@@ -157,7 +157,7 @@ const FindIdA = () => {
                     </div>
 
                     <div className="findid-footer-a-new">
-                        <button className="back-to-login-a-new" onClick={() => navigate('/A/login')}>
+                        <button className="back-to-login-a-new" onClick={() => navigate('/B/login')}>
                             <ArrowLeft size={24} /> 로그인 페이지로 돌아가기
                         </button>
                     </div>
@@ -248,4 +248,4 @@ const FindIdA = () => {
     );
 };
 
-export default FindIdA;
+export default FindIdB;

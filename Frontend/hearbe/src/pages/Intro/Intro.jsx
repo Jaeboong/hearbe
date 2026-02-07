@@ -67,7 +67,6 @@ export default function Intro() {
                 if (!hasStarted) {
                     handleStart();
                 } else {
-                    // 다음 단계로 이동 (마지막 단계면 메인으로)
                     if (currentStep < STEPS.length - 1) {
                         setCurrentStep(prev => prev + 1);
                     } else {

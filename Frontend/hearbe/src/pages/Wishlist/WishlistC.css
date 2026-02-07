@@ -1,3 +1,10 @@
+.mall-order-indicator {
+    width: 0.5rem;
+    height: 1.5rem;
+    background-color: #7c3aed;
+    border-radius: 0.8rem;
+}
+
 .wishlist-header-title-area {
     margin-left: 0 !important;
 }
@@ -18,7 +25,6 @@
 .mall-wish-group,
 .group-items {
     width: 100%;
-    /* 모든 컨테이너가 가로로 꽉 차도록 설정 */
 }
 
 .mall-wish-group {
@@ -61,7 +67,6 @@
 .selection-toolbar {
     display: flex;
     justify-content: flex-end;
-    /* 버튼을 우측으로 정렬 */
     align-items: center;
     margin-bottom: 0.8rem;
     padding: 0 0.5rem;
@@ -145,8 +150,6 @@
     font-weight: 900;
     color: #111827;
 }
-
-/* Header styles now in MyPageC.css as .mall-header-c */
 
 @media (max-width: 768px) {
     .mall-header-c {

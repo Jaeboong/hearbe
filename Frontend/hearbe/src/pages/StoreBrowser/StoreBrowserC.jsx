@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Share2, ShoppingCart, User, Menu, X, Home, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import MyPage from '../MyPage/MyPageC';
+import MyPageC from '../MyPage/MyPageC';
+import CartC from '../Cart/CartC';
 import './StoreBrowserC.css';
 
 const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, onMyPage }) => {
@@ -17,7 +18,8 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
     const [showMeetingCode, setShowMeetingCode] = useState(false);
     const [meetingCode, setMeetingCode] = useState('');
     const [showMeetingRoom, setShowMeetingRoom] = useState(false);
-    // showCart state removed - integrated into MyPage
+    // showCart state - used for cart overlay
+    const [showCart, setShowCart] = useState(false);
     const [showMyPage, setShowMyPage] = useState(false);
     const [participants, setParticipants] = useState([
         { id: 1, name: '나 (방장)', role: 'host', isMe: true }
@@ -30,7 +32,6 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
      */
     // const fetchParticipants = async () => { ... }
 
-    // 화면 공유 시작 (회의 코드 생성)
     const handleShareButtonClick = () => {
         handleShareStart();
         setShowMainMenu(false); // Close main menu when share button is clicked
@@ -41,7 +42,6 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
         setMeetingCode(newCode);
         setShowMeetingRoom(true);
 
-        // 초기 방장 정보 세팅 (추후 DB로부터 현재 로그인 정보를 가져오도록 수정)
         setParticipants([{ id: Date.now(), name: '나 (방장)', role: 'host', isMe: true }]);
     };
 
@@ -208,12 +208,12 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
             {/* 페이지 전환 컴포넌트 */}
             {showCart && (
                 <div className="full-screen-overlay">
-                    <CartPage onClose={() => setShowCart(false)} onHome={onHome} />
+                    <CartC onClose={() => setShowCart(false)} onHome={onHome} />
                 </div>
             )}
             {showMyPage && (
                 <div className="full-screen-overlay">
-                    <MyPage onBack={() => setShowMyPage(false)} onHome={onHome} onCart={() => { setShowMyPage(false); setShowCart(true); }} />
+                    <MyPageC onBack={() => setShowMyPage(false)} onHome={onHome} onCart={() => { setShowMyPage(false); setShowCart(true); }} />
                 </div>
             )}
         </div>

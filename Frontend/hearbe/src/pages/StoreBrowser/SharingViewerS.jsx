@@ -65,7 +65,6 @@ const SharingViewerS = () => {
             };
 
             pc.ontrack = (event) => {
-                console.log("화면 공유 트랙 수신됨");
                 setRemoteStream(event.streams[0]);
             };
 

@@ -218,7 +218,6 @@ const BrandLanding = () => {
             const audio = new Audio(stepData.audioSrc);
             audioRef.current = audio;
             audio.play().catch(e => {
-                console.warn("Auto-play blocked:", e);
             });
         }
 
@@ -265,7 +264,6 @@ const BrandLanding = () => {
         <div className="relative w-full h-screen overflow-hidden bg-white selection:bg-purple-200">
             <WaveBackground />
 
-            {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-transparent h-32 flex items-center">
                 <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
                     <img

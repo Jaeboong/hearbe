@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { User, Store, Package, LogOut } from 'lucide-react';
 import { orderAPI } from '../../services/orderAPI';
 import { authAPI } from '../../services/authAPI';
-import '../MyPage/MyPageC.css';
+import '../MyPage/mypage-common.css';
 import './OrderHistoryC.css';
 import logoC from '../../assets/logoC.png';
 
-export default function OrderHistoryC({ onHome }) {
+const OrderHistoryC = ({ onHome }) => {
     const navigate = useNavigate();
 
     const [userData, setUserData] = useState({
@@ -24,7 +24,6 @@ export default function OrderHistoryC({ onHome }) {
         });
     }, []);
 
-    // 사이드바 아이템
     const sidebarItems = [
         { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
         { id: 'order-history', label: '주문 내역', path: '/C/order-history' },
@@ -125,7 +124,6 @@ export default function OrderHistoryC({ onHome }) {
                     groupedByMall[mallName].push(orderGroup);
                 });
 
-                // 각 몰 내부 주문들 날짜순 정렬
                 Object.keys(groupedByMall).forEach(mall => {
                     groupedByMall[mall].sort((a, b) => {
                         if (a.date === '날짜 미상') return 1;
@@ -284,4 +282,6 @@ export default function OrderHistoryC({ onHome }) {
             </footer>
         </div>
     );
-}
+};
+
+export default OrderHistoryC;

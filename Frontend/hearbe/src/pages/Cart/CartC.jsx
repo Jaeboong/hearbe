@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Store, User, LogOut } from 'lucide-react';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
-import '../MyPage/MyPageC.css';
+import '../MyPage/mypage-common.css';
 import './CartC.css';
 import logoC from '../../assets/logoC.png';
 
-export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }) {
+const CartC = ({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }) => {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +27,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
         });
     }, []);
 
-    // 사이드바 아이템
     const sidebarItems = [
         { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
         { id: 'order-history', label: '주문 내역', path: '/C/order-history' },
@@ -97,7 +96,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
         fetchCartItems();
     }, []);
 
-    // 쇼핑몰별 그룹화 로직
     const groupedItems = cartItems.reduce((acc, item) => {
         if (!acc[item.mallName]) acc[item.mallName] = [];
         acc[item.mallName].push(item);
@@ -130,7 +128,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
         }
     };
 
-    // 임베디드 모드 - 기존 동작 유지
     if (isEmbedded) {
         return (
             <div className="cart-page-container" style={{
@@ -212,7 +209,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
         );
     }
 
-    // 독립 페이지 모드 - 사이드바 포함
     return (
         <div className="mypage-container">
             {/* Header */}
@@ -344,4 +340,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
             </footer>
         </div>
     );
-}
+};
+
+export default CartC;

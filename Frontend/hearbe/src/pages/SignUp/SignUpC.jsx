@@ -5,10 +5,10 @@ import { ArrowLeft, User, Lock, Eye, EyeOff, Mail, Calendar, Phone, CheckCircle2
 import { validateUsername, validatePassword, validatePasswordConfirm, validateEmail, validateName } from '../../utils/validation';
 import { authAPI } from '../../services/authAPI';
 import Swal from 'sweetalert2';
-import logoC from '../../assets/logoC.png'; // C형 로고로 변경
+import logoC from '../../assets/logoC.png';
 import './SignUpC.css';
 
-export default function SignUpC() {
+const SignUpC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
@@ -20,12 +20,11 @@ export default function SignUpC() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
-  const [agreements, setAgreements] = useState(false); // 단일 약관 동의 상태 (Boolean)
+  const [agreements, setAgreements] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUsernameChecked, setIsUsernameChecked] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
 
-  // 약관 모달 상태
   const [termModalState, setTermModalState] = useState({
     isOpen: false,
     title: '',
@@ -42,9 +41,9 @@ AI 브라우저 대리 조작: 사용자가 음성으로 명령하면, HearBe의
     privacy: `제2조 (개인정보 수집 및 이용 항목)
 서비스 제공을 위해 아래와 같은 정보를 수집합니다. 수집된 정보는 회원 탈퇴 시 또는 법정 보유 기간 종료 시 즉시 파기됩니다.
 
-1. 시각장애인 사용자 (A형·B형)
+1. 시각장애인 사용자 (A형, B형)
 - 필수 수집 항목: 아이디, 비밀번호, 이름
-- 선택 수집 항목: 휴대폰 번호 (본인 인증 및 알림 서비스 제공 목적)
+- 선택 수집 항목: 휴대폰 번호
 - 장애인 복지 카드 확인 정보: 카드사, 카드번호 뒤 4자리, 유효기간 (사용자 맞춤형 UI 제공 목적)
 - 음성 데이터: 음성 명령 인식 및 처리 (목적 달성 후 즉시 파기)
 
@@ -90,7 +89,6 @@ ${termContents.security}`;
     if (errors[field]) {
       setErrors({ ...errors, [field]: null });
     }
-    // 아이디 입력이 변경되면 중복확인 상태 초기화
     if (field === 'username') {
       setIsUsernameChecked(false);
       setIsUsernameAvailable(false);
@@ -121,8 +119,6 @@ ${termContents.security}`;
     if (errors.confirmPassword) {
       setErrors({ ...errors, confirmPassword: null });
     }
-    // 입력 중에도 메시지 초기화 혹은 실시간 체크를 원한다면 여기서 호출 가능
-    // 하지만 LoginC와 동일하게 onBlur/onMouseLeave에서만 메시지 뜨게 하려면 여기서는 메시지 초기화만
     if (matchMessage) {
       setMatchMessage('');
     }
@@ -178,7 +174,6 @@ ${termContents.security}`;
 
 
   // handleAgreementChange는 더이상 필요하지 않고 setter 직접 사용
-  // 하지만 호환성을 위해 남겨두거나 삭제하고 JSX에서 setAgreements 직접 호출
 
 
   const handleEmailBlur = () => {
@@ -189,7 +184,6 @@ ${termContents.security}`;
       return;
     }
 
-    // 간단한 도메인 체크를 포함한 정규식 (최소한 . 뒤에 2글자 이상)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     if (!emailRegex.test(formData.email)) {
       setErrors((prev) => ({ ...prev, email: '유효한 이메일을 입력해주세요' }));
@@ -206,7 +200,6 @@ ${termContents.security}`;
     // emailError는 아래에서 별도로 처리하거나 validateEmail 결과 사용
     const nameError = validateName(formData.name);
 
-    // 이메일 정밀 검사
     if (!formData.email.includes('@')) {
       Swal.fire({
         icon: 'warning',
@@ -308,7 +301,6 @@ ${termContents.security}`;
     }
   };
 
-  // 실시간 유효성 검사 (버튼 활성화용)
   const isFormValid =
     isUsernameChecked &&
     isUsernameAvailable &&
@@ -322,7 +314,7 @@ ${termContents.security}`;
     <div className="signup-c-container">
       <main className="signup-c-main">
         <div className="signup-card-c">
-          <div className="signup-header-c"> {/* 로고 이미지 사용 */}
+          <div className="signup-header-c">
             <img
               src={logoC}
               alt="HearBe Logo"
@@ -384,7 +376,6 @@ ${termContents.security}`;
                   </button>
                 </div>
 
-                {/* 비밀번호 실시간 유효성 검사 표시 */}
                 {formData.password.length > 0 && (
                   <div className="password-conditions-text-group">
                     {formData.password.length >= 8 && formData.password.length <= 20 && /[a-zA-Z]/.test(formData.password) && /[0-9]/.test(formData.password) ? (
@@ -543,4 +534,6 @@ ${termContents.security}`;
 
     </div>
   );
-}
+};
+
+export default SignUpC;

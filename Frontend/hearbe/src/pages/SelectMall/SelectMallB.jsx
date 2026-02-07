@@ -8,7 +8,7 @@ import iconSsg from '../../assets/C/ssg_logo.png';
 import logoA from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import Swal from 'sweetalert2';
-import './SelectMallA.css';
+import './SelectMallB.css';
 
 const SelectMall = () => {
     const navigate = useNavigate();
@@ -58,11 +58,11 @@ const SelectMall = () => {
             {/* Top Navigation */}
             <header className="select-mall-a-header">
                 <div className="header-actions-a">
-                    <button className="header-btn-a cursor-pointer" onClick={() => navigate('/A/cart')}>
+                    <button className="header-btn-a cursor-pointer" onClick={() => navigate('/B/cart')}>
                         <ShoppingCart size={56} />
                         <span>카트</span>
                     </button>
-                    <button className="header-btn-a cursor-pointer" onClick={() => navigate('/A/member-info')}>
+                    <button className="header-btn-a cursor-pointer" onClick={() => navigate('/B/member-info')}>
                         <User size={56} />
                         <span>마이</span>
                     </button>

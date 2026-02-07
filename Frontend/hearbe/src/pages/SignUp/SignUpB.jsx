@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import { validateUsername } from '../../utils/validation';
-import './SignUpA.css';
+import './SignUpB.css';
 
 // Utility Functions
 const formatPhoneNumber = (value) => {
@@ -232,7 +232,7 @@ const SignUp = () => {
                     text: '가입 완료! HearBe 회원이 되신 것을 환영합니다.',
                     confirmButtonText: '확인'
                 });
-                navigate('/A/login');
+                navigate('/B/login');
             } else {
                 throw new Error(response.message || '회원가입에 실패했습니다.');
             }
@@ -451,7 +451,7 @@ const SignUp = () => {
                                 서비스 제공을 위해 아래와 같은 정보를 수집합니다. 수집된 정보는 회원 탈퇴 시 또는 법정 보유 기간 종료 시 즉시 파기됩니다.<br /><br />
                                 <strong>1. 시각장애인 사용자 (A형·B형)</strong><br />
                                 - 필수 수집 항목: 아이디, 비밀번호, 이름<br />
-                                - 선택 수집 항목: 휴대폰 번호 (본인 인증 및 알림 서비스 제공 목적)<br />
+                                - 선택 수집 항목: 휴대폰 번호 <br />
                                 - 장애인 복지 카드 확인 정보: 카드사, 카드번호 뒤 4자리, 유효기간 (사용자 맞춤형 UI 제공 목적)<br />
                                 - 음성 데이터: 음성 명령 인식 및 처리 (목적 달성 후 즉시 파기)<br /><br />
                                 <strong>2. 일반인 및 보호자 사용자 (C형)</strong><br />

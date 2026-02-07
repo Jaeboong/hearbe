@@ -5,9 +5,9 @@ import logoA from '../../assets/logoA.png';
 import iconCamera from '../../assets/icon-camera.png';
 import iconCard from '../../assets/icon-card.png';
 import { authAPI } from '../../services/authAPI';
-import './CardManagementA.css';
+import './CardManagementB.css';
 
-const CardManagementA = () => {
+const CardManagementB = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -93,7 +93,6 @@ const CardManagementA = () => {
             videoRef.current.muted = true;
             videoRef.current.srcObject = stream;
             videoRef.current.play()
-                .then(() => console.log("video play success"))
                 .catch(e => console.error("video play fail:", e));
         }
     }, [stream, modalStep]);
@@ -222,11 +221,11 @@ const CardManagementA = () => {
     };
 
     const menuItems = [
-        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
-        { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
-        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
+        { id: 'profile', label: '회원 정보', path: '/B/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/B/order-history' },
+        { id: 'wishlist', label: '찜한 상품', path: '/B/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/B/cart' },
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/B/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -257,7 +256,7 @@ const CardManagementA = () => {
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/B/mall')}>
                         <Store size={56} />
                         <span>쇼핑몰</span>
                     </button>
@@ -429,4 +428,4 @@ const CardManagementA = () => {
     );
 };
 
-export default CardManagementA;
+export default CardManagementB;

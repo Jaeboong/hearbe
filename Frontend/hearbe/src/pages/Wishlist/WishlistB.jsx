@@ -5,18 +5,17 @@ import logoA from '../../assets/logoA.png';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
-import './WishlistA.css';
+import './WishlistB.css';
 
-const WishlistA = () => {
+const WishlistB = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // 상태 관리
     const [wishlistData, setWishlistData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // platformName 매핑 (영문 -> 한글)
+
     const platformDisplayNames = {
         'coupang': '쿠팡',
         'naver': '네이버',
@@ -26,11 +25,11 @@ const WishlistA = () => {
     };
 
     const menuItems = [
-        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
-        { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
-        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
+        { id: 'profile', label: '회원 정보', path: '/B/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/B/order-history' },
+        { id: 'wishlist', label: '찜한 상품', path: '/B/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/B/cart' },
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/B/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -60,11 +59,8 @@ const WishlistA = () => {
             setError(null);
             const response = await wishlistAPI.getWishlist();
 
-            // 응답 데이터 변환 후 그룹핑
             const groupedData = {};
 
-            // 백엔드 응답 필드명 snake_case
-            // wishlist_item_id, product_name, product_url, platform_name, created_at, img_url, price, liked
             if (response.items && response.items.length > 0) {
                 response.items.forEach(item => {
                     const platformKey = (item.platform_name || '').toLowerCase();
@@ -93,7 +89,7 @@ const WishlistA = () => {
 
             // 401 에러 시 로그인 페이지로 이동
             if (err.message === '로그인이 필요합니다.') {
-                navigate('/A/login');
+                navigate('/B/login');
             }
         } finally {
             setIsLoading(false);
@@ -138,7 +134,7 @@ const WishlistA = () => {
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/B/mall')}>
                         <Store size={56} />
                         <span>쇼핑몰</span>
                     </button>
@@ -254,5 +250,5 @@ const WishlistA = () => {
     );
 };
 
-export default WishlistA;
+export default WishlistB;
 

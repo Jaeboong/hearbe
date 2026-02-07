@@ -29,7 +29,6 @@ const FloatingMenu = ({ onShare, onMyPage, onCart }) => {
 
     return (
         <div className="floating-menu-container">
-            {/* 메뉴 항목들 */}
             {isOpen && (
                 <div className="floating-menu-items">
                     <button className="menu-item" onClick={handleMyPage}>
@@ -44,7 +43,6 @@ const FloatingMenu = ({ onShare, onMyPage, onCart }) => {
                 </div>
             )}
 
-            {/* 햄버거 버튼 */}
             <button
                 className={`floating-menu-button ${isOpen ? 'open' : ''}`}
                 onClick={toggleMenu}

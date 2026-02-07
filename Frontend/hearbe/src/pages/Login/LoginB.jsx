@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { Eye, EyeOff, User, Lock, Check } from 'lucide-react';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
-import './LoginA.css';
+import './LoginB.css';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Login = () => {
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
         if (token) {
-            navigate('/A/mall');
+            navigate('/B/mall');
             return;
         }
         const savedId = localStorage.getItem('savedLoginId');
@@ -80,8 +80,7 @@ const Login = () => {
                     localStorage.removeItem('savedLoginId');
                     localStorage.removeItem('savedLoginPassword');
                 }
-                // 로그인 성공
-                navigate('/A/mall');
+                navigate('/B/mall');
             } else if (!isAuto) {
                 const message = response?.message || '로그인에 실패했습니다.';
                 Swal.fire({
@@ -172,11 +171,11 @@ const Login = () => {
                         </button>
 
                         <div className="login-footer-links-a-new">
-                            <span onClick={() => navigate('/A/findId')} className="cursor-pointer">아이디 찾기</span>
+                            <span onClick={() => navigate('/B/findId')} className="cursor-pointer">아이디 찾기</span>
                             <span className="separator-a-new">|</span>
-                            <span onClick={() => navigate('/A/findPassword')} className="cursor-pointer">비밀번호 재설정</span>
+                            <span onClick={() => navigate('/B/findPassword')} className="cursor-pointer">비밀번호 재설정</span>
                             <span className="separator-a-new">|</span>
-                            <span onClick={() => navigate('/A/signup')} className="cursor-pointer">회원가입</span>
+                            <span onClick={() => navigate('/B/signup')} className="cursor-pointer">회원가입</span>
                         </div>
                     </form>
                 </div>

@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { User, Store, Heart, LogOut } from 'lucide-react';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import { authAPI } from '../../services/authAPI';
-import '../MyPage/MyPageC.css';
+import '../MyPage/mypage-common.css';
 import './WishlistC.css';
 import logoC from '../../assets/logoC.png';
 
-export default function WishlistC({ onHome }) {
+const WishlistC = ({ onHome }) => {
     const navigate = useNavigate();
 
     const [userData, setUserData] = useState({
@@ -24,7 +24,6 @@ export default function WishlistC({ onHome }) {
         });
     }, []);
 
-    // 사이드바 아이템
     const sidebarItems = [
         { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
         { id: 'order-history', label: '주문 내역', path: '/C/order-history' },
@@ -230,4 +229,6 @@ export default function WishlistC({ onHome }) {
             </footer>
         </div>
     );
-}
+};
+
+export default WishlistC;

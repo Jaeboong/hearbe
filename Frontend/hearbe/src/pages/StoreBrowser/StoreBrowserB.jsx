@@ -2,7 +2,7 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCallback } from 'react';
 import Swal from 'sweetalert2';
-import './StoreBrowserA.css';
+import './StoreBrowserB.css';
 import iconCart from '../../assets/icon-cart.png';
 import iconShare from '../../assets/icon-share.png';
 import iconCard from '../../assets/icon-cart.png';
@@ -155,9 +155,9 @@ const StoreBrowser = () => {
         stopSharing();
     };
 
-    const handleCart = () => navigate('/A/cart');
+    const handleCart = () => navigate('/B/cart');
 
-    const handleMyPage = () => navigate('/A/mypage');
+    const handleMyPage = () => navigate('/B/mypage');
 
     const handlePlatformCart = () => {
         const cartUrl = getPlatformCartUrl();

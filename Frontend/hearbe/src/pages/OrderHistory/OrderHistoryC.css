@@ -1,6 +1,3 @@
-/* OrderHistoryC - 주문 내역 페이지 전용 스타일 */
-
-/* 콘텐츠 타이틀 영역 */
 .oh-content-title-row {
     display: flex;
     align-items: center;
@@ -19,13 +16,11 @@
     justify-content: center;
 }
 
-/* 콘텐츠 본문 컨테이너 */
 .oh-content-body {
     width: 100%;
     margin-top: 1.5rem;
 }
 
-/* 상태 메시지 (로딩, 에러, 빈 목록) */
 .oh-status-message {
     width: 100%;
     display: flex;
@@ -33,7 +28,6 @@
     padding: 3rem;
     color: #888;
     font-size: 1.5rem;
-    /* [디자인 유지]: 사용자님의 폰트 크기 유지 */
     font-weight: bold;
 }
 
@@ -41,14 +35,12 @@
     color: #e53e3e;
 }
 
-/* [레이아웃 보정]: 원격의 너비 보장 코드 통합 */
 .orders-list,
 .mall-order-group,
 .group-items {
     width: 100%;
 }
 
-/* 플랫폼명 헤더 */
 .order-mall-name-header {
     display: flex;
     align-items: center;
@@ -68,13 +60,11 @@
 
 .order-mall-name-header h2 {
     font-size: 1.5rem;
-    /* [디자인 유지]: 사용자님의 제목 크기 */
     font-weight: 800;
     color: #1f2937;
     margin: 0;
 }
 
-/* 주문 건별 그룹 (카드 형태) */
 .mall-order-group {
     background: white;
     border: 1px solid #f1f5f9;
@@ -93,7 +83,6 @@
     border-bottom: 1px solid #f8fafc;
 }
 
-/* 주문 그룹 헤더 - 플랫폼명 + 날짜 */
 .mall-header-title-container {
     display: flex;
     flex-direction: column;
@@ -106,7 +95,6 @@
     color: #4b5563;
 }
 
-/* 주문 상세 버튼 */
 .order-detail-btn {
     padding: 0.5rem 1.25rem;
     font-size: 0.9rem;
@@ -123,7 +111,6 @@
     border-color: #7c3aed;
 }
 
-/* 아이템 리스트 (세로 나열) */
 .group-items {
     display: flex;
     flex-direction: column;
@@ -131,7 +118,6 @@
     width: 100%;
 }
 
-/* 아이템 카드 (한 줄 가로 배치) */
 .item-row-card {
     width: 100%;
     background: #fcfcfc;
@@ -168,7 +154,6 @@
     object-fit: cover;
 }
 
-/* 아이템 왼쪽 영역 (이미지 + 상품정보) */
 .item-row-left {
     display: flex;
     align-items: center;
@@ -177,7 +162,6 @@
     min-width: 0;
 }
 
-/* 상품 정보 (이름 + 가격 세로 배치) */
 .oh-item-info {
     display: flex;
     flex-direction: column;
@@ -186,7 +170,6 @@
     min-width: 0;
 }
 
-/* 상품명 */
 .oh-item-name {
     font-size: 1.2rem;
     font-weight: 800;
@@ -196,7 +179,6 @@
     text-overflow: ellipsis;
 }
 
-/* 가격 - 상품명 아래 */
 .oh-item-price {
     font-size: 1.15rem;
     font-weight: 900;
@@ -204,7 +186,6 @@
     white-space: nowrap;
 }
 
-/* 수량 배지 */
 .oh-item-qty {
     font-size: 1rem;
     font-weight: 800;
@@ -214,7 +195,6 @@
     border-radius: 0.5rem;
 }
 
-/* 버튼 컨테이너 */
 .order-id-actions {
     display: flex;
     align-items: center;
@@ -241,13 +221,10 @@
 
 .order-item-deliver-btn:disabled {
     background: #f3f4f6;
-    /* 더 연한 배경색 */
     color: #cbd5e1;
-    /* 더 연한 글자색 */
     box-shadow: none;
     cursor: default;
     transform: none !important;
-    /* 호버 효과 무시 */
 }
 
 @media (max-width: 768px) {

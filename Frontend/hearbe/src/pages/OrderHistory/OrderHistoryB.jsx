@@ -4,13 +4,12 @@ import { Home, LogOut, Package } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { orderAPI } from '../../services/orderAPI';
 import { authAPI } from '../../services/authAPI';
-import './OrderHistoryA.css';
+import './OrderHistoryB.css';
 
-const OrderHistoryA = () => {
+const OrderHistoryB = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // 상태 관리
     const [orderData, setOrderData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -45,11 +44,11 @@ const OrderHistoryA = () => {
     };
 
     const menuItems = [
-        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
-        { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
-        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
+        { id: 'profile', label: '회원 정보', path: '/B/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/B/order-history' },
+        { id: 'wishlist', label: '찜한 상품', path: '/B/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/B/cart' },
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/B/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -134,7 +133,7 @@ const OrderHistoryA = () => {
 
                 // 401 에러 시 로그인 페이지로 이동
                 if (err.message === '로그인이 필요합니다.') {
-                    navigate('/A/login');
+                    navigate('/B/login');
                 }
             } finally {
                 setIsLoading(false);
@@ -184,7 +183,7 @@ const OrderHistoryA = () => {
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/B/mall')}>
                         <Home size={56} />
                         <span>홈</span>
                     </button>
@@ -325,7 +324,7 @@ const OrderHistoryA = () => {
     );
 };
 
-export default OrderHistoryA;
+export default OrderHistoryB;
 
 
 

@@ -4,9 +4,9 @@ import { Store, LogOut, User } from 'lucide-react';
 import logoA from '../../assets/logoA.png';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
-import './MemberInfoA.css';
+import './MemberInfoB.css';
 
-const MemberInfoA = () => {
+const MemberInfoB = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -15,11 +15,11 @@ const MemberInfoA = () => {
     const [error, setError] = useState(null);
 
     const menuItems = [
-        { id: 'profile', label: '회원 정보', path: '/A/member-info' },
-        { id: 'orders', label: '주문 내역', path: '/A/order-history' },
-        { id: 'wishlist', label: '찜한 상품', path: '/A/wishlist' },
-        { id: 'cart', label: '장바구니', path: '/A/cart' },
-        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/A/card-management' }
+        { id: 'profile', label: '회원 정보', path: '/B/member-info' },
+        { id: 'orders', label: '주문 내역', path: '/B/order-history' },
+        { id: 'wishlist', label: '찜한 상품', path: '/B/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/B/cart' },
+        { id: 'card', label: <>장애인 복지<br />카드 변경</>, path: '/B/card-management' }
     ];
 
     const currentPath = location.pathname;
@@ -42,7 +42,6 @@ const MemberInfoA = () => {
                 setError(null);
                 const response = await memberAPI.getProfile();
 
-                // 백엔드 ProfileResponse 구조:
                 // username: 실제 이름 (user.getName())
                 // phoneNumber: 전화번호
                 // userType: 사용자 유형 (BLIND, LOW_VISION, GENERAL)
@@ -58,7 +57,7 @@ const MemberInfoA = () => {
 
                 // Redirect to login on 401
                 if (err.message === '로그인이 필요합니다.') {
-                    navigate('/A/login');
+                    navigate('/B/login');
                 }
             } finally {
                 setLoading(false);
@@ -118,7 +117,6 @@ const MemberInfoA = () => {
 
             // Show success alert
             showAlert("회원탈퇴가 완료되었습니다.", "success", () => {
-                // 로그아웃과 동일한 정리 작업 (Alert 확인 버튼 클릭 시 실행)
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 localStorage.removeItem('savedLoginId');
@@ -164,7 +162,7 @@ const MemberInfoA = () => {
             <div className="mypage-topbar">
                 <h1 className="mypage-topbar-title">마이페이지</h1>
                 <div className="mypage-topbar-actions">
-                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/A/mall')}>
+                    <button className="topbar-action cursor-pointer" onClick={() => navigate('/B/mall')}>
                         <Store size={56} />
                         <span>쇼핑몰</span>
                     </button>
@@ -234,7 +232,7 @@ const MemberInfoA = () => {
                                                 <span className="member-value">{userData.password}</span>
                                                 <button
                                                     className="password-change-btn cursor-pointer"
-                                                    onClick={() => navigate('/A/changePassword')}
+                                                    onClick={() => navigate('/B/changePassword')}
                                                 >
                                                     변경하기
                                                 </button>
@@ -314,4 +312,4 @@ const MemberInfoA = () => {
     );
 };
 
-export default MemberInfoA;
+export default MemberInfoB;

@@ -33,7 +33,6 @@ export const apiClient = async (url, options = {}) => {
         }
 
         // 401 detected - attempt token refresh
-        console.log('🔒 401 Unauthorized detected. Attempting token refresh...');
 
         // If already refreshing, queue this request
         if (isRefreshing) {
@@ -78,7 +77,6 @@ export const apiClient = async (url, options = {}) => {
                 }
             };
 
-            console.log('✅ Token refreshed. Retrying original request...');
             return fetch(url, newOptions);
 
         } catch (refreshError) {
