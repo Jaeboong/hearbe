@@ -1,6 +1,8 @@
 package com.ssafy.d108.backend.order.service;
 
 import com.ssafy.d108.backend.auth.repository.UserRepository;
+import com.ssafy.d108.backend.category.repository.CategoryRepository;
+import com.ssafy.d108.backend.entity.Category;
 import com.ssafy.d108.backend.entity.Order;
 import com.ssafy.d108.backend.entity.OrderItem;
 import com.ssafy.d108.backend.entity.Platform;
@@ -14,6 +16,8 @@ import com.ssafy.d108.backend.order.dto.OrderResponse;
 import com.ssafy.d108.backend.order.repository.OrderItemRepository;
 import com.ssafy.d108.backend.order.repository.OrderRepository;
 import com.ssafy.d108.backend.platform.repository.PlatformRepository;
+import com.ssafy.d108.backend.product.dto.RecommendedProductDto;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +35,8 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
     private final PlatformRepository platformRepository;
+    private final CategoryRepository categoryRepository;
+    private final com.ssafy.d108.backend.product.service.ProductRecommendationService productRecommendationService;
 
     /**
      * 주문 생성 (다중 상품 주문)
@@ -68,10 +74,26 @@ public class OrderService {
             orderItem.setImgUrl(itemDto.getImgUrl());
             orderItem.setDeliverUrl(itemDto.getDeliverUrl());
 
+            if (itemDto.getCoupangProductNumber() != null) {
+                orderItem.setCoupangProductNumber(itemDto.getCoupangProductNumber());
+            }
+
+            if (itemDto.getCategoryPath() != null && !itemDto.getCategoryPath().isEmpty()) {
+                String[] categoryArray = itemDto.getCategoryPath().toArray(new String[0]);
+
+                for (int level = 0; level < categoryArray.length; level++) {
+                    Category category = Category.from(categoryArray, level);
+
+                    Category existingCategory = categoryRepository.findByFullPath(category.getFullPath())
+                            .orElseGet(() -> categoryRepository.save(category));
+
+                    orderItem.addCategory(existingCategory);
+                }
+            }
+
             savedItems.add(orderItemRepository.save(orderItem));
         }
 
-        // 3. Response 생성
         List<OrderItemResponse> itemResponses = savedItems.stream()
                 .map(OrderItemResponse::from)
                 .collect(Collectors.toList());
@@ -79,12 +101,6 @@ public class OrderService {
         return OrderResponse.of(savedOrder, itemResponses);
     }
 
-    /**
-     * 내 주문 내역 조회
-     * 
-     * @param userId 사용자 ID
-     * @return 주문 내역 리스트
-     */
     public OrderListResponse getMyOrders(Integer userId) {
         List<Order> orders = orderRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
 
@@ -92,7 +108,6 @@ public class OrderService {
                 .map(order -> {
                     List<OrderItem> items = orderItemRepository.findAllByOrderId(order.getId());
 
-                    // 아이템이 없으면 null 반환 (나중에 제거됨)
                     if (items.isEmpty()) {
                         return null;
                     }
@@ -101,14 +116,17 @@ public class OrderService {
                             .map(OrderItemResponse::from)
                             .collect(Collectors.toList());
 
-                    // 플랫폼 ID 추출 (첫 번째 아이템 기준)
                     Long extractedPlatformId = Long.valueOf(items.get(0).getPlatform().getId());
 
                     return OrderListResponse.OrderDetailDto.from(order, itemResponses, extractedPlatformId);
                 })
-                .filter(dto -> dto != null) // null 제거
+                .filter(dto -> dto != null)
                 .collect(Collectors.toList());
 
-        return new OrderListResponse(orderDtos);
+        // 추천 상품 생성 - 사용자의 전체 주문 이력 기반으로 추천
+        List<RecommendedProductDto> recommendations = productRecommendationService
+                .generateRecommendationsForUser(userId);
+
+        return new OrderListResponse(orderDtos, recommendations);
     }
 }
