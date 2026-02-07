@@ -195,9 +195,9 @@ const BrandLanding = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-6xl md:text-7xl font-black mb-12 tracking-tight">
+                            <h2 className="text-6xl md:text-7xl font-black mb-20 tracking-tight" style={{ fontFamily: 'Outfit' }}>
                                 <span className="block opacity-30 text-xl font-bold mb-3 tracking-[0.2em] uppercase">Ready to go?</span>
-                                <span className="text-white">HearBe 시작</span>
+                                <span className="text-white">HearBe와 함께</span>
                             </h2>
                         </motion.div>
 
@@ -205,12 +205,18 @@ const BrandLanding = () => {
                             initial={{ opacity: 0, y: 15 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2, duration: 0.6 }}
+                            className="relative group"
                         >
+                            {/* Cosmic Purple Glow behind the button */}
+                            <div className="absolute inset-0 bg-purple-600/30 blur-[60px] rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                            <div className="absolute inset-0 bg-indigo-600/20 blur-[40px] rounded-full scale-125 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none" />
+
                             <button
                                 onClick={goToMain}
-                                className="cursor-pointer px-14 py-5 rounded-full bg-linear-to-r from-purple-600 to-indigo-600 text-white font-bold text-xl hover:shadow-[0_10px_30px_rgba(124,58,237,0.3)] hover:scale-105 active:scale-95 transition-all duration-300"
+                                className="relative cursor-pointer px-16 py-6 rounded-full bg-white text-[#0f0d15] font-black text-xl hover:shadow-[0_15px_40px_rgba(255,255,255,0.2),0_0_60px_rgba(124,58,237,0.3)] hover:-translate-y-1 active:scale-95 transition-all duration-500 overflow-hidden"
+                                style={{ fontFamily: 'Outfit' }}
                             >
-                                쇼핑 시작하기
+                                <span className="relative z-10">쇼핑 시작하기</span>
                             </button>
                         </motion.div>
                         <p className="mt-16 text-white/10 text-xs tracking-widest uppercase">© 2026 HearBe</p>

@@ -40,7 +40,7 @@ const GuardianJoinModal = ({ isOpen, onClose, onJoin }) => {
                     <img src={logoC} alt="HearBe Logo" className="logo-image-c-modal" />
                 </div>
                 <h2 className="modal-title-c">공유 쇼핑 입장</h2>
-                <p className="modal-subtitle-c">초대코드를 입력하여 상점에 입장하세요</p>
+                <p className="modal-subtitle-c">초대코드를 입력하여 입장하세요</p>
 
                 <div className="code-input-container-c">
                     <input

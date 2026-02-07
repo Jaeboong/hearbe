@@ -11,8 +11,8 @@ import introAudio3 from '../../assets/audio/intro/intro_guide_3.wav';
 
 const STEPS = [
     { title: "목소리만으로 완성하는 쇼핑 경험", desc: "복잡한 화면 대신 당신의 목소리에 귀를 기울입니다.", audioSrc: introAudio1, duration: 5000 },
-    { title: "보이지 않아도, 스스로 선택하는 쇼핑", desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.", audioSrc: introAudio2, duration: 5000 },
-    { title: "HearBe와 함께 시작해요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3, duration: 5000 },
+    { title: "스스로 선택하는 쇼핑", desc: "복잡한 상품 정보도 HearBe가 알기 쉽게 읽어드립니다.", audioSrc: introAudio2, duration: 5000 },
+    { title: "HearBe와 함께 시작해보세요", desc: "찾고 싶은 물건을 말하면 결제까지 한 번에 도와드려요.", audioSrc: introAudio3, duration: 5000 },
 ];
 
 export default function Intro() {

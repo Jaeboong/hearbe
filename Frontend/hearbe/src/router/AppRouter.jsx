@@ -26,7 +26,6 @@ import ChangePasswordA from '../pages/FindPassword/ChangePasswordA';
 import LoginC from '../pages/Login/LoginC';
 import SignUpC from '../pages/SignUp/SignUpC';
 import SelectMallC from '../pages/SelectMall/SelectMallC';
-import StoreBrowserC from '../pages/StoreBrowser/StoreBrowserC';
 import CartC from '../pages/Cart/CartC';
 import MemberInfoC from '../pages/MemberInfo/MemberInfoC';
 import OrderHistoryC from '../pages/OrderHistory/OrderHistoryC';
@@ -247,18 +246,7 @@ function AppContent() {
             onBack={() => navigate('/C/login')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
-            onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
-          />
-        }
-      />
-      <Route
-        path="/C/store"
-        element={
-          <StoreBrowserC
-            onBack={() => navigate('/C/mall')}
-            onHome={() => navigate('/C/mall')}
-            onCart={() => navigate('/C/cart')}
-            onMyPage={() => navigate('/C/member-info')}
+            onSelectMall={(mall) => window.open(mall.url, '_blank')}
           />
         }
       />
