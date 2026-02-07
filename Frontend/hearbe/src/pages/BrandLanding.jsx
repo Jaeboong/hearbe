@@ -17,11 +17,6 @@ import guideAudio1 from '../assets/audio/guide/brand_guide_1.wav';
 import guideAudio2 from '../assets/audio/guide/brand_guide_2.wav';
 import guideAudio3 from '../assets/audio/guide/brand_guide_3.wav';
 
-// 오디오 파일들
-import guideAudio1 from '../assets/audio/guide/brand_guide_1.mp3';
-import guideAudio2 from '../assets/audio/guide/brand_guide_2.mp3';
-import guideAudio3 from '../assets/audio/guide/brand_guide_3.mp3';
-
 const WaveBackground = () => (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <svg className="absolute left-0 w-[200%] h-full opacity-[0.03] animate-wave" viewBox="0 0 1000 1000" preserveAspectRatio="none">
@@ -40,6 +35,8 @@ const BrandLanding = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
     const timerRef = useRef(null);
+    const audioRef = useRef(null);
+    const isMountedRef = useRef(true);
 
     const goToMain = () => {
         navigate('/main');
@@ -194,6 +191,8 @@ const BrandLanding = () => {
             )
         }
     ];
+
+    const totalSteps = GUIDE_STEPS.length;
 
     useEffect(() => {
         if (timerRef.current) return;

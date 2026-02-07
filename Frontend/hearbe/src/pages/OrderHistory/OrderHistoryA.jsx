@@ -285,8 +285,8 @@ const OrderHistoryA = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            );
-                                        })}
+                                            ))}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
