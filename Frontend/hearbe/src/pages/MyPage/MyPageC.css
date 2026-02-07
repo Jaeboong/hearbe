@@ -273,6 +273,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
+    /* [수정]: 메뉴 아이템 중앙 정렬 */
     font-size: 1.4rem;
     width: 100%;
     padding: 1rem 1.5rem;
