@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Spline from '@splinetool/react-spline';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import './Intro.css';
 
 import introAudio1 from '../../assets/audio/intro/intro_guide_1.wav';
@@ -53,11 +54,8 @@ export default function Intro() {
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-<<<<<<<<< Temporary merge branch 1
-        setTimeout(() => navigate('/main'), 850);
-=========
+        // [프로세스 유지]: Intro -> Guide (BrandLanding) 흐름 유지
         setTimeout(() => navigate('/guide'), 850);
->>>>>>>>> Temporary merge branch 2
     };
 
     const handleStart = () => {
@@ -71,15 +69,10 @@ export default function Intro() {
                 if (!hasStarted) {
                     handleStart();
                 } else {
-                    // 다음 단계로 이동 (마지막 단계면 메인으로)
                     if (currentStep < STEPS.length - 1) {
                         setCurrentStep(prev => prev + 1);
                     } else {
-<<<<<<<<< Temporary merge branch 1
-                        navigate('/main');
-=========
                         navigate('/guide');
->>>>>>>>> Temporary merge branch 2
                     }
                 }
             }
@@ -157,7 +150,7 @@ export default function Intro() {
         <div className="intro-container">
             {/* [디자인 우선]: 프리미엄 Skip 버튼 스타일 유지 */}
             <button
-                className="skip-btn"
+                className="fixed top-10 right-10 z-50 cursor-pointer px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/60 text-[14px] font-semibold hover:bg-white/20 hover:text-white transition-all duration-300 shadow-sm"
                 onClick={() => navigate('/guide')}
             >
                 skip

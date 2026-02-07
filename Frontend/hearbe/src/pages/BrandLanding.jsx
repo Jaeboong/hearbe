@@ -52,7 +52,7 @@ const BrandLanding = () => {
             duration: 8000,
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 shrink-0">
-                    <div className="max-w-7xl w-full">
+                    <div className="max-w-7xl w-full z-10">
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -112,22 +112,23 @@ const BrandLanding = () => {
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 z-10 shrink-0">
                     <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
-                        <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8 }}
-                        >
-                            <span className="text-purple-600 font-bold tracking-widest uppercase mb-4 block">User Guide</span>
-                            <h2 className="text-6xl font-black mb-8 text-gray-900 leading-[1.1]">
-                                간단하게,<br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">시작하세요.</span>
-                            </h2>
-                            <p className="text-2xl text-gray-600 font-medium leading-relaxed max-w-md">
-                                복잡한 절차 없이 세 단계만으로.<br />
-                                쇼핑의 새로운 기준을 제시합니다.
-                            </p>
-                        </motion.div>
-
+                        <div className="text-left">
+                            <motion.div
+                                initial={{ opacity: 0, x: -50 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.8 }}
+                            >
+                                <span className="text-purple-600 font-bold tracking-widest uppercase mb-4 block">User Guide</span>
+                                <h2 className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-[1.1] tracking-tight">
+                                    간단하게,<br />
+                                    <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-indigo-600">시작하세요.</span>
+                                </h2>
+                                <p className="text-2xl text-gray-600 font-medium leading-relaxed max-w-md">
+                                    복잡한 절차 없이 세 단계만으로.<br />
+                                    누구나 쉽게 쇼핑할 수 있습니다.
+                                </p>
+                            </motion.div>
+                        </div>
                         <div className="space-y-6">
                             {[
                                 { num: "01", text: "모드 선택", desc: "사용자에게 가장 편안한 쇼핑 방식을 선택하세요." },
