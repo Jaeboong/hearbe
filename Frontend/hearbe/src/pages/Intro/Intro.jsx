@@ -4,10 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Spline from '@splinetool/react-spline';
 import './Intro.css';
 
-// 오디오 파일 경로
-import guideAudio1 from '../../assets/audio/guide/intro_guide_1.mp3';
-import guideAudio2 from '../../assets/audio/guide/intro_guide_2.mp3';
-import guideAudio3 from '../../assets/audio/guide/intro_guide_3.mp3';
+import introAudio1 from '../../assets/audio/intro/intro_guide_1.wav';
+import introAudio2 from '../../assets/audio/intro/intro_guide_2.wav';
+import introAudio3 from '../../assets/audio/intro/intro_guide_3.wav';
 
 const STEPS = [
     {

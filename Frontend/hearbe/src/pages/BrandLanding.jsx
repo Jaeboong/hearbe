@@ -13,6 +13,9 @@ import {
     Share2
 } from 'lucide-react';
 import logoC from '../assets/logoC.png';
+import guideAudio1 from '../assets/audio/guide/brand_guide_1.wav';
+import guideAudio2 from '../assets/audio/guide/brand_guide_2.wav';
+import guideAudio3 from '../assets/audio/guide/brand_guide_3.wav';
 
 // 오디오 파일들
 import guideAudio1 from '../assets/audio/guide/brand_guide_1.mp3';
