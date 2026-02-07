@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: hearbe
+    image: ai-ai-server:${TAG:-latest}
     ports:
       - "8000:8000"
     environment:
@@ -25,7 +26,8 @@ services:
       - ./flows:/app/flows
       - huggingface-cache:/root/.cache/huggingface
       - paddleocr-cache:/root/.paddleocr
-    command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    command:
+      ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     deploy:
       resources:
         reservations:

@@ -1,0 +1,222 @@
+/* --- MypageB.css --- */
+
+:root {
+    --color-bg-navy: #1E2A3A;
+    --color-bg-dark-navy: #141C29;
+    --color-text-yellow: #FFF064;
+    --font-main: 'Pretendard', system-ui, -apple-system, sans-serif;
+}
+
+/* body 배경색은 index.css에서 중앙 관리 */
+
+
+
+
+
+
+
+
+
+.mypage-container-a {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--color-bg-navy);
+    color: var(--color-text-yellow);
+    font-family: var(--font-main);
+    position: relative;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    padding: 0;
+    padding-top: 10px;
+    padding-right: 10px;
+}
+
+/* Header & Nav */
+/* 1. 상단 네비게이션 영역 */
+.top-nav-area {
+    position: absolute;
+    top: clamp(100px, 5vw, 140px);
+    right: clamp(20px, 5vw, 40px);
+    display: flex;
+    justify-content: flex-end;
+    width: auto;
+    z-index: 100;
+}
+
+.header-nav {
+    display: flex;
+    gap: clamp(12px, 3vw, 32px);
+    z-index: 20;
+}
+
+/* 2. 유저 정보 영역 */
+.user-info-area {
+    display: flex;
+    align-items: center;
+    /* 세로 중앙 정렬 (화살표랑 글씨 높이 맞춤) */
+    gap: clamp(20px, 5vw, 40px);
+    /* 화살표랑 인사말 사이 간격 */
+    width: 100%;
+    padding-left: clamp(60px, 15vw, 120px);
+}
+
+.mypage-logo-left {
+    width: clamp(210px, 35vw, 380px);
+    height: auto;
+    cursor: pointer;
+    flex-shrink: 0;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* User Greeting (인사말 내부) */
+.user-greeting {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 4vw, 32px);
+}
+
+/* 네비게이션 아이콘 스타일 (기존 유지) */
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(4px, 1vw, 8px);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.nav-item:hover {
+    transform: translateY(clamp(-2px, -0.5vw, -4px));
+}
+
+.nav-icon {
+    width: clamp(48px, 13vw, 110px);
+    height: clamp(48px, 13vw, 110px);
+    object-fit: contain;
+}
+
+.nav-item span {
+    font-size: clamp(21px, 5.5vw, 36px);
+    font-weight: bold;
+    color: var(--color-text-yellow);
+}
+
+/* 유저 프로필 아이콘 스타일 (기존 유지) */
+.user-icon-circle {
+    width: clamp(60px, 15vw, 120px);
+    height: clamp(60px, 15vw, 120px);
+    border-radius: 50%;
+    background-color: var(--color-text-yellow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* 원이 찌그러지지 않도록 고정 */
+    flex-shrink: 0;
+}
+
+.user-profile-icon {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    filter: brightness(0);
+}
+
+.greeting-text {
+    font-size: clamp(24px, 6vw, 48px);
+    font-weight: 900;
+    color: var(--color-text-yellow);
+}
+
+/* Page Title */
+.page-title {
+    font-size: clamp(58px, 9vw, 110px);
+    font-weight: 900;
+    color: var(--color-text-yellow);
+    text-align: left;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Menu List (Grid 3 Rows, 2 Cols) */
+.menu-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    margin: 0 auto;
+    gap: clamp(16px, 3vw, 28px);
+    min-width: 680px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    background-color: #141C29;
+    border: clamp(3px, 0.8vw, 8px) solid var(--color-text-yellow);
+    border-radius: clamp(12px, 3vw, 24px);
+    padding: clamp(0px, 3vw, 0px) clamp(16px, 4vw, 32px);
+    /* Reduced padding */
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    gap: clamp(16px, 4vw, 32px);
+    min-height: clamp(80px, 20vw, 160px);
+}
+
+
+.menu-item.active {
+    background-color: #171C28;
+    border: clamp(2px, 0.4vw, 4px) solid #FFF064;
+    box-shadow: 0 0 12px rgba(255, 240, 100, 0.45);
+}
+.menu-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px rgba(255, 240, 100, 0.3);
+}
+
+.menu-number {
+    font-size: clamp(36px, 9vw, 72px);
+    font-weight: 900;
+    color: var(--color-text-yellow);
+    min-width: clamp(40px, 10vw, 80px);
+    /* Fixed width for alignment */
+    text-align: center;
+}
+
+.menu-label {
+    font-size: clamp(29px, 7.2vw, 58px);
+    /* Increased 1.2x */
+    font-weight: 900;
+    color: var(--color-text-yellow);
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px), (max-height: 900px) {
+    .mypage-container-a {
+        padding: 0;
+    }
+
+    .top-nav-area {
+        position: static;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .user-info-area {
+        padding-left: 0;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .menu-list {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .menu-list {
+        min-width: 0;
+    }
+}

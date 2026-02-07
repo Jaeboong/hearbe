@@ -1,5 +1,3 @@
-/* CartC - 장바구니 페이지 전용 스타일 */
-
 .cart-page-container {
     width: 100%;
     min-height: 100vh;
@@ -14,7 +12,6 @@
     margin: 0;
 }
 
-/* 콘텐츠 타이틀 영역 */
 .cart-content-title-row {
     display: flex;
     align-items: center;
@@ -33,7 +30,6 @@
     justify-content: center;
 }
 
-/* 콘텐츠 본문 컨테이너 */
 .cart-content-body {
     width: 100%;
     margin-top: 1.5rem;
@@ -45,7 +41,6 @@
     width: 100%;
 }
 
-/* 상태 메시지 */
 .cart-status-message {
     width: 100%;
     display: flex;
@@ -60,7 +55,6 @@
     color: #e53e3e;
 }
 
-/* Main Content - embedded mode */
 .cart-content {
     flex: 1;
     max-width: 1000px;
@@ -73,7 +67,6 @@
     margin-bottom: 1.5rem;
 }
 
-/* 쇼핑몰 그룹 */
 .mall-group {
     margin-bottom: 1.5rem;
     padding: 1.2rem;
@@ -86,7 +79,6 @@
     gap: 0;
 }
 
-/* 수량 배지 - 오른쪽 정렬 */
 .item-quantity-badge-right {
     background-color: #f5f3ff;
     padding: 0.4rem 0.8rem;
@@ -234,7 +226,6 @@
     transform: scale(1.05);
 }
 
-/* Mall Footer & Summary */
 .mall-footer {
     margin-top: 1rem;
     background-color: #f8fafc;
@@ -301,7 +292,6 @@
     color: #7c3aed;
 }
 
-/* CartC 전용 타이틀 margin 조정 */
 .mypage-content .card-title-lg {
     margin-bottom: 0 !important;
 }

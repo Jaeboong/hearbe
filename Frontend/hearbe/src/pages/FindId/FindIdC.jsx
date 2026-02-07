@@ -8,7 +8,7 @@ import logoC from '../../assets/logoC.png';
 import { authAPI } from '../../services/authAPI';
 import { emailService } from '../../services/emailService';
 
-export default function FindIdPage({ onBack, micPermissionGranted }) {
+const FindIdC = ({ onBack, micPermissionGranted }) => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -99,7 +99,6 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
         }
         try {
             const response = await authAPI.findId(name, email);
-            // 백엔드 응답: { code, message, data: { username, message } }
             if (response.data && response.data.username) {
                 setFoundUserId(response.data.username);
                 setShowIdPopup(true);
@@ -221,4 +220,6 @@ export default function FindIdPage({ onBack, micPermissionGranted }) {
             )}
         </div>
     );
-}
+};
+
+export default FindIdC;

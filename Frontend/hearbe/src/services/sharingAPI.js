@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 const API_PATH = `${API_BASE_URL}/api/sharing`;
 
 export const sharingAPI = {
-    // 세션 시작 기록
+    // 세션 시작
     startSession: async (sessionData) => {
         // sessionData: { hostUserId: number, meetingCode: string }
         const token = localStorage.getItem('accessToken');
@@ -19,7 +19,7 @@ export const sharingAPI = {
         }
     },
 
-    // 세션 종료 기록
+    // 세션 종료
     endSession: async (sessionId) => {
         const token = localStorage.getItem('accessToken');
         try {
