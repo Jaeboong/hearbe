@@ -1,6 +1,8 @@
-import { Volume2, Download } from 'lucide-react';
+import { Volume2, Download, Mic, Headphones } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import Swal from 'sweetalert2';
+import './InitialSetup.css';
 
 const STEPS = {
     MCP_DOWNLOAD: 'mcp_download',
@@ -17,11 +19,18 @@ export default function InitialSetup({ onComplete }) {
     const [voiceProgramVersion, setVoiceProgramVersion] = useState('');
 
     useEffect(() => {
+        const loadVoices = () => window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+    }, []);
+
+    useEffect(() => {
         if (currentStep === STEPS.COMPLETED) {
             onComplete(true);
         }
     }, [currentStep, onComplete]);
 
+    // [최신 기능 통합]: 서버에서 음성 프로그램 최신 버전 정보를 가져옵니다.
     useEffect(() => {
         let mounted = true;
         fetch('/downloads/voice-program-version.json', { cache: 'no-store' })
@@ -30,13 +39,13 @@ export default function InitialSetup({ onComplete }) {
                 if (!mounted || !data?.version) return;
                 setVoiceProgramVersion(data.version);
             })
-            .catch(() => {});
+            .catch(() => { });
         return () => { mounted = false; };
     }, []);
 
     const voiceProgramDownloadFile = voiceProgramVersion
         ? `${VOICE_PROGRAM_BASE_NAME}_${voiceProgramVersion}.zip`
-        : null;
+        : 'MCPDesktop.zip';
 
     const handleMcpDownload = () => {
         setCurrentStep(STEPS.MIC_PERMISSION);
@@ -62,94 +71,124 @@ export default function InitialSetup({ onComplete }) {
         onComplete(micPermissionGranted);
     };
 
-    // 브라우저 TTS 기능을 활용한 테스트 음성 재생
+    const handleSpeakerFailure = () => {
+        Swal.fire({
+            title: '소리가 안 들리시나요?',
+            html: '컴퓨터의 **음량 설정**과 **스피커 연결** 상태를 확인해 주세요.<br/>브라우저의 소리가 꺼져있을 수도 있습니다.',
+            icon: 'warning',
+            confirmButtonText: '다시 시도하기',
+            confirmButtonColor: '#7c3aed'
+        });
+    };
+
     const playTestSound = () => {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance('안녕하세요. 이 소리가 선명하게 들리나요?');
+        const utterance = new SpeechSynthesisUtterance('이 소리가 선명하게 들리시면 잘들림 버튼을 눌러주세요.');
+
         utterance.lang = 'ko-KR';
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(voice =>
+            (voice.lang === 'ko-KR' || voice.lang === 'ko_KR') &&
+            (voice.name.includes('Google') || voice.name.includes('Yuna') || voice.name.includes('Heami') || voice.name.includes('Sun-Hi'))
+        );
+
+        if (femaleVoice) {
+            utterance.voice = femaleVoice;
+        }
+
+        utterance.pitch = 1.1;
+        utterance.rate = 1.0;
+
         window.speechSynthesis.speak(utterance);
     };
 
-    if (currentStep === STEPS.COMPLETED) {
-        return null;
-    }
+    if (currentStep === STEPS.COMPLETED) return null;
 
-    // --- 단계 1: MCP 다운로드 페이지 ---
-    if (currentStep === STEPS.MCP_DOWNLOAD) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-8 bg-[#F8F8FA]">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative rounded-3xl p-12 max-w-2xl w-full shadow-2xl bg-white border border-[#7C3AED]/15">
-                    <div className="flex flex-col items-center text-center">
-                        <div className="relative w-24 h-24 rounded-2xl flex items-center justify-center mb-6" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>
-                            <Download className="w-12 h-12 text-white" />
+    return (
+        <div className="setup-container">
+            <AnimatePresence mode="wait">
+                {currentStep === STEPS.MCP_DOWNLOAD && (
+                    <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        className="setup-card"
+                    >
+                        <div className="icon-box">
+                            <Download size={48} />
                         </div>
-                        <h2 className="text-4xl font-bold mb-4 text-[#1A1A1A]">보조 프로그램 설치</h2>
-                        <p className="text-xl mb-12 text-[#6B7280]">
-                            음성 인식과 화면 공유 기능을 사용하려면<br />아래 프로그램을 설치해주세요.
+                        <h2 className="setup-title">음성 보조 프로그램 설치</h2>
+                        <p className="setup-desc">
+                            음성 인식과 원격 음성 제어를 위해<br />
+                            보조 프로그램을 설치해 주세요.
                         </p>
-                        <div className="flex gap-4 w-full">
-                            <button onClick={handleMcpDownload} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">나중에</button>
+                        <div className="btn-group">
+                            <button onClick={handleMcpDownload} className="btn-secondary-setup">나중에</button>
                             <a
-                                href={voiceProgramDownloadFile ? encodeURI(`/downloads/${voiceProgramDownloadFile}`) : undefined}
-                                download={!!voiceProgramDownloadFile}
+                                href={encodeURI(`/downloads/${voiceProgramDownloadFile}`)}
+                                download
                                 onClick={handleMcpDownload}
-                                aria-disabled={!voiceProgramDownloadFile}
-                                className={`flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg no-underline flex items-center justify-center ${voiceProgramDownloadFile ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'}`}
-                                style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}
-                            >다운로드</a>
+                                className="btn-primary-setup no-underline flex items-center justify-center"
+                                style={{ flex: 1.5 }}
+                            >
+                                지금 다운로드
+                            </a>
                         </div>
-                    </div>
-                </motion.div>
-            </div>
-        );
-    }
+                    </motion.div>
+                )}
 
-    // --- 단계 2: 마이크 권한 팝업 ---
-    if (currentStep === STEPS.MIC_PERMISSION) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-8 bg-[#F8F8FA]">
-                <div className="relative rounded-3xl p-12 max-w-2xl w-full shadow-2xl bg-white border border-[#7C3AED]/15">
-                    <div className="flex flex-col items-center text-center">
-                        <div className="relative w-24 h-24 rounded-2xl flex items-center justify-center mb-6" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>
-                            <Volume2 className="w-12 h-12 text-white" />
+                {currentStep === STEPS.MIC_PERMISSION && (
+                    <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        className="setup-card"
+                    >
+                        <div className="icon-box">
+                            <Mic size={48} />
                         </div>
-                        <h2 className="text-4xl font-bold mb-4 text-[#1A1A1A]">마이크 권한</h2>
-                        <p className="text-xl mb-12 text-[#6B7280]">
-                            HearBe는 음성 명령을 통해 쇼핑을 돕는 서비스입니다.<br />
-                            마이크 사용 권한을 허용하여 음성 기능을 활성화하시겠습니까?
+                        <h2 className="setup-title">마이크 권한 허용</h2>
+                        <p className="setup-desc">
+                            HearBe는 음성 명령으로 쇼핑을 돕습니다.<br />
+                            원활한 사용을 위해 마이크 권한을 허용해 주세요.
                         </p>
-                        <div className="flex gap-4 w-full">
-                            <button onClick={() => handleMicPermission(false)} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">거부</button>
-                            <button onClick={() => handleMicPermission(true)} className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg cursor-pointer" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>활성화</button>
+                        <div className="btn-group">
+                            <button onClick={() => handleMicPermission(false)} className="btn-secondary-setup">건너뛰기</button>
+                            <button onClick={() => handleMicPermission(true)} className="btn-primary-setup">권한 허용하기</button>
                         </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+                    </motion.div>
+                )}
 
-    // --- 단계 3: 스피커 테스트 팝업 ---
-    if (currentStep === STEPS.SPEAKER_TEST) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-8 bg-[#F8F8FA]">
-                <div className="relative rounded-3xl p-12 max-w-2xl w-full shadow-2xl bg-white border border-[#7C3AED]/15">
-                    <div className="flex flex-col items-center text-center">
-                        <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}
-                            className="relative w-24 h-24 rounded-2xl flex items-center justify-center mb-6" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>
-                            <Volume2 className="w-12 h-12 text-white" />
-                        </motion.div>
-                        <h2 className="text-4xl font-bold mb-4 text-[#1A1A1A]">스피커 테스트</h2>
-                        <p className="text-xl mb-6 text-[#6B7280]">
-                            아래 버튼을 눌러 소리가 잘 들리는지 확인해주세요.
-                        </p>
-                        <button onClick={playTestSound} className="mb-12 px-8 py-4 rounded-xl text-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">소리 듣기</button>
-                        <div className="flex gap-4 w-full">
-                            <button onClick={handleSpeakerTest} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563] cursor-pointer">안 들림</button>
-                            <button onClick={handleSpeakerTest} className="flex-1 py-5 text-xl rounded-xl font-bold text-white shadow-lg cursor-pointer" style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>잘 들림</button>
+                {currentStep === STEPS.SPEAKER_TEST && (
+                    <motion.div
+                        key="step3"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        className="setup-card"
+                    >
+                        <div className="icon-box pulse">
+                            <Headphones size={48} />
                         </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+                        <h2 className="setup-title">스피커 확인</h2>
+                        <p className="setup-desc">
+                            안내 음성이 잘 들리는지 확인해 주세요.
+                        </p>
+
+                        <button onClick={playTestSound} className="test-sound-btn">
+                            <Volume2 size={24} />
+                            소리 재생하기
+                        </button>
+
+                        <div className="btn-group">
+                            <button onClick={handleSpeakerFailure} className="btn-secondary-setup">안 들려요</button>
+                            <button onClick={handleSpeakerTest} className="btn-primary-setup">잘 들려요</button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 }
