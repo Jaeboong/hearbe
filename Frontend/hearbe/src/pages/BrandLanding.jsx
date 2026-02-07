@@ -1,60 +1,33 @@
-import { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Eye, Command, ArrowRight, ChevronRight, ChevronDown, Download } from 'lucide-react';
-import '../App.css';
-import '../index.css'
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    ChevronRight,
+    ChevronDown,
+    Mic,
+    Eye,
+    Command,
+    ArrowRight,
+    Volume2,
+    Layout,
+    Share2
+} from 'lucide-react';
 import logoC from '../assets/logoC.png';
 import guideAudio1 from '../assets/audio/guide/brand_guide_1.wav';
 import guideAudio2 from '../assets/audio/guide/brand_guide_2.wav';
 import guideAudio3 from '../assets/audio/guide/brand_guide_3.wav';
 
-
 const WaveBackground = () => (
-    <div className="absolute inset-x-0 bottom-0 h-[30vh] pointer-events-none opacity-50 z-0 overflow-hidden">
-        <svg width="0" height="0">
-            <defs>
-                <linearGradient id="flowGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#A78BFA" stopOpacity="0.4" />
-                    <stop offset="50%" stopColor="#8B5CF6" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#A78BFA" stopOpacity="0.4" />
-                </linearGradient>
-                <linearGradient id="flowGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#818CF8" stopOpacity="0.4" />
-                    <stop offset="50%" stopColor="#6366F1" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#818CF8" stopOpacity="0.4" />
-                </linearGradient>
-            </defs>
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <svg className="absolute left-0 w-[200%] h-full opacity-[0.03] animate-wave" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <path d="M0,500 C150,400 350,600 500,500 C650,400 850,600 1000,500 L1000,1000 L0,1000 Z" fill="url(#wave-gradient)" />
         </svg>
-
-        {/* Wave 1 */}
-        <motion.div
-            className="absolute bottom-0 left-0 h-full w-[200%] flex"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-        >
-            <svg className="w-1/2 h-full" viewBox="0 0 1000 100" preserveAspectRatio="none">
-                <path d="M0,50 C200,40 300,80 500,50 C700,20 800,60 1000,50" stroke="url(#flowGradient1)" strokeWidth="1.5" fill="none" />
-            </svg>
-            <svg className="w-1/2 h-full" viewBox="0 0 1000 100" preserveAspectRatio="none">
-                <path d="M0,50 C200,40 300,80 500,50 C700,20 800,60 1000,50" stroke="url(#flowGradient1)" strokeWidth="1.5" fill="none" />
-            </svg>
-        </motion.div>
-
-        {/* Wave 2 */}
-        <motion.div
-            className="absolute bottom-0 left-0 h-full w-[200%] flex"
-            animate={{ x: ["-50%", "0%"] }}
-            transition={{ duration: 55, repeat: Infinity, ease: "linear" }}
-            style={{ opacity: 0.6 }}
-        >
-            <svg className="w-1/2 h-full" viewBox="0 0 1000 100" preserveAspectRatio="none">
-                <path d="M0,50 C150,70 350,30 500,50 C650,70 850,30 1000,50" stroke="url(#flowGradient2)" strokeWidth="1.5" fill="none" />
-            </svg>
-            <svg className="w-1/2 h-full" viewBox="0 0 1000 100" preserveAspectRatio="none">
-                <path d="M0,50 C150,70 350,30 500,50 C650,70 850,30 1000,50" stroke="url(#flowGradient2)" strokeWidth="1.5" fill="none" />
-            </svg>
-        </motion.div>
+        <defs>
+            <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#7C3AED" />
+                <stop offset="100%" stopColor="#3B82F6" />
+            </linearGradient>
+        </defs>
     </div>
 );
 
@@ -69,8 +42,6 @@ const BrandLanding = () => {
         navigate('/main');
     };
 
-    const totalSteps = 3;
-
     const GUIDE_STEPS = [
         {
             id: 'speciality',
@@ -78,7 +49,7 @@ const BrandLanding = () => {
             duration: 8000,
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 shrink-0">
-                    <div className="max-w-7xl w-full z-10">
+                    <div className="max-w-7xl w-full">
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -138,26 +109,25 @@ const BrandLanding = () => {
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 z-10 shrink-0">
                     <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
-                        <div className="text-left">
-                            <motion.div
-                                initial={{ opacity: 0, x: -50 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.8 }}
-                            >
-                                <span className="text-purple-600 font-bold tracking-widest uppercase mb-4 block">User Guide</span>
-                                <h2 className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-[1.1] tracking-tight">
-                                    간단하게,<br />
-                                    <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-indigo-600">시작하세요.</span>
-                                </h2>
-                                <p className="text-2xl text-gray-600 font-medium leading-relaxed max-w-md">
-                                    복잡한 절차 없이 세 단계만으로.<br />
-                                    누구나 쉽게 쇼핑할 수 있습니다.
-                                </p>
-                            </motion.div>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <span className="text-purple-600 font-bold tracking-widest uppercase mb-4 block">User Guide</span>
+                            <h2 className="text-6xl font-black mb-8 text-gray-900 leading-[1.1]">
+                                간단하게,<br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">시작하세요.</span>
+                            </h2>
+                            <p className="text-2xl text-gray-600 font-medium leading-relaxed max-w-md">
+                                복잡한 절차 없이 세 단계만으로.<br />
+                                쇼핑의 새로운 기준을 제시합니다.
+                            </p>
+                        </motion.div>
+
                         <div className="space-y-6">
                             {[
-                                { num: "01", text: "쇼핑 모드 선택", desc: "사용자에게 맞는 최적의 UI를 선택하세요." },
+                                { num: "01", text: "모드 선택", desc: "사용자에게 가장 편안한 쇼핑 방식을 선택하세요." },
                                 { num: "02", text: "음성 대화", desc: "목소리로 상품을 찾고 설명을 들어보세요." },
                                 { num: "03", text: "간편 구매", desc: "결제까지 대화하듯 자연스럽게 완료됩니다." }
                             ].map((step, i) => (
@@ -170,7 +140,7 @@ const BrandLanding = () => {
                                 >
                                     <span className="text-4xl font-black text-purple-300">{step.num}</span>
                                     <div>
-                                        <h3 className="text-2xl font-bold text-gray-900">{step.text}</h3>
+                                        <h4 className="text-xl font-bold text-gray-900 mb-1">{step.text}</h4>
                                         <p className="text-gray-500">{step.desc}</p>
                                     </div>
                                 </motion.div>
@@ -222,6 +192,8 @@ const BrandLanding = () => {
         }
     ];
 
+    const totalSteps = GUIDE_STEPS.length;
+
     useEffect(() => {
         if (timerRef.current) return;
 
@@ -238,7 +210,6 @@ const BrandLanding = () => {
 
         if (currentStep < totalSteps - 1) {
             timerRef.current = setTimeout(() => {
-                timerRef.current = null;
                 handleMove();
             }, stepData.duration);
         }
@@ -274,11 +245,10 @@ const BrandLanding = () => {
                 if (currentStep === totalSteps - 1) {
                     goToMain();
                 } else {
-                    setCurrentStep(prev => prev + 1);
+                    handleNext();
                 }
             }
         };
-
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [currentStep]);
@@ -298,7 +268,12 @@ const BrandLanding = () => {
             {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-transparent h-32 flex items-center">
                 <div className="max-w-7xl w-full mx-auto px-8 flex items-center justify-between">
-                    <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" onClick={() => setCurrentStep(0)} />
+                    <img
+                        src={logoC}
+                        alt="HearBe"
+                        className="h-24 object-contain cursor-pointer opacity-90 hover:opacity-100 transition-opacity"
+                        onClick={() => setCurrentStep(0)}
+                    />
                     <button
                         onClick={goToMain}
                         className="cursor-pointer absolute top-10 right-10 px-6 py-2 rounded-full bg-gray-100/80 backdrop-blur-sm border border-gray-200 text-gray-500 text-[14px] font-semibold hover:bg-gray-200 hover:text-gray-800 transition-all duration-300 z-50 shadow-sm"
@@ -313,8 +288,8 @@ const BrandLanding = () => {
                 className="flex w-full h-full transition-transform duration-1000 ease-in-out will-change-transform"
                 style={{ transform: `translateX(-${currentStep * 100}vw)` }}
             >
-                {GUIDE_STEPS.map((step, index) => (
-                    <div key={step.id}>
+                {GUIDE_STEPS.map((step) => (
+                    <div key={step.id} className="w-screen h-full shrink-0">
                         {step.content}
                     </div>
                 ))}
@@ -331,7 +306,7 @@ const BrandLanding = () => {
                 </button>
 
                 <div className="flex gap-3">
-                    {Array.from({ length: totalSteps }).map((_, i) => (
+                    {GUIDE_STEPS.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => setCurrentStep(i)}

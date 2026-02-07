@@ -135,155 +135,239 @@
     font-family: 'Pretendard', sans-serif;
 }
 
-/* Mall Section - 개별 카드박스 형태로 복구 */
-.mall-section {
+/* Orders Container */
+.orders-container {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    margin-bottom: 40px;
-    background-color: #121521;
-    border: 4px solid #FFF064;
-    border-radius: 30px;
-    overflow: hidden;
+    gap: 50px;
+    width: 100%;
 }
 
-.mall-header {
-    background-color: #FFF064;
-    /* 헤더는 다시 노란색으로 강조 (A형 스타일 복구) */
-    padding: 15px 25px;
+/* Date Group - Contains date header + multiple platform sections */
+.date-group-a {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Date Header */
+.date-header-main-a {
     display: flex;
     align-items: center;
     gap: 15px;
+    padding-bottom: 15px;
+    border-bottom: 4px solid #FFF064;
 }
 
-.mall-header::before {
-    display: none;
-    /* 이전 인디케이터 제거 */
+.date-indicator-a {
+    width: 6px;
+    height: 50px;
+    background-color: #FFF064;
+    border-radius: 3px;
+    flex-shrink: 0;
 }
 
-.mall-name {
+.date-title-a {
     font-size: 32px;
     font-weight: 950;
-    color: #141C29;
-    /* 노란색 배경이므로 어두운 글씨 */
+    color: #FFF064;
     margin: 0;
     font-family: 'Pretendard', sans-serif;
+    line-height: 1;
 }
 
-/* Items List Container (Wishlist/Cart 와 동일한 내부 여백 적용) */
-.orders-list {
+/* Platform Section - Individual platform within a date */
+.platform-section-a {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    background-color: #121521;
-    margin: clamp(12px, 2.5vw, 20px);
-    border-radius: clamp(10px, 2vw, 14px);
-    overflow: hidden;
+    gap: 15px;
 }
 
-/* Old block removed */
-
-.order-group {
-    border-bottom: clamp(1px, 0.2vw, 2px) solid rgba(255, 240, 100, 0.2);
-}
-
-.order-group:last-child {
-    border-bottom: none;
-    border-radius: 0 0 clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px);
-}
-
-.order-date-header {
-    padding: 15px 25px;
-    background-color: rgba(255, 240, 100, 0.05);
-    font-size: 20px;
-    font-weight: bold;
-    color: #FFF064;
-    font-family: 'Pretendard', sans-serif;
-    border-bottom: 1px solid rgba(255, 240, 100, 0.2);
-}
-
-.order-details {
+/* Platform Header */
+.platform-header-a {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: clamp(16px, 3vw, 24px);
-    background-color: #121521;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 2px solid rgba(255, 240, 100, 0.3);
 }
 
-.order-items {
-    flex: 1;
+.platform-name-a {
+    font-size: 32px;
+    font-weight: 950;
+    color: #FFF064;
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+    line-height: 1;
+}
+
+
+/* Order Detail Button in Header */
+.btn-order-detail {
+    padding: 12px 24px;
+    background-color: #FFF064;
+    color: #141C29;
+    border: none;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: 900;
+    font-family: 'Pretendard', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-order-detail:hover:not(:disabled) {
+    background-color: #FFE54D;
+    transform: scale(1.05);
+}
+
+.btn-order-detail:disabled {
+    background-color: #555;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* Order Items List */
+.order-items-list {
     display: flex;
     flex-direction: column;
     gap: clamp(12px, 2.5vw, 18px);
 }
 
-.order-item {
+/* Order Item Card */
+.order-item-card {
     display: flex;
     align-items: center;
     gap: clamp(16px, 3vw, 24px);
-    padding: 15px 25px;
-    /* 헤더 및 날짜바와 좌측 정렬 일치시킴 */
-    box-sizing: border-box;
+    padding: clamp(16px, 3vw, 24px);
+    background-color: #121521;
+    border: 2px solid rgba(255, 240, 100, 0.2);
+    border-radius: 16px;
+    transition: all 0.3s ease;
 }
 
-.order-item-image {
+.order-item-card:hover {
+    transform: translateY(-4px);
+    border-color: #FFF064;
+    box-shadow: 0 8px 16px rgba(255, 240, 100, 0.2);
+}
+
+/* Item Image */
+.item-image {
     width: 80px;
-    /* 찜한 상품, 장바구니와 동일하게 80px로 통일 */
     height: 80px;
-    object-fit: contain;
+    flex-shrink: 0;
     background-color: #ffffff;
     border-radius: 12px;
-    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.order-item-info {
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.item-placeholder {
+    font-size: 40px;
+}
+
+/* Item Info */
+.item-info {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: clamp(4px, 1vw, 8px);
+    min-width: 0;
 }
 
-.order-item-name {
-    font-size: 24px;
-    font-weight: 800;
+.item-name {
+    font-size: clamp(28px, 6vw, 32px);
+    font-weight: 900;
     color: #FFF064;
     font-family: 'Pretendard', sans-serif;
-    line-height: 1.4;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.order-item-meta {
-    font-size: clamp(16px, 3vw, 22px);
-    color: #FFF064;
-    font-weight: bold;
-    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
-}
-
-/* Track Delivery Button - 버튼 크기 축소 */
-.track-delivery-btn {
-    padding: clamp(8px, 1.5vw, 12px) clamp(16px, 2.5vw, 24px);
-    background-color: #FFF064;
-    color: #171C28;
-    border: clamp(2px, 0.4vw, 3px) solid #FFF064;
-    border-radius: clamp(6px, 1.5vw, 10px);
-    font-size: clamp(14px, 2.5vw, 20px);
+.item-price-a {
+    font-size: clamp(18px, 5vw, 26px);
     font-weight: 900;
-    cursor: pointer;
-    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
-    transition: opacity 0.2s, background-color 0.2s;
+    color: #FFF064;
+    font-family: 'Pretendard', sans-serif;
+}
+
+/* Item Quantity */
+.item-quantity {
+    font-size: clamp(20px, 5vw, 28px);
+    font-weight: 900;
+    color: #FFF064;
+    font-family: 'Pretendard', sans-serif;
+    padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
+    background-color: rgba(255, 240, 100, 0.1);
+    border: 2px solid #FFF064;
+    border-radius: 12px;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-.track-delivery-btn:hover:not(:disabled) {
-    opacity: 0.9;
+/* Item Actions */
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 12px);
+    flex-shrink: 0;
 }
 
-.track-delivery-btn.disabled,
-.track-delivery-btn:disabled {
-    background-color: #CCCCCC;
-    color: #888888;
-    border-color: #CCCCCC;
+.btn-product-detail,
+.btn-delivery-track {
+    padding: 10px 20px;
+    border: 2px solid #FFF064;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 900;
+    font-family: 'Pretendard', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+.btn-product-detail {
+    background-color: #FFF064;
+    color: #141C29;
+}
+
+.btn-product-detail:hover:not(:disabled) {
+    background-color: #FFE54D;
+    transform: scale(1.05);
+}
+
+.btn-delivery-track {
+    background-color: transparent;
+    color: #FFF064;
+}
+
+.btn-delivery-track:hover:not(:disabled) {
+    background-color: rgba(255, 240, 100, 0.1);
+    transform: scale(1.05);
+}
+
+.btn-product-detail:disabled,
+.btn-delivery-track:disabled {
+    background-color: #555;
+    color: #888;
+    border-color: #555;
     cursor: not-allowed;
 }
+
 
 /* Loading State */
 .loading-state {
@@ -387,34 +471,25 @@
 @media (max-width: 768px) {
     .orderhistory-container .orderhistory-content {
         flex-direction: column;
-
-        .orderhistory-container .orderhistory-content {
-            min-width: 0;
-        }
     }
 
     .orderhistory-sidebar {
         flex: none;
     }
 
-    .order-details {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .track-delivery-btn {
-        width: 100%;
-    }
-
-    .order-item {
+    .order-item-card {
         flex-direction: column;
         align-items: flex-start;
     }
 
+    .item-actions {
+        width: 100%;
+        flex-direction: row;
+    }
 
-
-    .orderhistory-container .orderhistory-content {
-        min-width: 0;
+    .btn-product-detail,
+    .btn-delivery-track {
+        flex: 1;
     }
 }
 
