@@ -16,11 +16,12 @@ logger = logging.getLogger(__name__)
 class CommandPipeline:
     """Prepare and dispatch tool commands with shared safeguards."""
 
-    def __init__(self, sender, action_feedback, login_guard=None, login_feedback=None, command_queue=None):
+    def __init__(self, sender, action_feedback, login_guard=None, login_feedback=None, logout_feedback=None, command_queue=None):
         self._sender = sender
         self._action_feedback = action_feedback
         self._login_guard = login_guard
         self._login_feedback = login_feedback
+        self._logout_feedback = logout_feedback
         self._command_queue = command_queue
 
     def prepare_commands(
@@ -49,6 +50,12 @@ class CommandPipeline:
                 session_id,
                 commands,
                 current_url or ""
+            )
+        if self._logout_feedback:
+            self._logout_feedback.mark_logout_pending(
+                session_id,
+                commands,
+                current_url or "",
             )
         return commands
 

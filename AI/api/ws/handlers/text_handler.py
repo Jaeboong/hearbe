@@ -90,6 +90,7 @@ class TextHandler:
         order_detail_handler=None,
         page_extract=None,
         command_queue=None,
+        logout_feedback=None,
     ):
         self._nlu = nlu_service
         self._llm = llm_planner
@@ -110,6 +111,7 @@ class TextHandler:
             action_feedback=action_feedback,
             login_guard=login_guard,
             login_feedback=login_feedback,
+            logout_feedback=logout_feedback,
             command_queue=command_queue,
         )
 

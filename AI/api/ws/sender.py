@@ -95,6 +95,9 @@ class WSSender:
         if not self._tts:
             logger.warning("TTS service not available")
             return
+        if not self._connections.is_connected(session_id):
+            logger.info("Skip TTS (not connected): session=%s", session_id)
+            return
 
         try:
             tts_id = uuid.uuid4().hex[:10]
@@ -113,9 +116,13 @@ class WSSender:
                 preview,
             )
             chunk_count = 0
+            disconnected = False
             for segment_index, segment in enumerate(segments):
                 if self._tts_epoch.get(session_id, 0) != epoch:
                     logger.info(f"TTS cancelled: session={session_id}")
+                    break
+                if not self._connections.is_connected(session_id):
+                    disconnected = True
                     break
                 if not segment:
                     continue
@@ -131,6 +138,9 @@ class WSSender:
                 async for chunk in self._tts.synthesize_stream(segment):
                     if self._tts_epoch.get(session_id, 0) != epoch:
                         logger.info(f"TTS cancelled: session={session_id}")
+                        break
+                    if not self._connections.is_connected(session_id):
+                        disconnected = True
                         break
                     data = {
                         "audio": chunk.audio_data.hex() if chunk.audio_data else "",
@@ -152,8 +162,15 @@ class WSSender:
                         data=data,
                         session_id=session_id
                     )
-                    await self._connections.send_message(session_id, msg)
+                    ok = await self._connections.send_message(session_id, msg)
+                    if not ok:
+                        disconnected = True
+                        break
                     chunk_count += 1
+                if disconnected:
+                    break
+            if disconnected:
+                logger.info("TTS aborted (disconnected): id=%s session=%s", tts_id, session_id)
             logger.info(
                 "TTS completed: id=%s session=%s chunks=%d segments=%d",
                 tts_id,

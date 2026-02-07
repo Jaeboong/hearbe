@@ -26,6 +26,7 @@ class BrowserConnectionMixin:
         self._last_published_url: Optional[str] = None
         self._last_published_page_id: Optional[int] = None
         self._focus_poll_task: Optional[asyncio.Task] = None
+        self._url_poll_task: Optional[asyncio.Task] = None
 
     @property
     def is_connected(self) -> bool:
@@ -66,8 +67,33 @@ class BrowserConnectionMixin:
                 context = contexts[0] if contexts else await self._browser.new_context()
                 self._page = await context.new_page()
 
+            # Prefer the currently focused tab as the initial active page when available.
+            try:
+                focused_page: Optional[Page] = None
+                for context in self._browser.contexts:
+                    for candidate in context.pages:
+                        if candidate.is_closed():
+                            continue
+                        try:
+                            has_focus = await candidate.evaluate("document.hasFocus()")
+                        except Exception:
+                            continue
+                        if has_focus:
+                            focused_page = candidate
+                            break
+                    if focused_page:
+                        break
+                if focused_page:
+                    self._page = focused_page
+            except Exception:
+                pass
+
             self._attach_browser_listeners()
             self._start_focus_poll()
+            self._start_url_poll()
+            if self._page and not self._page.is_closed():
+                # Ensure server receives current URL even when attaching to an already-loaded SPA page.
+                self._publish_page_url(self._page)
             logger.info(f"Connected to browser via CDP: {cdp_url}")
             return True
 
@@ -119,6 +145,11 @@ class BrowserConnectionMixin:
             return
         self._focus_poll_task = asyncio.create_task(self._focus_poll_loop())
 
+    def _start_url_poll(self):
+        if self._url_poll_task and not self._url_poll_task.done():
+            return
+        self._url_poll_task = asyncio.create_task(self._url_poll_loop())
+
     async def _focus_poll_loop(self):
         while self.is_connected and self._browser:
             focused_page: Optional[Page] = None
@@ -143,11 +174,32 @@ class BrowserConnectionMixin:
                 pass
             await asyncio.sleep(0.8)
 
-    def _publish_page_url(self, page: Page):
+    async def _url_poll_loop(self):
+        # Fallback polling for SPA same-document navigations (pushState/replaceState).
+        while self.is_connected and self._browser:
+            try:
+                page = self._page
+                if page and not page.is_closed():
+                    url = None
+                    try:
+                        url = await page.evaluate("location.href")
+                    except Exception:
+                        url = None
+                    if isinstance(url, str) and url:
+                        self._publish_page_url(page, url=url)
+                    else:
+                        self._publish_page_url(page)
+            except Exception:
+                pass
+            await asyncio.sleep(0.5)
+
+    def _publish_page_url(self, page: Page, url: Optional[str] = None):
         try:
-            url = page.url or ""
+            url = (url or page.url or "").strip()
             page_id = id(page)
             if not url:
+                return
+            if url.startswith(("about:", "chrome:", "edge:", "chrome-extension:")):
                 return
             if url == self._last_published_url and page_id == self._last_published_page_id:
                 return
@@ -205,6 +257,9 @@ class BrowserConnectionMixin:
         if self._focus_poll_task:
             self._focus_poll_task.cancel()
             self._focus_poll_task = None
+        if self._url_poll_task:
+            self._url_poll_task.cancel()
+            self._url_poll_task = None
         if self._browser:
             try:
                 await self._browser.close()

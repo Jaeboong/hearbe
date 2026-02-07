@@ -20,7 +20,10 @@ from ..rules.cart import CartRule
 from ..rules.login import LoginRule
 from ..rules.order_list import OrderListRule
 from ..rules.hearbe_nav import HearbeNavRule
+from ..rules.hearbe_mall_select import HearbeMallSelectRule
+from ..rules.hearbe_main_mode import HearbeMainModeRule
 from ..rules.checkout import CheckoutRule
+from ..rules.logout import LogoutRule
 from ..rules.generic import GenericClickRule
 
 logger = logging.getLogger(__name__)
@@ -52,11 +55,14 @@ class CommandGenerator:
         self.rules: list[BaseRule] = [
             SiteAccessRule(self.site_manager),
             HearbeNavRule(self.site_manager),
+            HearbeMallSelectRule(self.site_manager),
+            HearbeMainModeRule(self.site_manager),
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
             OrderDetailRule(self.site_manager),
             CartRule(self.site_manager),
             OrderListRule(self.site_manager),
+            LogoutRule(self.site_manager),
             LoginRule(self.site_manager),
             CheckoutRule(self.site_manager),
             GenericClickRule(self.site_manager),

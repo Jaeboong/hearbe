@@ -102,6 +102,15 @@ class AIServer:
 
         logger.info("All services initialized")
 
+    async def _warmup_ocr(self):
+        """OCR 모델을 백그라운드에서 미리 로드"""
+        try:
+            from services.summarizer import get_ocr_integrator
+            integrator = get_ocr_integrator()
+            await integrator.warmup()
+        except Exception as e:
+            logger.warning(f"OCR warmup skipped: {e}")
+
     async def shutdown_services(self):
         """모든 서비스 종료"""
         logger.info("Shutting down services...")
@@ -145,6 +154,9 @@ class AIServer:
 
             await publish(EventType.SERVER_STARTED, source="main")
             logger.info("AI Server started")
+
+            # OCR 모델 백그라운드 사전 로딩
+            asyncio.create_task(self._warmup_ocr())
 
             yield
 

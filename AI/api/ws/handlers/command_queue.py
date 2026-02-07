@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class CommandBatch:
+    session_id: str
     commands: List[MCPCommand]
     response_text: str
     current_url: str
@@ -79,6 +80,7 @@ class CommandQueueManager:
 
         self._queues.setdefault(session_id, deque())
         batch = CommandBatch(
+            session_id=session_id,
             commands=commands or [],
             response_text=response_text or "",
             current_url=current_url or "",
@@ -101,6 +103,14 @@ class CommandQueueManager:
             return False
         if tool_name.startswith("extract"):
             return False
+
+        # MCP can occasionally send arguments as a JSON string. Normalize so our
+        # fingerprint matches what we originally dispatched.
+        if isinstance(arguments, str):
+            try:
+                arguments = json.loads(arguments)  # type: ignore[assignment]
+            except Exception:
+                arguments = {}
 
         key = _fingerprint(tool_name, arguments or {})
         if key not in batch.pending:
@@ -181,7 +191,7 @@ class CommandQueueManager:
         except asyncio.TimeoutError:
             logger.warning(
                 "Command queue timeout: session=%s commands=%d tts=%s",
-                "<unknown>",
+                batch.session_id,
                 len(batch.commands or []),
                 bool(batch.response_text),
             )

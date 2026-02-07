@@ -230,11 +230,18 @@ async def extract_coupang_order_list(page) -> Dict[str, Any]:
         pushOrder(parsed);
       });
 
-      orders.forEach((item, idx) => { item.index = idx + 1; });
+      // Keep only real order-detail entries. This prevents "마이쿠팡" / list links from
+      // being treated as an order (which breaks "N번째 주문 상세보기" indexing).
+      // Some order detail links include query strings or trailing slashes.
+      // Accept those so we don't drop all orders and break "N번째 주문 상세보기".
+      const isOrderDetailUrl = (url) => /\/ssr\/desktop\/order\/\d+(?:[/?#].*)?$/.test(String(url || ''));
+      const filtered = orders.filter((o) => isOrderDetailUrl(o && o.detail_url));
+
+      filtered.forEach((item, idx) => { item.index = idx + 1; });
 
       return {
-        orders,
-        count: orders.length,
+        orders: filtered,
+        count: filtered.length,
       };
     }
     """

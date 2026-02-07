@@ -13,6 +13,7 @@ import uuid
 from typing import Optional, Dict, Any, Callable
 from datetime import datetime
 from enum import Enum
+from asyncio import Queue
 
 import websockets
 from websockets.client import WebSocketClientProtocol
@@ -57,6 +58,9 @@ class WSClient:
         self._reconnect_task: Optional[asyncio.Task] = None
         self._receive_task: Optional[asyncio.Task] = None
         self._pending_requests: Dict[str, asyncio.Future] = {}
+        # Text inputs (console/scripted) should not be dropped during transient reconnects.
+        self._text_input_queue: "Queue[str]" = Queue()
+        self._text_input_sender_task: Optional[asyncio.Task] = None
         
     @property
     def is_connected(self) -> bool:
@@ -130,6 +134,14 @@ class WSClient:
     async def disconnect(self):
         """연결 해제"""
         self._running = False
+
+        if self._text_input_sender_task:
+            self._text_input_sender_task.cancel()
+            try:
+                await self._text_input_sender_task
+            except asyncio.CancelledError:
+                pass
+            self._text_input_sender_task = None
         
         # 수신 태스크 취소
         if self._receive_task:
@@ -430,14 +442,34 @@ class WSClient:
         )
 
     async def _on_text_input_ready(self, event):
-        """Send text input to server (bypass ASR)."""
+        """Queue text input to server (bypass ASR).
+
+        Important: the WS connection can drop/reconnect; do not lose inputs.
+        """
         text = (event.data or "").strip()
         if not text:
             return
-        await self.send_message(
-            MessageType.USER_INPUT,
-            {"text": text}
-        )
+        await self._text_input_queue.put(text)
+
+    async def _text_input_sender_loop(self):
+        """Send queued text inputs in order, waiting out reconnects."""
+        while self._running:
+            try:
+                text = await self._text_input_queue.get()
+            except asyncio.CancelledError:
+                return
+
+            if not self._running:
+                return
+
+            while self._running:
+                if not self.is_connected:
+                    await asyncio.sleep(0.5)
+                    continue
+                ok = await self.send_message(MessageType.USER_INPUT, {"text": text})
+                if ok:
+                    break
+                await asyncio.sleep(0.5)
 
     async def _on_page_url_updated(self, event):
         """Send page URL updates to server."""
@@ -460,6 +492,9 @@ class WSClient:
     async def start(self):
         """클라이언트 시작"""
         logger.info("Starting WSClient...")
+        self._running = True
+        if not self._text_input_sender_task:
+            self._text_input_sender_task = asyncio.create_task(self._text_input_sender_loop())
         await self.connect()
     
     async def stop(self):

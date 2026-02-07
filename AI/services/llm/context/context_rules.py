@@ -162,6 +162,12 @@ def build_extract_products_command(
     if selectors.get("product_free_return"):
         field_selectors["free_return"] = selectors["product_free_return"]
 
+    # URL is essential for robust selection (avoid brittle nth-of-type clicks).
+    # Keep it conservative: only attach for Coupang where we know the DOM shape.
+    if current_url and "coupang.com" in current_url:
+        field_selectors.setdefault("url", "a[href*='/vp/products/']")
+        field_attributes.setdefault("url", "href")
+
     fields = list(field_selectors.keys()) or ["name"]
 
     return GeneratedCommand(

@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Optional, Dict, Any, List
 import re
+import time
+from urllib.parse import urlparse
 
 from core.interfaces import MCPCommand, LLMResponse, SessionState
 from core.korean_datetime import format_date_for_tts
@@ -41,6 +43,41 @@ def _normalize(text: str) -> str:
     return re.sub(r"\s+", "", text or "").lower()
 
 
+def _is_coupang_orderlist_url(url: str) -> bool:
+    """
+    Guard: only handle "order list" actions on Coupang order-list pages.
+
+    We have multiple "orderlist" page_types (platform/other sites). Without this guard,
+    "N번째 주문 상세보기" can click a product title link and drift to a product page.
+    """
+    if not url:
+        return False
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        return False
+    host = (parsed.netloc or "").lower()
+    if not host.endswith("coupang.com"):
+        return False
+    path = parsed.path or ""
+    # Expected: https://mc.coupang.com/ssr/desktop/order/list
+    return "/ssr/desktop/order/list" in path
+
+
+def _is_valid_order_detail_url(url: str) -> bool:
+    if not url:
+        return False
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        return False
+    host = (parsed.netloc or "").lower()
+    if not host.endswith("coupang.com"):
+        return False
+    # Some links may include a trailing slash. Keep this permissive to avoid dropping all items.
+    return bool(re.search(r"/ssr/desktop/order/\d+/?$", parsed.path or ""))
+
+
 def _find_by_title(items: List[Dict[str, Any]], text: str) -> Optional[Dict[str, Any]]:
     if not text:
         return None
@@ -65,20 +102,22 @@ def _build_detail_commands(item: Dict[str, Any]) -> List[MCPCommand]:
     title = item.get("title") or ""
 
     commands: List[MCPCommand] = []
-    if selector:
-        commands.append(
-            MCPCommand(
-                tool_name="click",
-                arguments={"selector": selector},
-                description="open order detail",
-            )
-        )
-    elif url:
+    # Prefer URL navigation when we have a valid order-detail URL.
+    # It's less error-prone than clicking text/selectors that might match a product link.
+    if url and _is_valid_order_detail_url(str(url)):
         commands.append(
             MCPCommand(
                 tool_name="goto",
                 arguments={"url": url},
                 description="go to order detail",
+            )
+        )
+    elif selector:
+        commands.append(
+            MCPCommand(
+                tool_name="click",
+                arguments={"selector": selector},
+                description="open order detail",
             )
         )
     elif title:
@@ -150,15 +189,63 @@ def _is_negative(text: str) -> bool:
 
 
 def handle_order_list_action(user_text: str, session: Optional[SessionState]) -> Optional[LLMResponse]:
-    if not session or not session.context:
+    if not session:
         return None
+    # Allow handling even when context is empty; we'll set pending extraction if needed.
+    if session.context is None:
+        session.context = {}
     current_url = session.current_url or ""
     if not current_url or get_page_type(current_url) != "orderlist":
+        return None
+    if not _is_coupang_orderlist_url(current_url):
         return None
 
     text = (user_text or "").strip()
     if not text:
         return None
+
+    # Order list extraction is async (auto-extract on page change). If the user asks for an
+    # order detail by ordinal before extraction finishes, queue the intent and trigger extract.
+    ordinal_index = extract_ordinal_index(text)
+    has_detail_intent = any(keyword in text for keyword in DETAIL_KEYWORDS)
+    if (ordinal_index is not None or has_detail_intent) and not session.context.get("order_list"):
+        session.context["pending_order_detail_open"] = {
+            "index": ordinal_index,
+            "text": text[:200],
+            "ts": time.time(),
+        }
+        return LLMResponse(
+            text="주문 목록을 먼저 불러온 뒤 선택한 주문의 상세 페이지로 이동할게요. 잠시만 기다려 주세요.",
+            commands=[
+                MCPCommand(
+                    tool_name="wait_for_selector",
+                    arguments={
+                        # Exclude `/list` to avoid matching breadcrumb links and extracting too early.
+                        "selector": "a[href*='/ssr/desktop/order/']:not([href*='/ssr/desktop/order/list'])",
+                        "state": "visible",
+                        "timeout": 20000,
+                    },
+                    description="wait for order list items",
+                ),
+                MCPCommand(
+                    tool_name="wait",
+                    arguments={"ms": 800},
+                    description="wait for order list items to stabilize",
+                ),
+                MCPCommand(
+                    tool_name="extract_order_list",
+                    arguments={},
+                    description="extract order list (pending order detail open)",
+                ),
+                MCPCommand(
+                    tool_name="wait",
+                    arguments={"ms": 1200},
+                    description="wait for order list extraction",
+                ),
+            ],
+            requires_flow=False,
+            flow_type=None,
+        )
     order_list = session.context.get("order_list")
     items: List[Dict[str, Any]] = []
     if isinstance(order_list, dict):
@@ -168,12 +255,17 @@ def handle_order_list_action(user_text: str, session: Optional[SessionState]) ->
     elif isinstance(order_list, list):
         items = [item for item in order_list if isinstance(item, dict)]
 
+    # Filter out non-order entries (e.g., "마이쿠팡" nav items) to keep indexing stable.
+    items = [
+        item
+        for item in items
+        if _is_valid_order_detail_url(str(item.get("detail_url") or ""))
+    ]
+
     if not items:
         return None
-    ordinal_index = extract_ordinal_index(text)
     title_match = _find_by_title(items, text)
     has_read_intent = any(keyword in text for keyword in READ_KEYWORDS)
-    has_detail_intent = any(keyword in text for keyword in DETAIL_KEYWORDS)
 
     prompt_pending = bool(session.context.get("order_list_prompt_pending"))
     if prompt_pending:

@@ -16,6 +16,7 @@ from services.llm.sites.site_manager import get_page_type, get_selector
 from services.llm.pipelines.compound import handle_read_then_act
 from services.llm.pipelines.read import (
     handle_product_info_read,
+    handle_page_info_read,
     handle_cart_summary_read,
     handle_order_list_summary_read,
     handle_search_summary_read,
@@ -75,7 +76,12 @@ class LLMPipelineHandler:
 
         # Read-only pipelines: bypass command LLM and generate TTS directly.
         if session and session.context:
-            if is_product_info_request(resolved_text):
+            current_url = session.current_url or ""
+            page_type = get_page_type(current_url) if current_url else None
+
+            # Product info requests may arrive before extract finishes on product pages.
+            # Guard by page_type to avoid misfiring on non-product pages (e.g., "현재 페이지 정보").
+            if page_type == "product" and is_product_info_request(resolved_text):
                 waited = await self._wait_for_product_detail(session, session_id, interrupted)
                 if not waited and not has_recent_product_detail(session):
                     pending = session.context.get("pending_product_info_read")
@@ -89,6 +95,7 @@ class LLMPipelineHandler:
                         await self._sender.send_tts_response(session_id, ack_text)
                         return ack_text
             read_handlers = (
+                handle_page_info_read,
                 handle_product_info_read,
                 handle_cart_summary_read,
                 handle_order_list_summary_read,
@@ -117,17 +124,11 @@ class LLMPipelineHandler:
                             handler.__name__,
                             session_id,
                         )
-                        page_type = get_page_type(session.current_url or "") if session.current_url else None
-                        tts_text = await self._tts_only.generate(
-                            user_text=resolved_text,
-                            current_url=session.current_url or "",
-                            page_type=page_type,
-                            commands=read_response.commands or [],
-                            fallback_text=read_response.text,
-                            session_context=session.context,
-                        )
-                        await self._sender.send_tts_response(session_id, tts_text or read_response.text)
-                        return tts_text or read_response.text
+                        # Read-only pipelines already produce user-facing speech text.
+                        # Do not run the separate TTS LLM here: it is optimized for short acknowledgements
+                        # and can omit/alter the extracted content (e.g., order list summaries).
+                        await self._sender.send_tts_response(session_id, read_response.text)
+                        return read_response.text
 
         if session and session.context:
             detail = session.context.get("product_detail")

@@ -61,6 +61,25 @@ class OrderListRule(BaseRule):
                     description="Wait for order list page",
                 )
             )
+            # Avoid extracting too early due to breadcrumb links like `/ssr/desktop/order/list`.
+            commands.append(
+                GeneratedCommand(
+                    tool_name="wait_for_selector",
+                    arguments={
+                        "selector": "a[href*='/ssr/desktop/order/']:not([href*='/ssr/desktop/order/list'])",
+                        "state": "visible",
+                        "timeout": 25000,
+                    },
+                    description="Wait for order items to render",
+                )
+            )
+            commands.append(
+                GeneratedCommand(
+                    tool_name="wait",
+                    arguments={"ms": 800},
+                    description="Wait for order list items to stabilize",
+                )
+            )
             commands.append(
                 GeneratedCommand(
                     tool_name="extract_order_list",
@@ -81,6 +100,24 @@ class OrderListRule(BaseRule):
                     tool_name="wait_for_new_page",
                     arguments={"timeout_ms": 3000, "focus": True},
                     description="Wait for order list page",
+                )
+            )
+            commands.append(
+                GeneratedCommand(
+                    tool_name="wait_for_selector",
+                    arguments={
+                        "selector": "a[href*='/ssr/desktop/order/']:not([href*='/ssr/desktop/order/list'])",
+                        "state": "visible",
+                        "timeout": 25000,
+                    },
+                    description="Wait for order items to render",
+                )
+            )
+            commands.append(
+                GeneratedCommand(
+                    tool_name="wait",
+                    arguments={"ms": 800},
+                    description="Wait for order list items to stabilize",
                 )
             )
             commands.append(

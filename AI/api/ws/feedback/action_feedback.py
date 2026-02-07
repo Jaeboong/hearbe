@@ -240,21 +240,28 @@ class ActionFeedbackManager:
         ]
 
     def _build_verify_checkout_commands(self, current_url: str) -> List[MCPCommand]:
+        # We intentionally do not auto-verify checkout via `extract_cart`.
+        # After clicking the cart checkout button, the browser usually navigates to
+        # `checkout.coupang.com/...`, which should be handled by page-update flows
+        # (and extractors) rather than forcing another cart extract.
         if not current_url or get_page_type(current_url) != "cart":
             return []
-        return [
-            MCPCommand(
-                tool_name="wait",
-                arguments={"ms": 800},
-                description="Wait for checkout modal",
-            ),
-            MCPCommand(
-                tool_name="extract_cart",
-                arguments={},
-                description="Extract cart summary after checkout",
-            ),
-        ]
+        return []
 
     def clear_pending(self, session_id: str):
         """Clear pending actions for a session."""
         self._pending.pop(session_id, None)
+
+    def get_pending_action(self, session_id: str) -> Optional[PendingAction]:
+        """
+        Introspection helper for other handlers (e.g., MCP result handler).
+
+        We use this to adjust downstream behavior (like suppressing verbose TTS)
+        while a verification flow is in progress.
+        """
+
+        return self._pending.get(session_id)
+
+    def get_pending_action_type(self, session_id: str) -> Optional[str]:
+        pending = self._pending.get(session_id)
+        return pending.action_type if pending else None

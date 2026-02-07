@@ -48,8 +48,6 @@ class LLMRoutingPolicy:
         intent: IntentResult,
         rule_result: CommandResult,
     ) -> RoutingDecision:
-        if intent and intent.intent == IntentType.LOGIN:
-            return RoutingDecision(use_llm=True, reason="force_llm_login")
         if rule_result.matched_rule in ("empty",):
             return RoutingDecision(use_llm=False, reason="empty_input")
 

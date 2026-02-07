@@ -18,7 +18,20 @@ from ..planner.selection.site_extractors import build_product_extract_command_fo
 from core.korean_numbers import extract_ordinal_index
 
 
-SELECTION_TRIGGERS = ["선택", "골라", "고르", "열어", "눌러", "클릭", "열어줘", "열어봐"]
+# Keep triggers permissive to match natural spoken phrases (e.g. "2번째 상품 들어줘").
+SELECTION_TRIGGERS = [
+    "선택",
+    "골라",
+    "고르",
+    "열어",
+    "열어줘",
+    "열어봐",
+    "들어",
+    "들어가",
+    "들어줘",
+    "눌러",
+    "클릭",
+]
 FILLER_WORDS = ["그거", "이거", "저거", "해줘", "해주세요", "해", "좀", "줘", "봐", "봐줘", "상품", "결과"]
 DEICTIC_WORDS = {"그거", "이거", "저거", "그것", "이것", "저것"}
 

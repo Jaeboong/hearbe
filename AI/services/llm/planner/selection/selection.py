@@ -6,7 +6,6 @@ from typing import Optional
 
 from core.interfaces import LLMResponse, MCPCommand, SessionState
 from core.korean_numbers import extract_ordinal_index
-from .selection_extract import build_product_extract_command
 from .selection_intent import is_selection_request, is_ranking_query
 from ...sites.site_manager import get_site_manager, get_current_site, get_selector, get_page_type
 
@@ -59,9 +58,6 @@ def select_from_results(
                             description="wait for product page"
                         )
                     ]
-                    extract_command = build_product_extract_command(session)
-                    if extract_command:
-                        commands.append(extract_command)
             if commands:
                 return LLMResponse(
                     text=f"{ordinal_index + 1}번째 상품을 선택합니다.",
@@ -107,9 +103,6 @@ def select_from_results(
                 description="wait for product page"
             )
         ]
-    extract_command = build_product_extract_command(session)
-    if extract_command:
-        commands.append(extract_command)
 
     return LLMResponse(
         text=f"검색 결과에서 '{matched_name}'을 선택합니다.",
@@ -125,6 +118,32 @@ def _build_click_nth_result_commands(
 ) -> Optional[list[MCPCommand]]:
     if not session:
         return None
+
+    # Prefer navigating by extracted product URL when available.
+    # This avoids brittle selectors like `:nth-of-type(...)` that often break on Coupang.
+    ctx = getattr(session, "context", {}) or {}
+    results = ctx.get("search_results")
+    if isinstance(results, list) and 0 <= ordinal_index < len(results):
+        item = results[ordinal_index] if isinstance(results[ordinal_index], dict) else {}
+        url = (item.get("url") or item.get("detail_url") or item.get("link") or "").strip() if isinstance(item, dict) else ""
+        if url:
+            if url.startswith("//"):
+                url = "https:" + url
+            elif url.startswith("/"):
+                url = "https://www.coupang.com" + url
+            commands = [
+                MCPCommand(
+                    tool_name="goto",
+                    arguments={"url": url},
+                    description=f"navigate to search result #{ordinal_index + 1}",
+                ),
+                MCPCommand(
+                    tool_name="wait",
+                    arguments={"ms": 1500},
+                    description="wait for product page",
+                ),
+            ]
+            return commands
 
     current_url = session.current_url or ""
     site = None
@@ -176,9 +195,5 @@ def _build_click_nth_result_commands(
             description="wait for product page"
         )
     ]
-
-    extract_command = build_product_extract_command(session)
-    if extract_command:
-        commands.append(extract_command)
 
     return commands
