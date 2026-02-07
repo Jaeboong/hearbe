@@ -48,41 +48,38 @@ def _format_site_urls(site) -> str:
     return "\n".join(["## Site URLs"] + [f"- {k}: {u}" for k, u in ordered_items])
 
 
-def _build_login_constraints(site_id: str, page_type: str) -> str:
-    # Keep login constraints scoped to login pages only to avoid bleeding platform-specific rules
-    # into unrelated contexts (e.g., Hearbe mall pages).
-    if page_type != "login":
-        return ""
+def _build_login_constraints(site_id: str, page_type: str, login_method_active: Optional[str] = None) -> str:
+    if page_type == "login":
+        if site_id == "coupang":
+            return (
+                "## Login constraints\n"
+                "- When the user expresses login intent, proceed with email + password (do not ask the method).\n"
+                "- Default method is email + password.\n"
+                "- Do NOT choose phone/OTP unless the user explicitly asks for phone login.\n"
+                "- If the user asks for phone login, switch to the phone login tab and request the phone number (OTP is via SMS only).\n"
+                "- After entering OTP, click otp_submit_button (e.g., #loginWithSmsCode) if available.\n"
+                "- Prefer concrete actions over follow-up questions when selectors exist.\n"
+                "- Use only tools from the Available commands list; do not invent tools like 'submit_login'.\n"
+                "- To submit login, click the login button selector (e.g., login_button/submit_button or button[type='submit']).\n"
+            )
 
-    if site_id == "coupang":
+        if site_id == "hearbe":
+            return (
+                "## Login constraints\n"
+                "- This is Hearbe (first-party) login. Use email + password only.\n"
+                "- Prefer using provided selectors (email_input, password_input, login_button/submit_button).\n"
+                "- If credentials are already filled by the browser, just click submit.\n"
+                "- Use only tools from the Available commands list; do not invent tools.\n"
+            )
+
         return (
             "## Login constraints\n"
-            "- When the user expresses login intent, go to the login page without asking extra questions.\n"
-            "- Default method is email + password.\n"
-            "- If the user simply says \"login\" on the login page, proceed with email + password (do not ask the method).\n"
-            "- Only ask which method to use when the user has not specified a method and has just arrived on the login page.\n"
-            "- If the user asks for phone login, switch to the phone login tab and request the phone number (OTP is via SMS only).\n"
-            "- After entering OTP, click otp_submit_button (e.g., #loginWithSmsCode) if available.\n"
-            "- Available methods: (1) email + password, (2) phone number + OTP.\n"
-            "- Prefer concrete actions over follow-up questions when selectors exist.\n"
-            "- Use only tools from the Available commands list; do not invent tools like 'submit_login'.\n"
-            "- To submit login, click the login button selector (e.g., login_button/submit_button or button[type='submit']).\n"
+            "- Use email + password by default.\n"
+            "- Use only tools from the Available commands list.\n"
         )
 
-    if site_id == "hearbe":
-        return (
-            "## Login constraints\n"
-            "- This is Hearbe (first-party) login. Use email + password only.\n"
-            "- Prefer using provided selectors (email_input, password_input, login_button/submit_button).\n"
-            "- If credentials are already filled by the browser, just click submit.\n"
-            "- Use only tools from the Available commands list; do not invent tools.\n"
-        )
-
-    return (
-        "## Login constraints\n"
-        "- Use email + password by default.\n"
-        "- Use only tools from the Available commands list.\n"
-    )
+    # Not on login page: if user wants to login, navigate to login page first
+    return ""
 
 
 def build_system_prompt(
@@ -94,6 +91,7 @@ def build_system_prompt(
     order_detail: Optional[Dict[str, Any]] = None,
     order_list: Optional[Any] = None,
     previous_url: Optional[str] = None,
+    login_method_active: Optional[str] = None,
 ) -> str:
     """Build the LLM system prompt for the current request."""
     if page_context is None:
@@ -132,7 +130,7 @@ def build_system_prompt(
     url_context_section = format_url_context(current_url, previous_url)
     site_urls_section = _format_site_urls(site)
     site_id = getattr(site, "site_id", "") if site else ""
-    login_constraints = _build_login_constraints(site_id, page_context.page_type)
+    login_constraints = _build_login_constraints(site_id, page_context.page_type, login_method_active)
 
     output_example = json.dumps(
         {
@@ -144,15 +142,6 @@ def build_system_prompt(
         ensure_ascii=True,
         indent=2,
     )
-    fallback_example = json.dumps(
-        {
-            "response": "Sorry, I could not understand the request. Please rephrase.",
-            "commands": [],
-        },
-        ensure_ascii=True,
-        indent=2,
-    )
-
     return f"""You are a shopping assistant that converts user requests into MCP tool calls.
 
 ## Current context
@@ -181,14 +170,13 @@ def build_system_prompt(
 2. Commands are executed in order.
 3. If a selector is uncertain, use click_text.
 4. Add wait before or after navigation when needed.
-5. If the request is informational and can be answered from context, return an answer with an empty "commands" list.
-6. If the request requires an action (click, input, navigation), include appropriate commands and a brief response.
-7. If you lack necessary info, ask a clarification with empty commands.
+5. You are an action executor. If the user requests any action (navigate, click, login, search, add to cart, etc.), you MUST generate commands. Never ask clarifying questions — pick the most likely action and execute it. Only return empty commands when answering a purely informational question that can be fully answered from the provided context data above (e.g. reading product info, price, search results).
+6. If the user wants to navigate to a site or page, use goto with the URL from Site URLs, or click the appropriate link/button.
+7. If the user wants to login and is NOT on the login page, navigate to the login page first.
 8. Do not include URLs in the response text.
+9. Keep response text under 2 sentences. Describe only what you are doing.
+10. If the user asks to logout, click the top logout button only (use selector 'logout' if available, otherwise click_text for '\ub85c\uadf8\uc544\uc6c3') and respond only with '\ub85c\uadf8\uc544\uc6c3 \ub418\uc5c8\uc2b5\ub2c8\ub2e4.'.
 
 ## Output format
 {output_example}
-
-If the request cannot be understood:
-{fallback_example}
 """

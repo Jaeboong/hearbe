@@ -6,10 +6,13 @@ MCP result handler: HTML/OCR summary -> TTS
 import asyncio
 import json
 import logging
+import re
 import time
 from typing import Dict, Any, Optional, List
 from urllib.parse import urljoin
+from urllib.parse import urlparse
 
+from core.interfaces import MCPCommand
 from core.event_bus import EventType, publish
 from services.llm.sites.site_manager import get_page_type
 from services.llm.planner.selection.option_select import CTX_PENDING_OPTION, select_option_from_detail
@@ -53,6 +56,7 @@ class MCPHandler:
         self._dom_fallback = dom_fallback
         self._command_queue = command_queue
         self._file_manager = TempFileManager()  # Manages temporary JSON files
+        self._ocr_file_manager = TempFileManager()  # Separate tracker for OCR result files
         self._tts = TTSGenerator()
 
     async def handle_mcp_result(self, session_id: str, data: Dict[str, Any]):
@@ -158,6 +162,22 @@ class MCPHandler:
                 success=success,
                 result=result
             )
+            # If ActionFeedback kicked off a cart-verification flow (e.g. add-to-cart verify),
+            # suppress the auto cart summary TTS that would otherwise fire on the cart page.
+            # This keeps the flow responsive for the next user command (e.g. "결제해").
+            if session and self._session:
+                try:
+                    pending_type = None
+                    if self._action_feedback:
+                        pending_type = self._action_feedback.get_pending_action_type(session_id)
+                    if pending_type in ("add_to_cart_verify", "checkout_verify"):
+                        self._session.set_context(
+                            session_id,
+                            "cart_summary_suppress_until",
+                            time.time() + 45,
+                        )
+                except Exception:
+                    pass
             if self._failure_notifier:
                 if self._dom_fallback:
                     triggered = await self._dom_fallback.maybe_trigger(
@@ -245,6 +265,27 @@ class MCPHandler:
                 if order_list is not None:
                     self._session.set_context(session_id, "order_list", order_list)
                     self._save_order_list_to_file(order_list, session_id)
+                    # Keep this compact; it is critical for diagnosing "N번째 주문 상세보기" failures.
+                    try:
+                        items = []
+                        if isinstance(order_list, list):
+                            items = [it for it in order_list if isinstance(it, dict)]
+                        elif isinstance(order_list, dict):
+                            raw = order_list.get("orders") or order_list.get("items") or order_list.get("order_list")
+                            if isinstance(raw, list):
+                                items = [it for it in raw if isinstance(it, dict)]
+                        detail_urls = [(it.get("detail_url") or "").strip() for it in items]
+                        present = sum(1 for u in detail_urls if u)
+                        sample = [u for u in detail_urls if u][:3]
+                        logger.info(
+                            "Order list received: session=%s items=%s detail_url_present=%s sample=%s",
+                            session_id,
+                            len(items),
+                            f"{present}/{len(items)}",
+                            [s[:120] for s in sample],
+                        )
+                    except Exception:
+                        pass
             previous_url = session.current_url
             if page_url:
                 if previous_url and previous_url != page_url:
@@ -264,11 +305,19 @@ class MCPHandler:
                     until = self._session.get_context(session_id, "tts_suppress_until", 0)
                     if until and time.time() < float(until):
                         suppress_cart_tts = True
+                    cart_until = self._session.get_context(session_id, "cart_summary_suppress_until", 0)
+                    if cart_until and time.time() < float(cart_until):
+                        suppress_cart_tts = True
                 if not suppress_outputs and not suppress_cart_tts:
                     tts_text = self._tts.build_cart_summary(cart_items, cart_summary or {})
                     await self._sender.send_tts_response(session_id, tts_text)
                 return
             if order_list is not None:
+                # If the user requested "N번째 주문 상세보기" before the async order-list extract finished,
+                # continue automatically now that extraction has arrived.
+                handled_pending = await self._maybe_handle_pending_order_detail_open(session_id, order_list)
+                if handled_pending:
+                    return
                 if not suppress_outputs:
                     prompt_pending = False
                     if self._session:
@@ -290,6 +339,29 @@ class MCPHandler:
                 return
 
             if products:
+                # Debugging aid: selection-by-URL relies on `url` being present in extracted search results.
+                # Keep this log compact to avoid noisy TTS-related logs.
+                try:
+                    non_empty_urls = 0
+                    first_keys = []
+                    first_url = ""
+                    if isinstance(products, list) and products:
+                        for p in products[:10]:
+                            if isinstance(p, dict) and (p.get("url") or "").strip():
+                                non_empty_urls += 1
+                        if isinstance(products[0], dict):
+                            first_keys = sorted(list(products[0].keys()))[:20]
+                            first_url = (products[0].get("url") or "").strip()
+                    logger.info(
+                        "Search results received: session=%s count=%s url_present=%s first_url=%s first_keys=%s",
+                        session_id,
+                        len(products) if isinstance(products, list) else "n/a",
+                        f"{non_empty_urls}/10",
+                        (first_url[:120] if first_url else ""),
+                        first_keys,
+                    )
+                except Exception:
+                    pass
                 self._session.set_context(session_id, "search_results", products)
                 self._session.set_context(session_id, "search_active_results", products)
                 self._session.set_context(session_id, "search_active_label", "all")
@@ -335,6 +407,8 @@ class MCPHandler:
                             if name:
                                 self._session.set_context(session_id, "last_mentioned_product", name)
                         self._session.set_context(session_id, "search_results_announced_signature", signature)
+                        # Used by SearchQueryHandler to avoid re-reading the same results right after auto-announce.
+                        self._session.set_context(session_id, "search_last_announce_ts", time.time())
                         await self._sender.send_tts_response(session_id, tts_text)
 
         if not suppress_outputs and tool_name == "check_login_status" and self._login_guard:
@@ -373,9 +447,19 @@ class MCPHandler:
                 logger.error(f"HTML 파싱 실패: {e}")
 
         if not suppress_outputs and SUMMARIZER_AVAILABLE and detail_images:
-            asyncio.create_task(
-                self._process_ocr_batch(session_id, detail_images, page_url)
-            )
+            # OCR dedup: skip if same images were already processed for this session
+            ocr_sig = self._build_ocr_signature(detail_images)
+            prev_ocr_sig = None
+            if session and self._session:
+                prev_ocr_sig = self._session.get_context(session_id, "ocr_image_signature")
+            if ocr_sig and ocr_sig == prev_ocr_sig:
+                logger.info("OCR skipped (duplicate images): session=%s sig=%s", session_id, ocr_sig[:60])
+            else:
+                if session and self._session:
+                    self._session.set_context(session_id, "ocr_image_signature", ocr_sig)
+                asyncio.create_task(
+                    self._process_ocr_batch(session_id, detail_images, page_url)
+                )
 
     async def _maybe_handle_pending_option(self, session_id: str, session) -> None:
         if not session or not self._session:
@@ -396,6 +480,98 @@ class MCPHandler:
             await self._sender.send_tool_calls(session_id, commands)
         if response.text:
             await self._sender.send_tts_response(session_id, response.text)
+
+    async def _maybe_handle_pending_order_detail_open(self, session_id: str, order_list) -> bool:
+        """
+        Continue an order-detail navigation request ("N번째 주문 상세보기") that arrived before
+        `extract_order_list` completed.
+        """
+        if not self._session:
+            return False
+        pending = self._session.get_context(session_id, "pending_order_detail_open")
+        if not isinstance(pending, dict):
+            return False
+
+        ts = pending.get("ts")
+        if ts and time.time() - float(ts) > 60:
+            self._session.set_context(session_id, "pending_order_detail_open", None)
+            return False
+
+        idx = pending.get("index")
+        if not isinstance(idx, int) or idx < 0:
+            # Without a stable ordinal we can't safely auto-navigate.
+            self._session.set_context(session_id, "pending_order_detail_open", None)
+            return False
+
+        items: List[Dict[str, Any]] = []
+        if isinstance(order_list, dict):
+            raw = order_list.get("orders") or order_list.get("items") or order_list.get("order_list")
+            if isinstance(raw, list):
+                items = [it for it in raw if isinstance(it, dict)]
+        elif isinstance(order_list, list):
+            items = [it for it in order_list if isinstance(it, dict)]
+
+        # Keep indexing stable: only consider valid order-detail URLs.
+        valid_items: List[Dict[str, Any]] = []
+        for it in items:
+            url = str(it.get("detail_url") or "")
+            if not url:
+                continue
+            try:
+                parsed = urlparse(url)
+            except Exception:
+                continue
+            # Be permissive about a trailing slash to avoid dropping valid items.
+            if re.search(r"/ssr/desktop/order/\d+/?$", parsed.path or ""):
+                valid_items.append(it)
+
+        self._session.set_context(session_id, "pending_order_detail_open", None)
+
+        if idx >= len(valid_items):
+            logger.info(
+                "Pending order detail open failed: session=%s index=%s items=%s valid_items=%s",
+                session_id,
+                idx,
+                len(items),
+                len(valid_items),
+            )
+            await self._sender.send_tts_response(
+                session_id,
+                f"{idx + 1}번째 주문을 찾지 못했어요. 다시 '주문 목록 보여줘'라고 말씀해 주세요.",
+            )
+            return True
+
+        target = valid_items[idx]
+        target_url = (target.get("detail_url") or "").strip()
+        if not target_url:
+            await self._sender.send_tts_response(
+                session_id,
+                "주문 상세 페이지로 이동할 링크를 찾지 못했어요. 다시 시도해 주세요.",
+            )
+            return True
+
+        logger.info(
+            "Pending order detail open: session=%s index=%s url=%s",
+            session_id,
+            idx,
+            target_url[:160],
+        )
+        await self._sender.send_tool_calls(
+            session_id,
+            [
+                MCPCommand(
+                    tool_name="goto",
+                    arguments={"url": target_url},
+                    description="go to order detail (pending)",
+                ),
+                MCPCommand(
+                    tool_name="wait",
+                    arguments={"ms": 1800},
+                    description="wait for order detail page (pending)",
+                ),
+            ],
+        )
+        return True
 
     def _build_search_signature(self, products: List[Dict[str, Any]]) -> str:
         names = []
@@ -461,6 +637,9 @@ class MCPHandler:
                     updated.setdefault("ocr_product_type", ocr_payload.get("product_type"))
                     self._session.set_context(session_id, "product_detail", updated)
 
+            # Save OCR result to temp JSON for developer inspection
+            self._save_ocr_result_to_file(ocr_payload, session_id)
+
             await self._sender.send_ocr_progress(session_id, "completed", 100, len(image_urls))
             logger.info(f"OCR 배치 처리 완료: {session_id}")
 
@@ -502,6 +681,19 @@ class MCPHandler:
             filename_prefix="cart"
         )
 
+    def _save_ocr_result_to_file(self, ocr_payload: Dict[str, Any], session_id: str):
+        self._ocr_file_manager.save_json(
+            data=ocr_payload,
+            session_id=session_id,
+            category="ocr_results",
+            filename_prefix="ocr_result"
+        )
+
+    def _build_ocr_signature(self, image_urls: List[str]) -> str:
+        """Build a signature from sorted image URLs for dedup."""
+        sorted_urls = sorted(set(url.strip() for url in image_urls if isinstance(url, str) and url.strip()))
+        return f"{len(sorted_urls)}|" + "|".join(sorted_urls[:20])
+
     def _save_order_list_to_file(self, orders: List[Dict[str, Any]], session_id: str):
         payload = {
             "orders": orders or [],
@@ -516,6 +708,7 @@ class MCPHandler:
 
     def cleanup_session(self, session_id: str):
         self._file_manager.cleanup_session(session_id)
+        self._ocr_file_manager.cleanup_session(session_id)
 
 
 def _normalize_image_urls(urls: List[str], base_url: Optional[str] = None) -> List[str]:

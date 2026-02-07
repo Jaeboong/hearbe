@@ -1,24 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-TTS text normalizer
+TTS text normalizer.
 
-Converts unit expressions (e.g., 2L, 500ml) into Korean-friendly forms.
+ - Strip lightweight Markdown markers.
+ - Normalize dates, percentages, won, and unit expressions.
+ - Convert English words to Korean-friendly pronunciation.
 """
 
+from __future__ import annotations
+
 import re
+
+from .tts_english_korean import convert_english_to_korean
 
 
 _UNIT_PATTERNS = [
     # liters
-    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:L|l|ℓ)\b"), r"\1리터"),
+    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:l|L)(?=x|X|\b|[^A-Za-z])"), r"\1리터"),
     # milliliters
-    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:mL|ml|ML|㎖)\b"), r"\1밀리리터"),
+    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:ml|mL|Ml|ML)(?=x|X|\b|[^A-Za-z])"), r"\1밀리리터"),
     # kilograms
-    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:kg|Kg|kG|KG)\b"), r"\1킬로그램"),
+    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:kg|Kg|kG|KG)(?=x|X|\b|[^A-Za-z])"), r"\1킬로그램"),
     # grams (lowercase only to avoid 5G)
-    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:g)\b"), r"\1그램"),
+    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:g)(?=x|X|\b|[^A-Za-z])"), r"\1그램"),
     # milligrams
-    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:mg|mG|Mg|MG)\b"), r"\1밀리그램"),
+    (re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:mg|mG|Mg|MG)(?=x|X|\b|[^A-Za-z])"), r"\1밀리그램"),
 ]
 
 
@@ -95,7 +101,7 @@ _WON_PATTERN = re.compile(r"(\d{1,3}(?:,\d{3})*|\d+)\s*원")
 _COMMA_NUMBER_PATTERN = re.compile(r"(\d{1,3}(?:,\d{3})+)")
 _DATE_SLASH_PATTERN = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])\s*/\s*(3[01]|[12]\d|0?[1-9])(?!\d)")
 _DATE_CONTEXT_PATTERN = re.compile(
-    r"(도착|배송|보장|새벽|오전|오후|밤|오늘|내일|모레)"
+    r"(입금|배송|보장|예정|이전|이후|반품|다음|내일|모레)"
 )
 
 
@@ -112,15 +118,41 @@ def _normalize_date_slash(text: str) -> str:
     return _DATE_SLASH_PATTERN.sub(_repl, text)
 
 
+_MD_LINK = re.compile(r"\[([^\]]+)\]\([^)]+\)")
+_MD_CODE = re.compile(r"`([^`]+)`")
+_MD_BOLD = re.compile(r"\*\*([^*]+)\*\*")
+_MD_ITALIC = re.compile(r"\*([^*]+)\*")
+_MD_UNDERLINE = re.compile(r"__([^_]+)__")
+_MD_UNDER = re.compile(r"_([^_]+)_")
+_MD_STRIKE = re.compile(r"~~([^~]+)~~")
+
+
+def _strip_markdown(text: str) -> str:
+    if not text:
+        return text
+    stripped = _MD_LINK.sub(r"\1", text)
+    stripped = _MD_CODE.sub(r"\1", stripped)
+    stripped = _MD_BOLD.sub(r"\1", stripped)
+    stripped = _MD_ITALIC.sub(r"\1", stripped)
+    stripped = _MD_UNDERLINE.sub(r"\1", stripped)
+    stripped = _MD_UNDER.sub(r"\1", stripped)
+    stripped = _MD_STRIKE.sub(r"\1", stripped)
+    stripped = re.sub(r"(?m)^\s*#+\s+", "", stripped)
+    stripped = re.sub(r"(?m)^\s*>\s+", "", stripped)
+    stripped = re.sub(r"(?m)^\s*[-*]\s+", "", stripped)
+    return stripped
+
+
 def normalize_tts_text(text: str) -> str:
     if not text:
         return text
 
-    normalized = text
+    normalized = _strip_markdown(text)
     normalized = _normalize_date_slash(normalized)
     normalized = _PERCENT_PATTERN.sub(_replace_percent, normalized)
     normalized = _WON_PATTERN.sub(_replace_won, normalized)
     normalized = _COMMA_NUMBER_PATTERN.sub(_replace_comma_number, normalized)
     for pattern, repl in _UNIT_PATTERNS:
         normalized = pattern.sub(repl, normalized)
+    normalized = convert_english_to_korean(normalized)
     return normalized

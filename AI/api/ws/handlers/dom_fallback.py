@@ -35,6 +35,7 @@ class DomFallbackManager:
         action_feedback,
         login_guard=None,
         login_feedback=None,
+        logout_feedback=None,
     ):
         self._sender = sender
         self._session = session_manager
@@ -43,6 +44,7 @@ class DomFallbackManager:
             action_feedback=action_feedback,
             login_guard=login_guard,
             login_feedback=login_feedback,
+            logout_feedback=logout_feedback,
         )
         self._llm = LLMGenerator()
         self._context_builder = ContextBuilder()

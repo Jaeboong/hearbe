@@ -74,15 +74,18 @@ class SearchQueryHandler:
         if not normalized:
             return False
 
-        # 정보성 질문은 LLM에게 위임
-        if self._is_attribute_query(normalized):
-            return False
+        # Insight queries are deterministic and should not require LLM.
         if (
             self._is_highest_discount_request(normalized)
             or self._is_lowest_price_request(normalized)
             or self._is_tomorrow_delivery_request(normalized)
             or self._is_free_shipping_list_request(normalized)
         ):
+            return await self._handle_insight_query(session_id, normalized, session)
+
+        # Attribute-level Q&A can also be implemented here, but keep it routed to LLM for now
+        # until wording coverage is validated (price/discount/delivery/rating/free-shipping).
+        if self._is_attribute_query(normalized):
             return False
 
         if not self._is_read_request(normalized):
@@ -214,6 +217,18 @@ class SearchQueryHandler:
         total = len(results)
         start_index = self._session.get_context(session_id, "search_read_index", 0)
 
+        # If results were just auto-announced, avoid re-reading immediately unless the user
+        # explicitly requested a restart ("다시", "처음부터"). This reduces duplicate TTS spam.
+        if self._was_recently_auto_announced(session_id, session) and start_index > 0:
+            # Allow explicit "more" requests (e.g. "2개 더 읽어줘") even if auto-announcement
+            # happened recently. Only dedupe vague "read the results" requests.
+            if mode != "more" and not self._is_restart_read_request(normalized):
+                await self._sender.send_tts_response(
+                    session_id,
+                    "방금 검색 결과를 읽어드렸어요. 몇 개 더 읽어드릴까요?",
+                )
+                return True
+
         if mode == "all":
             count = total
         elif mode == "restart":
@@ -235,6 +250,34 @@ class SearchQueryHandler:
         self._set_last_mentioned_from_index(session_id, results, next_index - 1)
         await self._sender.send_tts_response(session_id, tts_text)
         return True
+
+    def _was_recently_auto_announced(self, session_id: str, session) -> bool:
+        """
+        True if the current search results were auto-read very recently.
+
+        Used to dedupe when the user says "검색 결과 읽어줘" immediately after auto-extract.
+        """
+        try:
+            if not session or not getattr(session, "context", None):
+                return False
+            ctx = session.context
+            sig = ctx.get("search_results_signature")
+            announced_sig = ctx.get("search_results_announced_signature")
+            if not sig or not announced_sig or sig != announced_sig:
+                return False
+            ts = ctx.get("search_last_announce_ts")
+            if not ts:
+                return False
+            import time
+
+            return (time.time() - float(ts)) <= 20.0
+        except Exception:
+            return False
+
+    @staticmethod
+    def _is_restart_read_request(normalized: str) -> bool:
+        compact = (normalized or "").replace(" ", "")
+        return ("다시" in compact) or ("처음" in compact) or ("처음부터" in compact)
 
     def _get_active_results(self, session):
         """Get currently active search results from session."""

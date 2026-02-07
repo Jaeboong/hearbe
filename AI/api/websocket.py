@@ -31,6 +31,19 @@ class ConnectionManager:
         self._connections: Dict[str, WebSocket] = {}
         self._ws_to_session: Dict[WebSocket, str] = {}
 
+    @staticmethod
+    def _is_closed_socket_error(exc: Exception) -> bool:
+        """Heuristic for expected errors after a client/server initiated close."""
+        if isinstance(exc, WebSocketDisconnect):
+            return True
+        msg = str(exc) or ""
+        return (
+            'Cannot call "send" once a close message has been sent.' in msg
+            or 'Cannot call "receive" once a disconnect message has been received.' in msg
+            or "WebSocket is not connected" in msg
+            or "connection closed" in msg.lower()
+        )
+
     async def connect(self, websocket: WebSocket, session_id: str) -> None:
         """Register new connection"""
         await websocket.accept()
@@ -46,27 +59,73 @@ class ConnectionManager:
             logger.info(f"WebSocket disconnected: session={session_id}")
         return session_id
 
-    async def send_message(self, session_id: str, message) -> None:
-        """Send message to specific session"""
-        ws = self._connections.get(session_id)
-        if ws:
-            try:
-                await ws.send_text(message.to_json())
-            except Exception as e:
-                logger.error(f"Failed to send message to {session_id}: {e}")
+    async def send_message(self, session_id: str, message) -> bool:
+        """Send message to specific session.
 
-    async def send_bytes(self, session_id: str, data: bytes) -> None:
-        """Send binary data to specific session"""
+        Returns:
+            True if the message was sent, False if the session is not connected
+            or the socket is already closed.
+        """
         ws = self._connections.get(session_id)
-        if ws:
-            try:
-                await ws.send_bytes(data)
-            except Exception as e:
-                logger.error(f"Failed to send bytes to {session_id}: {e}")
+        if not ws:
+            return False
+        try:
+            await ws.send_text(message.to_json())
+            return True
+        except Exception as e:
+            # If the socket is already closed, stop spamming logs by
+            # unregistering it immediately so subsequent sends are no-ops.
+            if self._is_closed_socket_error(e):
+                logger.warning(
+                    "WebSocket send failed (closed). Disconnecting: session=%s err=%s: %s",
+                    session_id,
+                    type(e).__name__,
+                    e,
+                )
+            else:
+                logger.error(
+                    "WebSocket send failed. Disconnecting: session=%s err=%s: %s",
+                    session_id,
+                    type(e).__name__,
+                    e,
+                )
+            self.disconnect(ws)
+            return False
+
+    async def send_bytes(self, session_id: str, data: bytes) -> bool:
+        """Send binary data to specific session.
+
+        Returns:
+            True if data was sent, False if the session is not connected or the
+            socket is already closed.
+        """
+        ws = self._connections.get(session_id)
+        if not ws:
+            return False
+        try:
+            await ws.send_bytes(data)
+            return True
+        except Exception as e:
+            if self._is_closed_socket_error(e):
+                logger.warning(
+                    "WebSocket send_bytes failed (closed). Disconnecting: session=%s err=%s: %s",
+                    session_id,
+                    type(e).__name__,
+                    e,
+                )
+            else:
+                logger.error(
+                    "WebSocket send_bytes failed. Disconnecting: session=%s err=%s: %s",
+                    session_id,
+                    type(e).__name__,
+                    e,
+                )
+            self.disconnect(ws)
+            return False
 
     async def broadcast(self, message) -> None:
         """Broadcast message to all connections"""
-        for session_id, ws in self._connections.items():
+        for session_id, ws in list(self._connections.items()):
             try:
                 await ws.send_text(message.to_json())
             except Exception as e:
@@ -144,6 +203,12 @@ class WebSocketHandler:
 
         except WebSocketDisconnect:
             logger.info(f"Client disconnected: {session_id}")
+        except RuntimeError as e:
+            # Starlette can raise RuntimeError on receive() after a disconnect frame.
+            if ConnectionManager._is_closed_socket_error(e):
+                logger.info(f"Client disconnected: {session_id}")
+            else:
+                logger.error(f"WebSocket runtime error: {e}")
         except Exception as e:
             logger.error(f"WebSocket error: {e}")
         finally:

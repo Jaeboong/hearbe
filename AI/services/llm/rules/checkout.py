@@ -24,6 +24,21 @@ MSG_BUY_NOW = "\ubc14\ub85c\uad6c\ub9e4"
 MSG_CHECKOUT = "\uacb0\uc81c\ud558\uae30"
 MSG_CART_CHECKOUT = "\uad6c\ub9e4\ud558\uae30"
 MSG_PROCESSING_WAIT = "\ucc98\ub9ac \ub300\uae30"
+MSG_CHECKOUT_PAGE_WAIT = "\uacb0\uc81c \ud398\uc774\uc9c0 \ub85c\ub529 \ub300\uae30"
+
+
+# A conservative "checkout page loaded" indicator. We only need to reach the
+# checkout entry page (not the final payment keypad).
+#
+# Notes:
+# - `#btnPay` on cart does not always report URL change immediately.
+# - The checkout entry page reliably contains a visible "결제하기" button,
+#   while the cart page uses "구매하기/총 N개 상품 구매하기" wording.
+CHECKOUT_PAGE_READY_SELECTOR = (
+    "button:has-text('\uacb0\uc81c\ud558\uae30'), "
+    "h1:has-text('\uc8fc\ubb38/\uacb0\uc81c'), "
+    "h2:has-text('\uc8fc\ubb38/\uacb0\uc81c')"
+)
 
 
 class CheckoutRule(BaseRule):
@@ -65,12 +80,32 @@ class CheckoutRule(BaseRule):
                 arguments={"selector": selector},
                 description=f"{button_name} \ubc84\ud2bc \ud074\ub9ad",
             ),
-            GeneratedCommand(
-                tool_name="wait",
-                arguments={"ms": 2000},
-                description=MSG_PROCESSING_WAIT,
-            ),
         ]
+        # Cart checkout is the most timing-sensitive: it can navigate to a new domain
+        # and sometimes takes longer than a fixed sleep. Prefer a page-ready wait.
+        if page_type == "cart":
+            commands.append(
+                GeneratedCommand(
+                    tool_name="wait_for_selector",
+                    arguments={"selector": CHECKOUT_PAGE_READY_SELECTOR, "state": "visible", "timeout": 30000},
+                    description=MSG_CHECKOUT_PAGE_WAIT,
+                )
+            )
+            commands.append(
+                GeneratedCommand(
+                    tool_name="wait",
+                    arguments={"ms": 800},
+                    description=MSG_PROCESSING_WAIT,
+                )
+            )
+        else:
+            commands.append(
+                GeneratedCommand(
+                    tool_name="wait",
+                    arguments={"ms": 2000},
+                    description=MSG_PROCESSING_WAIT,
+                )
+            )
 
         return RuleResult(
             matched=True,

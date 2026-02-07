@@ -7,9 +7,11 @@ Coordinates text processing pipeline and delegates to specialized handlers.
 
 import asyncio
 import logging
+import re
 from typing import Dict, Any
 
 from core.interfaces import ASRResult
+from core.korean_numbers import extract_ordinal_index
 from .search_query_handler import SearchQueryHandler
 from .command_pipeline import CommandPipeline
 from .text_ingress.text_queue import TextQueueManager
@@ -19,9 +21,48 @@ from .text_routing.ai_next_router import AiNextRouter
 from .text_routing.text_router import TextRouter
 from .text_session.history_writer import HistoryWriter
 from .text_session.interrupt_manager import InterruptManager
+from .logout_confirm import LogoutConfirmManager
 from services.llm.sites.site_manager import get_page_type
 
 logger = logging.getLogger(__name__)
+
+
+_SEARCH_SELECT_HINTS = ("선택", "열어", "클릭", "눌러", "골라", "고르")
+_SEARCH_READ_HINTS = ("읽어", "들려", "보여", "요약")
+
+_BARE_ORDINAL_RE = re.compile(r"^\\s*[가-힣0-9]+\\s*(?:번째|번)\\s*(?:상품)?\\s*(?:이요|요)?\\s*$")
+
+
+def _is_bare_ordinal_utterance(text: str) -> bool:
+    """
+    True only for short ordinal-only utterances like "1번", "첫번째", "2번이요".
+    """
+    if not text:
+        return False
+    if extract_ordinal_index(text) is None:
+        return False
+    return bool(_BARE_ORDINAL_RE.match(text))
+
+
+def _is_search_quick_select(text: str) -> bool:
+    """
+    Detect selection requests that should not be blocked by auto-extract.
+
+    When the user is on a search page and asks to select an item (e.g., "1번 선택"),
+    we can click by selector without needing extracted search_results first. In that
+    case, forcing ensure_context would trigger auto-announce TTS and delay the action.
+    """
+    value = (text or "").strip()
+    if not value:
+        return False
+    if any(hint in value for hint in _SEARCH_READ_HINTS):
+        return False
+    if any(hint in value for hint in _SEARCH_SELECT_HINTS):
+        return True
+    if _is_bare_ordinal_utterance(value):
+        return True
+    return False
+
 
 class TextHandler:
     """
@@ -50,6 +91,7 @@ class TextHandler:
         order_detail_handler=None,
         page_extract=None,
         command_queue=None,
+        logout_feedback=None,
     ):
         self._nlu = nlu_service
         self._llm = llm_planner
@@ -70,7 +112,13 @@ class TextHandler:
             action_feedback=action_feedback,
             login_guard=login_guard,
             login_feedback=login_feedback,
+            logout_feedback=logout_feedback,
             command_queue=command_queue,
+        )
+        self._logout_confirm = LogoutConfirmManager(
+            sender=sender,
+            session_manager=session_manager,
+            command_pipeline=self._command_pipeline,
         )
 
         # Specialized handlers
@@ -104,6 +152,7 @@ class TextHandler:
             history_writer=self._history,
             interrupt_manager=self._interrupts,
             command_pipeline=self._command_pipeline,
+            logout_confirm=self._logout_confirm,
         )
 
     async def create_session(self, session_id: str):
@@ -123,6 +172,7 @@ class TextHandler:
                 pass
         self._queue_manager.cleanup_session(session_id)
         self._interrupts.cleanup_session(session_id)
+        self._logout_confirm.cleanup_session(session_id)
 
     async def interrupt(self, session_id: str):
         """Interrupt current processing and prioritize new input."""
@@ -156,6 +206,7 @@ class TextHandler:
         session = self._session.get_session(session_id) if self._session else None
         if session and self._flow:
             await self._flow.cancel_flow(session)
+        self._logout_confirm.cleanup_session(session_id)
 
         await self._sender.send_status(session_id, "cancelled", "Cancelled")
         await self._sender.send_tts_response(session_id, "Cancelled")
@@ -210,22 +261,24 @@ class TextHandler:
 
             if session and self._page_extract:
                 page_type = get_page_type(session.current_url or "")
-                triggered = await self._page_extract.ensure_context(
-                    session_id,
-                    session.current_url,
-                    session
-                )
-                if triggered:
-                    retries = 0
-                    if self._session:
-                        retries = self._session.get_context(session_id, "auto_extract_retry", 0)
-                    if retries < 1:
+                skip_auto_extract = page_type == "search" and _is_search_quick_select(text)
+                if not skip_auto_extract:
+                    triggered = await self._page_extract.ensure_context(
+                        session_id,
+                        session.current_url,
+                        session
+                    )
+                    if triggered:
+                        retries = 0
                         if self._session:
-                            self._session.set_context(session_id, "auto_extract_retry", retries + 1)
-                        asyncio.create_task(self._requeue_after_delay(session_id, text, delay_sec=1.6))
-                        return
-                    if self._session:
-                        self._session.set_context(session_id, "auto_extract_retry", 0)
+                            retries = self._session.get_context(session_id, "auto_extract_retry", 0)
+                        if retries < 1:
+                            if self._session:
+                                self._session.set_context(session_id, "auto_extract_retry", retries + 1)
+                            asyncio.create_task(self._requeue_after_delay(session_id, text, delay_sec=1.6))
+                            return
+                        if self._session:
+                            self._session.set_context(session_id, "auto_extract_retry", 0)
 
             if self._session:
                 self._session.set_context(session_id, "auto_extract_retry", 0)

@@ -7,7 +7,6 @@ import base64
 import logging
 import os
 import time
-from urllib.parse import urlparse
 
 from core.interfaces import MCPCommand
 from services.llm.sites.site_manager import get_current_site, get_page_type
@@ -18,14 +17,18 @@ from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
 from .dom_fallback import DomFallbackManager
 from .payment_keypad import PaymentKeypadManager
+from .hearbe_session_gate import HearbeSessionGate
 from .login_autofill import LoginAutofillManager
 from .login_status import LoginStatusManager
 from .login_challenge import LoginChallengeManager
 from .command_queue import CommandQueueManager
 from .page_extract_manager import PageExtractManager
+from .page_focus import PageFocusManager
+from .login_page_state import LoginPageStateManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
 from ..feedback.login_feedback import LoginFeedbackManager
+from ..feedback.logout_feedback import LogoutFeedbackManager
 from ..feedback.order_detail_handler import OrderDetailHandler
 from ..feedback.hearbe_order_history_handler import HearbeOrderHistoryHandler
 from ..feedback.tool_failure_notifier import ToolFailureNotifier
@@ -53,6 +56,7 @@ class HandlerManager:
         self._token_manager = TokenManager(sender, session_manager)
 
         self._command_queue = CommandQueueManager(sender)
+        self._page_focus = PageFocusManager(session_manager)
         self._action_feedback = ActionFeedbackManager(sender)
         self._failure_notifier = ToolFailureNotifier(sender)
         self._login_guard = LoginGuard(
@@ -62,12 +66,14 @@ class HandlerManager:
             command_queue=self._command_queue,
         )
         self._login_feedback = LoginFeedbackManager(session_manager, sender)
+        self._logout_feedback = LogoutFeedbackManager(session_manager)
         self._dom_fallback = DomFallbackManager(
             sender=sender,
             session_manager=session_manager,
             action_feedback=self._action_feedback,
             login_guard=self._login_guard,
             login_feedback=self._login_feedback,
+            logout_feedback=self._logout_feedback,
         )
         self._payment_keypad = PaymentKeypadManager(
             sender=sender,
@@ -81,10 +87,18 @@ class HandlerManager:
             sender=sender,
             session_manager=session_manager,
         )
+        self._login_page_state = LoginPageStateManager(
+            sender=sender,
+            session_manager=session_manager,
+        )
         self._login_autofill = LoginAutofillManager(
             sender=sender,
             session_manager=session_manager,
             login_feedback=self._login_feedback,
+        )
+        self._hearbe_session_gate = HearbeSessionGate(
+            sender=sender,
+            session_manager=session_manager,
         )
         self._order_detail = OrderDetailHandler(
             sender=sender,
@@ -117,6 +131,7 @@ class HandlerManager:
             order_detail_handler=self._order_detail,
             page_extract=self._page_extract,
             command_queue=self._command_queue,
+            logout_feedback=self._logout_feedback,
         )
         self._login_status.set_enqueue(self._text_handler.enqueue_text)
         self._audio_handler = AudioHandler(
@@ -147,12 +162,15 @@ class HandlerManager:
         self._action_feedback.clear_pending(session_id)
         self._login_guard.clear_pending(session_id)
         self._login_feedback.clear_pending(session_id)
+        self._logout_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._mcp_handler.cleanup_session(session_id)
         self._payment_keypad.cleanup_session(session_id)
         self._login_status.cleanup_session(session_id)
         self._login_challenge.cleanup_session(session_id)
+        self._login_page_state.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
+        self._hearbe_session_gate.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         self._hearbe_order_history.cleanup_session(session_id)
         self._token_manager.cleanup_session(session_id)
@@ -178,11 +196,14 @@ class HandlerManager:
         self._action_feedback.clear_pending(session_id)
         self._login_guard.clear_pending(session_id)
         self._login_feedback.clear_pending(session_id)
+        self._logout_feedback.clear_pending(session_id)
         self._dom_fallback.clear_pending(session_id)
         self._payment_keypad.cleanup_session(session_id)
         self._login_status.cleanup_session(session_id)
         self._login_challenge.cleanup_session(session_id)
+        self._login_page_state.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
+        self._hearbe_session_gate.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         self._hearbe_order_history.cleanup_session(session_id)
         self._token_manager.cleanup_session(session_id)
@@ -208,8 +229,8 @@ class HandlerManager:
         self._payment_keypad.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
         self._login_challenge.cleanup_session(session_id)
+        self._login_page_state.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
-        self._hearbe_order_history.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
 
@@ -249,6 +270,12 @@ class HandlerManager:
         handled = await self._login_status.handle_mcp_result(session_id, data)
         if handled:
             return
+        handled = await self._login_page_state.handle_mcp_result(session_id, data)
+        if handled:
+            return
+        handled = await self._hearbe_session_gate.handle_mcp_result(session_id, data)
+        if handled:
+            return
         handled = await self._login_autofill.handle_mcp_result(session_id, data)
         if handled:
             return
@@ -266,6 +293,19 @@ class HandlerManager:
         session = self._session.get_session(session_id) if self._session else None
         if not session:
             return
+        # Filter noisy PAGE_UPDATEs from background tabs by keeping a per-session "primary" page focus.
+        decision = self._page_focus.decide(session_id, url, page_id, session.current_url or "")
+        if not decision.accept:
+            logger.debug(
+                "handle_page_update ignored (not primary): session=%s url=%s page_id=%s primary_page_id=%s primary_host=%s",
+                session_id,
+                url,
+                page_id,
+                decision.primary_page_id,
+                decision.primary_host,
+            )
+            return
+
         previous_url = session.current_url
         if previous_url and previous_url != url:
             self._session.set_context(session_id, "previous_url", previous_url)
@@ -294,29 +334,60 @@ class HandlerManager:
 
         # On login page entry, trigger autofill probe (no user text required).
         if page_type == "login":
+            await self._hearbe_session_gate.handle_login_page_update(session_id, url, previous_url)
             await self._login_autofill.handle_page_update(session_id, url, previous_url)
+            await self._login_page_state.handle_page_update(session_id, url, previous_url, page_id)
         # On main page entry, check if user is logged in and redirect to appropriate mall.
         elif page_type == "main":
-            await self._login_autofill.handle_main_page_update(session_id, url)
+            # Only on entry (URL change) to avoid repeated session checks / duplicate TTS.
+            if previous_url != url:
+                await self._hearbe_session_gate.handle_main_page_update(session_id, url)
 
-        # On main page entry for our backend site, cache access token via localStorage.
-        try:
-            parsed = urlparse(url)
-            host = (parsed.netloc or "").lower()
-            path = parsed.path or ""
-            if host == "i14d108.p.ssafy.io" and path.startswith("/main") and previous_url != url:
-                await self._sender.send_tool_calls(
-                    session_id,
-                    [
-                        MCPCommand(
-                            tool_name="get_user_session",
-                            arguments={},
-                            description="cache access token from localStorage",
-                        )
-                    ],
-                )
-        except Exception:
-            pass
+        # Hearbe: on mall page entry, announce available actions and mall options (cooldown per page_id).
+        if (
+            site
+            and getattr(site, "site_id", "") == "hearbe"
+            and page_type == "mall"
+            and previous_url != url
+            and self._session
+        ):
+            suppress = False
+            until = self._session.get_context(session_id, "tts_suppress_until", 0)
+            if until and time.time() < float(until):
+                suppress = True
+
+            # Cooldown to avoid repeated guidance during redirect bounces / tab switching.
+            # Keyed by page_id so returning to the same mall tab doesn't spam guidance.
+            page_key = str(page_id or "none")
+            raw = self._session.get_context(session_id, "hearbe_mall_guidance_map", {}) or {}
+            guidance_map = raw if isinstance(raw, dict) else {}
+            last_ts = guidance_map.get(page_key) or 0.0
+            try:
+                last_ts = float(last_ts)
+            except (TypeError, ValueError):
+                last_ts = 0.0
+
+            if not suppress and (time.time() - last_ts) > 300.0:
+                guidance_map[page_key] = time.time()
+                self._session.set_context(session_id, "hearbe_mall_guidance_map", guidance_map)
+                # If /main detected an existing session and redirected here, the session gate
+                # intentionally suppresses its own "already logged in" TTS to avoid duplication.
+                # We fold that status into this single mall guidance TTS.
+                prefix = ""
+                try:
+                    recent_to = self._session.get_context(session_id, "hearbe_recent_login_redirect_to") or ""
+                    recent_ts = float(self._session.get_context(session_id, "hearbe_recent_login_redirect_ts") or 0)
+                    recent_reason = self._session.get_context(session_id, "hearbe_recent_login_redirect_reason") or ""
+                except Exception:
+                    recent_to, recent_ts, recent_reason = "", 0.0, ""
+
+                if recent_reason == "already_logged_in" and recent_to == url and (time.time() - recent_ts) < 10.0:
+                    prefix = "이미 로그인되어 있습니다. "
+                    self._session.set_context(session_id, "hearbe_recent_login_redirect_to", None)
+                    self._session.set_context(session_id, "hearbe_recent_login_redirect_ts", None)
+                    self._session.set_context(session_id, "hearbe_recent_login_redirect_reason", None)
+
+                await self._sender.send_tts_response(session_id, prefix + self._tts.build_hearbe_mall_guidance())
 
     async def handle_invalid_message(self, session_id: str, error: str):
         await self._sender.send_error(session_id, error)

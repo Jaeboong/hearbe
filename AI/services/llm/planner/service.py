@@ -24,6 +24,7 @@ from .cart_action import handle_cart_action
 from .order_list_action import handle_order_list_action
 from .hearbe_order_history_action import handle_hearbe_order_history_action
 from .product_info_action import handle_product_info_action
+from .search_cheapest_action import handle_search_cheapest_action
 from .fallback import build_llm_fallback_response
 
 logger = logging.getLogger(__name__)
@@ -90,6 +91,15 @@ class LLMPlanner(ILLMPlanner):
         conversation_history = session.conversation_history if session else None
         session_context = session.context if session else None
 
+        # Some pages have "page-scoped" actions that must take priority over generic
+        # selection (e.g., "N번째 주문 상세보기" on order list pages). Otherwise,
+        # a stale search selection can steal the intent and drift to a product page.
+        current_page_type = get_page_type(current_url) if current_url else None
+        if current_page_type == "orderlist":
+            order_list_action = handle_order_list_action(user_text, session)
+            if order_list_action:
+                return order_list_action
+
         # 1. Selection from recent search results (prefer session-aware match)
         selection = select_from_results(user_text, session)
         if selection:
@@ -100,20 +110,27 @@ class LLMPlanner(ILLMPlanner):
         if option_selection:
             return option_selection
 
+        # 1.06. Page-scoped actions should win over generic rules/LLM fallback.
+        # These handlers are safe because they gate on current_url/page_type internally.
+        if current_page_type != "orderlist":
+            order_list_action = handle_order_list_action(user_text, session)
+            if order_list_action:
+                return order_list_action
+
         # 1.1. Rule-based pass
         rule_result = await self._rule_generator.generate_rules(user_text, current_url)
 
         # 1.5. Post-rule session-aware handlers
         if rule_result.matched_rule == "none":
+            search_cheapest_action = handle_search_cheapest_action(user_text, session)
+            if search_cheapest_action:
+                return search_cheapest_action
             hearbe_order_history_action = handle_hearbe_order_history_action(user_text, session)
             if hearbe_order_history_action:
                 return hearbe_order_history_action
             cart_action = handle_cart_action(user_text, session)
             if cart_action:
                 return cart_action
-            order_list_action = handle_order_list_action(user_text, session)
-            if order_list_action:
-                return order_list_action
             product_info_action = handle_product_info_action(user_text, session)
             if product_info_action:
                 return product_info_action

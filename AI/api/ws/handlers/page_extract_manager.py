@@ -21,6 +21,8 @@ CTX_LAST_URL = "auto_extract_last_url"
 CTX_LAST_TS = "auto_extract_last_ts"
 CTX_LAST_TYPE = "auto_extract_last_type"
 CTX_LAST_PAGE_ID = "auto_extract_last_page_id"
+CTX_LAST_TS_MAP = "auto_extract_last_ts_map"  # key: "{page_id}:{page_type}" -> ts
+CTX_LAST_URL_MAP = "auto_extract_last_url_map"  # key: "{page_id}:{page_type}" -> url
 
 
 class PageExtractManager:
@@ -55,34 +57,49 @@ class PageExtractManager:
         if not page_type:
             return False
 
-        last_url = self._get_context(session_id, CTX_LAST_URL)
-        last_page_id = self._get_context(session_id, CTX_LAST_PAGE_ID)
-        if page_id is None and last_page_id is not None:
-            page_id = last_page_id
-        if not force and last_url == url and last_page_id == page_id:
+        # Prefer per-page_id+page_type de-duplication to avoid cross-tab interference.
+        key = f"{page_id or 'none'}:{page_type}"
+        url_map = self._get_context(session_id, CTX_LAST_URL_MAP) or {}
+        if not isinstance(url_map, dict):
+            url_map = {}
+        ts_map = self._get_context(session_id, CTX_LAST_TS_MAP) or {}
+        if not isinstance(ts_map, dict):
+            ts_map = {}
+
+        last_url = url_map.get(key)
+        if not force and last_url == url:
             return False
 
         now = time.time()
-        last_ts = self._get_context(session_id, CTX_LAST_TS) or 0.0
-        if now - last_ts < AUTO_EXTRACT_MIN_INTERVAL_SEC:
+        last_ts = ts_map.get(key) or 0.0
+        if now - float(last_ts) < AUTO_EXTRACT_MIN_INTERVAL_SEC:
             return False
 
         commands = self._build_extract_commands(page_type, url)
-        if commands:
-            await self._sender.send_tool_calls(session_id, commands)
-            logger.info(
-                "Auto extract triggered: session=%s type=%s url=%s force=%s",
-                session_id,
-                page_type,
-                url,
-                force,
-            )
+        if not commands:
+            # Do not update last_ts/last_url if we didn't run an extract.
+            # Otherwise, platform page_update noise can suppress the real extract we care about.
+            return False
 
-        self._set_context(session_id, CTX_LAST_URL, url)
-        self._set_context(session_id, CTX_LAST_TS, now)
+        await self._sender.send_tool_calls(session_id, commands)
+        logger.info(
+            "Auto extract triggered: session=%s type=%s url=%s force=%s page_id=%s",
+            session_id,
+            page_type,
+            url,
+            force,
+            page_id,
+        )
+
+        url_map[key] = url
+        ts_map[key] = now
+        self._set_context(session_id, CTX_LAST_URL_MAP, url_map)
+        self._set_context(session_id, CTX_LAST_TS_MAP, ts_map)
+        self._set_context(session_id, CTX_LAST_URL, url)  # legacy (debug)
+        self._set_context(session_id, CTX_LAST_TS, now)  # legacy (debug)
         self._set_context(session_id, CTX_LAST_TYPE, page_type)
         self._set_context(session_id, CTX_LAST_PAGE_ID, page_id)
-        return bool(commands)
+        return True
 
     def _build_extract_commands(self, page_type: str, url: str) -> List[MCPCommand]:
         wait_cmd = MCPCommand(
@@ -95,8 +112,25 @@ class PageExtractManager:
             cmd = build_extract_products_command(site, current_url=url, limit=0)
             if not cmd:
                 return []
+            # Search pages often update the URL before results are fully rendered.
+            # Waiting for the product list reduces false "extract failed" results,
+            # which otherwise causes LLM fallbacks and noisy TTS.
+            product_list_selector = None
+            if site:
+                page = site.get_page_selectors("search")
+                if page and page.selectors:
+                    product_list_selector = page.selectors.get("product_list")
             return [
                 wait_cmd,
+                MCPCommand(
+                    tool_name="wait_for_selector",
+                    arguments={
+                        "selector": product_list_selector or "li.search-product",
+                        "state": "visible",
+                        "timeout": 20000,
+                    },
+                    description="wait for search results to render",
+                ),
                 MCPCommand(
                     tool_name=cmd.tool_name,
                     arguments=cmd.arguments,
@@ -112,10 +146,30 @@ class PageExtractManager:
                     selectors = page.selectors
 
             field_selectors = {}
+            field_attributes = {}
+
+            # Coupang product pages are prone to DOM/selector churn. Prefer stable meta tags for
+            # core fields so downstream read-only pipelines can reliably speak product info.
+            # Note: meta tags require attribute extraction (content), not text_content.
+            if "coupang.com" in (url or ""):
+                # Prefer OG/Twitter meta tags which tend to survive UI changes.
+                field_selectors["name"] = (
+                    "meta[property='og:title'], meta[name='og:title'], "
+                    "meta[property='twitter:title'], meta[name='twitter:title']"
+                )
+                field_attributes["name"] = "content"
+                field_selectors["price"] = (
+                    "meta[property='product:price:amount'], "
+                    "meta[name='product:price:amount'], "
+                    "meta[property='og:price:amount'], "
+                    "meta[name='og:price:amount'], "
+                    "meta[property='og:product:price:amount']"
+                )
+                field_attributes["price"] = "content"
             if selectors.get("product_title"):
-                field_selectors["name"] = selectors["product_title"]
+                field_selectors.setdefault("name", selectors["product_title"])
             if selectors.get("final_price"):
-                field_selectors["price"] = selectors["final_price"]
+                field_selectors.setdefault("price", selectors["final_price"])
             if selectors.get("discount_rate"):
                 field_selectors["discount_rate"] = selectors["discount_rate"]
             if selectors.get("original_price"):
@@ -131,6 +185,8 @@ class PageExtractManager:
             if field_selectors:
                 args["fields"] = list(field_selectors.keys())
                 args["field_selectors"] = field_selectors
+                if field_attributes:
+                    args["field_attributes"] = field_attributes
             if image_selector:
                 args["image_selector"] = image_selector
                 args["image_limit"] = 40
@@ -156,14 +212,17 @@ class PageExtractManager:
                 ),
             ]
         if page_type == "orderlist":
-            return [
-                wait_cmd,
+            cmds: List[MCPCommand] = [wait_cmd]
+            # Coupang order list data lives in __NEXT_DATA__ (SSR), not in DOM links.
+            # No need to wait_for_selector; the script tag is available on page load.
+            cmds.append(
                 MCPCommand(
                     tool_name="extract_order_list",
                     arguments={},
                     description="extract order list on page change",
-                ),
-            ]
+                )
+            )
+            return cmds
         return []
 
     def _is_context_missing(self, page_type: str, session) -> bool:

@@ -32,6 +32,7 @@ class ContextBuilder:
         order_detail = select_order_detail(session_context, conversation_history)
         order_list = select_order_list(session_context, conversation_history)
         previous_url = session_context.get("previous_url") if session_context else None
+        login_method_active = session_context.get("login_method_active") if session_context else None
 
         system_prompt = build_system_prompt(
             current_url=current_url,
@@ -42,6 +43,7 @@ class ContextBuilder:
             order_detail=order_detail,
             order_list=order_list,
             previous_url=previous_url,
+            login_method_active=login_method_active,
         )
 
         messages = [{"role": "system", "content": system_prompt}]

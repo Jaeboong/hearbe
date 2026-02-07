@@ -9,6 +9,7 @@ import os
 from typing import Any, Dict, Optional
 
 from api.order.order_client import OrderClient, COUPANG_PLATFORM_ID
+from api.product.product_client import ProductClient
 from ..auth.token_manager import TokenManager
 from .order_detail_constants import (
     CTX_ORDER_DETAIL_API_SENT_ID,
@@ -17,6 +18,7 @@ from .order_detail_constants import (
     CTX_ORDER_DETAIL_DATA,
 )
 from .order_detail_utils import build_order_items, get_access_token
+from .product_detail_utils import build_product_payload
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +100,11 @@ class OrderDetailApiSender:
                 len(items),
                 order_url or "missing",
             )
+            await self._send_product_if_available(
+                session_id=session_id,
+                order_id=order_id,
+                token=token,
+            )
             return
 
         status_code = result.get("status_code")
@@ -127,6 +134,71 @@ class OrderDetailApiSender:
             return
         self._session.set_context(session_id, CTX_ORDER_DETAIL_API_SENT_ID, None)
         self._session.set_context(session_id, CTX_ORDER_DETAIL_API_PENDING_ID, None)
+
+    async def _send_product_if_available(self, *, session_id: str, order_id: str, token: str) -> None:
+        if not self._session:
+            return
+        detail = self._session.get_context(session_id, "product_detail")
+        if not isinstance(detail, dict):
+            logger.info("Product API skipped: no product_detail (session=%s order_id=%s)", session_id, order_id)
+            return
+
+        payload = build_product_payload(detail)
+        if not payload:
+            logger.info(
+                "Product API skipped: incomplete product_detail (session=%s order_id=%s keys=%s)",
+                session_id,
+                order_id,
+                list(detail.keys()),
+            )
+            return
+
+        logger.info(
+            "Product API send start: session=%s order_id=%s token=%s name=%s",
+            session_id,
+            order_id,
+            _format_token(token),
+            payload.get("name") or "",
+        )
+        client = ProductClient(jwt_token=token)
+        result = await client.create_product(**payload)
+        if result.get("success"):
+            logger.info(
+                "Product API sent: session=%s order_id=%s status=%s category_depth=%s",
+                session_id,
+                order_id,
+                result.get("status_code"),
+                len(payload.get("category_path") or []),
+            )
+            return
+
+        status_code = result.get("status_code")
+        if status_code in (401, 403) and self._tokens:
+            return_url = self._session.get_context(session_id, CTX_ORDER_DETAIL_LAST_URL)
+            refreshed_token = await self._tokens.handle_auth_failure(
+                session_id,
+                status_code=status_code,
+                return_url=return_url,
+                reason="product_api_unauthorized",
+            )
+            if refreshed_token:
+                client = ProductClient(jwt_token=refreshed_token)
+                retry = await client.create_product(**payload)
+                if retry.get("success"):
+                    logger.info(
+                        "Product API sent after refresh: session=%s order_id=%s status=%s",
+                        session_id,
+                        order_id,
+                        retry.get("status_code"),
+                    )
+                    return
+
+        logger.warning(
+            "Product API failed: session=%s order_id=%s error=%s",
+            session_id,
+            order_id,
+            result.get("error"),
+        )
 
 
 def _format_token(token: Optional[str]) -> str:

@@ -68,6 +68,11 @@ def format_product_detail_section(product_detail: Optional[Dict[str, Any]] = Non
     if not product_detail:
         return ""
 
+    # Keep this compact: include structured extras only when present.
+    coupang_info = product_detail.get("coupang_product_info_kv")
+    if not (isinstance(coupang_info, dict) and coupang_info):
+        coupang_info = product_detail.get("coupang_product_info")
+
     detail = {
         "name": product_detail.get("name"),
         "price": product_detail.get("price"),
@@ -76,6 +81,8 @@ def format_product_detail_section(product_detail: Optional[Dict[str, Any]] = Non
         "option": product_detail.get("option"),
         "options": product_detail.get("options"),
         "options_list": product_detail.get("options_list"),
+        "category_path": product_detail.get("category_path"),
+        "coupang_product_info": coupang_info,
         "ocr_summary": product_detail.get("ocr_summary"),
         "ocr_keywords": product_detail.get("ocr_keywords"),
         "ocr_product_type": product_detail.get("ocr_product_type"),

@@ -17,6 +17,9 @@ DEFAULT_MODEL_NAME = "korean_PP-OCRv5_mobile_rec"
 MAX_IMAGE_FILE_SIZE = 50 * 1024 * 1024  # 이미지 파일 최대 50MB
 DEFAULT_DEVICE = "gpu:0"
 
+# 싱글톤 PaddleOCR 인스턴스 (warmup 시 미리 생성, GPU 단일 스레드에서 재사용)
+_default_ocr_instance: PaddleOCR = None
+
 
 def create_ocr_instance(
     model_name: str = DEFAULT_MODEL_NAME,
@@ -32,12 +35,20 @@ def create_ocr_instance(
     )
 
 
+def get_ocr_instance(device: str = DEFAULT_DEVICE) -> PaddleOCR:
+    """싱글톤 PaddleOCR 인스턴스 반환. 없으면 생성."""
+    global _default_ocr_instance
+    if _default_ocr_instance is None:
+        _default_ocr_instance = create_ocr_instance(device=device)
+    return _default_ocr_instance
+
+
 def run_ocr(
     image_path: str,
     ocr_instance: Optional[PaddleOCR] = None
 ) -> List[Any]:
     if ocr_instance is None:
-        ocr_instance = create_ocr_instance()
+        ocr_instance = get_ocr_instance()
     return ocr_instance.predict(image_path)
 
 
@@ -104,8 +115,8 @@ def process_image(
     width, height = get_image_size(image_path)
     
     if ocr_instance is None:
-        ocr_instance = create_ocr_instance()
-    
+        ocr_instance = get_ocr_instance()
+
     if height > max_height:
         
         try:
@@ -180,7 +191,7 @@ def process_images_parallel(
     def process_single(image_path: str) -> Dict[str, Any]:
         try:
             if not hasattr(thread_local, "ocr_instance"):
-                thread_local.ocr_instance = create_ocr_instance(device=device)
+                thread_local.ocr_instance = get_ocr_instance(device=device)
             result = process_image(
                 image_path,
                 max_height=max_height,

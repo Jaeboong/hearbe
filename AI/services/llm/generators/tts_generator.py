@@ -57,13 +57,25 @@ class TTSGenerator:
         from .tts_pages.login import build_login_autofill_success_tts
         return build_login_autofill_success_tts(current_url)
 
-    def build_login_guidance(self) -> str:
+    def build_login_guidance(self, active_method: Optional[str] = None) -> str:
         from .tts_pages.login import build_login_guidance_tts
-        return build_login_guidance_tts()
+        return build_login_guidance_tts(active_method)
 
     def build_captcha_prompt(self) -> str:
         from .tts_pages.login import build_captcha_prompt_tts
         return build_captcha_prompt_tts()
+
+    def build_hearbe_main_guidance(self) -> str:
+        from .tts_pages.hearbe import build_hearbe_main_guidance_tts
+        return build_hearbe_main_guidance_tts()
+
+    def build_hearbe_login_redirect(self) -> str:
+        from .tts_pages.hearbe import build_hearbe_login_redirect_tts
+        return build_hearbe_login_redirect_tts()
+
+    def build_hearbe_mall_guidance(self) -> str:
+        from .tts_pages.hearbe import build_hearbe_mall_guidance_tts
+        return build_hearbe_mall_guidance_tts()
 
 
 __all__ = [

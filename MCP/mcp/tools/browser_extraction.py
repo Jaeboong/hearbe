@@ -383,11 +383,12 @@ class BrowserExtractionMixin:
                 page_url = page.url or ""
                 if "coupang.com" in page_url:
                     try:
-                        dynamic_options = await apply_detail_option_fallback(page, detail)
-                        if dynamic_options:
-                            logger.info(f"Dynamic option extraction succeeded: {dynamic_options}")
+                        dynamic_extras = await apply_detail_option_fallback(page, detail)
+                        if dynamic_extras:
+                            keys = list(dynamic_extras.keys()) if isinstance(dynamic_extras, dict) else []
+                            logger.info("Dynamic detail extraction succeeded: keys=%s", keys)
                     except Exception as e:
-                        logger.warning(f"Dynamic option extraction failed: {e}")
+                        logger.warning(f"Dynamic detail extraction failed: {e}")
 
             return {
                 "success": True,

@@ -21,6 +21,8 @@
 .ai/
 .anthropic/
 .agent/
+agents.toml
+.multi_agent
 
 # ============================================================================
 # Python / FastAPI / AI 서버
@@ -479,6 +481,7 @@ application-secret.properties
 # ============================================================================
 MCP/logs/
 MCP/session.json
+MCP/config.env
 MCP/chrome_profile/
 AI/chrome_profile/
 MCP/.mcp_chrome_profile/

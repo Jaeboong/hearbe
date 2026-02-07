@@ -40,6 +40,10 @@ class Application:
         self.config = get_config()
         setup_logging(self.config)
 
+        # CLI flag should override env-based config so developers can reliably
+        # enable console input without editing config.env/.env.
+        if console_mode:
+            self.config.debug.console_enabled = True
         self.console_mode = console_mode or self.config.debug.console_enabled
         self.running = False
 
@@ -102,16 +106,19 @@ class Application:
         self.modules["ws_client"].setup_event_handlers()
 
         # Audio 모듈 (PTT 녹음)
-        try:
-            from audio.audio_manager import AudioManager
-            self.modules["audio"] = AudioManager(
-                hotkey=self.config.audio.hotkey,
-                input_device_index=self.config.audio.input_device_index
-            )
-            self.modules["audio"].setup_event_handlers()
-        except ImportError as e:
-            logger.warning(f"Audio module not available: {e}")
-            logger.warning("Install pyaudio and keyboard for voice support")
+        if self.console_mode:
+            logger.info("Console mode enabled: audio hotkey disabled")
+        else:
+            try:
+                from audio.audio_manager import AudioManager
+                self.modules["audio"] = AudioManager(
+                    hotkey=self.config.audio.hotkey,
+                    input_device_index=self.config.audio.input_device_index
+                )
+                self.modules["audio"].setup_event_handlers()
+            except ImportError as e:
+                logger.warning(f"Audio module not available: {e}")
+                logger.warning("Install pyaudio and keyboard for voice support")
 
         # Audio Player 모듈 (TTS 재생)
         try:
@@ -171,7 +178,11 @@ class Application:
             await self.modules["audio"].start()
 
         logger.info("=== MCP Desktop App is now running ===")
-        logger.info("Hold SPACE to record voice command, release to send")
+        if "audio" in self.modules:
+            logger.info(
+                "Hold %s to record voice command, release to send",
+                self.config.audio.hotkey.upper()
+            )
         if self.console_mode:
             logger.info("Console input mode: ON (type 'exit' to quit)")
         logger.info("Press Ctrl+C to exit")
