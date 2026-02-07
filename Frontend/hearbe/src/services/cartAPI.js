@@ -1,4 +1,3 @@
-// 공통 장바구니 API
 // A형과 C형에서 공통으로 사용
 
 import { apiClient, API_BASE_URL } from './apiClient.js';
@@ -14,7 +13,6 @@ const getAuthHeader = () => {
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
-// 공통 에러 핸들링
 const handleResponse = async (response) => {
     const text = await response.text();
     let data;

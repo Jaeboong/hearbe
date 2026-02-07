@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Store, ShieldCheck, LogOut } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
-import '../MyPage/MyPageC.css';
+import '../MyPage/mypage-common.css';
+import './MemberInfoC.css';
 import logoC from '../../assets/logoC.png';
 
-export default function MemberInfoC({ onHome }) {
+const MemberInfoC = ({ onHome }) => {
     const navigate = useNavigate();
 
     const [userData, setUserData] = useState({
@@ -18,7 +19,6 @@ export default function MemberInfoC({ onHome }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // 회원탈퇴 모달 상태
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
     const [withdrawPassword, setWithdrawPassword] = useState('');
     const [alertState, setAlertState] = useState({
@@ -28,7 +28,6 @@ export default function MemberInfoC({ onHome }) {
         onConfirm: null
     });
 
-    // 사이드바 아이템 (A형과 동일한 URL 구조)
     const sidebarItems = [
         { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
         { id: 'order-history', label: '주문 내역', path: '/C/order-history' },
@@ -43,7 +42,6 @@ export default function MemberInfoC({ onHome }) {
                 setError(null);
                 const response = await memberAPI.getProfile();
 
-                // 데이터 매핑
                 const profileData = response.data || response;
 
                 setUserData({
@@ -117,18 +115,15 @@ export default function MemberInfoC({ onHome }) {
         if (callback) callback();
     };
 
-    // 회원탈퇴 모달 열기
     const handleWithdraw = () => {
         setShowWithdrawModal(true);
         setWithdrawPassword('');
     };
 
-    // 회원탈퇴 모달 닫기
     const handleCloseWithdrawModal = () => {
         setShowWithdrawModal(false);
     };
 
-    // 회원탈퇴 실행
     const handleConfirmWithdraw = async () => {
         if (!withdrawPassword) {
             showAlert("비밀번호를 입력해주세요.", "error");
@@ -169,7 +164,6 @@ export default function MemberInfoC({ onHome }) {
 
     // DEBUG: Mount log
     useEffect(() => {
-        console.log('MemberInfoC Mounted');
     }, []);
 
     const handleLogout = async () => {
@@ -480,4 +474,6 @@ export default function MemberInfoC({ onHome }) {
             )}
         </div>
     );
-}
+};
+
+export default MemberInfoC;

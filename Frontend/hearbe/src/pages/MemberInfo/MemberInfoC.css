@@ -1,3 +1,70 @@
+.info-list-full {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-row-full {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.8rem 0;
+}
+
+.row-icon-circle {
+    width: 3rem;
+    height: 3rem;
+    background-color: #f9fafb;
+    border-radius: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+.row-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.row-label {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #9ca3af;
+}
+
+.row-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+.small-action-btn {
+    background: #f5f3ff;
+    color: #7c3aed;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.8rem;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.withdraw-link {
+    align-self: flex-end;
+    background: transparent;
+    border: none;
+    text-decoration: underline;
+    color: #9ca3af;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+}
+
 .member-info-page-c {
     min-height: 100vh;
     background-color: #f8fafc;
@@ -7,10 +74,6 @@
     flex-direction: column;
 }
 
-/* Header and navigation styles now in MyPageC.css */
-
-/* Main Content */
-/* Main Content */
 .member-info-main-c {
     flex: 1;
     display: flex;
@@ -26,7 +89,6 @@
     gap: 1.5rem;
 }
 
-/* Profile Section */
 .profile-section-c {
     background: white;
     border-radius: 2rem;
@@ -72,7 +134,6 @@
     font-weight: 700;
 }
 
-/* Info Card */
 .info-card-c {
     background: white;
     border-radius: 2rem;
@@ -166,7 +227,6 @@
     color: white;
 }
 
-/* Withdraw Section */
 .withdraw-section-c {
     display: flex;
     justify-content: flex-end;

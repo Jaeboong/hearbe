@@ -1,17 +1,12 @@
 import emailjs from '@emailjs/browser';
 
-// EmailJS 설정 - 환경변수로 관리
+// EmailJS 설정
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID';
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
 
-console.log('[EmailJS ENV]', {
-    serviceId: EMAILJS_SERVICE_ID,
-    templateId: EMAILJS_TEMPLATE_ID,
-    publicKey: EMAILJS_PUBLIC_KEY
-});
 
-// 인증번호 저장소 (메모리)
+// 인증번호 저장소
 const verificationStore = new Map();
 
 // 6자리 인증번호 생성
@@ -28,7 +23,7 @@ export const emailService = {
         // 인증번호 저장
         verificationStore.set(email, { code, expiresAt });
 
-        // EmailJS로 이메일 발송
+        // 이메일 발송
         try {
             await emailjs.send(
                 EMAILJS_SERVICE_ID,
@@ -70,7 +65,7 @@ export const emailService = {
         return { success: true, message: '인증이 완료되었습니다.' };
     },
 
-    // 인증번호 만료 시간 확인 (초 단위 반환)
+    // 남은 시간 확인
     getRemainingTime: (email) => {
         const stored = verificationStore.get(email);
         if (!stored) return 0;

@@ -5,7 +5,7 @@ import {
     ShieldCheck, Settings, Package, Home, CheckSquare, Trash2
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import CartPage from '../Cart/CartC';
+import CartC from '../Cart/CartC';
 import { orderAPI } from '../../services/orderAPI';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import { memberAPI } from '../../services/memberAPI';
@@ -13,7 +13,7 @@ import './MyPageC.css';
 import logoC from '../../assets/logoC.png';
 
 
-export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
+const MyPageC = ({ onBack, onHome, onCart, onMyPage }) => {
     const navigate = useNavigate();
     const location = useLocation();
     // Determine active tab from URL (A형과 동일한 URL 구조)
@@ -101,7 +101,6 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                     if (!ordersByMall[mallName]) {
                         ordersByMall[mallName] = { mall: mallName, items: [] };
                     }
-                    // 새 API는 order 안에 items 배열이 있음
                     if (order.items && order.items.length > 0) {
                         order.items.forEach(item => {
                             ordersByMall[mallName].items.push({
@@ -453,10 +452,10 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
                         </section>
                     )}
 
-                    {/* Cart Tab - Integrated CartPage */}
+                    {/* Cart Tab - Integrated CartC */}
                     {activeTab === 'cart' && (
                         <section className="dashboard-card full-height" style={{ background: 'transparent', padding: 0, boxShadow: 'none', border: 'none' }}>
-                            <CartPage
+                            <CartC
                                 isEmbedded={true}
                                 onHome={onHome}
                                 onMyPage={() => setActiveTab('settings')}
@@ -471,4 +470,6 @@ export default function MyPage({ onBack, onHome, onCart, onMyPage }) {
             </footer>
         </div >
     );
-}
+};
+
+export default MyPageC;

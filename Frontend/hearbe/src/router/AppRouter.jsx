@@ -1,46 +1,38 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
-// [페이지 컴포넌트]
 import MainLanding from '../pages/MainLanding';
 import BrandLanding from '../pages/BrandLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
 import AudioPage from '../Audio/AudioPage';
 
-// [A형 페이지 컴포넌트]
-import LoginA from '../pages/Login/LoginA';
-import SignUpA from '../pages/SignUp/SignUpA';
-import SelectMallA from '../pages/SelectMall/SelectMallA';
-import StoreBrowserA from '../pages/StoreBrowser/StoreBrowserA';
-import CartA from '../pages/Cart/CartA';
-import MemberInfoA from '../pages/MemberInfo/MemberInfoA';
-import OrderHistoryA from '../pages/OrderHistory/OrderHistoryA';
-import WishlistA from '../pages/Wishlist_A/WishlistA';
-import CardManagementA from '../pages/CardManagement_A/CardManagementA';
-import FindIdA from '../pages/FindId/FindIdA';
-import FindPasswordA from '../pages/FindPassword/FindPasswordA';
-import ChangePasswordA from '../pages/FindPassword/ChangePasswordA';
+import LoginB from '../pages/Login/LoginB';
+import SignUpB from '../pages/SignUp/SignUpB';
+import SelectMallB from '../pages/SelectMall/SelectMallB';
+import StoreBrowserB from '../pages/StoreBrowser/StoreBrowserB';
+import CartB from '../pages/Cart/CartB';
+import MemberInfoB from '../pages/MemberInfo/MemberInfoB';
+import OrderHistoryB from '../pages/OrderHistory/OrderHistoryB';
+import WishlistB from '../pages/Wishlist/WishlistB';
+import CardManagementB from '../pages/CardManagement_B/CardManagementB';
+import FindIdB from '../pages/FindId/FindIdB';
+import FindPasswordB from '../pages/FindPassword/FindPasswordB';
+import ChangePasswordB from '../pages/FindPassword/ChangePasswordB';
 
-// [C형 페이지 컴포넌트]
 import LoginC from '../pages/Login/LoginC';
 import SignUpC from '../pages/SignUp/SignUpC';
 import SelectMallC from '../pages/SelectMall/SelectMallC';
 import CartC from '../pages/Cart/CartC';
 import MemberInfoC from '../pages/MemberInfo/MemberInfoC';
 import OrderHistoryC from '../pages/OrderHistory/OrderHistoryC';
-import WishlistC from '../pages/Wishlist_C/WishlistC';
+import WishlistC from '../pages/Wishlist/WishlistC';
 import FindIdC from '../pages/FindId/FindIdC';
 import FindPasswordC from '../pages/FindPassword/FindPasswordC';
 
-// [S형 페이지 컴포넌트]
 import GuardianViewS from '../pages/GuardianView/GuardianViewS';
 
 
-/**
- * AppContent - BrowserRouter 내부에서 실행되는 컴포넌트
- * useNavigate와 같은 라우터 훅을 사용할 수 있음
- */
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,16 +50,13 @@ function AppContent() {
 
   const handleModeSelect = (mode) => {
     setSelectedMode(mode);
-    // 모드에 따라 분기 처리
     if (mode === 'common') {
       navigate('/C/login');
     } else if (mode === 'sharing') {
       navigate('/S/join');
     } else if (mode === 'big') {
-      // Type B (big text) -> Original Type A Login
-      navigate('/A/login');
+      navigate('/B/login');
     } else {
-      // Type A (audio) -> Spline Page
       navigate('/spline-test');
     }
   };
@@ -76,23 +65,15 @@ function AppContent() {
     setShowInitialSetup(false);
   };
 
-  // 초기 설정이 완료되지 않았으면 InitialSetup을 보여줌
   if (showInitialSetup) {
     return <InitialSetup onComplete={handleSetupComplete} />;
   }
 
   return (
     <Routes>
-      {/* 기본 경로 접속 시 Intro 페이지로 리다이렉트 */}
       <Route path="/" element={<Navigate to="/intro" replace />} />
-
-      {/* Intro 페이지 별도 경로 유지 */}
       <Route path="/intro" element={<Intro />} />
-
-      {/* 인트로 완료 후 브랜드 소개 페이지 */}
       <Route path="/guide" element={<BrandLanding />} />
-
-      {/* 메인 랜딩 페이지 (쇼핑 모드 선택 전용) */}
       <Route
         path="/main"
         element={
@@ -103,59 +84,55 @@ function AppContent() {
           />
         }
       />
-
-      {/* Spline Test Page */}
       <Route path="/spline-test" element={<AudioPage />} />
-
-      {/* Type A Routes */}
       <Route
-        path="/A/login"
+        path="/B/login"
         element={
-          <LoginA
+          <LoginB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
-            onLoginSuccess={() => navigate('/A/mall')}
-            onSignup={() => navigate('/A/signup')}
+            onLoginSuccess={() => navigate('/B/mall')}
+            onSignup={() => navigate('/B/signup')}
           />
         }
       />
 
       <Route
-        path="/A/signup"
+        path="/B/signup"
         element={
-          <SignUpA
+          <SignUpB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
-            onBack={() => navigate('/A/login')}
+            onBack={() => navigate('/B/login')}
           />
         }
       />
       <Route
-        path="/A/mall"
+        path="/B/mall"
         element={
-          <SelectMallA
+          <SelectMallB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
           />
         }
       />
       <Route
-        path="/A/store"
+        path="/B/store"
         element={
-          <StoreBrowserA
+          <StoreBrowserB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
-            onBack={() => navigate('/A/mall')}
+            onBack={() => navigate('/B/mall')}
             onHome={() => navigate('/main')}
-            onCart={() => navigate('/A/cart')}
-            onMyPage={() => navigate('/A/member-info')}
+            onCart={() => navigate('/B/cart')}
+            onMyPage={() => navigate('/B/member-info')}
           />
         }
       />
       <Route
-        path="/A/cart"
+        path="/B/cart"
         element={
-          <CartA
+          <CartB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
@@ -164,9 +141,9 @@ function AppContent() {
         }
       />
       <Route
-        path="/A/member-info"
+        path="/B/member-info"
         element={
-          <MemberInfoA
+          <MemberInfoB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
@@ -175,9 +152,9 @@ function AppContent() {
         }
       />
       <Route
-        path="/A/order-history"
+        path="/B/order-history"
         element={
-          <OrderHistoryA
+          <OrderHistoryB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
@@ -186,9 +163,9 @@ function AppContent() {
         }
       />
       <Route
-        path="/A/wishlist"
+        path="/B/wishlist"
         element={
-          <WishlistA
+          <WishlistB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
@@ -197,9 +174,9 @@ function AppContent() {
         }
       />
       <Route
-        path="/A/card-management"
+        path="/B/card-management"
         element={
-          <CardManagementA
+          <CardManagementB
             mode={selectedMode}
             micPermissionGranted={micPermissionGranted}
             onBack={() => navigate(-1)}
@@ -208,19 +185,17 @@ function AppContent() {
         }
       />
       <Route
-        path="/A/findId"
-        element={<FindIdA />}
+        path="/B/findId"
+        element={<FindIdB />}
       />
       <Route
-        path="/A/findPassword"
-        element={<FindPasswordA />}
+        path="/B/findPassword"
+        element={<FindPasswordB />}
       />
       <Route
-        path="/A/changePassword"
-        element={<ChangePasswordA />}
+        path="/B/changePassword"
+        element={<ChangePasswordB />}
       />
-
-      {/* Type C Routes */}
       <Route
         path="/C/login"
         element={
@@ -274,8 +249,8 @@ function AppContent() {
       <Route
         path="/C/member-info"
         element={
-          <MemberInfoC // MemberInfoC는 이제 /C/member-info 경로에서 직접 렌더링
-            onBack={() => navigate('/C/mypage')} // 뒤로가기 시 /C/mypage (리다이렉트될 경로)로 이동
+          <MemberInfoC
+            onBack={() => navigate('/C/mypage')}
             onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
@@ -292,9 +267,7 @@ function AppContent() {
           />
         }
       />
-
-      {/* Flat Routes for compatibility */}
-      <Route path="/login" element={<Navigate to="/A/login" replace />} />
+      <Route path="/login" element={<Navigate to="/B/login" replace />} />
       <Route path="/signup" element={<Navigate to="/C/signup" replace />} />
       <Route path="/mall" element={<Navigate to="/C/mall" replace />} />
       <Route path="/cart" element={<Navigate to="/C/cart" replace />} />
@@ -305,18 +278,11 @@ function AppContent() {
       <Route path="/login-s" element={<Navigate to="/S/join" replace />} />
       <Route path="/S/guardian-view" element={<Navigate to="/S/join" replace />} />
       <Route path="/S/join" element={<GuardianViewS />} caseSensitive={false} />
-
-      {/* Fallback */}
-
       <Route path="*" element={<Navigate to="/intro" replace />} />
     </Routes>
   );
 }
 
-/**
- * AppRouter - 애플리케이션의 최상위 라우터 컴포넌트
- * BrowserRouter를 포함하여 모든 라우팅 로직을 관리
- */
 export default function AppRouter() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

@@ -37,7 +37,6 @@
     transition: all 0.3s ease;
 }
 
-/* Legacy support - redirect to common header */
 .mypage-header {
     position: sticky;
     top: 0;
@@ -201,8 +200,6 @@
     font-weight: 800;
 }
 
-/* mypage-layout moved to top */
-
 .mypage-sidebar {
     width: 13rem;
     /* 16rem -> 13rem Further Reduced */
@@ -273,6 +270,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     font-size: 1.4rem;
     width: 100%;
     padding: 1rem 1.5rem;
@@ -478,9 +476,6 @@
     padding: 0.5rem;
 }
 
-/* .mypage-footer removed to use global .landing-footer */
-
-/* NEW STYLES FOR ORDER/WISHLIST */
 .mall-order-group {
     margin-bottom: 2rem;
     padding: 1.5rem;

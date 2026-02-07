@@ -9,7 +9,6 @@ import logoC from '../assets/logoC.png';
 const VOICE_PROGRAM_BASE_NAME = '음성지원프로그램';
 const VOICE_PROGRAM_LATEST_FILE = `${VOICE_PROGRAM_BASE_NAME}_latest.zip`;
 
-// 프리미엄 모드 선택 카드 컴포넌트 (A, B, C 전용)
 const ModeCard = ({ mode, onSelect }) => (
   <motion.button
     whileHover={{ y: -15, scale: 1.02 }}

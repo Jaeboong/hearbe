@@ -14,10 +14,8 @@ const StoreBrowserS = () => {
   const [participants, setParticipants] = useState([]);
   const [recentKeywords, setRecentKeywords] = useState([]);
 
-  // 초기 데이터 로드 (DB 연동 구조)
   useEffect(() => {
     const fetchData = async () => {
-      // 가상 데이터 (실제 연동 시 API 호출로 대체)
       setParticipants([
         { id: 1, name: '서해령 (나)', role: 'host' },
         { id: 2, name: '김싸피', role: 'guest' }
@@ -27,7 +25,6 @@ const StoreBrowserS = () => {
     fetchData();
   }, []);
 
-  // 오디오 녹음 및 AI 서버 전송 함수
   const toggleRecording = async () => {
     if (!isRecording) {
       try {

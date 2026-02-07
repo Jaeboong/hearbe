@@ -8,7 +8,7 @@ import './FindPasswordC.css';
 import { authAPI } from '../../services/authAPI';
 import { emailService } from '../../services/emailService';
 
-export default function FindPasswordPage({ onBack, micPermissionGranted }) {
+const FindPasswordC = ({ onBack, micPermissionGranted }) => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
@@ -337,4 +337,6 @@ export default function FindPasswordPage({ onBack, micPermissionGranted }) {
 
         </div>
     );
-}
+};
+
+export default FindPasswordC;
