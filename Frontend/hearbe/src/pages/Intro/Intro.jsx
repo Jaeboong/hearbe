@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import Spline from '@splinetool/react-spline';
 import './Intro.css';
 
 import introAudio1 from '../../assets/audio/intro/intro_guide_1.wav';
