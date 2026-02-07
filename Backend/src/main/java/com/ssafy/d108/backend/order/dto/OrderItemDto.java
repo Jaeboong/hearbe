@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * 주문 생성 시 개별 아이템 정보
  */
@@ -40,4 +42,18 @@ public class OrderItemDto {
 
     @JsonProperty("deliver_url")
     private String deliverUrl;
+
+    /**
+     * 쿠팡 상품 고유 번호 (선택 사항)
+     * 예: "7689270513 - 20972233691"
+     */
+    @JsonProperty("coupang_product_number")
+    private String coupangProductNumber;
+
+    /**
+     * 카테고리 경로 배열 (선택 사항)
+     * 예: ["식품", "사과식초/땅콩버터 외", "생수/음료", "생수", "국산생수"]
+     */
+    @JsonProperty("category_path")
+    private List<String> categoryPath;
 }
