@@ -53,11 +53,7 @@ export default function Intro() {
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-<<<<<<<<< Temporary merge branch 1
-        setTimeout(() => navigate('/main'), 850);
-=========
         setTimeout(() => navigate('/guide'), 850);
->>>>>>>>> Temporary merge branch 2
     };
 
     const handleStart = () => {
@@ -75,11 +71,7 @@ export default function Intro() {
                     if (currentStep < STEPS.length - 1) {
                         setCurrentStep(prev => prev + 1);
                     } else {
-<<<<<<<<< Temporary merge branch 1
-                        navigate('/main');
-=========
                         navigate('/guide');
->>>>>>>>> Temporary merge branch 2
                     }
                 }
             }
@@ -212,6 +204,4 @@ export default function Intro() {
             </div>
         </div>
     );
-};
-
-export default Intro;
+}

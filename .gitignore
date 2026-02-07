@@ -558,6 +558,7 @@ AI_next/
 
 # Allow only curated samples
 !AI/services/tts/samples/*.wav
+!Frontend/hearbe/audio/guide/
 Backend/src/main/resources/application.properties
 
 google-service-account.json
