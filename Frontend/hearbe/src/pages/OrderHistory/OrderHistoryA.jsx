@@ -56,48 +56,40 @@ const OrderHistoryA = () => {
                 setError(null);
                 const response = await orderAPI.getOrders();
 
-                // 응답 데이터 변환 후 그룹핑
-                const groupedData = {};
-
                 if (response.data && response.data.orders) {
+                    const groupedByMall = {};
+
                     response.data.orders.forEach(order => {
-                        const platformName = platformNames[order.platform_id] || `Platform ${order.platform_id}`;
+                        const mallName = platformNames[order.platform_id] || `Platform ${order.platform_id}`;
 
-                        if (!groupedData[platformName]) {
-                            groupedData[platformName] = [];
+                        if (!groupedByMall[mallName]) {
+                            groupedByMall[mallName] = [];
                         }
 
-                        // 같은 날짜에 주문된 항목 그룹핑
-                        const existingGroup = groupedData[platformName].find(
-                            g => g.datetime === order.ordered_at
-                        );
-
-                        const orderItems = order.items.map(item => ({
-                            id: `${order.order_id}-${item.name}`,
-                            image: item.img_url || 'https://via.placeholder.com/80',
-                            name: item.name,
-                            price: item.price,
-                            quantity: item.quantity,
-                            url: item.url,
-                            deliverUrl: item.deliver_url
-                        }));
-
-                        if (existingGroup) {
-                            // 기존 그룹에 추가
-                            existingGroup.orders.push(...orderItems);
-                        } else {
-                            // 새 그룹 생성
-                            groupedData[platformName].push({
-                                datetime: order.ordered_at,
-                                orderUrl: order.order_url,
-                                orderId: order.order_id,
-                                orders: orderItems
-                            });
-                        }
+                        // 날짜순 정렬을 위해 주문 데이터 구성
+                        groupedByMall[mallName].push({
+                            orderId: order.order_id,
+                            datetime: order.ordered_at,
+                            orderUrl: order.order_url,
+                            items: order.items.map(item => ({
+                                id: `${order.order_id}-${item.name}`,
+                                image: item.img_url || 'https://via.placeholder.com/80',
+                                name: item.name,
+                                price: item.price,
+                                quantity: item.quantity,
+                                url: item.url,
+                                deliverUrl: item.deliver_url
+                            }))
+                        });
                     });
-                }
 
-                setOrderData(groupedData);
+                    // 각 몰 내부의 주문들을 최신순으로 정렬
+                    Object.keys(groupedByMall).forEach(mall => {
+                        groupedByMall[mall].sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+                    });
+
+                    setOrderData(groupedByMall);
+                }
             } catch (err) {
                 console.error('Failed to fetch orders:', err);
                 setError(err.message);
@@ -227,17 +219,17 @@ const OrderHistoryA = () => {
                             </div>
                         )}
 
-                        {/* 주문 내역 데이터 */}
+                        {/* 주문 내역 데이터 (쇼핑몰별 그룹화 + 내부 건별 노출) */}
                         {!isLoading && !error && Object.keys(orderData).length > 0 && (
-                            <>
-                                {Object.entries(orderData).map(([mallName, orderGroups]) => (
+                            <div className="mall-sections-wrapper">
+                                {Object.entries(orderData).map(([mallName, orders]) => (
                                     <div key={mallName} className="mall-section">
                                         <div className="mall-header">
                                             <h3 className="mall-name">{mallName}</h3>
                                         </div>
 
                                         <div className="orders-list">
-                                            {orderGroups.map((group, index) => (
+                                            {orders.map((group, index) => (
                                                 <div key={`${group.orderId}-${index}`} className="order-group">
                                                     <div className="order-date-header">
                                                         {formatDate(group.datetime)}
@@ -245,20 +237,18 @@ const OrderHistoryA = () => {
 
                                                     <div className="order-details">
                                                         <div className="order-items">
-                                                            {group.orders.map((order, orderIndex) => (
-                                                                <div key={`${order.id}-${orderIndex}`} className="order-item">
+                                                            {group.items.map((item, itemIdx) => (
+                                                                <div key={`${item.id}-${itemIdx}`} className="order-item">
                                                                     <img
-                                                                        src={order.image}
-                                                                        alt={order.name}
+                                                                        src={item.image}
+                                                                        alt={item.name}
                                                                         className="order-item-image"
-                                                                        onError={(e) => {
-                                                                            e.target.src = 'https://via.placeholder.com/80';
-                                                                        }}
+                                                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/80'; }}
                                                                     />
                                                                     <div className="order-item-info">
-                                                                        <div className="order-item-name">{order.name}</div>
+                                                                        <div className="order-item-name">{item.name}</div>
                                                                         <div className="order-item-meta">
-                                                                            {order.price.toLocaleString()}원, {order.quantity}개
+                                                                            {item.price.toLocaleString()}원, {item.quantity}개
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -273,12 +263,12 @@ const OrderHistoryA = () => {
                                                                 상세 조회
                                                             </button>
                                                             <button
-                                                                className={`track-delivery-btn cursor-pointer ${!group.orders.some(o => o.deliverUrl) ? 'disabled' : ''}`}
+                                                                className={`track-delivery-btn cursor-pointer ${!group.items.some(o => o.deliverUrl) ? 'disabled' : ''}`}
                                                                 onClick={() => {
-                                                                    const deliverUrl = group.orders.find(o => o.deliverUrl)?.deliverUrl;
+                                                                    const deliverUrl = group.items.find(o => o.deliver_url)?.deliver_url || group.items.find(o => o.deliverUrl)?.deliverUrl;
                                                                     handleTrackDelivery(deliverUrl);
                                                                 }}
-                                                                disabled={!group.orders.some(o => o.deliverUrl)}
+                                                                disabled={!group.items.some(o => o.deliverUrl || o.deliver_url)}
                                                             >
                                                                 배송조회
                                                             </button>
@@ -289,7 +279,7 @@ const OrderHistoryA = () => {
                                         </div>
                                     </div>
                                 ))}
-                            </>
+                            </div>
                         )}
                     </div>
                 </main>
@@ -303,12 +293,3 @@ const OrderHistoryA = () => {
 };
 
 export default OrderHistoryA;
-
-
-
-
-
-
-
-
-

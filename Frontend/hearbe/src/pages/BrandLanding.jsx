@@ -5,9 +5,9 @@ import { Mic, Eye, Command, ArrowRight, ChevronRight, ChevronDown, Download } fr
 import '../App.css';
 import '../index.css'
 import logoC from '../assets/logoC.png';
-import guideAudio1 from '../assets/Guide/guide1.wav';
-import guideAudio2 from '../assets/Guide/guide2.wav';
-import guideAudio3 from '../assets/Guide/guide3.wav';
+import guideAudio1 from '../assets/audio/guide/brand_guide_1.wav';
+import guideAudio2 from '../assets/audio/guide/brand_guide_2.wav';
+import guideAudio3 from '../assets/audio/guide/brand_guide_3.wav';
 
 
 const WaveBackground = () => (
@@ -61,9 +61,6 @@ const WaveBackground = () => (
 const BrandLanding = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
-    const SECTION_DURATION = 6000;
-
-    // Strict Mode 방지용
     const timerRef = useRef(null);
     const audioRef = useRef(null);
     const isMountedRef = useRef(true);
@@ -82,39 +79,53 @@ const BrandLanding = () => {
             content: (
                 <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-8 shrink-0">
                     <div className="max-w-7xl w-full z-10">
-                        <div className="text-center mb-16">
-                            <h2 className="text-5xl font-black mb-6 text-gray-900">HearBe의 특별함</h2>
-                            <p className="text-xl text-gray-500">평등한 쇼핑 가치를 전달하는 핵심 기술</p>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="text-center mb-12"
+                        >
+                            <h2 className="text-5xl font-black mb-4 text-gray-900 tracking-tight">HearBe의 특별함</h2>
+                            <p className="text-xl text-gray-500 font-medium">평등한 쇼핑 가치를 전달하는 핵심 기술</p>
+                        </motion.div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div className="bg-white rounded-[2rem] p-10 shadow-xl border border-purple-50 hover:-translate-y-2 transition-transform duration-300">
-                                <div className="w-16 h-16 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center mb-6">
-                                    <Mic size={32} />
-                                </div>
-                                <h3 className="text-2xl font-bold mb-4 text-gray-900">보이스 컨트롤</h3>
-                                <p className="text-gray-500 leading-relaxed">
-                                    검색부터 결제까지,<br />손 하나 까딱하지 않고<br />오직 목소리만으로.
-                                </p>
-                            </div>
-                            <div className="bg-white rounded-[2rem] p-10 shadow-xl border border-purple-50 hover:-translate-y-2 transition-transform duration-300">
-                                <div className="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mb-6">
-                                    <Eye size={32} />
-                                </div>
-                                <h3 className="text-2xl font-bold mb-4 text-gray-900">초고대비 모드</h3>
-                                <p className="text-gray-500 leading-relaxed">
-                                    저시력 사용자를 위한<br />최적의 명암비와<br />글자 크기를 제공합니다.
-                                </p>
-                            </div>
-                            <div className="bg-white rounded-[2rem] p-10 shadow-xl border border-purple-50 hover:-translate-y-2 transition-transform duration-300">
-                                <div className="w-16 h-16 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center mb-6">
-                                    <Command size={32} />
-                                </div>
-                                <h3 className="text-2xl font-bold mb-4 text-gray-900">음성 명령 브릿지</h3>
-                                <p className="text-gray-500 leading-relaxed">
-                                    사용자의 의도를 파악해<br />스스로 화면을 제어하는<br />지능형 인터페이스.
-                                </p>
-                            </div>
+                            {[
+                                {
+                                    icon: <Mic size={32} />,
+                                    color: "bg-purple-100 text-purple-600",
+                                    title: "보이스 컨트롤",
+                                    desc: "검색부터 결제까지,\n목소리 하나로 편리하게."
+                                },
+                                {
+                                    icon: <Eye size={32} />,
+                                    color: "bg-indigo-100 text-indigo-600",
+                                    title: "초고대비 모드",
+                                    desc: "저시력 사용자를 위한\n최적의 시각 경험 제공."
+                                },
+                                {
+                                    icon: <Command size={32} />,
+                                    color: "bg-pink-100 text-pink-600",
+                                    title: "음성 명령 브릿지",
+                                    desc: "사용자의 의도를 파악하는\n지능형 인터페이스."
+                                }
+                            ].map((item, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 + i * 0.1, duration: 0.5 }}
+                                    className="bg-white rounded-[2.5rem] p-10 shadow-lg border border-gray-100 hover:-translate-y-2 transition-all duration-300"
+                                >
+                                    <div className={`w-16 h-16 rounded-2xl ${item.color} flex items-center justify-center mb-6`}>
+                                        {item.icon}
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-4 text-gray-900">{item.title}</h3>
+                                    <p className="text-gray-500 text-lg leading-relaxed whitespace-pre-line">
+                                        {item.desc}
+                                    </p>
+                                </motion.div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -129,14 +140,14 @@ const BrandLanding = () => {
                     <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
                         <div className="text-left">
                             <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: -50 }}
+                                whileInView={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.8 }}
                             >
                                 <span className="text-purple-600 font-bold tracking-widest uppercase mb-4 block">User Guide</span>
                                 <h2 className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-[1.1] tracking-tight">
                                     간단하게,<br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">시작하세요.</span>
+                                    <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-indigo-600">시작하세요.</span>
                                 </h2>
                                 <p className="text-2xl text-gray-600 font-medium leading-relaxed max-w-md">
                                     복잡한 절차 없이 세 단계만으로.<br />
@@ -150,16 +161,19 @@ const BrandLanding = () => {
                                 { num: "02", text: "음성 대화", desc: "목소리로 상품을 찾고 설명을 들어보세요." },
                                 { num: "03", text: "간편 구매", desc: "결제까지 대화하듯 자연스럽게 완료됩니다." }
                             ].map((step, i) => (
-                                <div
+                                <motion.div
                                     key={i}
-                                    className="flex items-center gap-6 p-6 rounded-3xl bg-white/80 backdrop-blur-sm shadow-xl shadow-purple-100/50 border border-white/50"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.2 }}
+                                    className="flex items-center gap-6 p-8 rounded-3xl bg-white/80 backdrop-blur-sm shadow-xl shadow-purple-100/50 border border-white/50"
                                 >
                                     <span className="text-4xl font-black text-purple-300">{step.num}</span>
                                     <div>
                                         <h3 className="text-2xl font-bold text-gray-900">{step.text}</h3>
                                         <p className="text-gray-500">{step.desc}</p>
                                     </div>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
                     </div>
@@ -169,44 +183,52 @@ const BrandLanding = () => {
         {
             id: 'cta',
             audioSrc: guideAudio3,
-            duration: 4000,
+            duration: 8000,
             content: (
-                <section className="min-w-[100vw] h-full flex flex-col justify-center items-center relative px-6 z-10 bg-gradient-to-br from-gray-900 to-black text-white shrink-0">
-                    <div className="text-center">
-                        <h2 className="text-6xl md:text-8xl font-black mb-12 tracking-tight">
-                            준비되셨나요?<br />
-                            <span className="text-purple-400">HearBe 시작</span>
-                        </h2>
-                        <button
-                            onClick={goToMain}
-                            className="cursor-pointer group relative px-12 py-6 rounded-full bg-white text-black font-black text-xl overflow-hidden transition-transform hover:scale-105"
+                <section className="min-w-[100vw] h-full flex flex-col justify-center items-center relative px-6 z-10 bg-[#0f0d15] text-white shrink-0">
+                    <div className="text-center z-10">
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
                         >
-                            <span className="relative z-10 group-hover:text-purple-600 transition-colors flex items-center gap-3">
-                                쇼핑 시작하기 <ArrowRight size={24} />
-                            </span>
-                        </button>
-                        <p className="mt-12 text-gray-500 text-sm">© 2026 HearBe. All rights reserved.</p>
+                            <h2 className="text-6xl md:text-7xl font-black mb-20 tracking-tight" style={{ fontFamily: 'Outfit' }}>
+                                <span className="block opacity-30 text-xl font-bold mb-3 tracking-[0.2em] uppercase">Ready to go?</span>
+                                <span className="text-white">HearBe와 함께</span>
+                            </h2>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2, duration: 0.6 }}
+                            className="relative group"
+                        >
+                            <div className="absolute inset-0 bg-purple-600/30 blur-[60px] rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                            <div className="absolute inset-0 bg-indigo-600/20 blur-[40px] rounded-full scale-125 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none" />
+
+                            <button
+                                onClick={goToMain}
+                                className="relative cursor-pointer px-16 py-6 rounded-full bg-white text-[#0f0d15] font-black text-xl hover:shadow-[0_15px_40px_rgba(255,255,255,0.2),0_0_60px_rgba(124,58,237,0.3)] hover:-translate-y-1 active:scale-95 transition-all duration-500 overflow-hidden"
+                                style={{ fontFamily: 'Outfit' }}
+                            >
+                                <span className="relative z-10">쇼핑 시작하기</span>
+                            </button>
+                        </motion.div>
+                        <p className="mt-16 text-white/10 text-xs tracking-widest uppercase">© 2026 HearBe</p>
                     </div>
                 </section>
             )
         }
     ];
 
-
-
-    // Audio와 화면 전환 동기화 로직
     useEffect(() => {
-
-        // Strict Mode 중복 실행 방지
-        if (timerRef.current) {
-            return;
-        }
+        if (timerRef.current) return;
 
         const stepData = GUIDE_STEPS[currentStep];
 
         const handleMove = () => {
             if (!isMountedRef.current) return;
-
             if (currentStep < totalSteps - 1) {
                 setCurrentStep(prev => prev + 1);
             } else {
@@ -214,8 +236,6 @@ const BrandLanding = () => {
             }
         };
 
-        // 마지막 단계가 아니면 타이머 설정 (각 단계별 duration 적용)
-        // 마지막 단계는 자동 넘김 없이 사용자가 스페이스바로 넘김
         if (currentStep < totalSteps - 1) {
             timerRef.current = setTimeout(() => {
                 timerRef.current = null;
@@ -223,7 +243,6 @@ const BrandLanding = () => {
             }, stepData.duration);
         }
 
-        // 오디오 재생
         if (stepData.audioSrc) {
             const audio = new Audio(stepData.audioSrc);
             audioRef.current = audio;
@@ -234,7 +253,6 @@ const BrandLanding = () => {
 
         return () => {
             isMountedRef.current = false;
-
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current = null;
@@ -243,21 +261,16 @@ const BrandLanding = () => {
                 clearTimeout(timerRef.current);
                 timerRef.current = null;
             }
-
             setTimeout(() => {
                 isMountedRef.current = true;
             }, 0);
         };
     }, [currentStep, navigate]);
 
-    // Spacebar로 다음 단계로 이동 (모든 단계에서)
     useEffect(() => {
-
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();
-
-                // 마지막 단계면 메인으로, 아니면 다음 단계로
                 if (currentStep === totalSteps - 1) {
                     goToMain();
                 } else {
@@ -278,9 +291,6 @@ const BrandLanding = () => {
         if (currentStep > 0) setCurrentStep(prev => prev - 1);
     };
 
-
-
-
     return (
         <div className="relative w-full h-screen overflow-hidden bg-white selection:bg-purple-200">
             <WaveBackground />
@@ -291,9 +301,9 @@ const BrandLanding = () => {
                     <img src={logoC} alt="HearBe" className="h-24 object-contain cursor-pointer drop-shadow-sm opacity-90 hover:opacity-100 transition-opacity" onClick={() => setCurrentStep(0)} />
                     <button
                         onClick={goToMain}
-                        className="cursor-pointer px-10 py-4 rounded-full font-bold text-xl text-white flex items-center gap-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-[length:200%_auto] hover:bg-right transition-all duration-500 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1"
+                        className="cursor-pointer absolute top-10 right-10 px-6 py-2 rounded-full bg-gray-100/80 backdrop-blur-sm border border-gray-200 text-gray-500 text-[14px] font-semibold hover:bg-gray-200 hover:text-gray-800 transition-all duration-300 z-50 shadow-sm"
                     >
-                        Skip Guide <ArrowRight size={24} />
+                        skip
                     </button>
                 </div>
             </header>

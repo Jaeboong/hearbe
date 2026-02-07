@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import logoC from '../../assets/logoC.png';
 import './GuardianJoinModal.css';
 
 /**
@@ -34,31 +35,33 @@ const GuardianJoinModal = ({ isOpen, onClose, onJoin }) => {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content guardian-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-icon">🔗</div>
-                <h2 className="modal-title">공유 쇼핑 입장</h2>
-                <p className="modal-subtitle">조건으로 입장해주세요</p>
+            <div className="modal-content guardian-modal-c" onClick={(e) => e.stopPropagation()}>
+                <div className="logo-area-c-modal">
+                    <img src={logoC} alt="HearBe Logo" className="logo-image-c-modal" />
+                </div>
+                <h2 className="modal-title-c">공유 쇼핑 입장</h2>
+                <p className="modal-subtitle-c">초대코드를 입력하여 입장하세요</p>
 
-                <div className="code-input-container">
+                <div className="code-input-container-c">
                     <input
                         type="text"
-                        className={`code-input ${error ? 'error' : ''}`}
-                        placeholder="초대코드 입력 (4자리)"
+                        className={`code-input-c ${error ? 'error' : ''}`}
+                        placeholder="초대코드 (4자리)"
                         value={code}
                         onChange={handleCodeChange}
                         onKeyPress={handleKeyPress}
                         maxLength={4}
                         autoFocus
                     />
-                    {error && <p className="error-message">{error}</p>}
+                    {error && <p className="error-message-c">{error}</p>}
                 </div>
 
-                <div className="modal-buttons">
-                    <button className="btn-cancel" onClick={onClose}>
+                <div className="modal-buttons-c">
+                    <button className="btn-cancel-c" onClick={onClose}>
                         취소
                     </button>
                     <button
-                        className="btn-join"
+                        className="btn-join-c"
                         onClick={handleJoin}
                         disabled={code.length !== 4}
                     >
