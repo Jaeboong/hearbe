@@ -85,7 +85,7 @@ function AppContent() {
           />
         }
       />
-      <Route path="/A" element={<AudioPage />} />
+      <Route path="/A/*" element={<AudioPage />} />
       <Route
         path="/B/login"
         element={
