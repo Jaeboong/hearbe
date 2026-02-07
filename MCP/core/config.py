@@ -218,7 +218,7 @@ class ConfigManager:
             window_width=self._get_env_int("BROWSER_WINDOW_WIDTH", 1280),
             window_height=self._get_env_int("BROWSER_WINDOW_HEIGHT", 720),
             extension_path=self._get_extension_path(),
-            home_url=self._get_env("HOME_URL", "https://i14d108.p.ssafy.io/main")
+            home_url=self._get_env("HOME_URL", "https://i14d108.p.ssafy.io/main?app=mcp")
         )
 
         # MCP 설정

@@ -72,7 +72,8 @@
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 35px rgba(139, 92, 246, 0.35));
+    /* [수정]: filter 대신 text-shadow를 사용하여 사각형 잔상 버그 해결 */
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
     animation: textShine 7s linear infinite;
     pointer-events: auto;
 }
@@ -91,9 +92,6 @@
     pointer-events: auto;
 }
 
-/* 파형 컨테이너 수정: 시각적으로 확실히 보이도록 보정 */
-
-
 /* Spline 오브젝트 레이어 하향 조정 */
 .object-section {
     position: absolute;
@@ -108,6 +106,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    /* [디자인 우선]: 더 웅장한 경험을 위해 사용자님의 스케일(1.5) 유지 */
     transform: scale(1.5);
 }
 

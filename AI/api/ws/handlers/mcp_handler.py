@@ -293,46 +293,49 @@ class MCPHandler:
                 self._session.set_context(session_id, "search_results", products)
                 self._session.set_context(session_id, "search_active_results", products)
                 self._session.set_context(session_id, "search_active_label", "all")
-                try:
-                    payload = json.dumps(products, ensure_ascii=True)
-                    self._session.add_to_history(
-                        session_id,
-                        "system",
-                        f"SEARCH_RESULTS:{payload}"
-                    )
-                except Exception:
-                    logger.warning("Failed to serialize search_results for history")
-
-                # Save search results to JSON file
-                self._save_search_results_to_file(products, session_id)
-
-                product_count = len(products)
                 signature = self._build_search_signature(products)
                 prev_signature = self._session.get_context(session_id, "search_results_signature")
-                if signature != prev_signature:
+                is_new_signature = signature != prev_signature
+                if is_new_signature:
                     self._session.set_context(session_id, "search_read_index", 0)
                     self._session.set_context(session_id, "search_results_signature", signature)
 
-                start_index = self._session.get_context(session_id, "search_read_index", 0)
-                tts_text = ""
-                next_index = start_index
-                has_more = False
+                # Avoid inflating LLM history / double-reading when the same search results
+                # are extracted multiple times (e.g., auto-extract + manual extract).
+                if is_new_signature:
+                    try:
+                        payload = json.dumps(products, ensure_ascii=True)
+                        self._session.add_to_history(
+                            session_id,
+                            "system",
+                            f"SEARCH_RESULTS:{payload}"
+                        )
+                    except Exception:
+                        logger.warning("Failed to serialize search_results for history")
+
+                    # Save search results to JSON file (new signature only)
+                    self._save_search_results_to_file(products, session_id)
+
                 if not suppress_outputs:
-                    tts_text, next_index, has_more = self._tts.build_search_list(
-                        products,
-                        start_index=start_index,
-                        count=4,
-                        include_total=True,
-                        more_prompt=MORE_PROMPT_COUNT
-                    )
-                self._session.set_context(session_id, "search_read_index", next_index)
-                if next_index > 0:
-                    last_item = products[next_index - 1]
-                    name = last_item.get("name") or last_item.get("title") or last_item.get("product_name")
-                    if name:
-                        self._session.set_context(session_id, "last_mentioned_product", name)
-                if not suppress_outputs:
-                    await self._sender.send_tts_response(session_id, tts_text)
+                    announced_sig = self._session.get_context(session_id, "search_results_announced_signature")
+                    should_announce = announced_sig != signature
+                    if should_announce:
+                        start_index = self._session.get_context(session_id, "search_read_index", 0)
+                        tts_text, next_index, has_more = self._tts.build_search_list(
+                            products,
+                            start_index=start_index,
+                            count=4,
+                            include_total=True,
+                            more_prompt=MORE_PROMPT_COUNT
+                        )
+                        self._session.set_context(session_id, "search_read_index", next_index)
+                        if next_index > 0:
+                            last_item = products[next_index - 1]
+                            name = last_item.get("name") or last_item.get("title") or last_item.get("product_name")
+                            if name:
+                                self._session.set_context(session_id, "last_mentioned_product", name)
+                        self._session.set_context(session_id, "search_results_announced_signature", signature)
+                        await self._sender.send_tts_response(session_id, tts_text)
 
         if not suppress_outputs and tool_name == "check_login_status" and self._login_guard:
             handled = await self._login_guard.handle_login_check_result(

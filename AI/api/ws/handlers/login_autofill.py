@@ -13,7 +13,7 @@ import re
 from typing import Any, Dict, Optional
 
 from core.interfaces import MCPCommand
-from services.llm.sites.site_manager import get_page_type, get_selector
+from services.llm.sites.site_manager import get_current_site, get_page_type, get_selector
 from services.llm.generators.tts_generator import TTSGenerator
 
 logger = logging.getLogger(__name__)
@@ -28,6 +28,10 @@ CTX_ATTEMPT = "login_autofill_attempt"
 CTX_LAST_URL = "login_autofill_last_url"
 CTX_SESSION_CHECK_PENDING = "login_autofill_session_check_pending"
 CTX_SESSION_CHECK_URL = "login_autofill_session_check_url"
+CTX_SESSION_CHECK_SOURCE = "login_autofill_session_check_source"
+CTX_SESSION_CHECK_PREVIOUS_URL = "login_autofill_session_check_previous_url"
+CTX_AUTOFILL_USED = "login_autofill_used"
+CTX_FINALIZED = "login_autofill_finalized"
 
 MAX_ATTEMPTS = 2
 FOCUS_WAIT_MS = 300
@@ -51,9 +55,17 @@ class LoginAutofillManager:
         current_url = session.current_url or ""
         if get_page_type(current_url) != "login":
             return False
+        if not _is_coupang_login_url(current_url):
+            logger.info("login_autofill skip: not coupang login url (text)")
+            return False
 
         if not _is_login_intent(text):
             return False
+
+        # If we're already submitting login, ignore repeated "login" intents.
+        if self._session.get_context(session_id, "login_submit_pending"):
+            logger.info("login_autofill skip: login_submit_pending is True (coupang)")
+            return True
 
         if self._session.get_context(session_id, CTX_PENDING):
             return True
@@ -68,6 +80,27 @@ class LoginAutofillManager:
         )
         if page_type != "login":
             logger.info("login_autofill skip: page_type is not login")
+            return False
+        if _is_coupang_login_url(url):
+            if self._session.get_context(session_id, "login_submit_pending"):
+                logger.info("login_autofill skip: login_submit_pending is True (coupang page)")
+                return True
+            if previous_url and get_page_type(previous_url) == "login":
+                logger.info("login_autofill skip: previous_url was also login (coupang)")
+                return False
+            if self._session.get_context(session_id, CTX_PENDING):
+                logger.info("login_autofill skip: CTX_PENDING is True (coupang)")
+                return True
+            if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
+                logger.info("login_autofill skip: CTX_SESSION_CHECK_PENDING is True (coupang)")
+                return True
+            last_url = self._session.get_context(session_id, CTX_LAST_URL)
+            if last_url == url:
+                logger.info("login_autofill skip: same as last_url (coupang)")
+                return False
+            return await self._start_probe(session_id, url, source="page")
+        if not _is_hearbe_url(url):
+            logger.info("login_autofill skip: login page not heabe or coupang")
             return False
         if previous_url and get_page_type(previous_url) == "login":
             logger.info("login_autofill skip: previous_url was also login")
@@ -84,7 +117,12 @@ class LoginAutofillManager:
             return False
 
         # Check existing session before autofill probe
-        return await self._start_session_check(session_id, url)
+        return await self._start_session_check(
+            session_id,
+            url,
+            source="login_page",
+            previous_url=previous_url,
+        )
 
     async def handle_main_page_update(self, session_id: str, url: str) -> bool:
         """Handle main page entry - redirect logged-in users to appropriate mall."""
@@ -92,17 +130,36 @@ class LoginAutofillManager:
             "login_autofill handle_main_page_update: session=%s url=%s",
             session_id, url,
         )
+        if self._session.get_context(session_id, "token_recovery_in_flight"):
+            logger.info("login_autofill main skip: token recovery in flight")
+            return False
+        if not _is_hearbe_url(url):
+            logger.info("login_autofill main skip: not heabe url")
+            return False
         if self._session.get_context(session_id, CTX_SESSION_CHECK_PENDING):
             logger.info("login_autofill main skip: CTX_SESSION_CHECK_PENDING is True")
             return True
 
         # Check existing session and redirect if logged in
-        return await self._start_session_check(session_id, url)
+        return await self._start_session_check(
+            session_id,
+            url,
+            source="main_page",
+            previous_url=None,
+        )
 
-    async def _start_session_check(self, session_id: str, url: str) -> bool:
+    async def _start_session_check(
+        self,
+        session_id: str,
+        url: str,
+        source: str = "",
+        previous_url: Optional[str] = None,
+    ) -> bool:
         """Check if user already has a valid session in localStorage."""
         self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, True)
         self._session.set_context(session_id, CTX_SESSION_CHECK_URL, url)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_SOURCE, source or "")
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL, previous_url or "")
 
         logger.info(
             "login session check start: session=%s url=%s",
@@ -163,10 +220,56 @@ class LoginAutofillManager:
         logged_in = result.get("logged_in", False)
         user_type = result.get("user_type")
         check_url = self._session.get_context(session_id, CTX_SESSION_CHECK_URL) or ""
+        check_source = self._session.get_context(session_id, CTX_SESSION_CHECK_SOURCE) or ""
+        check_previous_url = self._session.get_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL) or ""
+
+        # Clear per-check metadata to avoid reuse across fast page bounces.
+        self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_SOURCE, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL, None)
+
+        if self._session.get_context(session_id, "token_recovery_in_flight"):
+            logger.info(
+                "login session check skip redirect: session=%s token recovery in flight (url=%s)",
+                session_id,
+                check_url,
+            )
+            return False
 
         if logged_in and user_type:
             # Redirect based on userType
             redirect_url = self._get_redirect_url(user_type, check_url)
+            session = self._session.get_session(session_id) if self._session else None
+            current_url = session.current_url if session else ""
+
+            # If we're already on the target page (common during frontend redirect bounces),
+            # avoid redundant navigation and confusing TTS.
+            if current_url and redirect_url and current_url == redirect_url:
+                logger.info(
+                    "login session found: session=%s user_type=%s already_on_redirect_url=%s source=%s - skip redirect/tts",
+                    session_id,
+                    user_type,
+                    redirect_url,
+                    check_source or "missing",
+                )
+                return False
+
+            # Hearbe login-page entry is sometimes a frontend auth redirect (e.g. token check).
+            # In that bounce case, avoid confusing "already logged in" TTS and redundant redirects.
+            if check_source == "login_page" and _is_hearbe_url(check_url):
+                already_left_login = bool(
+                    current_url and current_url != check_url and get_page_type(current_url) != "login"
+                )
+                if already_left_login:
+                    logger.info(
+                        "login session found (hearbe bounce): session=%s user_type=%s current_url=%s prev_url=%s - skip redirect/tts",
+                        session_id,
+                        user_type,
+                        current_url,
+                        check_previous_url or "missing",
+                    )
+                    return False
+
             logger.info(
                 "login session found: session=%s user_type=%s redirect=%s",
                 session_id,
@@ -183,18 +286,66 @@ class LoginAutofillManager:
                     )
                 ],
             )
-            await self._sender.send_tts_response(
+            if not (check_source == "login_page" and _is_hearbe_url(check_url)):
+                await self._sender.send_tts_response(
+                    session_id,
+                    "이미 로그인되어 있습니다. 쇼핑몰 페이지로 이동합니다.",
+                )
+            return True
+
+        page_type = get_page_type(check_url)
+        if page_type == "login":
+            if _is_coupang_login_url(check_url):
+                logger.info(
+                    "login session not found: session=%s on coupang login, starting autofill probe",
+                    session_id,
+                )
+                return await self._start_probe(session_id, check_url, source="page")
+            logger.info(
+                "login session not found: session=%s on login page, no autofill (hearbe)",
                 session_id,
-                "이미 로그인되어 있습니다. 쇼핑몰 페이지로 이동합니다.",
+            )
+            return False
+
+        login_url = self._resolve_login_url(check_url, user_type=None)
+        if login_url and login_url != check_url:
+            logger.info(
+                "login session not found: session=%s redirecting to login page=%s",
+                session_id,
+                login_url,
+            )
+            await self._sender.send_tool_calls(
+                session_id,
+                [
+                    MCPCommand(
+                        tool_name="navigate_to_url",
+                        arguments={"url": login_url},
+                        description="redirect to login page",
+                    )
+                ],
             )
             return True
 
-        # No session found, proceed with autofill probe
         logger.info(
-            "login session not found: session=%s, starting autofill probe",
+            "login session not found: session=%s no login redirect available (url=%s)",
             session_id,
+            check_url,
         )
-        return await self._start_probe(session_id, check_url, source="page")
+        return False
+
+    def _resolve_login_url(self, current_url: str, user_type: Optional[str]) -> Optional[str]:
+        """Resolve login URL for Hearbe site based on user type or current path."""
+        site = get_current_site(current_url)
+        urls = site.urls if site else {}
+        if user_type == "BLIND":
+            return urls.get("login_a") or urls.get("login_b") or urls.get("login_c")
+        if user_type == "LOW_VISION":
+            return urls.get("login_b") or urls.get("login_c") or urls.get("login_a")
+        if user_type == "GENERAL":
+            return urls.get("login_c") or urls.get("login_b") or urls.get("login_a")
+
+        # Default to GENERAL login
+        return urls.get("login_c") or urls.get("login_b") or urls.get("login_a")
 
     def _get_redirect_url(self, user_type: str, current_url: str) -> str:
         """Get redirect URL based on userType."""
@@ -222,8 +373,14 @@ class LoginAutofillManager:
         self._session.set_context(session_id, CTX_LAST_URL, None)
         self._session.set_context(session_id, CTX_SESSION_CHECK_PENDING, None)
         self._session.set_context(session_id, CTX_SESSION_CHECK_URL, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_SOURCE, None)
+        self._session.set_context(session_id, CTX_SESSION_CHECK_PREVIOUS_URL, None)
+        self._session.set_context(session_id, CTX_AUTOFILL_USED, None)
+        self._session.set_context(session_id, CTX_FINALIZED, None)
 
     async def _maybe_finalize(self, session_id: str) -> bool:
+        if self._session.get_context(session_id, CTX_FINALIZED):
+            return True
         email_filled = self._session.get_context(session_id, CTX_EMAIL_FILLED)
         pass_filled = self._session.get_context(session_id, CTX_PASS_FILLED)
         if email_filled is None or pass_filled is None:
@@ -241,6 +398,8 @@ class LoginAutofillManager:
                 email_filled,
                 pass_filled,
             )
+            self._session.set_context(session_id, CTX_AUTOFILL_USED, True)
+            self._session.set_context(session_id, CTX_FINALIZED, True)
             await self._send_login_click(session_id, current_url)
             return True
 
@@ -254,6 +413,9 @@ class LoginAutofillManager:
             )
             self._session.set_context(session_id, CTX_ATTEMPT, attempt + 1)
             self._session.set_context(session_id, CTX_PENDING, True)
+            # Reset for the next attempt so we don't accidentally finalize with stale values.
+            self._session.set_context(session_id, CTX_EMAIL_FILLED, None)
+            self._session.set_context(session_id, CTX_PASS_FILLED, None)
             email_args = self._session.get_context(session_id, CTX_EMAIL_ARGS)
             pass_args = self._session.get_context(session_id, CTX_PASS_ARGS)
             if email_args and pass_args:
@@ -286,10 +448,14 @@ class LoginAutofillManager:
             email_filled,
             pass_filled,
         )
+        self._session.set_context(session_id, CTX_FINALIZED, True)
         await self._sender.send_tts_response(session_id, self._tts.build_login_guidance())
         return True
 
     async def _start_probe(self, session_id: str, current_url: str, source: str) -> bool:
+        if not _is_coupang_login_url(current_url):
+            logger.info("login_autofill probe skip: not coupang login url")
+            return False
         email_selector = get_selector(current_url, "email_input") or "#login-email-input"
         password_selector = get_selector(current_url, "password_input") or "#login-password-input"
 
@@ -300,6 +466,7 @@ class LoginAutofillManager:
         self._session.set_context(session_id, CTX_PASS_ARGS, pass_args)
         self._session.set_context(session_id, CTX_EMAIL_FILLED, None)
         self._session.set_context(session_id, CTX_PASS_FILLED, None)
+        self._session.set_context(session_id, CTX_FINALIZED, None)
         self._session.set_context(session_id, CTX_ATTEMPT, 1)
         self._session.set_context(session_id, CTX_PENDING, True)
         self._session.set_context(session_id, CTX_LAST_URL, current_url)
@@ -415,3 +582,21 @@ def _args_match(expected: Optional[Dict[str, Any]], actual: Dict[str, Any]) -> b
         if actual.get(key) != value:
             return False
     return True
+
+
+def _is_coupang_login_url(url: str) -> bool:
+    if not url:
+        return False
+    lowered = url.lower()
+    return "login.coupang.com" in lowered and "/login/login.pang" in lowered
+
+
+def _is_hearbe_url(url: str) -> bool:
+    if not url:
+        return False
+    lowered = url.lower()
+    return (
+        "i14d108.p.ssafy.io" in lowered
+        or "localhost" in lowered
+        or "127.0.0.1" in lowered
+    )

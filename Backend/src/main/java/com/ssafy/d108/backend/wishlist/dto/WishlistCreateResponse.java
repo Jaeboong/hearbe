@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WishlistCreateResponseDto {
+public class WishlistCreateResponse {
 
     @JsonProperty("wishlist_item_id")
     private Integer wishlistItemId;

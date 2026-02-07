@@ -265,10 +265,10 @@ const OrderHistoryA = () => {
                                                             <button
                                                                 className={`track-delivery-btn cursor-pointer ${!group.items.some(o => o.deliverUrl) ? 'disabled' : ''}`}
                                                                 onClick={() => {
-                                                                    const deliverUrl = group.items.find(o => o.deliverUrl)?.deliverUrl;
+                                                                    const deliverUrl = group.items.find(o => o.deliver_url)?.deliver_url || group.items.find(o => o.deliverUrl)?.deliverUrl;
                                                                     handleTrackDelivery(deliverUrl);
                                                                 }}
-                                                                disabled={!group.items.some(o => o.deliverUrl)}
+                                                                disabled={!group.items.some(o => o.deliverUrl || o.deliver_url)}
                                                             >
                                                                 배송조회
                                                             </button>
@@ -293,12 +293,3 @@ const OrderHistoryA = () => {
 };
 
 export default OrderHistoryA;
-
-
-
-
-
-
-
-
-

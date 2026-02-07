@@ -25,8 +25,7 @@ const formatPhoneNumber = (value) => {
     const limited = numbers.slice(0, 11);
     if (limited.length <= 3) return limited;
     if (limited.length <= 7) return `${limited.slice(0, 3)}-${limited.slice(3)}`;
-    return `${limited.slice(0, 3)}-${limited.slice(3, 7)}-
-    ${limited.slice(7)}`;
+    return `${limited.slice(0, 3)}-${limited.slice(3, 7)}-${limited.slice(7)}`;
 };
 
 const validatePassword = (password) => /^\d{6}$/.test(password);

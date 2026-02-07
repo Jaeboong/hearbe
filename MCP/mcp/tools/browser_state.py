@@ -95,6 +95,7 @@ class BrowserStateMixin:
         script = """
           () => {
             const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken') || localStorage.getItem('refresh_token');
             const userType = localStorage.getItem('userType');
             const userId = localStorage.getItem('user_id');
             const username = localStorage.getItem('username');
@@ -103,6 +104,7 @@ class BrowserStateMixin:
             return {
               logged_in: !!accessToken,
               access_token: accessToken,
+              refresh_token: refreshToken,
               user_type: userType,
               user_id: userId,
               username: username,
@@ -114,6 +116,16 @@ class BrowserStateMixin:
         try:
             result = await page.evaluate(script)
             if isinstance(result, dict):
+                access_token = result.get("access_token")
+                refresh_token = result.get("refresh_token")
+                logger.info(
+                    "get_user_session result: logged_in=%s access_token=%s refresh_token=%s user_type=%s user_id=%s",
+                    result.get("logged_in"),
+                    "present" if access_token else "missing",
+                    "present" if refresh_token else "missing",
+                    result.get("user_type") or "missing",
+                    result.get("user_id") or "missing",
+                )
                 return {"success": True, **result}
             return {"success": True, "logged_in": False}
         except Exception as e:

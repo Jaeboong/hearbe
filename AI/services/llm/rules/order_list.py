@@ -5,7 +5,7 @@ from typing import Optional
 
 from . import BaseRule, RuleResult
 from ..context.context_rules import GeneratedCommand
-from ..sites.site_manager import get_page_type
+from ..sites.site_manager import get_page_type, get_current_site
 
 # Order list / history triggers.
 ORDER_LIST_TRIGGERS = (
@@ -31,6 +31,8 @@ class OrderListRule(BaseRule):
     """Order list rule: navigate to the order history/list page."""
 
     def check(self, text: str, current_url: str, current_site) -> Optional[RuleResult]:
+        if not _is_coupang_site(current_url, current_site):
+            return None
         if not any(kw in text for kw in ORDER_LIST_TRIGGERS):
             return None
 
@@ -95,3 +97,10 @@ class OrderListRule(BaseRule):
             response_text=MSG_GO_TO_ORDER_LIST,
             rule_name="order_list",
         )
+
+
+def _is_coupang_site(current_url: str, current_site) -> bool:
+    if current_site and getattr(current_site, "site_id", "") == "coupang":
+        return True
+    site = get_current_site(current_url) if current_url else None
+    return bool(site and getattr(site, "site_id", "") == "coupang")

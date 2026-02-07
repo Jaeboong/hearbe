@@ -11,9 +11,12 @@ const STEPS = {
     COMPLETED: 'completed',
 };
 
+const VOICE_PROGRAM_BASE_NAME = '음성지원프로그램';
+
 export default function InitialSetup({ onComplete }) {
     const [currentStep, setCurrentStep] = useState(STEPS.MCP_DOWNLOAD);
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
+    const [voiceProgramVersion, setVoiceProgramVersion] = useState('');
 
     useEffect(() => {
         const loadVoices = () => window.speechSynthesis.getVoices();
@@ -26,6 +29,23 @@ export default function InitialSetup({ onComplete }) {
             onComplete(true);
         }
     }, [currentStep, onComplete]);
+
+    // [최신 기능 통합]: 서버에서 음성 프로그램 최신 버전 정보를 가져옵니다.
+    useEffect(() => {
+        let mounted = true;
+        fetch('/downloads/voice-program-version.json', { cache: 'no-store' })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (!mounted || !data?.version) return;
+                setVoiceProgramVersion(data.version);
+            })
+            .catch(() => { });
+        return () => { mounted = false; };
+    }, []);
+
+    const voiceProgramDownloadFile = voiceProgramVersion
+        ? `${VOICE_PROGRAM_BASE_NAME}_${voiceProgramVersion}.zip`
+        : 'MCPDesktop.zip';
 
     const handleMcpDownload = () => {
         setCurrentStep(STEPS.MIC_PERMISSION);
@@ -104,7 +124,14 @@ export default function InitialSetup({ onComplete }) {
                             보조 프로그램을 설치해 주세요.
                         </p>
                         <div className="btn-group">
-                            <a href="/downloads/MCPDesktop.zip" download onClick={handleMcpDownload} className="btn-primary-setup" style={{ flex: 1 }}>
+                            <button onClick={handleMcpDownload} className="btn-secondary-setup">나중에</button>
+                            <a
+                                href={encodeURI(`/downloads/${voiceProgramDownloadFile}`)}
+                                download
+                                onClick={handleMcpDownload}
+                                className="btn-primary-setup no-underline flex items-center justify-center"
+                                style={{ flex: 1.5 }}
+                            >
                                 지금 다운로드
                             </a>
                         </div>

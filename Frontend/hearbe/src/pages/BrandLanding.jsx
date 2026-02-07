@@ -61,9 +61,6 @@ const WaveBackground = () => (
 const BrandLanding = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
-    const SECTION_DURATION = 6000;
-
-    // Strict Mode 방지용
     const timerRef = useRef(null);
     const audioRef = useRef(null);
     const isMountedRef = useRef(true);
@@ -207,7 +204,6 @@ const BrandLanding = () => {
                             transition={{ delay: 0.2, duration: 0.6 }}
                             className="relative group"
                         >
-                            {/* Cosmic Purple Glow behind the button */}
                             <div className="absolute inset-0 bg-purple-600/30 blur-[60px] rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                             <div className="absolute inset-0 bg-indigo-600/20 blur-[40px] rounded-full scale-125 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none" />
 
@@ -226,21 +222,13 @@ const BrandLanding = () => {
         }
     ];
 
-
-
-    // Audio와 화면 전환 동기화 로직
     useEffect(() => {
-
-        // Strict Mode 중복 실행 방지
-        if (timerRef.current) {
-            return;
-        }
+        if (timerRef.current) return;
 
         const stepData = GUIDE_STEPS[currentStep];
 
         const handleMove = () => {
             if (!isMountedRef.current) return;
-
             if (currentStep < totalSteps - 1) {
                 setCurrentStep(prev => prev + 1);
             } else {
@@ -248,8 +236,6 @@ const BrandLanding = () => {
             }
         };
 
-        // 마지막 단계가 아니면 타이머 설정 (각 단계별 duration 적용)
-        // 마지막 단계는 자동 넘김 없이 사용자가 스페이스바로 넘김
         if (currentStep < totalSteps - 1) {
             timerRef.current = setTimeout(() => {
                 timerRef.current = null;
@@ -257,7 +243,6 @@ const BrandLanding = () => {
             }, stepData.duration);
         }
 
-        // 오디오 재생
         if (stepData.audioSrc) {
             const audio = new Audio(stepData.audioSrc);
             audioRef.current = audio;
@@ -268,7 +253,6 @@ const BrandLanding = () => {
 
         return () => {
             isMountedRef.current = false;
-
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current = null;
@@ -277,21 +261,16 @@ const BrandLanding = () => {
                 clearTimeout(timerRef.current);
                 timerRef.current = null;
             }
-
             setTimeout(() => {
                 isMountedRef.current = true;
             }, 0);
         };
     }, [currentStep, navigate]);
 
-    // Spacebar로 다음 단계로 이동 (모든 단계에서)
     useEffect(() => {
-
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();
-
-                // 마지막 단계면 메인으로, 아니면 다음 단계로
                 if (currentStep === totalSteps - 1) {
                     goToMain();
                 } else {
@@ -311,9 +290,6 @@ const BrandLanding = () => {
     const handlePrev = () => {
         if (currentStep > 0) setCurrentStep(prev => prev - 1);
     };
-
-
-
 
     return (
         <div className="relative w-full h-screen overflow-hidden bg-white selection:bg-purple-200">

@@ -89,6 +89,7 @@ export default function OrderHistoryC({ onHome }) {
             const response = await orderAPI.getOrders();
 
             if (response.data && response.data.orders) {
+                // [사용자 디자인 유지]: 몰(Mall) 별로 그룹화하는 구조 유지
                 const groupedByMall = {};
 
                 response.data.orders.forEach(order => {
@@ -101,7 +102,7 @@ export default function OrderHistoryC({ onHome }) {
                     const orderGroup = {
                         orderId: order.order_id,
                         date: dateKey,
-                        orderUrl: order.order_url,
+                        orderUrl: order.order_url, // [원격 기능]: 최신 order_url 필드 유지
                         items: []
                     };
 
@@ -110,7 +111,7 @@ export default function OrderHistoryC({ onHome }) {
                             orderGroup.items.push({
                                 id: `${order.order_id}-${item.name}-${item.url || ''}`,
                                 name: item.name,
-                                price: `${item.price.toLocaleString()}원`,
+                                price: item.price ? `${item.price.toLocaleString()}원` : '가격 정보 없음',
                                 quantity: `${(item.quantity || 1)}개`,
                                 date: order.ordered_at || '',
                                 mall: mallName,
@@ -253,14 +254,13 @@ export default function OrderHistoryC({ onHome }) {
                                                             </div>
                                                             <span className="oh-item-qty">{item.quantity}</span>
                                                             <div className="order-id-actions">
-                                                                {item.deliverUrl && (
-                                                                    <button
-                                                                        className="order-item-deliver-btn cursor-pointer"
-                                                                        onClick={() => window.open(item.deliverUrl, '_blank')}
-                                                                    >
-                                                                        배송조회
-                                                                    </button>
-                                                                )}
+                                                                <button
+                                                                    className={`order-item-deliver-btn ${item.deliverUrl ? 'cursor-pointer' : ''}`}
+                                                                    onClick={() => item.deliverUrl && window.open(item.deliverUrl, '_blank')}
+                                                                    disabled={!item.deliverUrl}
+                                                                >
+                                                                    배송조회
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     ))}

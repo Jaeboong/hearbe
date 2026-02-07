@@ -15,6 +15,7 @@ try:
     from bs4 import BeautifulSoup
     HAS_BS4 = True
 except ImportError:
+    BeautifulSoup = Any  # type: ignore
     HAS_BS4 = False
 
 try:

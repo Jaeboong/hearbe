@@ -5,12 +5,10 @@ import com.ssafy.d108.backend.entity.Order;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderListResponse {
@@ -19,7 +17,6 @@ public class OrderListResponse {
     private List<OrderDetailDto> orders;
 
     @Getter
-    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OrderDetailDto {

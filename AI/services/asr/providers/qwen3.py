@@ -5,6 +5,7 @@ Qwen3-ASR model for speech recognition with superior Korean support.
 """
 
 import logging
+import os
 from typing import Optional, Tuple
 
 import numpy as np
@@ -69,12 +70,20 @@ class Qwen3ASRProvider(BaseASRProvider):
                 f"(device={device})"
             )
 
+            offline_env = _env_flag("HF_HUB_OFFLINE") or _env_flag("TRANSFORMERS_OFFLINE")
+            local_only_env = _env_flag("QWEN3_LOCAL_ONLY")
+            local_files_only = bool(offline_env or local_only_env)
+
+            if local_files_only:
+                logger.info("Qwen3-ASR loading in local_files_only mode")
+
             self._model = Qwen3ASRModel.from_pretrained(
                 model_name,
                 dtype=torch.bfloat16,
                 device_map=device,
                 max_inference_batch_size=self._config.qwen3_max_batch_size,
                 max_new_tokens=self._config.qwen3_max_new_tokens,
+                local_files_only=local_files_only,
             )
 
             self._ready = True
@@ -171,3 +180,10 @@ class Qwen3ASRProvider(BaseASRProvider):
         except Exception as e:
             logger.error(f"Qwen3 transcription failed: {e}")
             raise
+
+
+def _env_flag(name: str) -> bool:
+    value = os.getenv(name)
+    if not value:
+        return False
+    return value.strip().lower() in ("1", "true", "yes", "y", "on")

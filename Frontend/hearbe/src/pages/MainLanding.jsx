@@ -6,6 +6,9 @@ import '../App.css';
 import '../index.css'
 import logoC from '../assets/logoC.png';
 
+const VOICE_PROGRAM_BASE_NAME = '음성지원프로그램';
+const VOICE_PROGRAM_LATEST_FILE = `${VOICE_PROGRAM_BASE_NAME}_latest.zip`;
+
 // 프리미엄 모드 선택 카드 컴포넌트 (A, B, C 전용)
 const ModeCard = ({ mode, onSelect }) => (
   <motion.button
@@ -77,8 +80,31 @@ const ModeCard = ({ mode, onSelect }) => (
 );
 
 
-const MainLanding = ({ handleModeSelect, modeSelectionRef }) => {
+const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
   const navigate = useNavigate();
+  const [voiceProgramVersion, setVoiceProgramVersion] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetch('/downloads/voice-program-version.json', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!mounted || !data?.version) return;
+        setVoiceProgramVersion(data.version);
+      })
+      .catch(() => {
+        // Ignore metadata errors and fallback to latest alias.
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const voiceProgramDownloadFile = voiceProgramVersion
+    ? `${VOICE_PROGRAM_BASE_NAME}_${voiceProgramVersion}.zip`
+    : VOICE_PROGRAM_LATEST_FILE;
 
   return (
     <div className="w-full min-h-screen bg-[#fcfcfd] flex flex-col items-center justify-start relative overflow-x-hidden landing-container">
@@ -101,13 +127,27 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef }) => {
             {[
               { icon: <Info size={22} />, path: '/intro', label: '서비스 소개' },
               { icon: <BookOpen size={22} />, path: '/guide', label: '가이드' },
-              { icon: <Download size={22} />, path: '/downloads/MCPDesktop.zip', label: '다운로드' }
+              {
+                icon: <Download size={22} />,
+                path: voiceProgramVersion ? encodeURI(`/downloads/${voiceProgramDownloadFile}`) : `/downloads/MCPDesktop.zip`,
+                label: '다운로드',
+                isExternal: true
+              }
             ].map((item, idx) => (
               <motion.button
                 key={idx}
                 whileHover={{ scale: 1.05, backgroundColor: '#f9fafb' }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => navigate(item.path)}
+                onClick={() => {
+                  if (item.isExternal) {
+                    const link = document.createElement('a');
+                    link.href = item.path;
+                    link.download = item.path.split('/').pop();
+                    link.click();
+                  } else {
+                    navigate(item.path);
+                  }
+                }}
                 className="p-3 md:p-3.5 rounded-2xl bg-white border border-gray-100 shadow-sm text-gray-600 hover:text-purple-600 transition-all relative group"
               >
                 {item.icon}
@@ -119,7 +159,6 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef }) => {
           </div>
         </div>
       </header>
-
 
 
       {/* Main Content Area */}

@@ -5,6 +5,7 @@ Login TTS page module.
 
 from api.ws.presenter.pages.login import (
     build_login_success_tts as _build_success,
+    build_login_autofill_success_tts as _build_autofill_success,
     build_login_guidance_tts as _build_guidance,
     build_captcha_prompt_tts as _build_captcha,
 )
@@ -12,6 +13,10 @@ from api.ws.presenter.pages.login import (
 
 def build_login_success_tts(current_url: str) -> str:
     return _build_success(current_url)
+
+
+def build_login_autofill_success_tts(current_url: str) -> str:
+    return _build_autofill_success(current_url)
 
 
 def build_login_guidance_tts() -> str:
