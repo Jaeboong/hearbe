@@ -26,7 +26,6 @@ import ChangePasswordA from '../pages/FindPassword/ChangePasswordA';
 import LoginC from '../pages/Login/LoginC';
 import SignUpC from '../pages/SignUp/SignUpC';
 import SelectMallC from '../pages/SelectMall/SelectMallC';
-import StoreBrowserC from '../pages/StoreBrowser/StoreBrowserC';
 import CartC from '../pages/Cart/CartC';
 import MemberInfoC from '../pages/MemberInfo/MemberInfoC';
 import OrderHistoryC from '../pages/OrderHistory/OrderHistoryC';
@@ -48,6 +47,11 @@ function AppContent() {
   const [selectedMode, setSelectedMode] = useState('audio');
   const [micPermissionGranted, setMicPermissionGranted] = useState(false);
   const [showInitialSetup, setShowInitialSetup] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('app') === 'mcp') {
+      localStorage.setItem('hearbe_mcp_setup_completed', 'true');
+      return false;
+    }
     return localStorage.getItem('hearbe_mcp_setup_completed') !== 'true';
   });
   const modeSelectionRef = useRef(null);
@@ -247,18 +251,7 @@ function AppContent() {
             onBack={() => navigate('/C/login')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}
-            onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
-          />
-        }
-      />
-      <Route
-        path="/C/store"
-        element={
-          <StoreBrowserC
-            onBack={() => navigate('/C/mall')}
-            onHome={() => navigate('/C/mall')}
-            onCart={() => navigate('/C/cart')}
-            onMyPage={() => navigate('/C/member-info')}
+            onSelectMall={(mall) => window.open(mall.url, '_blank')}
           />
         }
       />
@@ -304,12 +297,10 @@ function AppContent() {
       <Route path="/login" element={<Navigate to="/A/login" replace />} />
       <Route path="/signup" element={<Navigate to="/C/signup" replace />} />
       <Route path="/mall" element={<Navigate to="/C/mall" replace />} />
-      <Route path="/store" element={<Navigate to="/C/store" replace />} />
       <Route path="/cart" element={<Navigate to="/C/cart" replace />} />
       <Route path="/login-c" element={<Navigate to="/C/login" replace />} />
       <Route path="/signup-c" element={<Navigate to="/C/signup" replace />} />
       <Route path="/mall-c" element={<Navigate to="/C/mall" replace />} />
-      <Route path="/store-c" element={<Navigate to="/C/store" replace />} />
       <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
       <Route path="/login-s" element={<Navigate to="/S/join" replace />} />
       <Route path="/S/guardian-view" element={<Navigate to="/S/join" replace />} />

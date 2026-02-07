@@ -10,26 +10,26 @@ import introAudio3 from '../../assets/audio/intro/intro_guide_3.wav';
 
 const STEPS = [
     {
-        title: "소리로 쇼핑하는 세상",
-        desc: "HearBe와 함께라면 쇼핑이 즐거워집니다.",
-        audio: guideAudio1,
+        title: "목소리만으로 완성하는 새로운 쇼핑 경험",
+        desc: "복잡한 화면 대신 당신의 목소리에 집중하는 스마트 쇼핑 파트너",
+        audioSrc: introAudio1,
         duration: 4000
     },
     {
-        title: "당신의 목소리로",
-        desc: "찾고 싶은 상품을 말해보세요.",
-        audio: guideAudio2,
+        title: "보이지 않아도, 스스로 선택하는 즐거움",
+        desc: "원하는 상품을 말해보세요. 당신의 목소리로 완벽한 쇼핑을 완성합니다.",
+        audioSrc: introAudio2,
         duration: 4000
     },
     {
-        title: "가장 쉬운 시작",
-        desc: "지금 바로 HearBe를 경험해보세요.",
-        audio: guideAudio3,
+        title: "검색부터 결제까지, 당신의 목소리와 함께",
+        desc: "모든 과정을 친절한 음성으로 안내하여 스스로 완성하는 쇼핑을 지원합니다.",
+        audioSrc: introAudio3,
         duration: 4000
-    }
+    },
 ];
 
-const Intro = () => {
+export default function Intro() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [hasStarted, setHasStarted] = useState(false);
@@ -37,12 +37,10 @@ const Intro = () => {
     const splineLoadedRef = useRef(false);
     const navigate = useNavigate();
 
-    // 오디오와 타이머 객체 관리
-    const audioRef = useRef(null);
-    const timerRef = useRef(null);
-    const isMountedRef = useRef(true);
+    const audioRef = React.useRef(null);
+    const timerRef = React.useRef(null);
+    const isMountedRef = React.useRef(true);
 
-    // Spline 로딩 타임아웃
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (!splineLoadedRef.current) {
@@ -55,24 +53,17 @@ const Intro = () => {
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-        setTimeout(() => {
-            navigate('/main');
-        }, 8000);
-    };
-
-    const handleNext = () => {
-        if (currentStep < STEPS.length - 1) {
-            setCurrentStep(prev => prev + 1);
-        } else {
-            goToMain();
-        }
+<<<<<<<<< Temporary merge branch 1
+        setTimeout(() => navigate('/main'), 850);
+=========
+        setTimeout(() => navigate('/guide'), 850);
+>>>>>>>>> Temporary merge branch 2
     };
 
     const handleStart = () => {
         setHasStarted(true);
     };
 
-    // 스페이스바, 탭키로 시작 및 다음 단계 이동
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === ' ' || e.code === 'Tab' || e.key === 'Tab') {
@@ -80,7 +71,16 @@ const Intro = () => {
                 if (!hasStarted) {
                     handleStart();
                 } else {
-                    handleNext();
+                    // 다음 단계로 이동 (마지막 단계면 메인으로)
+                    if (currentStep < STEPS.length - 1) {
+                        setCurrentStep(prev => prev + 1);
+                    } else {
+<<<<<<<<< Temporary merge branch 1
+                        navigate('/main');
+=========
+                        navigate('/guide');
+>>>>>>>>> Temporary merge branch 2
+                    }
                 }
             }
         };
@@ -88,22 +88,29 @@ const Intro = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [hasStarted, currentStep]);
 
-    // 스텝 변경 및 오디오 재생 로직
     useEffect(() => {
         if (!hasStarted || isTransitioning) return;
 
-        // 이전 오디오 중지 및 새로 재생
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current = null;
-        }
+        if (timerRef.current) return;
 
-        const audio = new Audio(STEPS[currentStep].audio);
+        const handleNext = () => {
+            if (!isMountedRef.current) return;
+            if (currentStep < STEPS.length - 1) {
+                setCurrentStep(prev => prev + 1);
+            } else {
+                goToMain();
+            }
+        };
+
+        const audio = new Audio(STEPS[currentStep].audioSrc);
         audioRef.current = audio;
-        audio.play().catch(e => console.log("Audio play deferred:", e));
 
-        // 타이머 설정
-        if (timerRef.current) clearTimeout(timerRef.current);
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn(`Audio Auto-play blocked.`);
+            });
+        }
 
         timerRef.current = setTimeout(() => {
             if (isMountedRef.current) {
@@ -112,6 +119,7 @@ const Intro = () => {
         }, STEPS[currentStep].duration);
 
         return () => {
+            isMountedRef.current = false;
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current = null;
@@ -120,36 +128,34 @@ const Intro = () => {
                 clearTimeout(timerRef.current);
                 timerRef.current = null;
             }
+            setTimeout(() => {
+                isMountedRef.current = true;
+            }, 0);
         };
     }, [currentStep, hasStarted, isTransitioning]);
 
-    // 시작 화면
     if (!hasStarted) {
         return (
-            <div className="intro-container start-screen" onClick={handleStart}>
-                <div className="start-content">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="start-title"
+            <div className="intro-container cursor-pointer" onClick={handleStart} style={{ justifyContent: 'center' }}>
+                <div className="text-section" style={{ marginTop: 0 }}>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 1 }}
                     >
-                        HearBe 서비스 시작하기
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 0.7 }}
-                        transition={{ delay: 0.5 }}
-                        className="start-hint"
-                    >
-                        스페이스바 또는 화면을 클릭하여 시작하세요
-                    </motion.p>
+                        <h1 className="main-copy">HearBe 서비스 시작하기</h1>
+                        <p className="sub-copy">스페이스바 또는 화면을 클릭하여 시작하세요</p>
+                    </motion.div>
                 </div>
+                {/* 배경에 은은한 오버레이 추가 전용 클래스 활용 가능 */}
+                <div className="purple-aura" style={{ opacity: 0.2 }} />
             </div>
         );
     }
 
     return (
         <div className="intro-container">
+            {/* [디자인 우선]: 프리미엄 Skip 버튼 스타일 유지 */}
             <button
                 className="skip-btn"
                 onClick={() => navigate('/guide')}

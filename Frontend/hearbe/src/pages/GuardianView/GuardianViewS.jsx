@@ -67,7 +67,7 @@ const GuardianViewS = () => {
 
     return (
         <div className="guardian-view-container">
-            {/* 헤더 */}
+            {/* 헤더 - [디자인 우선]: 로고와 전문적인 타이틀 레이아웃 유지 */}
             <header className="guardian-header-c">
                 <div className="header-left-c">
                     <img
