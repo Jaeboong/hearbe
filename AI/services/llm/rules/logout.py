@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Logout rule."""
 
+import re
 from typing import Optional
 
 from . import BaseRule, RuleResult
@@ -31,10 +32,12 @@ class LogoutRule(BaseRule):
         else:
             commands.append(build_click_text_command("\ub85c\uadf8\uc544\uc6c3", "Click logout button"))
 
+        response_text = "\ub85c\uadf8\uc544\uc6c3 \ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?" if _needs_logout_confirm(current_url, current_site) else "\ub85c\uadf8\uc544\uc6c3 \ub418\uc5c8\uc2b5\ub2c8\ub2e4."
+
         return RuleResult(
             matched=True,
             commands=commands,
-            response_text="\ub85c\uadf8\uc544\uc6c3 \ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
+            response_text=response_text,
             rule_name="logout",
         )
 
@@ -48,6 +51,15 @@ def _is_logout_intent(text: str) -> bool:
     if "\ub85c\uadf8\uc544\uc6c3" in text:
         return True
     return False
+
+
+def _needs_logout_confirm(current_url: str, current_site) -> bool:
+    if not current_url:
+        return False
+    if current_site and getattr(current_site, "site_id", "") != "hearbe":
+        return False
+    lowered = current_url.lower()
+    return bool(re.search(r"/c/mall(?:\\b|/|\\?)", lowered))
 
 
 __all__ = ["LogoutRule"]

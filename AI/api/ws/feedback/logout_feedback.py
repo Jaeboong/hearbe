@@ -6,11 +6,14 @@ Marks a short-lived suppression window to avoid extra guidance
 after a logout click redirects to the login page.
 """
 
+import re
 import time
 
 
 CTX_LOGOUT_SUPPRESS_UNTIL = "logout_guidance_suppress_until"
+CTX_LOGOUT_CONFIRM_PENDING = "logout_confirm_pending"
 SUPPRESS_WINDOW_SEC = 8.0
+CONFIRM_PENDING_TTL_SEC = 20.0
 
 
 class LogoutFeedbackManager:
@@ -29,10 +32,17 @@ class LogoutFeedbackManager:
             CTX_LOGOUT_SUPPRESS_UNTIL,
             time.time() + SUPPRESS_WINDOW_SEC,
         )
+        if _should_prompt_logout_confirm(current_url):
+            self._session.set_context(
+                session_id,
+                CTX_LOGOUT_CONFIRM_PENDING,
+                time.time(),
+            )
 
     def clear_pending(self, session_id: str):
         if self._session:
             self._session.set_context(session_id, CTX_LOGOUT_SUPPRESS_UNTIL, None)
+            self._session.set_context(session_id, CTX_LOGOUT_CONFIRM_PENDING, None)
 
 
 def _has_logout_click(commands) -> bool:
@@ -51,3 +61,17 @@ def _has_logout_click(commands) -> bool:
         except Exception:
             continue
     return False
+
+
+def _should_prompt_logout_confirm(current_url: str) -> bool:
+    if not current_url:
+        return False
+    lowered = current_url.lower()
+    return bool(re.search(r"/c/mall(?:\\b|/|\\?)", lowered))
+
+
+__all__ = [
+    "CTX_LOGOUT_CONFIRM_PENDING",
+    "CONFIRM_PENDING_TTL_SEC",
+    "LogoutFeedbackManager",
+]

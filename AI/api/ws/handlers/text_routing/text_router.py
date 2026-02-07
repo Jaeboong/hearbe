@@ -25,6 +25,7 @@ class TextRouter:
         history_writer,
         interrupt_manager,
         command_pipeline,
+        logout_confirm=None,
     ):
         self._session = session_manager
         self._payment_keypad = payment_keypad
@@ -39,12 +40,18 @@ class TextRouter:
         self._history = history_writer
         self._interrupts = interrupt_manager
         self._command_pipeline = command_pipeline
+        self._logout_confirm = logout_confirm
 
     async def handle_text(self, session_id: str, text: str) -> Optional[str]:
         session = self._session.get_session(session_id) if self._session else None
         if not session:
             return None
         epoch = self._interrupts.get_epoch(session_id)
+
+        if self._logout_confirm:
+            handled = await self._logout_confirm.handle_user_text(session_id, text)
+            if handled:
+                return None
 
         if self._payment_keypad:
             handled = await self._payment_keypad.handle_user_text(session_id, text)

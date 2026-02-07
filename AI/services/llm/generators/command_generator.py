@@ -15,6 +15,7 @@ from ..rules import BaseRule
 from ..rules.site_access import SiteAccessRule
 from ..rules.select import SearchSelectRule
 from ..rules.search import SearchRule
+from ..rules.search_sort import SearchSortRule
 from ..rules.orderdetail import OrderDetailRule
 from ..rules.cart import CartRule
 from ..rules.login import LoginRule
@@ -59,6 +60,7 @@ class CommandGenerator:
             HearbeMainModeRule(self.site_manager),
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
+            SearchSortRule(self.site_manager),
             OrderDetailRule(self.site_manager),
             CartRule(self.site_manager),
             OrderListRule(self.site_manager),

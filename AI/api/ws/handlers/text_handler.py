@@ -21,6 +21,7 @@ from .text_routing.ai_next_router import AiNextRouter
 from .text_routing.text_router import TextRouter
 from .text_session.history_writer import HistoryWriter
 from .text_session.interrupt_manager import InterruptManager
+from .logout_confirm import LogoutConfirmManager
 from services.llm.sites.site_manager import get_page_type
 
 logger = logging.getLogger(__name__)
@@ -114,6 +115,11 @@ class TextHandler:
             logout_feedback=logout_feedback,
             command_queue=command_queue,
         )
+        self._logout_confirm = LogoutConfirmManager(
+            sender=sender,
+            session_manager=session_manager,
+            command_pipeline=self._command_pipeline,
+        )
 
         # Specialized handlers
         self._search_query_handler = SearchQueryHandler(session_manager, sender)
@@ -146,6 +152,7 @@ class TextHandler:
             history_writer=self._history,
             interrupt_manager=self._interrupts,
             command_pipeline=self._command_pipeline,
+            logout_confirm=self._logout_confirm,
         )
 
     async def create_session(self, session_id: str):
@@ -165,6 +172,7 @@ class TextHandler:
                 pass
         self._queue_manager.cleanup_session(session_id)
         self._interrupts.cleanup_session(session_id)
+        self._logout_confirm.cleanup_session(session_id)
 
     async def interrupt(self, session_id: str):
         """Interrupt current processing and prioritize new input."""
@@ -198,6 +206,7 @@ class TextHandler:
         session = self._session.get_session(session_id) if self._session else None
         if session and self._flow:
             await self._flow.cancel_flow(session)
+        self._logout_confirm.cleanup_session(session_id)
 
         await self._sender.send_status(session_id, "cancelled", "Cancelled")
         await self._sender.send_tts_response(session_id, "Cancelled")

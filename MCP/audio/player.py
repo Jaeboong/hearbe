@@ -9,7 +9,8 @@ import logging
 import threading
 import queue
 import time
-from typing import Optional
+from array import array
+from typing import Optional, Tuple, Any
 
 try:
     import pyaudio
@@ -29,6 +30,7 @@ TTS_CHUNK_SIZE = 4096
 _STOP_SENTINEL = object()
 _FLUSH_SENTINEL = object()
 _BARGE_IN_SUPPRESS_SEC = 3.0
+_FADE_MS = 5.0
 
 
 class AudioPlayer(IAudioPlayer):
@@ -126,10 +128,11 @@ class AudioPlayer(IAudioPlayer):
                     self._on_playback_finished()
                     continue
 
-                audio_data, is_final = item
+                audio_data, is_final, segment_index, segment_total, segment_start = self._normalize_queue_item(item)
+                audio_data = _apply_fade(audio_data, self.sample_rate, fade_in=segment_start, fade_out=is_final)
                 self._play_chunk(audio_data)
 
-                if is_final:
+                if is_final and _is_last_segment(segment_index, segment_total):
                     self._on_playback_finished()
 
             except queue.Empty:
@@ -182,9 +185,12 @@ class AudioPlayer(IAudioPlayer):
 
         audio_bytes = data.get("audio")
         is_final = data.get("is_final", False)
+        segment_index = data.get("segment_index")
+        segment_total = data.get("segment_total")
+        segment_start = bool(data.get("text"))
 
         if audio_bytes:
-            self._audio_queue.put((audio_bytes, is_final))
+            self._audio_queue.put((audio_bytes, is_final, segment_index, segment_total, segment_start))
             logger.debug(f"TTS chunk queued: {len(audio_bytes)} bytes, final={is_final}")
 
     def _on_playback_finished(self):
@@ -251,6 +257,15 @@ class AudioPlayer(IAudioPlayer):
         """Check if currently playing"""
         return self._playing or not self._audio_queue.empty()
 
+    def _normalize_queue_item(self, item: Any) -> Tuple[bytes, bool, Optional[int], Optional[int], bool]:
+        if isinstance(item, tuple) and len(item) == 5:
+            audio_data, is_final, segment_index, segment_total, segment_start = item
+            return audio_data, bool(is_final), _safe_int(segment_index), _safe_int(segment_total), bool(segment_start)
+        if isinstance(item, tuple) and len(item) == 2:
+            audio_data, is_final = item
+            return audio_data, bool(is_final), None, None, False
+        return b"", False, None, None, False
+
     def shutdown(self):
         """Clean up resources"""
         logger.info("Stopping AudioPlayer...")
@@ -268,3 +283,52 @@ class AudioPlayer(IAudioPlayer):
             self.audio = None
 
         logger.info("AudioPlayer stopped")
+
+
+def _safe_int(value: Any) -> Optional[int]:
+    try:
+        return int(value)
+    except Exception:
+        return None
+
+
+def _is_last_segment(segment_index: Optional[int], segment_total: Optional[int]) -> bool:
+    if segment_index is None or segment_total is None or segment_total <= 0:
+        return True
+    return segment_index >= (segment_total - 1)
+
+
+def _apply_fade(audio_data: bytes, sample_rate: int, fade_in: bool, fade_out: bool) -> bytes:
+    if not audio_data:
+        return audio_data
+    if not (fade_in or fade_out):
+        return audio_data
+    if sample_rate <= 0:
+        return audio_data
+    if len(audio_data) % 2 != 0:
+        return audio_data
+
+    samples = array("h")
+    samples.frombytes(audio_data)
+    total = len(samples)
+    if total == 0:
+        return audio_data
+
+    fade_samples = int(sample_rate * (_FADE_MS / 1000.0))
+    if fade_samples <= 1:
+        return audio_data
+    fade_samples = min(fade_samples, total)
+
+    if fade_in:
+        for i in range(fade_samples):
+            scale = (i + 1) / fade_samples
+            samples[i] = int(samples[i] * scale)
+
+    if fade_out:
+        start = total - fade_samples
+        for i in range(fade_samples):
+            scale = 1.0 - ((i + 1) / fade_samples)
+            idx = start + i
+            samples[idx] = int(samples[idx] * scale)
+
+    return samples.tobytes()
