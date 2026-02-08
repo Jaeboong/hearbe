@@ -84,6 +84,8 @@ class TextHandler:
         action_feedback,
         login_guard=None,
         login_feedback=None,
+        hearbe_signup_flow=None,
+        hearbe_signup_b_flow=None,
         payment_keypad=None,
         login_status=None,
         login_challenge=None,
@@ -101,6 +103,8 @@ class TextHandler:
         self._action_feedback = action_feedback
         self._login_guard = login_guard
         self._login_feedback = login_feedback
+        self._hearbe_signup_flow = hearbe_signup_flow
+        self._hearbe_signup_b_flow = hearbe_signup_b_flow
         self._payment_keypad = payment_keypad
         self._login_status = login_status
         self._login_challenge = login_challenge
@@ -140,6 +144,8 @@ class TextHandler:
         self._ai_next_router = AiNextRouter()
         self._text_router = TextRouter(
             session_manager=session_manager,
+            hearbe_signup_flow=hearbe_signup_flow,
+            hearbe_signup_b_flow=hearbe_signup_b_flow,
             payment_keypad=payment_keypad,
             login_status=login_status,
             login_challenge=login_challenge,

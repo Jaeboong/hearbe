@@ -23,6 +23,7 @@ from ..rules.order_list import OrderListRule
 from ..rules.hearbe_nav import HearbeNavRule
 from ..rules.hearbe_mall_select import HearbeMallSelectRule
 from ..rules.hearbe_main_mode import HearbeMainModeRule
+from ..rules.hearbe_signup import HearbeSignupRule
 from ..rules.checkout import CheckoutRule
 from ..rules.logout import LogoutRule
 from ..rules.generic import GenericClickRule
@@ -58,6 +59,7 @@ class CommandGenerator:
             HearbeNavRule(self.site_manager),
             HearbeMallSelectRule(self.site_manager),
             HearbeMainModeRule(self.site_manager),
+            HearbeSignupRule(self.site_manager),
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
             SearchSortRule(self.site_manager),

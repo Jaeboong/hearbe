@@ -16,15 +16,17 @@ from .audio_handler import AudioHandler
 from .text_handler import TextHandler
 from .mcp_handler import MCPHandler
 from .dom_fallback import DomFallbackManager
-from .payment_keypad import PaymentKeypadManager
-from .hearbe_session_gate import HearbeSessionGate
-from .login_autofill import LoginAutofillManager
-from .login_status import LoginStatusManager
-from .login_challenge import LoginChallengeManager
+from .coupang.payment_keypad import PaymentKeypadManager
+from .hearbe.hearbe_session_gate import HearbeSessionGate
+from .coupang.login_autofill import LoginAutofillManager
+from .coupang.login_status import LoginStatusManager
+from .coupang.login_challenge import LoginChallengeManager
 from .command_queue import CommandQueueManager
+from .hearbe.hearbe_signup_b_flow import HearbeSignupBFlowManager
+from .hearbe.hearbe_signup_flow import HearbeSignupFlowManager
 from .page_extract_manager import PageExtractManager
 from .page_focus import PageFocusManager
-from .login_page_state import LoginPageStateManager
+from .coupang.login_page_state import LoginPageStateManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
 from ..feedback.login_feedback import LoginFeedbackManager
@@ -96,6 +98,15 @@ class HandlerManager:
             session_manager=session_manager,
             login_feedback=self._login_feedback,
         )
+        self._hearbe_signup_b_flow = HearbeSignupBFlowManager(
+            sender=sender,
+            session_manager=session_manager,
+        )
+        self._hearbe_signup_flow = HearbeSignupFlowManager(
+            sender=sender,
+            session_manager=session_manager,
+            login_feedback=self._login_feedback,
+        )
         self._hearbe_session_gate = HearbeSessionGate(
             sender=sender,
             session_manager=session_manager,
@@ -124,6 +135,8 @@ class HandlerManager:
             action_feedback=self._action_feedback,
             login_guard=self._login_guard,
             login_feedback=self._login_feedback,
+            hearbe_signup_flow=self._hearbe_signup_flow,
+            hearbe_signup_b_flow=self._hearbe_signup_b_flow,
             payment_keypad=self._payment_keypad,
             login_status=self._login_status,
             login_challenge=self._login_challenge,
@@ -170,6 +183,8 @@ class HandlerManager:
         self._login_challenge.cleanup_session(session_id)
         self._login_page_state.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
+        self._hearbe_signup_b_flow.cleanup_session(session_id)
+        self._hearbe_signup_flow.cleanup_session(session_id)
         self._hearbe_session_gate.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         self._hearbe_order_history.cleanup_session(session_id)
@@ -203,6 +218,8 @@ class HandlerManager:
         self._login_challenge.cleanup_session(session_id)
         self._login_page_state.cleanup_session(session_id)
         self._login_autofill.cleanup_session(session_id)
+        self._hearbe_signup_b_flow.cleanup_session(session_id)
+        self._hearbe_signup_flow.cleanup_session(session_id)
         self._hearbe_session_gate.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         self._hearbe_order_history.cleanup_session(session_id)
@@ -230,6 +247,8 @@ class HandlerManager:
         self._login_autofill.cleanup_session(session_id)
         self._login_challenge.cleanup_session(session_id)
         self._login_page_state.cleanup_session(session_id)
+        self._hearbe_signup_b_flow.cleanup_session(session_id)
+        self._hearbe_signup_flow.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
@@ -331,6 +350,8 @@ class HandlerManager:
         await self._order_detail.handle_page_update(session_id, url)
         await self._hearbe_order_history.handle_page_update(session_id, url)
         await self._page_extract.handle_page_update(session_id, url, page_id)
+        await self._hearbe_signup_b_flow.handle_page_update(session_id, url)
+        await self._hearbe_signup_flow.handle_page_update(session_id, url, previous_url)
 
         # On login page entry, trigger autofill probe (no user text required).
         if page_type == "login":
