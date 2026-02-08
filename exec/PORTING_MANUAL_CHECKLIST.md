@@ -136,8 +136,8 @@
 - Frontend(API 연결): `VITE_API_BASE_URL`, `VITE_API_URL` 기준
 
 추가 정리:
-- 메인 웹서버 라우팅 경로는 유지: `/api/`, `/ws`, `/asr-demo/`
-- AI 서버가 웹서버와 분리된 경우 `proxy_pass` 대상 주소만 AI 서버 접근 주소로 조정
+- 메인 웹서버 라우팅 경로: `/api/`, `/hearbe-peer/` (AI 프록시는 메인 Nginx에 없음)
+- AI 서버(`jhserver.shop`)는 Frontend에서 직접 호출: `/api/v1/ocr/welfare-card`, `/ws`
 
 ## 7) 현재 서버에서 확인된 버전(초안)
 
@@ -151,22 +151,26 @@
 - Docker Compose: v5.0.2
 - Nginx: 1.24.0
 
-AI 서버(WSL2):
+AI 서버(WSL2, 2026-02-09 재확인):
 - OS: Ubuntu 22.04.5 LTS
 - Kernel: 6.6.87.2-microsoft-standard-WSL2
 - Python: 3.10.12
 - Docker: 29.1.3
 - Docker Compose: v5.0.1
-- GPU 확인: `/usr/lib/wsl/lib/nvidia-smi`
+- GPU: NVIDIA Driver 560.94 / CUDA 12.6
+- 참고: 호스트 `/usr/lib/wsl/lib/nvidia-smi` segfault 발생 (WSL2 이슈), 컨테이너 내부 `nvidia-smi` 정상
 
 ## 8) 포팅 매뉴얼 본문 작성 시 TODO
 
 - [ ] IDE 버전(Backend/Frontend/AI 개발 IDE) 명시
 - [x] 실제 운영 도메인 및 Reverse Proxy(Nginx) 설정 파일 경로 명시
 - [x] 웹서버 메인 설정 유지 + AI 서버 항목 분리 기재
-- [ ] DB dump 최신본 생성/첨부
+- [ ] DB dump 최신본 생성/첨부 → 웹서버 팀에 요청 필요
 - [ ] 서비스별 계정 담당자(누가 키 관리하는지) 기재
-- [ ] 배포 특이사항(예: GPU 필수, 외부 API 장애 시 fallback) 정리
+- [x] 배포 특이사항(예: GPU 필수, 외부 API 장애 시 fallback) 정리
+- [x] AI 서버 실환경 검증 (2026-02-09 완료: 컨테이너 healthy, 헬스체크 확인)
+- [x] nvidia-smi segfault 이슈 문서화 (WSL2 알려진 이슈, 대안 명시)
+- [x] TTS health 500 논블로킹 이슈 문서화
 
 ## 9) 추천 산출물 파일 세트 (`exec`)
 

@@ -437,9 +437,22 @@ cat /etc/os-release
 python3 --version
 docker --version
 docker compose version
-nvidia-smi
-/usr/lib/wsl/lib/nvidia-smi
 ```
+
+GPU 확인:
+
+```bash
+# WSL2 환경에서 호스트 nvidia-smi는 segfault가 발생할 수 있음 (WSL2 알려진 이슈)
+# 아래 방법 중 동작하는 것으로 확인
+/usr/lib/wsl/lib/nvidia-smi          # segfault 발생 시 아래 대안 사용
+docker run --rm --gpus all nvidia/cuda:12.3.2-base-ubuntu22.04 nvidia-smi
+docker compose exec ai-server nvidia-smi
+```
+
+2026-02-09 실환경 확인 결과:
+- `/usr/lib/wsl/lib/nvidia-smi` 실행 시 segfault 발생 (WSL2 드라이버 호환 이슈)
+- 컨테이너 내부에서 `nvidia-smi` 정상 동작 확인
+- GPU: NVIDIA Driver 560.94 / CUDA 12.6
 
 ### 9-2. GPU/컨테이너 확인
 
@@ -457,8 +470,12 @@ docker compose logs --tail=200 ai-server
 curl -i http://localhost:8000/
 curl -i http://localhost:8000/api/v1/health
 curl -i http://localhost:8000/api/v1/health/asr
-curl -i http://localhost:8000/api/v1/health/tts
+curl -i http://localhost:8000/api/v1/health/tts    # 500 반환 가능 (아래 11-1 참고)
 ```
+
+2026-02-09 실환경 확인 결과:
+- `/` → 200, `/api/v1/health` → 200, `/api/v1/health/asr` → 200
+- `/api/v1/health/tts` → 500 (설정 필드 참조 불일치, 섹션 11-1 논블로킹 이슈 참고)
 
 ### 9-4. 운영 필수 확인
 
@@ -468,6 +485,12 @@ curl -i http://localhost:8000/api/v1/health/tts
 - 외부 API 키(OpenAI/GMS/Google TTS) 유효성
 - Reverse Proxy 경로(`/api/v1`, `/ws`) 연결 여부
 - 로그 저장 경로(`AI/logs`) 및 로테이션 정책 확인
+
+2026-02-09 실환경 확인 결과:
+- `AI/.env` 존재 확인
+- `config/google-service-account.json` 존재 확인
+- AI 컨테이너 상태: healthy
+- WSL2 호스트 `nvidia-smi` segfault 발생하나 컨테이너 내부 GPU 인식 정상
 
 ## 10. 배포 시 특이사항
 
@@ -490,9 +513,11 @@ curl -i http://localhost:8000/api/v1/health/tts
 ### 11-1. 논블로킹 이슈 (발표 핵심 기능 영향 없음)
 
 - `AI/api/http.py`의 일부 상태 조회 엔드포인트(`/api/v1/health/tts`, `/api/v1/config`)는 설정 필드 참조 불일치로 오류 가능성이 있음
+  - 2026-02-09 확인: `/api/v1/health/tts` → 500 실제 발생 (예상대로)
 - 영향 범위: 상태 조회성 API에 한정
 - 비영향 범위: 핵심 데모 플로우(프론트 회원가입 OCR, AI `/api/v1/ocr/welfare-card`, WebSocket `/ws`)는 별도 경로로 동작
 - 발표 대응: 상태 조회 API 호출은 생략하고 핵심 플로우 위주로 시연
+- WSL2 환경에서 호스트 `nvidia-smi` segfault 발생 (WSL2 알려진 이슈, 컨테이너 내부에서는 정상)
 
 ### 11-2. 블로킹 이슈 (발표 전 반드시 확인)
 
