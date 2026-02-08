@@ -148,32 +148,21 @@ class PageExtractManager:
             field_selectors = {}
             field_attributes = {}
 
-            # Coupang product pages are prone to DOM/selector churn. Prefer stable meta tags for
-            # core fields so downstream read-only pipelines can reliably speak product info.
-            # Note: meta tags require attribute extraction (content), not text_content.
+            # Coupang product pages: use OG meta for name, DOM selector for price.
+            # Meta tags like product:price:amount are unreliable on Coupang;
+            # use .final-price-amount (via site config) for accurate pricing.
             if "coupang.com" in (url or ""):
-                # Prefer OG/Twitter meta tags which tend to survive UI changes.
                 field_selectors["name"] = (
                     "meta[property='og:title'], meta[name='og:title'], "
                     "meta[property='twitter:title'], meta[name='twitter:title']"
                 )
                 field_attributes["name"] = "content"
-                field_selectors["price"] = (
-                    "meta[property='product:price:amount'], "
-                    "meta[name='product:price:amount'], "
-                    "meta[property='og:price:amount'], "
-                    "meta[name='og:price:amount'], "
-                    "meta[property='og:product:price:amount']"
-                )
-                field_attributes["price"] = "content"
             if selectors.get("product_title"):
                 field_selectors.setdefault("name", selectors["product_title"])
             if selectors.get("final_price"):
                 field_selectors.setdefault("price", selectors["final_price"])
             if selectors.get("discount_rate"):
                 field_selectors["discount_rate"] = selectors["discount_rate"]
-            if selectors.get("original_price"):
-                field_selectors["original_price"] = selectors["original_price"]
             if selectors.get("rocket_delivery"):
                 field_selectors["delivery"] = selectors["rocket_delivery"]
             if selectors.get("product_info"):
