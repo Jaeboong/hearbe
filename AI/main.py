@@ -146,6 +146,11 @@ class AIServer:
         async def lifespan(app: FastAPI):
             # Startup
             await event_bus.start()
+            try:
+                from api.ws.utils.temp_file_manager import TempFileManager
+                TempFileManager().cleanup_all()
+            except Exception as e:
+                logger.warning(f"Temp cleanup on startup skipped: {e}")
             await self.initialize_services()
 
             # Expose services to app state for HTTP routes

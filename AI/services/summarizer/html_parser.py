@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 from bs4 import BeautifulSoup
+from core.korean_product_terms import format_product_terms_for_tts
 
 logger = logging.getLogger(__name__)
 
@@ -541,6 +542,7 @@ def format_for_tts(info: ProductInfo, include_details: bool = False) -> str:
     elif info.delivery_info:
         parts.append(info.delivery_info)
 
+    parts = [format_product_terms_for_tts(part) for part in parts]
     return ". ".join(parts) + "."
 
 
@@ -571,4 +573,5 @@ def format_summary_for_tts(info: ProductInfo) -> List[str]:
     elif info.delivery_info:
         summaries.append(f"{info.delivery_info}입니다.")
 
+    summaries = [format_product_terms_for_tts(summary) for summary in summaries]
     return summaries if summaries else ["상품 정보를 찾을 수 없습니다."]

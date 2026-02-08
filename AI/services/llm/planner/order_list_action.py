@@ -22,6 +22,16 @@ DETAIL_KEYWORDS = (
     "주문 상세",
     "주문상세",
     "상세로",
+    "조회",
+    "주문 조회",
+    "주문조회",
+    "확인",
+    "내역",
+    "주문 내역",
+    "주문내역",
+    "보기",
+    "열어",
+    "들어가",
 )
 
 READ_KEYWORDS = (
@@ -287,15 +297,31 @@ def handle_order_list_action(user_text: str, session: Optional[SessionState]) ->
                 flow_type=None,
             )
 
-    if (
-        ordinal_index is None
-        and not title_match
-        and not has_read_intent
-        and not has_detail_intent
-    ):
-        return None
+    # ordinal 또는 상품명 매칭 시 → 상세 이동 우선
+    target = None
+    if ordinal_index is not None and 0 <= ordinal_index < len(items):
+        target = items[ordinal_index]
+    if target is None:
+        target = title_match or _find_by_title(items, text)
+    if target is None and len(items) == 1 and (has_detail_intent or ordinal_index is not None):
+        target = items[0]
 
-    if ordinal_index is None and title_match is None and has_read_intent and not has_detail_intent:
+    # 타겟이 있으면 바로 상세 이동
+    if target:
+        commands = _build_detail_commands(target)
+        if commands:
+            session.context["order_list_prompt_pending"] = False
+            title = target.get("title") or ""
+            label = title or "선택한 주문"
+            return LLMResponse(
+                text=f"{label} 상세로 이동합니다.",
+                commands=commands,
+                requires_flow=False,
+                flow_type=None,
+            )
+
+    # 타겟 없이 읽기 의도만 있으면 → 목록 요약
+    if has_read_intent and not has_detail_intent:
         session.context["order_list_prompt_pending"] = False
         summary = _build_order_list_summary_text(items)
         return LLMResponse(
@@ -305,31 +331,10 @@ def handle_order_list_action(user_text: str, session: Optional[SessionState]) ->
             flow_type=None,
         )
 
-    target = None
-    if ordinal_index is not None and 0 <= ordinal_index < len(items):
-        target = items[ordinal_index]
-    if target is None:
-        target = title_match or _find_by_title(items, text)
-    if target is None and len(items) == 1:
-        target = items[0]
-
-    if not target:
+    if not has_read_intent and not has_detail_intent:
         return None
 
-    commands = _build_detail_commands(target)
-    if not commands:
-        return None
-
-    session.context["order_list_prompt_pending"] = False
-    title = target.get("title") or ""
-    label = title or "선택한 주문"
-
-    return LLMResponse(
-        text=f"{label} 상세로 이동합니다.",
-        commands=commands,
-        requires_flow=False,
-        flow_type=None,
-    )
+    return None
 
 
 __all__ = ["handle_order_list_action"]

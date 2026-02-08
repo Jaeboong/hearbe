@@ -57,27 +57,8 @@ class OrderListRule(BaseRule):
             commands.append(
                 GeneratedCommand(
                     tool_name="wait",
-                    arguments={"ms": 1500},
-                    description="Wait for order list page",
-                )
-            )
-            # Avoid extracting too early due to breadcrumb links like `/ssr/desktop/order/list`.
-            commands.append(
-                GeneratedCommand(
-                    tool_name="wait_for_selector",
-                    arguments={
-                        "selector": "a[href*='/ssr/desktop/order/']:not([href*='/ssr/desktop/order/list'])",
-                        "state": "visible",
-                        "timeout": 25000,
-                    },
-                    description="Wait for order items to render",
-                )
-            )
-            commands.append(
-                GeneratedCommand(
-                    tool_name="wait",
-                    arguments={"ms": 800},
-                    description="Wait for order list items to stabilize",
+                    arguments={"ms": 2500},
+                    description="Wait for order list page to load",
                 )
             )
             commands.append(
@@ -104,20 +85,9 @@ class OrderListRule(BaseRule):
             )
             commands.append(
                 GeneratedCommand(
-                    tool_name="wait_for_selector",
-                    arguments={
-                        "selector": "a[href*='/ssr/desktop/order/']:not([href*='/ssr/desktop/order/list'])",
-                        "state": "visible",
-                        "timeout": 25000,
-                    },
-                    description="Wait for order items to render",
-                )
-            )
-            commands.append(
-                GeneratedCommand(
                     tool_name="wait",
-                    arguments={"ms": 800},
-                    description="Wait for order list items to stabilize",
+                    arguments={"ms": 2500},
+                    description="Wait for order list page to load",
                 )
             )
             commands.append(
