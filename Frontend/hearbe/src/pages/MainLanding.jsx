@@ -141,7 +141,8 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
                   if (item.isExternal) {
                     const link = document.createElement('a');
                     link.href = item.path;
-                    link.download = item.path.split('/').pop();
+                    const rawFileName = item.path.split('/').pop() || '';
+                    link.download = decodeURIComponent(rawFileName);
                     link.click();
                   } else {
                     navigate(item.path);

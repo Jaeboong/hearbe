@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Spline from '@splinetool/react-spline';
@@ -10,22 +10,22 @@ import introAudio3 from '../../assets/audio/intro/intro_guide_3.wav';
 
 const STEPS = [
     {
-        title: "목소리만으로 완성하는 쇼핑 경험",
-        desc: "복잡한 화면 대신 당신의 목소리에 집중하는 스마트 쇼핑 파트너",
+        title: '목소리만으로 완성하는 새로운 쇼핑 경험',
+        desc: '복잡한 화면 대신 당신의 목소리에 집중하는 스마트 쇼핑 파트너',
         audioSrc: introAudio1,
-        duration: 4000
+        duration: 4000,
     },
     {
-        title: "스스로 선택하는 즐거움",
-        desc: "원하는 상품을 말해보세요. 당신의 목소리로 완벽한 쇼핑을 완성합니다.",
+        title: '보이지 않아도, 스스로 선택하는 즐거움',
+        desc: '원하는 상품을 말해보세요. 당신의 목소리로 완벽한 쇼핑을 완성합니다.',
         audioSrc: introAudio2,
-        duration: 4000
+        duration: 4000,
     },
     {
-        title: "검색부터 결제까지, 당신의 목소리와 함께",
-        desc: "모든 과정을 친절한 음성으로 안내하여 스스로 완성하는 쇼핑을 지원합니다.",
+        title: '검색부터 결제까지, 당신의 목소리와 함께',
+        desc: '모든 과정을 친절한 음성으로 안내하여 스스로 완성하는 쇼핑을 지원합니다.',
         audioSrc: introAudio3,
-        duration: 4000
+        duration: 4000,
     },
 ];
 
@@ -37,9 +37,9 @@ export default function Intro() {
     const splineLoadedRef = useRef(false);
     const navigate = useNavigate();
 
-    const audioRef = React.useRef(null);
-    const timerRef = React.useRef(null);
-    const isMountedRef = React.useRef(true);
+    const audioRef = useRef(null);
+    const timerRef = useRef(null);
+    const isMountedRef = useRef(true);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -47,13 +47,14 @@ export default function Intro() {
                 setSplineFailed(true);
             }
         }, 8000);
+
         return () => clearTimeout(timeout);
     }, []);
 
     const goToMain = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
-        setTimeout(() => navigate('/main'), 850);
+        setTimeout(() => navigate('/guide'), 850);
     };
 
     const handleStart = () => {
@@ -64,30 +65,32 @@ export default function Intro() {
         const handleKeyDown = (e) => {
             if (e.code === 'Space' || e.key === ' ' || e.code === 'Tab' || e.key === 'Tab') {
                 e.preventDefault();
+
                 if (!hasStarted) {
                     handleStart();
+                    return;
+                }
+
+                if (currentStep < STEPS.length - 1) {
+                    setCurrentStep((prev) => prev + 1);
                 } else {
-                    if (currentStep < STEPS.length - 1) {
-                        setCurrentStep(prev => prev + 1);
-                    } else {
-                        navigate('/guide');
-                    }
+                    navigate('/guide');
                 }
             }
         };
+
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [hasStarted, currentStep]);
+    }, [hasStarted, currentStep, navigate]);
 
     useEffect(() => {
         if (!hasStarted || isTransitioning) return;
-
         if (timerRef.current) return;
 
         const handleNext = () => {
             if (!isMountedRef.current) return;
             if (currentStep < STEPS.length - 1) {
-                setCurrentStep(prev => prev + 1);
+                setCurrentStep((prev) => prev + 1);
             } else {
                 goToMain();
             }
@@ -98,8 +101,8 @@ export default function Intro() {
 
         const playPromise = audio.play();
         if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.warn(`Audio Auto-play blocked.`);
+            playPromise.catch(() => {
+                console.warn('Audio auto-play blocked.');
             });
         }
 
@@ -111,14 +114,17 @@ export default function Intro() {
 
         return () => {
             isMountedRef.current = false;
+
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current = null;
             }
+
             if (timerRef.current) {
                 clearTimeout(timerRef.current);
                 timerRef.current = null;
             }
+
             setTimeout(() => {
                 isMountedRef.current = true;
             }, 0);
@@ -138,7 +144,6 @@ export default function Intro() {
                         <p className="sub-copy">스페이스바 또는 화면을 클릭하여 시작하세요</p>
                     </motion.div>
                 </div>
-                {/* 배경에 은은한 오버레이 추가 전용 클래스 활용 가능 */}
                 <div className="purple-aura" style={{ opacity: 0.2 }} />
             </div>
         );
@@ -146,7 +151,9 @@ export default function Intro() {
 
     return (
         <div className="intro-container">
-            <button className="skip-btn cursor-pointer" onClick={() => navigate('/main')}>메인으로</button>
+            <button className="skip-btn cursor-pointer" onClick={() => navigate('/guide')}>
+                건너뛰기
+            </button>
 
             <AnimatePresence>
                 {isTransitioning && (
