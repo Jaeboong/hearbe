@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from
 import { useState, useRef } from 'react';
 
 import MainLanding from '../pages/Main/MainLanding';
-import BrandLanding from '../pages/Brand/BrandLanding';
+import BrandLanding from '../pages/Brand/Brandlanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
 import AudioPage from '../pages/Audio/AudioPage';
