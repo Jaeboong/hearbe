@@ -7,13 +7,13 @@
 
 ## 1) 제출 요구사항 체크리스트
 
-- [ ] `exec` 폴더 생성 및 문서 업로드
-- [ ] Git Clone 이후 빌드/배포 절차 문서화
-- [ ] JVM/웹서버/WAS/IDE 버전 기재
-- [ ] 빌드/실행 환경변수 상세 기재
-- [ ] 배포 시 특이사항 기재
-- [ ] DB 접속 정보 및 주요 계정/프로퍼티 파일 목록 기재
-- [ ] 외부 서비스 가입/활용 정보 문서화
+- [x] `exec` 폴더 생성 및 문서 업로드
+- [x] Git Clone 이후 빌드/배포 절차 문서화
+- [x] JVM/웹서버/WAS/IDE 버전 기재
+- [x] 빌드/실행 환경변수 상세 기재
+- [x] 배포 시 특이사항 기재
+- [x] DB 접속 정보 및 주요 계정/프로퍼티 파일 목록 기재
+- [ ] 외부 서비스 가입/활용 정보 문서화 (담당자/과금/발급 콘솔 정보 보강 필요)
 - [ ] 최신 DB 덤프 파일 첨부
 
 ## 2) 프로젝트 구성(포팅 범위)
@@ -22,6 +22,12 @@
 - Frontend: `Frontend/hearbe` (React + Vite)
 - AI: `AI` (FastAPI + GPU 기반 OCR/ASR/TTS)
 - Infra(Compose): 주로 `Backend/docker-compose.yml`, `AI/docker-compose.yml`
+
+### 2-1) 운영 분리 원칙 (이번 포팅 기준)
+
+- 메인 웹서버(AWS Nginx)는 기존 설정 유지
+- AI 서버(Windows + WSL2)는 별도 서버 기준으로 포팅 정보 추가
+- 문서에는 웹 메인 설정을 변경하지 않고 AI 서버 항목만 확장
 
 ## 3) 기능 목록 (포팅 매뉴얼에 들어갈 요약)
 
@@ -129,8 +135,13 @@
 - AI API: `8000`
 - Frontend(API 연결): `VITE_API_BASE_URL`, `VITE_API_URL` 기준
 
+추가 정리:
+- 메인 웹서버 라우팅 경로는 유지: `/api/`, `/ws`, `/asr-demo/`
+- AI 서버가 웹서버와 분리된 경우 `proxy_pass` 대상 주소만 AI 서버 접근 주소로 조정
+
 ## 7) 현재 서버에서 확인된 버전(초안)
 
+웹서버(AWS, 기존 유지):
 - OS: Ubuntu 24.04.3 LTS
 - Kernel: 6.14.0-1018-aws
 - Java: OpenJDK 17.0.18
@@ -139,12 +150,20 @@
 - Docker: 29.2.0
 - Docker Compose: v5.0.2
 - Nginx: 1.24.0
-- Python/pip: 호스트에 `python3`는 있으나 `pip` 미설치(컨테이너 기준 운영)
+
+AI 서버(WSL2):
+- OS: Ubuntu 22.04.5 LTS
+- Kernel: 6.6.87.2-microsoft-standard-WSL2
+- Python: 3.10.12
+- Docker: 29.1.3
+- Docker Compose: v5.0.1
+- GPU 확인: `/usr/lib/wsl/lib/nvidia-smi`
 
 ## 8) 포팅 매뉴얼 본문 작성 시 TODO
 
 - [ ] IDE 버전(Backend/Frontend/AI 개발 IDE) 명시
-- [ ] 실제 운영 도메인 및 Reverse Proxy(Nginx) 설정 파일 경로 명시
+- [x] 실제 운영 도메인 및 Reverse Proxy(Nginx) 설정 파일 경로 명시
+- [x] 웹서버 메인 설정 유지 + AI 서버 항목 분리 기재
 - [ ] DB dump 최신본 생성/첨부
 - [ ] 서비스별 계정 담당자(누가 키 관리하는지) 기재
 - [ ] 배포 특이사항(예: GPU 필수, 외부 API 장애 시 fallback) 정리
@@ -156,4 +175,3 @@
 - `exec/EXTERNAL_SERVICES.md`
 - `exec/ENV_VARIABLES_REFERENCE.md`
 - `exec/db_dump_YYYYMMDD.sql`
-

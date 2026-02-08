@@ -11,9 +11,15 @@
 - Frontend: `Frontend/hearbe` (React + Vite)
 - AI: `AI` (FastAPI + ASR/NLU/LLM/TTS/OCR)
 
+### 1-1. 운영 환경 분리 기준
+
+- 메인 웹서버(Nginx, AWS)는 기존 설정을 유지
+- AI 서버는 별도 서버(Windows 노트북 + WSL2) 기준으로 포팅/운영 정보 추가
+- 도메인 진입점은 메인 웹서버를 유지하고, AI는 `/api/`, `/ws`, `/asr-demo/` 경로로 연동
+
 ## 2. 빌드/런타임 버전
 
-### 2-1. 서버(현재 Ubuntu 배포 환경에서 확인)
+### 2-1. 메인 웹서버 (AWS, 기존 유지)
 
 - OS: Ubuntu 24.04.3 LTS
 - Kernel: 6.14.0-1018-aws
@@ -24,7 +30,16 @@
 - Docker Compose: v5.0.2
 - Nginx: 1.24.0
 
-### 2-2. Backend 기준 버전 파일
+### 2-2. AI 서버 (별도 서버, WSL2 기준 확인값)
+
+- OS: Ubuntu 22.04.5 LTS (WSL2)
+- Kernel: 6.6.87.2-microsoft-standard-WSL2
+- Python: 3.10.12
+- Docker: 29.1.3
+- Docker Compose: v5.0.1
+- GPU: NVIDIA Driver 560.94 / CUDA 12.6 (`/usr/lib/wsl/lib/nvidia-smi` 기준)
+
+### 2-3. Backend 기준 버전 파일
 
 - Java Toolchain: 17 (`Backend/build.gradle`)
 - Spring Boot: 3.5.9 (`Backend/build.gradle`)
@@ -33,14 +48,14 @@
 - Docker Build Image: `gradle:8-jdk17` (`Backend/Dockerfile`)
 - Docker Runtime Image: `eclipse-temurin:17-jre` (`Backend/Dockerfile`)
 
-### 2-3. Frontend 기준 버전 파일
+### 2-4. Frontend 기준 버전 파일
 
 - React: 19.2.4 (`Frontend/hearbe/package.json`)
 - Vite: 7.2.4 (`Frontend/hearbe/package.json`)
 - React Router DOM: 6.28.0 (`Frontend/hearbe/package.json`)
 - PeerJS: 1.5.5 (`Frontend/hearbe/package.json`)
 
-### 2-4. AI 기준 버전 파일
+### 2-5. AI 기준 버전 파일
 
 - Base Image: `nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04` (`AI/Dockerfile`)
 - Python: 3.10 (컨테이너 설치) (`AI/Dockerfile`)
@@ -61,6 +76,14 @@
 
 - AI API: `8000:8000`
 - 내부 실행 명령: `uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
+
+### 3-3. Reverse Proxy 연계 (메인 웹서버 설정 유지)
+
+- 메인 웹서버 Nginx는 기존 설정 유지 (`/etc/nginx/sites-available/default`)
+- AI HTTP 라우팅: `location ^~ /api/` -> `http://127.0.0.1:8000`
+- AI WebSocket 라우팅: `location /ws` -> `http://127.0.0.1:8000/ws`
+- ASR 데모 라우팅: `location /asr-demo/` -> `http://127.0.0.1:8001/`
+- AI가 별도 서버일 경우, 위 `proxy_pass` 대상 주소만 실제 AI 서버 접근 주소로 조정
 
 ## 4. Git Clone 이후 빌드/배포 절차
 
@@ -257,6 +280,12 @@ curl -i http://localhost:8000/api/v1/health
   - `PUBLIC_BASE_URL`
   - `PUBLIC_WS_URL`
   - `DEBUG`
+  - `MAIN_PAGE_URL`
+  - `BACKEND_BASE_URL`
+  - `BACKEND_URL`
+  - `GENERAL_URL`
+  - `BLIND_URL`
+  - `LOW_VISION_URL`
 
 - ASR
   - `ASR_PROVIDER`
@@ -278,8 +307,11 @@ curl -i http://localhost:8000/api/v1/health
   - `LLM_API_KEY_NAME`
   - `LLM_MODEL_NAME`
   - `LLM_MAX_TOKENS`
+  - `LLM_COMMAND_MAX_TOKENS`
+  - `LLM_TTS_MAX_TOKENS`
   - `LLM_TEMPERATURE`
   - `LLM_TIMEOUT`
+  - `LLM_DEBUG_LOG`
   - `OPENAI_API_KEY`
   - `OPENAI_BASE_URL`
   - `GMS_API_KEY`
@@ -287,6 +319,7 @@ curl -i http://localhost:8000/api/v1/health
 - TTS
   - `TTS_SAMPLE_RATE`
   - `TTS_STREAMING`
+  - `TTS_SPEAKING_RATE`
   - `GOOGLE_APPLICATION_CREDENTIALS`
   - `TTS_GOOGLE_VOICE`
 
@@ -302,6 +335,9 @@ curl -i http://localhost:8000/api/v1/health
   - `FLOWS_DIR`
   - `DEFAULT_SITE`
   - `FLOW_CONFIRMATION_REQUIRED`
+  - `SEARCH_MATCH_THRESHOLD`
+  - `SEARCH_MATCH_USE_LLM`
+  - `SEARCH_MATCH_LLM_MODEL`
   - `LOG_LEVEL`
   - `LOG_CONSOLE_LEVEL`
   - `LOG_FILE_LEVEL`
@@ -325,7 +361,7 @@ curl -i http://localhost:8000/api/v1/health
 
 - 존재: `Backend/.env` (키 확인 완료)
 - 존재: `Frontend/hearbe/.env` (키 확인 완료)
-- 없음: `AI/.env` (생성 필요, `AI/.env.example` 복사)
+- 존재: `AI/.env` (실서버 값, 민감정보)
 
 ## 7. DB 접속 정보 및 ERD/프로퍼티 파일 목록
 
@@ -378,6 +414,7 @@ python3 --version
 docker --version
 docker compose version
 nvidia-smi
+/usr/lib/wsl/lib/nvidia-smi
 ```
 
 ### 9-2. GPU/컨테이너 확인
@@ -410,6 +447,7 @@ curl -i http://localhost:8000/api/v1/health/tts
 
 ## 10. 배포 시 특이사항
 
+- 메인 웹서버 Nginx 설정은 유지하고, AI 관련 포팅은 AI 서버 중심으로 별도 관리
 - AI는 GPU 가속 의존도가 높아 CPU-only 서버에서 성능/지연 저하 가능
 - AI compose에 `--reload`가 포함되어 있어 운영 시 비활성 고려
 - Backend Security 설정상 일부 엔드포인트가 `permitAll`로 열려 있으므로 운영 정책 검토 필요
@@ -422,4 +460,3 @@ curl -i http://localhost:8000/api/v1/health/tts
 - [ ] `exec/db_dump_YYYYMMDD.sql` 첨부
 - [ ] AI 별도환경 실제 값/버전 반영
 - [ ] 외부 서비스 담당자/계정 정보 반영
-
