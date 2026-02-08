@@ -6,7 +6,6 @@ import BrandLanding from '../pages/Brand/Brandlanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
 import AudioPage from '../pages/Audio/AudioPage';
-import { resolveMallRouteFromStorage } from '../utils/userTypeRoute';
 
 import LoginB from '../pages/Login/LoginB';
 import SignUpB from '../pages/SignUp/SignUpB';
@@ -67,18 +66,6 @@ function AppContent() {
     setMicPermissionGranted(granted);
     setShowInitialSetup(false);
   };
-
-  const hasStoredUserType = !!(localStorage.getItem('userType') || localStorage.getItem('user_type'));
-  const hasStoredAccessToken = !!localStorage.getItem('accessToken');
-  const hasStoredRefreshToken = !!localStorage.getItem('refreshToken');
-  const shouldAutoRouteMallFromMain =
-    location.pathname === '/main'
-    && hasStoredUserType
-    && (hasStoredAccessToken || hasStoredRefreshToken);
-
-  if (shouldAutoRouteMallFromMain) {
-    return <Navigate to={resolveMallRouteFromStorage('/B/mall')} replace />;
-  }
 
   if (showInitialSetup && (location.pathname === '/main' || location.pathname === '/intro' || location.pathname === '/')) {
     return <InitialSetup onComplete={handleSetupComplete} />;
