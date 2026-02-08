@@ -69,6 +69,9 @@ class OCRConfig:
     provider: str = "openai"  # openai, tesseract, paddleocr
     api_key: Optional[str] = None
     language: str = "kor+eng"
+    device: str = "cpu"  # paddleocr device (gpu, gpu:0, cpu)
+    http_timeout_seconds: int = 45
+    http_max_upload_mb: int = 20
 
 
 @dataclass
@@ -262,7 +265,10 @@ class ConfigManager:
         ocr = OCRConfig(
             provider=self._get_env("OCR_PROVIDER", "openai"),
             api_key=self._get_env("OCR_API_KEY") or self._get_env("OPENAI_API_KEY") or None,
-            language=self._get_env("OCR_LANGUAGE", "kor+eng")
+            language=self._get_env("OCR_LANGUAGE", "kor+eng"),
+            device=self._get_env("OCR_DEVICE", "cpu"),
+            http_timeout_seconds=self._get_env_int("OCR_HTTP_TIMEOUT_SECONDS", 45),
+            http_max_upload_mb=max(15, self._get_env_int("OCR_HTTP_MAX_UPLOAD_MB", 20)),
         )
 
         # Flow Engine 설정

@@ -127,7 +127,7 @@ export default function InitialSetup({ onComplete }) {
                             <button onClick={handleMcpDownload} className="btn-secondary-setup">나중에</button>
                             <a
                                 href={encodeURI(`/downloads/${voiceProgramDownloadFile}`)}
-                                download
+                                download={voiceProgramDownloadFile}
                                 onClick={handleMcpDownload}
                                 className="btn-primary-setup no-underline flex items-center justify-center"
                                 style={{ flex: 1.5 }}
