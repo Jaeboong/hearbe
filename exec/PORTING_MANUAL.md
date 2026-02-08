@@ -13,9 +13,10 @@
 
 ### 1-1. 운영 환경 분리 기준
 
-- 메인 웹서버(Nginx, AWS)는 기존 설정을 유지
-- AI 서버는 별도 서버(Windows 노트북 + WSL2) 기준으로 포팅/운영 정보 추가
-- 도메인 진입점은 메인 웹서버를 유지하고, AI는 `/api/`, `/ws`, `/asr-demo/` 경로로 연동
+- 메인 웹서버(Nginx, AWS): Backend API + Frontend 정적 파일 서빙 + PeerJS 프록시
+- AI 서버: 별도 서버(Windows 노트북 + WSL2)에서 독립 운영
+- Frontend에서 AI 기능(OCR, WebSocket)은 AI 서버 도메인(`jhserver.shop`)으로 직접 호출
+- 메인 웹서버 Nginx에는 AI 관련 프록시 설정 없음
 
 ## 2. 빌드/런타임 버전
 
@@ -66,24 +67,30 @@
 
 ### 3-1. Backend Compose (`Backend/docker-compose.yml`)
 
-- Backend API: `${COMPOSE_HOST_PORT}:8080`
+- Backend API: `${COMPOSE_HOST_PORT}:8080` (기본값: `8080`)
 - MariaDB: `3306:3306`
 - Redis: `6379:6379`
 - phpMyAdmin: `8108:80`
-- PeerJS: `9000:9000`
+- PeerJS: `9000:9000` (경로: `/hearbe-peer`)
 
 ### 3-2. AI Compose (`AI/docker-compose.yml`)
 
 - AI API: `8000:8000`
 - 내부 실행 명령: `uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
 
-### 3-3. Reverse Proxy 연계 (메인 웹서버 설정 유지)
+### 3-3. Reverse Proxy (메인 웹서버 Nginx 실제 설정)
 
-- 메인 웹서버 Nginx는 기존 설정 유지 (`/etc/nginx/sites-available/default`)
-- AI HTTP 라우팅: `location ^~ /api/` -> `http://127.0.0.1:8000`
-- AI WebSocket 라우팅: `location /ws` -> `http://127.0.0.1:8000/ws`
-- ASR 데모 라우팅: `location /asr-demo/` -> `http://127.0.0.1:8001/`
-- AI가 별도 서버일 경우, 위 `proxy_pass` 대상 주소만 실제 AI 서버 접근 주소로 조정
+설정 파일: `/etc/nginx/sites-available/default`
+
+- HTTPS: `443` (Let's Encrypt, `i14d108.p.ssafy.io`)
+- HTTP → HTTPS 리다이렉트 (Certbot 자동 설정)
+- Frontend 정적 파일: `location /` → `Frontend/hearbe/dist` (try_files, SPA 폴백)
+- Backend API 프록시: `location /api/` → `http://127.0.0.1:8080/` (rate-limit 적용: `limit_req zone=api_rl burst=20 nodelay`)
+- PeerJS WebSocket 프록시: `location /hearbe-peer/` → `http://127.0.0.1:9000` (Upgrade/Connection 헤더 포함)
+- 보안 헤더: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`
+- 숨김파일 차단: `location ~* /\.(?!well-known)` → deny all
+
+참고: AI 서버는 별도 도메인(`jhserver.shop`)으로 운영되며, 메인 웹서버 Nginx에 AI 관련 프록시 설정은 없음. Frontend에서 AI API를 직접 호출하는 구조.
 
 ## 4. Git Clone 이후 빌드/배포 절차
 
@@ -113,12 +120,17 @@ curl -i http://localhost:${COMPOSE_HOST_PORT}/ping
 ```bash
 cd Frontend/hearbe
 cp .env.example .env
-# 또는 운영 시 .env.production 사용
+# 프로덕션 배포 시 .env.production 이 자동 적용됨 (Vite 빌드 모드 기준)
 
 npm install
 npm run build
-npm run preview
+# 빌드 결과물은 dist/ 에 생성되며, Nginx가 직접 서빙
 ```
+
+참고:
+- 개발용 `.env`와 배포용 `.env.production`이 분리되어 있음
+- `.env.production`에 `VITE_API_BASE_URL`, `VITE_PEER_*`, `VITE_OCR_WELFARE_CARD_URL` 설정
+- `.env`에 `VITE_EMAILJS_*` 설정 (프로덕션 빌드 시 `.env`도 기본 로딩됨)
 
 ### 4-3. AI (별도 서버/별도 환경)
 
@@ -359,9 +371,12 @@ curl -i http://localhost:8000/api/v1/health
 
 ### 6-4. 현재 `.env` 파일 존재 여부
 
-- 존재: `Backend/.env` (키 확인 완료)
-- 존재: `Frontend/hearbe/.env` (키 확인 완료)
-- 존재: `AI/.env` (실서버 값, 민감정보)
+- 웹서버 기준:
+  - 존재: `Backend/.env` (키 확인 완료)
+  - 존재: `Frontend/hearbe/.env` (개발용, EmailJS 키 포함)
+  - 존재: `Frontend/hearbe/.env.production` (배포용, API/PeerJS/OCR URL)
+- AI 별도 서버 기준:
+  - `AI/.env`는 AI 별도 서버에만 존재 (웹서버에는 없음)
 
 ## 7. DB 접속 정보 및 ERD/프로퍼티 파일 목록
 
@@ -386,22 +401,31 @@ curl -i http://localhost:8000/api/v1/health
 mysqldump -h <DB_HOST> -u <DB_USER> -p <DB_NAME> > exec/db_dump_YYYYMMDD.sql
 ```
 
-## 8. 외부 서비스 목록 (가입/활용 정보 작성 대상)
+## 8. 외부 서비스 목록
 
-- OpenAI API (LLM/OCR 보조)
-- Google Cloud TTS (서비스계정 JSON 필요)
-- EmailJS (프론트 이메일 인증)
-- SMTP (Gmail 등)
-- PeerJS + STUN (`stun:stun.l.google.com:19302`)
-- OpenVidu (사용 시)
-- ElevenLabs (AI compose 변수 존재, 실제 사용 여부 확인 필요)
+### 8-1. 유료 API (AI 서버에서 사용)
 
-각 서비스별로 아래를 기재:
-- 가입 계정(조직/소유자)
-- 콘솔 URL
-- 발급 키 이름
-- 적용 위치(`.env` 변수명)
-- 월 과금/쿼터
+| 서비스 | 용도 | 모델 | 과금 | 환경변수 |
+|---|---|---|---|---|
+| OpenAI API | LLM Planner / NLU 의도 분류 | GPT-5 mini | Input $0.25/1M tokens, Cached $0.025/1M, Output $2.00/1M tokens | `OPENAI_API_KEY`, `LLM_MODEL_NAME` |
+| Google Cloud TTS | 음성 합성 | Chirp 3: HD | 무료 ~100만자, 이후 $30/100만자 (US$0.00003/자) | `GOOGLE_APPLICATION_CREDENTIALS`, `TTS_GOOGLE_VOICE` |
+
+- OpenAI: https://platform.openai.com
+- Google Cloud: https://console.cloud.google.com (서비스계정 JSON 발급 필요, `config/google-service-account.json`에 배치)
+
+### 8-2. 무료 서비스
+
+| 서비스 | 용도 | 적용 위치 | 비고 |
+|---|---|---|---|
+| EmailJS | Frontend 이메일 인증코드 발송 | `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY` | https://www.emailjs.com (무료 플랜) |
+| PeerJS + STUN | 보호자 화면 공유 (WebRTC) | `VITE_PEER_HOST`, `VITE_PEER_PORT`, `VITE_PEER_SECURE` | STUN: `stun:stun.l.google.com:19302` (무료) |
+
+### 8-3. 자체 호스팅 (외부 API 호출 없음)
+
+| 서비스 | 용도 | 모델 | 실행 위치 |
+|---|---|---|---|
+| ASR (음성 인식) | 음성→텍스트 변환 | Faster-Whisper large-v3-turbo / Qwen3-ASR-0.6B | AI 서버 GPU 로컬 |
+| OCR (문자 인식) | 복지카드 텍스트 추출 | PaddleOCR | AI 서버 GPU 로컬 |
 
 ## 9. AI 서버가 별도 환경일 때 필수 확인 항목
 
@@ -447,13 +471,70 @@ curl -i http://localhost:8000/api/v1/health/tts
 
 ## 10. 배포 시 특이사항
 
-- 메인 웹서버 Nginx 설정은 유지하고, AI 관련 포팅은 AI 서버 중심으로 별도 관리
-- AI는 GPU 가속 의존도가 높아 CPU-only 서버에서 성능/지연 저하 가능
-- AI compose에 `--reload`가 포함되어 있어 운영 시 비활성 고려
+### 10-1. 웹서버 (AWS)
+
+- Nginx에서 Backend API(`/api/`)에 rate-limit(`limit_req zone=api_rl burst=20 nodelay`) 적용 중
+- Frontend는 `npm run build` 후 `dist/` 디렉토리를 Nginx가 직접 서빙 (별도 WAS 없음)
+- PeerJS는 Nginx WebSocket 프록시(`/hearbe-peer/`)를 통해 외부 접근
 - Backend Security 설정상 일부 엔드포인트가 `permitAll`로 열려 있으므로 운영 정책 검토 필요
 - 민감정보는 반드시 `.env` 또는 시크릿 매니저로 분리
 
-## 11. 제출 전 최종 체크리스트
+### 10-2. AI 서버 (별도)
+
+- AI는 GPU 가속 의존도가 높아 CPU-only 서버에서 성능/지연 저하 가능
+- AI compose에 `--reload`가 포함되어 있어 운영 시 비활성 고려
+- AI 서버는 메인 웹서버와 독립 운영, Frontend에서 AI 도메인으로 직접 호출
+
+## 11. 발표 기준 이슈 분류 (코드 변경 없이 운영)
+
+### 11-1. 논블로킹 이슈 (발표 핵심 기능 영향 없음)
+
+- `AI/api/http.py`의 일부 상태 조회 엔드포인트(`/api/v1/health/tts`, `/api/v1/config`)는 설정 필드 참조 불일치로 오류 가능성이 있음
+- 영향 범위: 상태 조회성 API에 한정
+- 비영향 범위: 핵심 데모 플로우(프론트 회원가입 OCR, AI `/api/v1/ocr/welfare-card`, WebSocket `/ws`)는 별도 경로로 동작
+- 발표 대응: 상태 조회 API 호출은 생략하고 핵심 플로우 위주로 시연
+
+### 11-2. 블로킹 이슈 (발표 전 반드시 확인)
+
+웹서버 측:
+- Frontend `.env.production`의 `VITE_OCR_WELFARE_CARD_URL`이 실제 AI 도메인(`jhserver.shop`)과 불일치하면 OCR 기능 즉시 실패
+- Frontend 빌드 시 `.env.production`에 EmailJS 키가 없으면 이메일 인증 실패 가능 (`.env`에만 존재하므로 Vite 빌드 시 자동 머지 여부 확인 필요)
+- Nginx PeerJS 프록시(`/hearbe-peer/`) WebSocket 업그레이드 설정 정상 동작 확인
+
+AI 서버 측 (별도 서버에서 확인):
+- AI 서버의 Google 서비스계정 JSON 미배치 시 TTS 기능 실패
+- AI 서버에서 GPU 미인식 시 ASR/OCR 초기화 지연 또는 실패 가능
+- AI 서버 WebSocket(`/ws`) 경로 접근 가능 여부 확인
+
+## 12. 포트/경로 최종 체크표 (발표 전 확인용)
+
+### 12-1. 웹서버 (AWS) 라우팅
+
+| 경로 | 대상 | 비고 |
+|---|---|---|
+| `https://i14d108.p.ssafy.io` | Frontend 정적 파일 (`dist/`) | Nginx 직접 서빙, SPA 폴백 |
+| `https://i14d108.p.ssafy.io/api/*` | Backend `127.0.0.1:8080` | rate-limit 적용 |
+| `https://i14d108.p.ssafy.io/hearbe-peer/` | PeerJS `127.0.0.1:9000` | WebSocket 프록시 |
+
+### 12-2. 웹서버 컨테이너 포트
+
+| 서비스 | 호스트:컨테이너 | 비고 |
+|---|---|---|
+| Backend API | `8080:8080` | `COMPOSE_HOST_PORT` 기본값 |
+| MariaDB | `3306:3306` | |
+| Redis | `6379:6379` | |
+| phpMyAdmin | `8108:80` | |
+| PeerJS | `9000:9000` | 경로: `/hearbe-peer` |
+
+### 12-3. AI 서버 (별도)
+
+| 경로 | 대상 | 비고 |
+|---|---|---|
+| `https://jhserver.shop/api/v1/ocr/welfare-card` | AI OCR API | Frontend에서 직접 호출 |
+| `wss://jhserver.shop/ws` | AI WebSocket | Frontend에서 직접 호출 |
+| AI 내부 컨테이너 | `8000` | |
+
+## 13. 제출 전 최종 체크리스트
 
 - [ ] `exec/PORTING_MANUAL.md` 최신화
 - [ ] `exec/PORTING_MANUAL_CHECKLIST.md` 완료 체크
