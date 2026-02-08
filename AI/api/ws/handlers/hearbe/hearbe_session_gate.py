@@ -40,6 +40,9 @@ CTX_SESSION_CHECK_PREVIOUS_URL = "hearbe_session_check_previous_url"
 CTX_RECENT_LOGIN_REDIRECT_TO = "hearbe_recent_login_redirect_to"
 CTX_RECENT_LOGIN_REDIRECT_TS = "hearbe_recent_login_redirect_ts"
 CTX_RECENT_LOGIN_REDIRECT_REASON = "hearbe_recent_login_redirect_reason"
+CTX_LOGIN_GUIDANCE_URL = "hearbe_login_guidance_url"
+CTX_LOGIN_GUIDANCE_TS = "hearbe_login_guidance_ts"
+LOGIN_GUIDANCE_COOLDOWN_SEC = 60.0
 
 
 class HearbeSessionGate:
@@ -216,7 +219,16 @@ class HearbeSessionGate:
                 await self._sender.send_tts_response(session_id, self._tts.build_hearbe_main_guidance())
             return True
 
-        # On Hearbe login page, do nothing (let the user log in manually).
+        # On Hearbe login page, announce login/signup guidance once per entry.
+        if check_source == "login_page" and page_type == "login":
+            if not self._is_tts_suppressed(session_id) and self._should_send_login_guidance(session_id, check_url):
+                await self._sender.send_tts_response(
+                    session_id,
+                    self._tts.build_hearbe_login_redirect(),
+                )
+            return True
+
+        # Otherwise, do nothing (let the user log in manually).
         return False
 
     def cleanup_session(self, session_id: str) -> None:
@@ -229,6 +241,8 @@ class HearbeSessionGate:
         self._session.set_context(session_id, CTX_RECENT_LOGIN_REDIRECT_TO, None)
         self._session.set_context(session_id, CTX_RECENT_LOGIN_REDIRECT_TS, None)
         self._session.set_context(session_id, CTX_RECENT_LOGIN_REDIRECT_REASON, None)
+        self._session.set_context(session_id, CTX_LOGIN_GUIDANCE_URL, None)
+        self._session.set_context(session_id, CTX_LOGIN_GUIDANCE_TS, None)
 
     async def _start_session_check(
         self,
@@ -267,6 +281,21 @@ class HearbeSessionGate:
         if until and time.time() < float(until):
             return True
         return False
+
+    def _should_send_login_guidance(self, session_id: str, url: str) -> bool:
+        if not self._session:
+            return False
+        last_url = self._session.get_context(session_id, CTX_LOGIN_GUIDANCE_URL) or ""
+        last_ts = self._session.get_context(session_id, CTX_LOGIN_GUIDANCE_TS) or 0
+        try:
+            last_ts = float(last_ts)
+        except (TypeError, ValueError):
+            last_ts = 0.0
+        if last_url == url and (time.time() - last_ts) < LOGIN_GUIDANCE_COOLDOWN_SEC:
+            return False
+        self._session.set_context(session_id, CTX_LOGIN_GUIDANCE_URL, url)
+        self._session.set_context(session_id, CTX_LOGIN_GUIDANCE_TS, time.time())
+        return True
 
 
 def _is_hearbe_site(url: str) -> bool:

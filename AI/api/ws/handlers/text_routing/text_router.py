@@ -13,6 +13,8 @@ class TextRouter:
     def __init__(
         self,
         session_manager,
+        hearbe_signup_flow,
+        hearbe_signup_b_flow,
         payment_keypad,
         login_status,
         login_challenge,
@@ -28,6 +30,8 @@ class TextRouter:
         logout_confirm=None,
     ):
         self._session = session_manager
+        self._hearbe_signup_flow = hearbe_signup_flow
+        self._hearbe_signup_b_flow = hearbe_signup_b_flow
         self._payment_keypad = payment_keypad
         self._login_status = login_status
         self._login_challenge = login_challenge
@@ -47,6 +51,14 @@ class TextRouter:
         if not session:
             return None
         epoch = self._interrupts.get_epoch(session_id)
+
+        if self._hearbe_signup_b_flow:
+            handled = await self._hearbe_signup_b_flow.handle_user_text(session_id, text)
+            if handled:
+                return None
+
+        if self._hearbe_signup_flow:
+            await self._hearbe_signup_flow.handle_user_text(session_id, text)
 
         if self._logout_confirm:
             handled = await self._logout_confirm.handle_user_text(session_id, text)

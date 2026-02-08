@@ -16,7 +16,7 @@ if "api" not in sys.modules:
     sys.modules["api"] = api_pkg
 
 from core.interfaces import SessionState
-from api.ws.handlers.payment_keypad import (
+from api.ws.handlers.coupang.payment_keypad import (
     PaymentKeypadManager,
     CTX_ARMED,
     CTX_WAIT_ARGS,

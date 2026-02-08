@@ -15,7 +15,7 @@ from typing import Dict, Any, Optional, List
 from core.interfaces import MCPCommand
 from services.ocr.payment.pin_parser import PinParser
 from services.llm.sites.site_manager import get_page_type, get_selector
-from ..presenter.pages.checkout import (
+from ...presenter.pages.checkout import (
     KEYPAD_PROMPT,
     KEYPAD_RETRY,
     KEYPAD_LENGTH_INVALID,
@@ -24,7 +24,7 @@ from ..presenter.pages.checkout import (
     KEYPAD_FAIL_SIMPLE,
     KEYPAD_IMAGE_UNREADABLE,
 )
-from ..feedback.payment_post_handler import PaymentPostHandler
+from ...feedback.payment_post_handler import PaymentPostHandler
 
 logger = logging.getLogger(__name__)
 

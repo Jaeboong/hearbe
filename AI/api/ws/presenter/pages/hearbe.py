@@ -13,7 +13,11 @@ def build_hearbe_main_guidance_tts() -> str:
 
 
 def build_hearbe_login_redirect_tts() -> str:
-    return "로그인이 필요합니다. 로그인 페이지로 이동합니다."
+    return (
+        "로그인이 필요합니다. "
+        "회원이시라면 로그인을, 비회원이시라면 회원가입을 도와드리겠습니다. "
+        "어떻게 도와드릴까요?"
+    )
 
 
 def build_hearbe_mall_guidance_tts() -> str:
