@@ -172,12 +172,8 @@ ${termContents.security}`;
     }
   };
 
-
-  // handleAgreementChange는 더이상 필요하지 않고 setter 직접 사용
-
-
   const handleEmailBlur = () => {
-    if (!formData.email) return; // 빈 값일 때는 에러 표시 안 함 (선택 사항)
+    if (!formData.email) return;
 
     if (!formData.email.includes('@')) {
       setErrors((prev) => ({ ...prev, email: '@포함한 유효한 이메일을 입력해주세요' }));
@@ -322,15 +318,6 @@ ${termContents.security}`;
               style={{ marginBottom: '20px', cursor: 'pointer' }}
               onClick={() => navigate('/main')}
             />
-            <div className="header-title-group-c" style={{ display: 'none' }}>
-              <div className="title-icon-c">
-                <User size={32} />
-              </div>
-              <h1>회원가입</h1>
-            </div>
-            <p className="signup-subtitle-c" style={{ display: 'none' }}>
-              HearBe 서비스 이용을 위한 회원가입을 진행합니다.
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="signup-form-c">

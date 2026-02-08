@@ -43,12 +43,9 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     };
 
     const malls = [
-        { id: 'coupang', name: '쿠팡', desc: '', color: '#E2211C', initial: 'C', logo: coupangLogo, logoSize: 300, url: 'https://www.coupang.com' },
-        { id: 'naver', name: '네이버 쇼핑', desc: '', color: '#03C75A', initial: 'N', logo: naverPlusLogo, logoSize: 240, url: 'https://shopping.naver.com/ns/home' },
-        { id: 'gmarket', name: 'G마켓', desc: '', color: '#0055ff', initial: 'G', logo: gmarketLogo, logoSize: 240, url: 'https://www.gmarket.co.kr' },
-        { id: 'kurly', name: '마켓컬리', desc: '', color: '#5f0080', initial: 'K', logo: kurlyLogo, logoSize: 200, url: 'https://www.kurly.com' },
-        { id: '11st', name: '11번가', desc: '', color: '#FF4B4B', initial: '1', logo: st11Logo, logoSize: 200, url: 'https://www.11st.co.kr' },
-        { id: 'ssg', name: 'SSG.COM', desc: '', color: '#ffb100', initial: 'S', logo: ssgLogo, logoSize: 240, url: 'https://www.ssg.com' },
+        { id: 'coupang', name: '쿠팡', desc: '', color: '#E2211C', initial: 'C', logo: coupangLogo, logoSize: 300, url: 'https://www.coupang.com', disabled: false },
+        { id: 'naver', name: '네이버 쇼핑', desc: '서비스 준비 중입니다.', color: '#03C75A', initial: 'N', logo: naverPlusLogo, logoSize: 240, url: '', disabled: true },
+        { id: '11st', name: '11번가', desc: '서비스 준비 중입니다.', color: '#FF4B4B', initial: '1', logo: st11Logo, logoSize: 200, url: '', disabled: true },
     ];
 
     const [isScrolled, setIsScrolled] = React.useState(false);
@@ -62,7 +59,7 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
     }, []);
 
     const handleSelect = (mall) => {
-        // Open shopping mall in new tab
+        if (mall.disabled) return;
         window.open(mall.url, '_blank');
     };
 
@@ -82,7 +79,7 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
 
                 <div className="header-right-c">
 
-                    <button className="nav-item-c cursor-pointer" onClick={onCart || (() => navigate('/C/mypage/cart', { state: { activeTab: 'cart' } }))}>
+                    <button className="nav-item-c cursor-pointer" onClick={onCart || (() => navigate('/C/cart'))}>
                         <div className="nav-icon-c"><ShoppingCart size={24} /></div>
                         <span>장바구니</span>
                     </button>
@@ -110,28 +107,28 @@ const SelectMallC = ({ onBack, onHome, onCart, onMyPage, onSelectMall }) => {
                     {malls.map((mall, index) => (
                         <div
                             key={mall.id}
-                            className="mall-card-new-c cursor-pointer"
+                            className={`mall-card-new-c ${mall.disabled ? 'mall-card-disabled' : 'cursor-pointer'}`}
                             onClick={() => handleSelect(mall)}
                         >
                             <div className="card-top-row-c">
                                 <div className="card-title-row-c">
-                                    <div className="card-num-badge-c" style={{ backgroundColor: mall.color }}>
+                                    <div className="card-num-badge-c" style={{ backgroundColor: mall.disabled ? '#cbd5e1' : mall.color }}>
                                         {index + 1}
                                     </div>
                                     <h3 className="mall-card-name-c">{mall.name}</h3>
                                 </div>
-                                <ArrowUpRight className="card-link-icon-c" size={20} />
+                                {!mall.disabled && <ArrowUpRight className="card-link-icon-c" size={20} />}
                             </div>
 
                             <img src={mall.logo} alt={mall.name} className="card-watermark-logo-c" style={mall.logoSize ? { width: `${mall.logoSize}px` } : {}} />
 
                             <div className="card-content-c">
-                                <p className="mall-card-desc-c">{mall.desc}</p>
+                                {!mall.disabled && <p className="mall-card-desc-c">{mall.desc}</p>}
                             </div>
 
                             <div className="card-footer-c">
-                                <span className="open-store-text-c">OPEN STORE</span>
-                                <span className="open-store-arrow-c">→</span>
+                                <span className="open-store-text-c">{mall.disabled ? 'COMING SOON' : 'OPEN STORE'}</span>
+                                {!mall.disabled && <span className="open-store-arrow-c">→</span>}
                             </div>
                         </div>
                     ))}

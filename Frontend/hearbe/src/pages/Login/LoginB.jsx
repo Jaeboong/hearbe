@@ -6,7 +6,7 @@ import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
 import './LoginB.css';
 
-const Login = () => {
+const LoginB = () => {
     const navigate = useNavigate();
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
@@ -15,24 +15,39 @@ const Login = () => {
     const [rememberLogin, setRememberLogin] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            navigate('/B/mall');
-            return;
-        }
-        const savedId = localStorage.getItem('savedLoginId');
-        const savedPassword = localStorage.getItem('savedLoginPassword');
-        if (savedId) {
-            setId(savedId);
-            setRememberLogin(true);
-        }
-        if (savedPassword) {
-            setPassword(savedPassword);
-            setRememberLogin(true);
-        }
-        if (savedId && savedPassword) {
-            handleLogin(null, savedId, savedPassword, true);
-        }
+        const checkAutoLogin = async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+            if (accessToken) {
+                navigate('/B/mall');
+                return;
+            }
+
+            if (refreshToken) {
+                try {
+                    setIsListening?.(false); // If there's a listener
+                    setIsLoading(true);
+                    await authAPI.refreshToken();
+                    navigate('/B/mall');
+                    return;
+                } catch (error) {
+                    console.warn("Auto-login failed:", error);
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+
+            const savedId = localStorage.getItem('savedLoginId');
+            if (savedId) {
+                setId(savedId);
+                setRememberLogin(true);
+            }
+        };
+
+        checkAutoLogin();
     }, [navigate]);
 
     const handleLogin = async (e, loginId = id, loginPassword = password, isAuto = false) => {
@@ -43,52 +58,32 @@ const Login = () => {
                 Swal.fire({
                     icon: 'warning',
                     text: '아이디와 비밀번호를 입력해주세요.',
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
             }
             return;
         }
+
         setIsLoading(true);
         try {
-            const response = await authAPI.login(loginId, loginPassword);
+            await authAPI.login(loginId, loginPassword);
 
-            const accessToken =
-                response?.data?.accessToken ||
-                response?.data?.access_token ||
-                response?.accessToken ||
-                response?.access_token;
-            const refreshToken =
-                response?.data?.refreshToken ||
-                response?.data?.refresh_token ||
-                response?.refreshToken ||
-                response?.refresh_token;
-
-            if (accessToken) {
-                localStorage.setItem('accessToken', accessToken);
-            }
-            if (refreshToken) {
-                localStorage.setItem('refreshToken', refreshToken);
+            // 로그인 유지 체크 여부에 따라 처리
+            if (rememberLogin) {
+                localStorage.setItem('savedLoginId', loginId);
+            } else {
+                // 로그인 유지를 체크하지 않으면 아이디와 리프레시 토큰 모두 삭제 (철저한 보안)
+                localStorage.removeItem('savedLoginId');
+                localStorage.removeItem('refreshToken');
             }
 
-            const isSuccess = response?.code === 200 || !!accessToken;
+            // 보안을 위해 기존 저장된 비밀번호 삭제 (있을 경우)
+            localStorage.removeItem('savedLoginPassword');
 
-            if (isSuccess) {
-                if (rememberLogin) {
-                    localStorage.setItem('savedLoginId', loginId);
-                    localStorage.setItem('savedLoginPassword', loginPassword);
-                } else {
-                    localStorage.removeItem('savedLoginId');
-                    localStorage.removeItem('savedLoginPassword');
-                }
-                navigate('/B/mall');
-            } else if (!isAuto) {
-                const message = response?.message || '로그인에 실패했습니다.';
-                Swal.fire({
-                    icon: 'error',
-                    text: message.includes('존재') || message.includes('없') ? '회원가입이 필요합니다.' : message,
-                    confirmButtonText: '확인'
-                });
-            }
+            navigate('/B/mall');
         } catch (error) {
             console.error('Login Error:', error);
             if (!isAuto) {
@@ -96,7 +91,10 @@ const Login = () => {
                 Swal.fire({
                     icon: 'error',
                     text: errorMessage.includes('존재') || errorMessage.includes('없') ? '회원가입이 필요합니다.' : errorMessage,
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
             }
         } finally {
@@ -184,5 +182,5 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginB;
 

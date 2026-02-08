@@ -230,8 +230,6 @@ export const authAPI = {
         }
     },
 
-
-
     refreshToken: async () => {
         try {
             const refreshToken = localStorage.getItem('refreshToken');
@@ -309,20 +307,17 @@ export const authAPI = {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('savedLoginId');
-            localStorage.removeItem('savedLoginPassword');
             localStorage.removeItem('savedLoginId_C');
+            localStorage.removeItem('savedLoginPassword');
             localStorage.removeItem('savedLoginPassword_C');
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
             localStorage.removeItem('user_name');
             localStorage.removeItem('userType');
-            // sessionStorage 정리 (혹시 남아있을 경우)
-            sessionStorage.removeItem('accessToken');
-            sessionStorage.removeItem('refreshToken');
-            sessionStorage.removeItem('user');
-            sessionStorage.removeItem('user_id');
-            sessionStorage.removeItem('username');
+
+            // sessionStorage 정리
+            sessionStorage.clear();
         }
     },
 
@@ -512,7 +507,6 @@ export const authAPI = {
         }
     }
 };
-
 
 if (import.meta.env.DEV) {
     window.authAPI = authAPI;

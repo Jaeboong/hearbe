@@ -57,7 +57,7 @@
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
-    padding: 10px 40px 60px;
+    padding: 80px 40px 60px;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -86,6 +86,27 @@
 .mall-item-a:hover {
     transform: scale(1.02);
     background: rgba(255, 240, 100, 0.08);
+}
+
+.mall-item-a.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: #334155;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.mall-item-a.disabled:hover {
+    transform: none;
+}
+
+.mall-item-a.disabled .mall-logo-img-a {
+    filter: grayscale(1);
+    opacity: 0.1;
+    /* 로고를 아주 희미하게 */
+}
+
+.mall-item-a.disabled .mall-name-a {
+    color: #475569;
 }
 
 .mall-num-a {
