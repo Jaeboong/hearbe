@@ -12,6 +12,7 @@ const STEPS = {
 };
 
 const VOICE_PROGRAM_BASE_NAME = '음성지원프로그램';
+const VOICE_PROGRAM_LATEST_FILE = `${VOICE_PROGRAM_BASE_NAME}_latest.zip`;
 
 export default function InitialSetup({ onComplete }) {
     const [currentStep, setCurrentStep] = useState(STEPS.MCP_DOWNLOAD);
@@ -45,7 +46,7 @@ export default function InitialSetup({ onComplete }) {
 
     const voiceProgramDownloadFile = voiceProgramVersion
         ? `${VOICE_PROGRAM_BASE_NAME}_${voiceProgramVersion}.zip`
-        : 'MCPDesktop.zip';
+        : VOICE_PROGRAM_LATEST_FILE;
 
     const handleMcpDownload = () => {
         setCurrentStep(STEPS.MIC_PERMISSION);

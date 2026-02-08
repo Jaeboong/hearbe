@@ -128,7 +128,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
                             { icon: <BookOpen size={22} />, path: '/guide', label: '가이드' },
                             {
                                 icon: <Download size={22} />,
-                                path: voiceProgramVersion ? encodeURI(`/downloads/${voiceProgramDownloadFile}`) : `/downloads/MCPDesktop.zip`,
+                                path: encodeURI(`/downloads/${voiceProgramDownloadFile}`),
                                 label: '다운로드',
                                 isExternal: true
                             }
