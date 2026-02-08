@@ -106,14 +106,20 @@ const WishlistB = () => {
             Swal.fire({
                 icon: 'success',
                 text: `${item.name}을(를) 장바구니에 담았습니다.`,
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         } catch (err) {
             console.error('Failed to add to cart:', err);
             Swal.fire({
                 icon: 'error',
                 text: err.message || '장바구니 담기에 실패했습니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };

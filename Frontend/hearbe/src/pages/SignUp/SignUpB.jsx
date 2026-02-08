@@ -29,7 +29,7 @@ const formatPhoneNumber = (value) => {
 
 const validatePassword = (password) => /^\d{6}$/.test(password);
 
-const SignUp = () => {
+const SignUpB = () => {
     const navigate = useNavigate();
 
     // Form State
@@ -80,7 +80,10 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'error',
                 text: '카메라에 접근할 수 없습니다. 권한을 확인해주세요.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };
@@ -121,7 +124,10 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'warning',
                 text: idError,
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -135,14 +141,20 @@ const SignUp = () => {
                 Swal.fire({
                     icon: 'success',
                     text: '사용 가능한 아이디입니다.',
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
             } else {
                 setIsIdAvailable(false);
                 Swal.fire({
                     icon: 'error',
                     text: '이미 사용 중인 아이디입니다.',
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
                 setIsIdChecked(true);
             }
@@ -150,7 +162,10 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'error',
                 text: error.message || "아이디 중복 확인에 실패했습니다.",
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };
@@ -171,40 +186,41 @@ const SignUp = () => {
     };
 
     const handleCardRegister = () => {
-        const today = new Date();
-        const issueDate = today.toISOString().split('T')[0];
         setCardData({
             ...cardForm,
-            issueDate
+            issueDate: '2024-01-01'
         });
         setShowCamera(false);
         setModalStep('camera');
         Swal.fire({
             icon: 'success',
             text: '복지카드가 등록되었습니다.',
-            confirmButtonText: '확인'
+            background: '#141C29',
+            color: '#FFF064',
+            confirmButtonColor: '#FFF064',
+            confirmButtonText: '<span style="color:#141C29">확인</span>'
         });
     };
 
     const handleSignUp = async () => {
         if (!isIdChecked || !isIdAvailable) {
-            Swal.fire({ icon: 'warning', text: '아이디 중복 확인이 필요합니다.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '아이디 중복 확인이 필요합니다.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!validatePassword(formData.password)) {
-            Swal.fire({ icon: 'warning', text: '비밀번호는 숫자 6자리를 입력해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '비밀번호는 숫자 6자리를 입력해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!formData.name) {
-            Swal.fire({ icon: 'warning', text: '이름을 입력해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '이름을 입력해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!cardData) {
-            Swal.fire({ icon: 'warning', text: '장애인 복지카드를 등록해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '장애인 복지카드를 등록해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!terms.term1 || !terms.term2) {
-            Swal.fire({ icon: 'warning', text: '필수 이용약관에 동의해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '필수 이용약관에 동의해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
 
@@ -230,7 +246,10 @@ const SignUp = () => {
                 Swal.fire({
                     icon: 'success',
                     text: '가입 완료! HearBe 회원이 되신 것을 환영합니다.',
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
                 navigate('/B/login');
             } else {
@@ -240,7 +259,10 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'error',
                 text: error.message || "회원가입 중 오류가 발생했습니다.",
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };
@@ -481,4 +503,4 @@ const SignUp = () => {
     );
 };
 
-export default SignUp;
+export default SignUpB;

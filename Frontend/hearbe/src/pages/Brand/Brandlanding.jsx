@@ -12,22 +12,22 @@ import {
     Layout,
     Share2
 } from 'lucide-react';
-import logoC from '../assets/logoC.png';
-import guideAudio1 from '../assets/audio/guide/brand_guide_1.wav';
-import guideAudio2 from '../assets/audio/guide/brand_guide_2.wav';
-import guideAudio3 from '../assets/audio/guide/brand_guide_3.wav';
+import logoC from '../../assets/logoC.png';
+import guideAudio1 from '../../assets/audio/guide/brand_guide_1.wav';
+import guideAudio2 from '../../assets/audio/guide/brand_guide_2.wav';
+import guideAudio3 from '../../assets/audio/guide/brand_guide_3.wav';
 
 const WaveBackground = () => (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <svg className="absolute left-0 w-[200%] h-full opacity-[0.03] animate-wave" viewBox="0 0 1000 1000" preserveAspectRatio="none">
             <path d="M0,500 C150,400 350,600 500,500 C650,400 850,600 1000,500 L1000,1000 L0,1000 Z" fill="url(#wave-gradient)" />
+            <defs>
+                <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#7C3AED" />
+                    <stop offset="100%" stopColor="#3B82F6" />
+                </linearGradient>
+            </defs>
         </svg>
-        <defs>
-            <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#7C3AED" />
-                <stop offset="100%" stopColor="#3B82F6" />
-            </linearGradient>
-        </defs>
     </div>
 );
 
@@ -117,7 +117,7 @@ const BrandLanding = () => {
                             <span className="text-purple-600 font-bold tracking-widest uppercase mb-4 block">User Guide</span>
                             <h2 className="text-6xl font-black mb-8 text-gray-900 leading-[1.1]">
                                 간단하게,<br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">시작하세요.</span>
+                                <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-600 to-indigo-600">시작하세요.</span>
                             </h2>
                             <p className="text-2xl text-gray-600 font-medium leading-relaxed max-w-md">
                                 복잡한 절차 없이 세 단계만으로.<br />
@@ -155,7 +155,7 @@ const BrandLanding = () => {
             audioSrc: guideAudio3,
             duration: 8000,
             content: (
-                <section className="min-w-[100vw] h-full flex flex-col justify-center items-center relative px-6 z-10 bg-[#0f0d15] text-white shrink-0">
+                <section className="min-w-screen h-full flex flex-col justify-center items-center relative px-6 z-10 bg-[#0f0d15] text-white shrink-0">
                     <div className="text-center z-10">
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
@@ -175,7 +175,7 @@ const BrandLanding = () => {
                             className="relative group"
                         >
                             <div className="absolute inset-0 bg-purple-600/30 blur-[60px] rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                            <div className="absolute inset-0 bg-indigo-600/20 blur-[40px] rounded-full scale-125 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none" />
+                            <div className="absolute inset-0 bg-indigo-600/20 blur-2xl rounded-full scale-125 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none" />
 
                             <button
                                 onClick={goToMain}

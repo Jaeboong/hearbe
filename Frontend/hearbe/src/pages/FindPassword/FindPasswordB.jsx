@@ -99,7 +99,10 @@ const FindPasswordB = () => {
             Swal.fire({
                 icon: 'warning',
                 text: '복지카드 정보를 모두 입력해주세요.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -118,7 +121,10 @@ const FindPasswordB = () => {
             Swal.fire({
                 icon: 'success',
                 text: '인증 완료. 비밀번호 재설정 페이지로 이동합니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
 
             localStorage.setItem('welfare_verified', 'true');
@@ -136,7 +142,10 @@ const FindPasswordB = () => {
             Swal.fire({
                 icon: 'error',
                 text: error.message || '인증에 실패했습니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };

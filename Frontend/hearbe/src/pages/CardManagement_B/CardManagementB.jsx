@@ -163,7 +163,10 @@ const CardManagementB = () => {
             Swal.fire({
                 icon: 'warning',
                 text: '복지카드 정보를 모두 입력해주세요.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -172,7 +175,10 @@ const CardManagementB = () => {
             Swal.fire({
                 icon: 'warning',
                 text: '유효기간은 MM/YY 형식으로 입력해주세요.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -181,7 +187,10 @@ const CardManagementB = () => {
             Swal.fire({
                 icon: 'warning',
                 text: '카드번호는 숫자 16자리로 입력해주세요.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -190,7 +199,10 @@ const CardManagementB = () => {
             Swal.fire({
                 icon: 'warning',
                 text: 'CVC는 3자리 숫자여야 합니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -210,7 +222,10 @@ const CardManagementB = () => {
             Swal.fire({
                 icon: 'error',
                 text: error.message || '복지카드 정보 저장에 실패했습니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };

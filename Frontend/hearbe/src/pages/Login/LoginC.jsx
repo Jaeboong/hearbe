@@ -17,26 +17,43 @@ const LoginC = () => {
 
 
     useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            navigate('/C/mall');
-            return;
-        }
+        const checkAutoLogin = async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
 
-        const savedId = localStorage.getItem('savedLoginId_C');
-        const savedPassword = localStorage.getItem('savedLoginPassword_C');
-        if (savedId) {
-            setId(savedId);
-            setRememberLogin(true);
-        }
-        if (savedPassword) {
-            setPassword(savedPassword);
-            setRememberLogin(true);
-        }
-        if (savedId && savedPassword) {
-            handleLogin(null, savedId, savedPassword, true);
-        }
-    }, []);
+            // 1. 이미 유효한 액세스 토큰이 있으면 즉시 이동
+            if (accessToken) {
+                navigate('/C/mall');
+                return;
+            }
+
+            // 2. 액세스 토큰은 없지만 리프레시 토큰이 있으면 갱신 시도
+            if (refreshToken) {
+                try {
+                    setIsLoading(true);
+                    await authAPI.refreshToken();
+                    navigate('/C/mall');
+                    return;
+                } catch (error) {
+                    console.warn("Auto-login failed:", error);
+                    // 갱신 실패하면 잘못된 토큰들 정리
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+
+            // 3. 자동 로그인 실패 시 저장된 아이디만 불러오기
+            const savedId = localStorage.getItem('savedLoginId_C');
+            if (savedId) {
+                setId(savedId);
+                setRememberLogin(true);
+            }
+        };
+
+        checkAutoLogin();
+    }, [navigate]);
 
     const handleLogin = async (e, loginId = id, loginPassword = password, isAuto = false) => {
         if (e) e.preventDefault();
@@ -55,15 +72,17 @@ const LoginC = () => {
         try {
             const response = await authAPI.login(loginId, loginPassword);
 
-
-
+            // 로그인 유지 체크 여부에 따라 처리
             if (rememberLogin) {
                 localStorage.setItem('savedLoginId_C', loginId);
-                localStorage.setItem('savedLoginPassword_C', loginPassword);
             } else {
                 localStorage.removeItem('savedLoginId_C');
-                localStorage.removeItem('savedLoginPassword_C');
+                // 로그인 유지 미체크 시 리프레시 토큰 삭제 (다음 방문 시 자동로그인 방지)
+                localStorage.removeItem('refreshToken');
             }
+
+            // 보안을 위해 기존 저장된 비밀번호 삭제 (있을 경우)
+            localStorage.removeItem('savedLoginPassword_C');
 
             if (response.data && response.data.id) {
                 localStorage.setItem('user_id', response.data.id);
