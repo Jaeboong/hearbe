@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 
+from core.korean_product_terms import format_product_terms_for_tts
 # OCR 파이프라인 경로 추가
 OCR_PATH = Path(__file__).parent.parent / "ocr" / "text_processors"
 if str(OCR_PATH) not in sys.path:
@@ -54,8 +55,9 @@ class OCRChunkResult:
         if not self.summary:
             return "이미지에서 추가 정보를 찾지 못했습니다."
 
+        formatted = [format_product_terms_for_tts(line) for line in self.summary if line]
         # 요약 문장들을 연결
-        return ". ".join(self.summary) + "."
+        return ". ".join(formatted) + "."
 
 
 class OCRIntegrator:

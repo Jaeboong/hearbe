@@ -7,6 +7,8 @@ Always read only name + price for consistency.
 import re
 from typing import List, Dict, Tuple
 
+from core.korean_product_terms import format_product_terms_for_tts
+
 
 def _get_name(item: Dict) -> str:
     return (
@@ -62,7 +64,7 @@ def build_search_read_tts(
     lines = []
     for idx in range(start_index, end_index):
         item = products[idx]
-        name = _get_name(item)
+        name = format_product_terms_for_tts(_get_name(item))
         price = _get_price(item)
         line = f"{idx + 1}번, {name}"
         if price:
