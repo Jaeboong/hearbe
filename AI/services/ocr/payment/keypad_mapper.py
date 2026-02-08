@@ -70,12 +70,8 @@ def map_keypad_image(
         with _OCR_LOCK:
             start = time.time()
             ocr = _get_ocr_instance(device)
-            ocr_result = korean_ocr.process_image(
-                image_path,
-                output_dir=tmpdir,
-                save_vis=False,
-                ocr_instance=ocr,
-            )
+            # 파일 경로를 직접 전달 (process_image의 numpy 변환은 키패드에 불필요)
+            ocr_raw = korean_ocr.run_ocr(image_path, ocr_instance=ocr)
             duration = time.time() - start
             try:
                 import logging
@@ -87,6 +83,11 @@ def map_keypad_image(
             except Exception:
                 pass
 
+    texts_with_scores = korean_ocr.extract_texts_with_scores(ocr_raw)
+    ocr_result = {
+        "rec_texts": [item["text"] for item in texts_with_scores],
+        "rec_scores": [item["score"] for item in texts_with_scores],
+    }
     digits = extract_digits_from_ocr_result(ocr_result)
     mapping = create_digit_to_key_mapping(digits, dom_keys)
     return {

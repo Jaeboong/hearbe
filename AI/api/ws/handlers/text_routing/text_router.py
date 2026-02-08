@@ -15,6 +15,7 @@ class TextRouter:
         session_manager,
         hearbe_signup_flow,
         hearbe_signup_b_flow,
+        coupang_order_cancel_flow,
         payment_keypad,
         login_status,
         login_challenge,
@@ -32,6 +33,7 @@ class TextRouter:
         self._session = session_manager
         self._hearbe_signup_flow = hearbe_signup_flow
         self._hearbe_signup_b_flow = hearbe_signup_b_flow
+        self._coupang_order_cancel_flow = coupang_order_cancel_flow
         self._payment_keypad = payment_keypad
         self._login_status = login_status
         self._login_challenge = login_challenge
@@ -54,6 +56,11 @@ class TextRouter:
 
         if self._hearbe_signup_b_flow:
             handled = await self._hearbe_signup_b_flow.handle_user_text(session_id, text)
+            if handled:
+                return None
+
+        if self._coupang_order_cancel_flow:
+            handled = await self._coupang_order_cancel_flow.handle_user_text(session_id, text)
             if handled:
                 return None
 
