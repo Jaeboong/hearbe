@@ -29,8 +29,6 @@ const SelectMallB = () => {
             title: '로그아웃 하시겠습니까?',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: '로그아웃',
-            cancelButtonText: '취소',
             background: '#141C29',
             color: '#FFF064',
             confirmButtonColor: '#FFF064',
