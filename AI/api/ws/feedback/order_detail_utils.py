@@ -49,6 +49,8 @@ def extract_order_id_from_order_detail_url(url: str) -> str:
 def is_order_detail_question(text: str) -> bool:
     if not text:
         return False
+    if is_order_cancel_intent(text):
+        return False
     keywords = [
         "주문",
         "배송",
@@ -70,6 +72,17 @@ def is_order_detail_question(text: str) -> bool:
         "보여",
     ]
     return any(word in text for word in keywords)
+
+
+def is_order_cancel_intent(text: str) -> bool:
+    if not text:
+        return False
+    normalized = "".join(text.split())
+    if "주문취소" in normalized or "배송취소" in normalized:
+        return True
+    if "취소" in normalized and "주문" in normalized:
+        return True
+    return False
 
 
 def is_order_detail_read_request(text: str) -> bool:
@@ -254,6 +267,7 @@ __all__ = [
     "is_order_detail_url",
     "extract_order_id_from_order_detail_url",
     "is_order_detail_question",
+    "is_order_cancel_intent",
     "is_order_detail_read_request",
     "build_order_detail_summary",
     "build_order_detail_actions",

@@ -114,7 +114,10 @@ class CommandQueueManager:
 
         key = _fingerprint(tool_name, arguments or {})
         if key not in batch.pending:
-            return False
+            fallback_key = _resolve_fallback_key(batch.pending, tool_name, arguments)
+            if not fallback_key:
+                return False
+            key = fallback_key
 
         batch.pending[key] -= 1
         if batch.pending[key] <= 0:
@@ -215,6 +218,21 @@ def _fingerprint(tool_name: str, arguments: dict) -> str:
     except Exception:
         payload = str(arguments)
     return f"{tool_name}:{payload}"
+
+
+def _resolve_fallback_key(pending: Dict[str, int], tool_name: str, arguments: Optional[dict]) -> Optional[str]:
+    """
+    MCP 결과에 arguments가 누락되는 경우를 대비한 폴백 매칭.
+
+    동일 tool_name에 대해 pending이 1개뿐일 때만 매칭한다.
+    """
+    if arguments:
+        return None
+    prefix = f"{tool_name}:"
+    candidates = [key for key in pending.keys() if key.startswith(prefix)]
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
 
 
 def _get_wait_timeout() -> float:
