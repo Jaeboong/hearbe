@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { Eye, EyeOff } from 'lucide-react';
 import logoC from '../../assets/logoC.png';
 import { authAPI } from '../../services/authAPI';
+import { resolveMallRouteFromAuthResponse, resolveMallRouteFromStorage } from '../../utils/userTypeRoute';
 import './LoginC.css';
 
 const LoginC = () => {
@@ -23,7 +24,7 @@ const LoginC = () => {
 
             // 1. 이미 유효한 액세스 토큰이 있으면 즉시 이동
             if (accessToken) {
-                navigate('/C/mall');
+                navigate(resolveMallRouteFromStorage('/C/mall'));
                 return;
             }
 
@@ -32,7 +33,7 @@ const LoginC = () => {
                 try {
                     setIsLoading(true);
                     await authAPI.refreshToken();
-                    navigate('/C/mall');
+                    navigate(resolveMallRouteFromStorage('/C/mall'));
                     return;
                 } catch (error) {
                     console.warn("Auto-login failed:", error);
@@ -92,7 +93,7 @@ const LoginC = () => {
                 localStorage.setItem('user_name', response.data.name);
             }
 
-            navigate('/C/mall');
+            navigate(resolveMallRouteFromAuthResponse(response, '/C/mall'));
         } catch (error) {
             console.error("Login failed:", error);
             if (!isAuto) {

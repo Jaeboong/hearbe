@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { Eye, EyeOff, User, Lock, Check } from 'lucide-react';
 import logo from '../../assets/logoA.png';
 import { authAPI } from '../../services/authAPI';
+import { resolveMallRouteFromAuthResponse, resolveMallRouteFromStorage } from '../../utils/userTypeRoute';
 import './LoginB.css';
 
 const LoginB = () => {
@@ -20,16 +21,15 @@ const LoginB = () => {
             const refreshToken = localStorage.getItem('refreshToken');
 
             if (accessToken) {
-                navigate('/B/mall');
+                navigate(resolveMallRouteFromStorage('/B/mall'));
                 return;
             }
 
             if (refreshToken) {
                 try {
-                    setIsListening?.(false); // If there's a listener
                     setIsLoading(true);
                     await authAPI.refreshToken();
-                    navigate('/B/mall');
+                    navigate(resolveMallRouteFromStorage('/B/mall'));
                     return;
                 } catch (error) {
                     console.warn("Auto-login failed:", error);
@@ -69,7 +69,7 @@ const LoginB = () => {
 
         setIsLoading(true);
         try {
-            await authAPI.login(loginId, loginPassword);
+            const response = await authAPI.login(loginId, loginPassword);
 
             // 로그인 유지 체크 여부에 따라 처리
             if (rememberLogin) {
@@ -83,7 +83,7 @@ const LoginB = () => {
             // 보안을 위해 기존 저장된 비밀번호 삭제 (있을 경우)
             localStorage.removeItem('savedLoginPassword');
 
-            navigate('/B/mall');
+            navigate(resolveMallRouteFromAuthResponse(response, '/B/mall'));
         } catch (error) {
             console.error('Login Error:', error);
             if (!isAuto) {
@@ -183,4 +183,3 @@ const LoginB = () => {
 };
 
 export default LoginB;
-

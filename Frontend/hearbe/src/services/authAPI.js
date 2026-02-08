@@ -175,8 +175,9 @@ export const authAPI = {
                 localStorage.setItem('user_name', data.data.name);
             }
             // userType 저장 (BLIND, LOW_VISION, GENERAL)
-            if (data.data && data.data.userType) {
-                localStorage.setItem('userType', data.data.userType);
+            const resolvedUserType = data?.data?.userType || data?.data?.user_type || data?.userType || data?.user_type;
+            if (resolvedUserType) {
+                localStorage.setItem('userType', String(resolvedUserType).trim().toUpperCase());
             }
 
             return data;
