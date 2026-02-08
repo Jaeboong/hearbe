@@ -226,8 +226,27 @@ async def extract_coupang_order_detail(page) -> Dict[str, Any]:
       if (orderDateMatch) textData.order_date = orderDateMatch[1].replace(/\s+/g, ' ').trim();
       const statusMatch = bodyText.match(/(배송중|배송완료|배송준비|상품준비|주문완료)/);
       if (statusMatch) textData.status = statusMatch[1];
+
+      const findEtaDom = () => {
+        const candidates = [];
+        const colorSpans = Array.from(document.querySelectorAll("span[color='#008C00'], span[style*='color:#008C00'], span[style*='color: #008C00']"));
+        candidates.push(...colorSpans);
+        candidates.push(...Array.from(document.querySelectorAll('span, em, strong, p, div')));
+        for (const el of candidates) {
+          const txt = getText(el);
+          if (!txt) continue;
+          if (/(오늘|내일)\([^\)]+\)\s*도착\s*(?:보장|예정)?/.test(txt)) return txt;
+          if (/새벽\s*도착\s*보장/.test(txt)) return txt;
+          if (/도착\s*보장/.test(txt)) return txt;
+        }
+        return '';
+      };
+
+      const etaDom = findEtaDom();
+      if (etaDom) textData.eta = etaDom;
+
       const etaMatch = bodyText.match(/(오늘|내일)\([^\)]+\)\s*도착\s*보장/);
-      if (etaMatch) textData.eta = etaMatch[0];
+      if (etaMatch) textData.eta = textData.eta || etaMatch[0];
       if (!textData.eta) {
         const etaMatch2 = bodyText.match(/([0-9]{1,2}[./월]\s*[0-9]{1,2}[일]?\s*\([^\)]+\)\s*도착\s*(?:예정|보장)?)/);
         if (etaMatch2) textData.eta = etaMatch2[1].replace(/\s+/g, ' ').trim();
@@ -246,8 +265,71 @@ async def extract_coupang_order_detail(page) -> Dict[str, Any]:
       if (addrMatch) textData.recipient_address = `(${addrMatch[1]}) ${addrMatch[2].trim()}`;
       orderData.text = textData;
 
+      const paymentDetail = {};
+      const labelMap = [
+        { key: "total_product_price", labels: ["총 상품 금액", "상품 금액", "상품금액"] },
+        { key: "shipping_fee", labels: ["배송비"] },
+        { key: "discount_amount", labels: ["할인", "쿠폰할인", "즉시할인", "할인 금액"] },
+        { key: "total_payed_amount", labels: ["총 결제 금액", "결제 금액", "총결제금액", "결제금액"] },
+        { key: "pay_method", labels: ["결제 수단", "결제수단", "결제 방법", "결제방법"] },
+      ];
+      const collectValue = (labelEl) => {
+        if (!labelEl) return '';
+        const directSibling = labelEl.nextElementSibling;
+        if (directSibling) {
+          const siblingText = getText(directSibling);
+          if (siblingText) return siblingText;
+        }
+        const row = labelEl.closest('tr');
+        if (row) {
+          const tds = Array.from(row.querySelectorAll('td'));
+          if (tds.length) {
+            const rowText = getText(tds[tds.length - 1]);
+            if (rowText) return rowText;
+          }
+        }
+        const dl = labelEl.closest('dl');
+        if (dl) {
+          const dd = dl.querySelector('dd');
+          const ddText = getText(dd);
+          if (ddText) return ddText;
+        }
+        return '';
+      };
+      const getPaymentDetailFromDom = () => {
+        const nodes = Array.from(document.querySelectorAll('dt, th, span, p, div, strong, em'));
+        for (const entry of labelMap) {
+          for (const label of entry.labels) {
+            const el = nodes.find((node) => getText(node) === label || getText(node).includes(label));
+            if (!el) continue;
+            const value = collectValue(el);
+            if (value) {
+              paymentDetail[entry.key] = value;
+              break;
+            }
+          }
+        }
+      };
+      getPaymentDetailFromDom();
+      orderData.payment_detail = paymentDetail;
+
       if (!orderData.payment.total_payed_amount && textData.total_price) {
         orderData.payment.total_payed_amount = parseNumber(textData.total_price);
+      }
+      if (!orderData.payment.total_product_price && paymentDetail.total_product_price) {
+        orderData.payment.total_product_price = parseNumber(paymentDetail.total_product_price);
+      }
+      if (!orderData.payment.total_payed_amount && paymentDetail.total_payed_amount) {
+        orderData.payment.total_payed_amount = parseNumber(paymentDetail.total_payed_amount);
+      }
+      if (!orderData.payment.shipping_fee && paymentDetail.shipping_fee) {
+        orderData.payment.shipping_fee = parseNumber(paymentDetail.shipping_fee);
+      }
+      if (!orderData.payment.discount_amount && paymentDetail.discount_amount) {
+        orderData.payment.discount_amount = parseNumber(paymentDetail.discount_amount);
+      }
+      if (!orderData.payment.main_pay_type && paymentDetail.pay_method) {
+        orderData.payment.main_pay_type = paymentDetail.pay_method;
       }
 
       const deliveryRecipientName = delivery?.receiverName || delivery?.receiver || delivery?.recipientName || '';

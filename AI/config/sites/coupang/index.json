@@ -5,7 +5,9 @@
     "coupang.com",
     "www.coupang.com",
     "login.coupang.com",
-    "cart.coupang.com"
+    "cart.coupang.com",
+    "mc.coupang.com",
+    "rocketpay.coupang.com"
   ],
   "urls": {
     "home": "https://www.coupang.com/",

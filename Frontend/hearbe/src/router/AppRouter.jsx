@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
-import MainLanding from '../pages/MainLanding';
-import BrandLanding from '../pages/BrandLanding';
+import MainLanding from '../pages/Main/MainLanding';
+import BrandLanding from '../pages/Brand/Brandlanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
-import AudioPage from '../Audio/AudioPage';
+import AudioPage from '../pages/Audio/AudioPage';
 
 import LoginB from '../pages/Login/LoginB';
 import SignUpB from '../pages/SignUp/SignUpB';
@@ -50,22 +50,24 @@ function AppContent() {
 
   const handleModeSelect = (mode) => {
     setSelectedMode(mode);
+    const accessToken = localStorage.getItem('accessToken');
     if (mode === 'common') {
-      navigate('/C/login');
+      navigate(accessToken ? '/C/mall' : '/C/login');
     } else if (mode === 'sharing') {
       navigate('/S/join');
     } else if (mode === 'big') {
-      navigate('/B/login');
+      navigate(accessToken ? '/B/mall' : '/B/login');
     } else {
-      navigate('/spline-test');
+      navigate('/A');
     }
   };
 
-  const handleSetupComplete = () => {
+  const handleSetupComplete = (granted = false) => {
+    setMicPermissionGranted(granted);
     setShowInitialSetup(false);
   };
 
-  if (showInitialSetup) {
+  if (showInitialSetup && (location.pathname === '/main' || location.pathname === '/intro' || location.pathname === '/')) {
     return <InitialSetup onComplete={handleSetupComplete} />;
   }
 
@@ -84,7 +86,7 @@ function AppContent() {
           />
         }
       />
-      <Route path="/spline-test" element={<AudioPage />} />
+      <Route path="/A/*" element={<AudioPage />} />
       <Route
         path="/B/login"
         element={
@@ -250,7 +252,7 @@ function AppContent() {
         path="/C/member-info"
         element={
           <MemberInfoC
-            onBack={() => navigate('/C/mypage')}
+            onBack={() => navigate('/C/mall')}
             onHome={() => navigate('/C/mall')}
             onCart={() => navigate('/C/cart')}
             onMyPage={() => navigate('/C/member-info')}

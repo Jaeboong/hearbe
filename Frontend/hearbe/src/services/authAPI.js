@@ -1,5 +1,6 @@
 ﻿import { apiClient } from './apiClient.js';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const OCR_WELFARE_CARD_URL = import.meta.env.VITE_OCR_WELFARE_CARD_URL || 'https://jhserver.shop/api/v1/ocr/welfare-card';
 
 // API Service for Authentication
 export const authAPI = {
@@ -57,6 +58,72 @@ export const authAPI = {
         }
     },
 
+    ocrWelfareCard: async (file) => {
+        try {
+            const maxFileSize = 20 * 1024 * 1024;
+            if (!file) {
+                throw new Error('OCR에 사용할 이미지 파일이 없습니다.');
+            }
+            if (typeof file.size === 'number' && file.size > maxFileSize) {
+                throw new Error('이미지 파일은 최대 20MB까지 업로드할 수 있습니다.');
+            }
+
+            const formData = new FormData();
+            formData.append('file', file, file.name || 'welfare-card.jpg');
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+            let response;
+            try {
+                response = await fetch(OCR_WELFARE_CARD_URL, {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal,
+                });
+            } finally {
+                clearTimeout(timeoutId);
+            }
+
+            const text = await response.text();
+            let payload = {};
+
+            if (text) {
+                try {
+                    payload = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('OCR 서버 응답 형식이 올바르지 않습니다.');
+                }
+            }
+
+            if (!response.ok) {
+                throw new Error(payload.message || payload.error || `OCR 인식에 실패했습니다. (상태: ${response.status})`);
+            }
+
+            const data = payload?.data && typeof payload.data === 'object' ? payload.data : payload;
+
+            return {
+                card_company: data?.card_company ?? null,
+                card_number: data?.card_number ?? null,
+                expiration_date: data?.expiration_date ?? null,
+                cvc: data?.cvc ?? null,
+                confidence: {
+                    card_company: data?.confidence?.card_company ?? null,
+                    card_number: data?.confidence?.card_number ?? null,
+                    expiration_date: data?.confidence?.expiration_date ?? null,
+                    cvc: data?.confidence?.cvc ?? null,
+                },
+                raw_text: Array.isArray(data?.raw_text) ? data.raw_text : [],
+            };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('OCR 요청 시간이 초과되었습니다. (약 45초)');
+            }
+            console.error('OCR Welfare Card API Error:', error);
+            throw error;
+        }
+    },
+
     login: async (id, password) => {
         try {
             if (typeof id !== 'string' || typeof password !== 'string') {
@@ -108,8 +175,9 @@ export const authAPI = {
                 localStorage.setItem('user_name', data.data.name);
             }
             // userType 저장 (BLIND, LOW_VISION, GENERAL)
-            if (data.data && data.data.userType) {
-                localStorage.setItem('userType', data.data.userType);
+            const resolvedUserType = data?.data?.userType || data?.data?.user_type || data?.userType || data?.user_type;
+            if (resolvedUserType) {
+                localStorage.setItem('userType', String(resolvedUserType).trim().toUpperCase());
             }
 
             return data;
@@ -230,8 +298,6 @@ export const authAPI = {
         }
     },
 
-
-
     refreshToken: async () => {
         try {
             const refreshToken = localStorage.getItem('refreshToken');
@@ -309,20 +375,17 @@ export const authAPI = {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('savedLoginId');
-            localStorage.removeItem('savedLoginPassword');
             localStorage.removeItem('savedLoginId_C');
+            localStorage.removeItem('savedLoginPassword');
             localStorage.removeItem('savedLoginPassword_C');
             localStorage.removeItem('userData');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
             localStorage.removeItem('user_name');
             localStorage.removeItem('userType');
-            // sessionStorage 정리 (혹시 남아있을 경우)
-            sessionStorage.removeItem('accessToken');
-            sessionStorage.removeItem('refreshToken');
-            sessionStorage.removeItem('user');
-            sessionStorage.removeItem('user_id');
-            sessionStorage.removeItem('username');
+
+            // sessionStorage 정리
+            sessionStorage.clear();
         }
     },
 
@@ -512,7 +575,6 @@ export const authAPI = {
         }
     }
 };
-
 
 if (import.meta.env.DEV) {
     window.authAPI = authAPI;

@@ -78,6 +78,7 @@ class LoginGuard:
                     response_text,
                     current_url or "",
                     front=True,
+                    wait=False,
                 )
             else:
                 await self._sender.send_tool_calls(session_id, pending.commands)

@@ -89,7 +89,10 @@ const MemberInfoB = () => {
         Swal.fire({
             icon: type,
             text: message,
-            confirmButtonText: '확인'
+            background: '#141C29',
+            color: '#FFF064',
+            confirmButtonColor: '#FFF064',
+            confirmButtonText: '<span style="color:#141C29">확인</span>'
         }).then(() => {
             if (onConfirm) onConfirm();
         });
@@ -130,15 +133,10 @@ const MemberInfoB = () => {
 
         } catch (err) {
             console.error('Withdrawal failed:', err);
-            // Check if it's a password mismatch error (assuming backend returns relevant message or status)
-            // If the error message implies password mismatch, show specific message.
-            // Otherwise show generic error.
             if (err.message && (err.message.includes('비밀번호') || err.message.includes('password') || err.message.includes('mismatch'))) {
                 showAlert("비밀번호가 일치하지 않습니다.", "error");
             } else {
-                showAlert(`예상치못한 오류가 발생했습니다.`, "error"); // Defaulting to user request "비밀번호가 일치하지 않습니다" for failure as per prompt implication, though usually we'd want accurate errors.
-                // Correct logic: The user said "if password matches -> success, if not -> mismatch message".
-                // I will assume the main failure reason is password mismatch here.
+                showAlert("비밀번호가 일치하지 않습니다.", "error");
             }
         }
     };

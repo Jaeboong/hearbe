@@ -98,7 +98,10 @@ const FindIdB = () => {
             Swal.fire({
                 icon: 'warning',
                 text: '복지카드 정보를 모두 입력해주세요.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -115,7 +118,10 @@ const FindIdB = () => {
                 Swal.fire({
                     icon: 'success',
                     text: `아이디 찾기 성공: 귀하의 아이디는 ${response.data} 입니다.`,
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
                 navigate('/B/login');
             } else {
@@ -125,7 +131,10 @@ const FindIdB = () => {
             Swal.fire({
                 icon: 'error',
                 text: error.message || '정보 확인 중 오류가 발생했습니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };

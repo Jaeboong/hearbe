@@ -86,6 +86,7 @@ class TextHandler:
         login_feedback=None,
         hearbe_signup_flow=None,
         hearbe_signup_b_flow=None,
+        coupang_order_cancel_flow=None,
         payment_keypad=None,
         login_status=None,
         login_challenge=None,
@@ -105,6 +106,7 @@ class TextHandler:
         self._login_feedback = login_feedback
         self._hearbe_signup_flow = hearbe_signup_flow
         self._hearbe_signup_b_flow = hearbe_signup_b_flow
+        self._coupang_order_cancel_flow = coupang_order_cancel_flow
         self._payment_keypad = payment_keypad
         self._login_status = login_status
         self._login_challenge = login_challenge
@@ -146,6 +148,7 @@ class TextHandler:
             session_manager=session_manager,
             hearbe_signup_flow=hearbe_signup_flow,
             hearbe_signup_b_flow=hearbe_signup_b_flow,
+            coupang_order_cancel_flow=coupang_order_cancel_flow,
             payment_keypad=payment_keypad,
             login_status=login_status,
             login_challenge=login_challenge,

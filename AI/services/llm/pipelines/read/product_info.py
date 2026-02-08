@@ -12,6 +12,7 @@ import time
 from typing import Optional, Dict, Any, List
 
 from core.interfaces import LLMResponse, SessionState
+from core.korean_product_terms import format_product_terms_for_tts
 from services.llm.sites.site_manager import get_page_type
 from services.llm.pipelines.shared.intent_guard import has_action_intent
 
@@ -112,6 +113,15 @@ def _build_summary(detail: Dict[str, Any]) -> str:
 
     if not parts:
         return "상품 정보를 찾지 못했어요."
+
+    # OCR 추출 데이터가 있으면 상세 정보 추가
+    ocr_summary = detail.get("ocr_summary")
+    if isinstance(ocr_summary, list) and ocr_summary:
+        ocr_text = " ".join(str(s) for s in ocr_summary if s)
+        if ocr_text:
+            parts.append(f"상세 정보: {ocr_text}")
+
+    parts = [format_product_terms_for_tts(part) for part in parts]
     return " ".join(parts)
 
 

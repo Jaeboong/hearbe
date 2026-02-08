@@ -10,18 +10,18 @@ import { authAPI } from '../../services/authAPI';
 import Swal from 'sweetalert2';
 import './SelectMallB.css';
 
-const SelectMall = () => {
+const SelectMallB = () => {
     const navigate = useNavigate();
 
     const malls = [
-        { id: '1', name: '쿠팡', logo: iconCoupang, url: 'https://www.coupang.com', color: '#E2211C' },
-        { id: '2', name: '네이버 쇼핑', logo: iconNaver, url: 'https://shopping.naver.com/ns/home', color: '#03C75A' },
-        { id: '3', name: '11번가', logo: icon11st, url: 'https://m.11st.co.kr/', color: '#FF4B4B' },
-        { id: '4', name: 'SSG.COM', logo: iconSsg, url: 'https://m.ssg.com/', color: '#ffb100' },
+        { id: '1', name: '쿠팡', logo: iconCoupang, url: 'https://www.coupang.com', color: '#E2211C', disabled: false },
+        { id: '2', name: '네이버 쇼핑', logo: iconNaver, url: '', color: '#03C75A', disabled: true },
+        { id: '3', name: '11번가', logo: icon11st, url: '', color: '#FF4B4B', disabled: true },
     ];
 
-    const handleSelectMall = (url) => {
-        window.open(url, '_blank', 'noopener,noreferrer');
+    const handleSelectMall = (mall) => {
+        if (mall.disabled) return;
+        window.open(mall.url, '_blank', 'noopener,noreferrer');
     };
 
     const handleLogout = () => {
@@ -29,8 +29,12 @@ const SelectMall = () => {
             title: '로그아웃 하시겠습니까?',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: '로그아웃',
-            cancelButtonText: '취소'
+            background: '#141C29',
+            color: '#FFF064',
+            confirmButtonColor: '#FFF064',
+            cancelButtonColor: 'transparent',
+            confirmButtonText: '<span style="color:#141C29">로그아웃</span>',
+            cancelButtonText: '<span style="color:#FFF064">취소</span>'
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
@@ -79,15 +83,15 @@ const SelectMall = () => {
                     {malls.map((mall, index) => (
                         <button
                             key={mall.id}
-                            className="mall-item-a cursor-pointer"
-                            onClick={() => handleSelectMall(mall.url)}
+                            className={`mall-item-a ${mall.disabled ? 'disabled' : 'cursor-pointer'}`}
+                            onClick={() => handleSelectMall(mall)}
                         >
-                            <div className="mall-num-a" style={{ backgroundColor: mall.color }}>{index + 1}</div>
+                            <div className="mall-num-a" style={{ backgroundColor: mall.disabled ? '#555' : mall.color }}>{index + 1}</div>
                             <div className="mall-info-a">
                                 <span className="mall-name-a">{mall.name}</span>
                                 <img src={mall.logo} alt={mall.name} className="mall-logo-img-a" />
                             </div>
-                            <div className="mall-arrow-a">→</div>
+                            {!mall.disabled && <div className="mall-arrow-a">→</div>}
                         </button>
                     ))}
                 </div>
@@ -100,4 +104,4 @@ const SelectMall = () => {
     );
 };
 
-export default SelectMall;
+export default SelectMallB;

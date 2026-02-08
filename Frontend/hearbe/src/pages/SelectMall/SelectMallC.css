@@ -11,7 +11,7 @@
 .mall-main-c {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 50px 20px 20px;
+    padding: 120px 20px 20px;
     text-align: center;
     flex: 1;
     /* 콘텐츠가 공간을 차지하게 하여 푸터를 밑으로 밈 */
@@ -236,6 +236,43 @@
 .mall-card-new-c:hover {
     transform: translateY(-12px);
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+}
+
+.mall-card-disabled {
+    filter: none;
+    /* Grayscale 대신 반투명으로 처리 */
+    opacity: 0.4;
+    cursor: not-allowed !important;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+
+.mall-card-disabled .card-num-badge-c {
+    background-color: #cbd5e1 !important;
+}
+
+.mall-card-disabled:hover {
+    transform: none !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04) !important;
+}
+
+.mall-card-disabled .card-watermark-logo-c {
+    filter: grayscale(1);
+    opacity: 0.07;
+    /* 로고를 아주 희미하게 실루엣만 남김 */
+}
+
+.mall-card-disabled .open-store-text-c {
+    color: #94a3b8 !important;
+    font-size: 12px;
+}
+
+.mall-card-new-c:not(.mall-card-disabled) {
+    border: 2px solid transparent;
+}
+
+.mall-card-new-c:not(.mall-card-disabled):hover {
+    border-color: #8B5CF6;
 }
 
 .card-top-row-c {

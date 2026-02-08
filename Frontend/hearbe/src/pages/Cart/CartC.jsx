@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Store, User, LogOut } from 'lucide-react';
 import { cartAPI } from '../../services/cartAPI';
 import { authAPI } from '../../services/authAPI';
+import Swal from 'sweetalert2';
 import '../MyPage/mypage-common.css';
 import './CartC.css';
 import logoC from '../../assets/logoC.png';
@@ -46,8 +47,6 @@ const CartC = ({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }
     useEffect(() => {
         const fetchCartItems = async () => {
             try {
-                setIsLoading(true);
-                setError(null);
                 setIsLoading(true);
                 setError(null);
                 const response = await cartAPI.getCart();
@@ -108,7 +107,12 @@ const CartC = ({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }
             setCartItems(items => items.filter(item => item.id !== id));
         } catch (err) {
             console.error('Failed to delete cart item:', err);
-            alert(err.message || '상품 삭제에 실패했습니다.');
+            Swal.fire({
+                icon: 'error',
+                text: err.message || '상품 삭제에 실패했습니다.',
+                confirmButtonText: '확인',
+                confirmButtonColor: '#7c3aed'
+            });
         }
     };
 

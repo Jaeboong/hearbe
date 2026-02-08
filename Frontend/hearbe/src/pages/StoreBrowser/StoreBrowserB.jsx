@@ -59,7 +59,10 @@ const StoreBrowser = () => {
             Swal.fire({
                 icon: 'error',
                 text: `화면 공유 에러: ${peerError}`,
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     }, [peerError]);
@@ -102,13 +105,19 @@ const StoreBrowser = () => {
             Swal.fire({
                 icon: 'success',
                 text: `[시뮬레이션] 장바구니에 '${randomItem.name}'이(가) 추가되었습니다!`,
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         } catch (error) {
             Swal.fire({
                 icon: 'error',
                 text: `시뮬레이션 추가 실패: ${error.message}`,
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };
@@ -128,7 +137,10 @@ const StoreBrowser = () => {
             Swal.fire({
                 icon: 'error',
                 text: '공유 코드를 생성할 수 없습니다. (백엔드 연결 확인)',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             setShowShareModal(false);
         } finally {
@@ -167,7 +179,10 @@ const StoreBrowser = () => {
             Swal.fire({
                 icon: 'info',
                 text: '현재 쇼핑몰의 장바구니 URL을 찾을 수 없습니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };
@@ -186,7 +201,10 @@ const StoreBrowser = () => {
             Swal.fire({
                 icon: 'warning',
                 text: '상품명과 가격은 필수 항목입니다.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -210,7 +228,10 @@ const StoreBrowser = () => {
             Swal.fire({
                 icon: 'success',
                 text: '장바구니에 상품이 추가되었습니다!',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             setShowAddCartModal(false);
             setProductInfo({ name: '', price: '', url: '', img_url: '' });
@@ -218,7 +239,10 @@ const StoreBrowser = () => {
             Swal.fire({
                 icon: 'error',
                 text: `장바구니 추가 실패: ${error.message}`,
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };

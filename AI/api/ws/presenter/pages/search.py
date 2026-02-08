@@ -5,6 +5,8 @@ Search page presenter helpers (TTS formatting).
 
 from typing import List, Tuple, Dict, Any, Optional
 
+from core.korean_product_terms import format_product_terms_for_tts
+
 from ...search.search_reader import build_search_read_tts
 
 MORE_PROMPT_COUNT = "더 읽어드릴까요? '몇 개 더 읽어줘' 또는 '전체 읽어줘'라고 말해 주세요."
@@ -35,6 +37,7 @@ def build_search_list_tts(
 
 
 def format_highest_discount(name: str, discount_text: Optional[str], price: Optional[str]) -> str:
+    name = format_product_terms_for_tts(name)
     msg = f"가장 할인율이 높은 상품은 {name}입니다."
     if discount_text:
         msg += f" 할인율 {discount_text}."
@@ -44,6 +47,7 @@ def format_highest_discount(name: str, discount_text: Optional[str], price: Opti
 
 
 def format_lowest_price(name: str, price: Optional[str]) -> str:
+    name = format_product_terms_for_tts(name)
     msg = f"가장 저렴한 상품은 {name}입니다."
     if price:
         msg += f" 가격 {price}."

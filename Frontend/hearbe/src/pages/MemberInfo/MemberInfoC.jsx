@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Store, ShieldCheck, LogOut } from 'lucide-react';
 import { memberAPI } from '../../services/memberAPI';
 import { authAPI } from '../../services/authAPI';
+import Swal from 'sweetalert2';
 import '../MyPage/mypage-common.css';
 import './MemberInfoC.css';
 import logoC from '../../assets/logoC.png';
@@ -18,15 +19,6 @@ const MemberInfoC = ({ onHome }) => {
     });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-    const [withdrawPassword, setWithdrawPassword] = useState('');
-    const [alertState, setAlertState] = useState({
-        isOpen: false,
-        message: '',
-        type: 'success', // 'success' or 'error'
-        onConfirm: null
-    });
 
     const sidebarItems = [
         { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
@@ -99,67 +91,60 @@ const MemberInfoC = ({ onHome }) => {
         navigate('/C/findPassword');
     };
 
-    // Alert Helper
-    const showAlert = (message, type = 'success', onConfirm = null) => {
-        setAlertState({
-            isOpen: true,
-            message,
-            type,
-            onConfirm
-        });
-    };
-
-    const handleAlertClose = () => {
-        const callback = alertState.onConfirm;
-        setAlertState(prev => ({ ...prev, isOpen: false }));
-        if (callback) callback();
-    };
-
     const handleWithdraw = () => {
-        setShowWithdrawModal(true);
-        setWithdrawPassword('');
-    };
-
-    const handleCloseWithdrawModal = () => {
-        setShowWithdrawModal(false);
-    };
-
-    const handleConfirmWithdraw = async () => {
-        if (!withdrawPassword) {
-            showAlert("비밀번호를 입력해주세요.", "error");
-            return;
-        }
-
-        try {
-            // Updated to use the post method with password as body
-            await authAPI.deleteAccount(withdrawPassword);
-
-            setShowWithdrawModal(false);
-
-            showAlert("회원탈퇴가 완료되었습니다.", "success", () => {
-                // Local Storage 정리
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('user');
-                localStorage.removeItem('username');
-                localStorage.removeItem('user_id');
-                localStorage.removeItem('user_name');
-                localStorage.removeItem('savedLoginId_C');
-                localStorage.removeItem('savedLoginPassword_C');
-
-                navigate('/');
-            });
-
-        } catch (error) {
-            console.error('Delete account failed:', error);
-            if (error.message && (error.message.includes('비밀번호') || error.message.includes('password') || error.message.includes('mismatch'))) {
-                showAlert("비밀번호가 일치하지 않습니다.", "error");
-            } else {
-                showAlert("예상치못한 오류가 발생했습니다.", "error");
+        Swal.fire({
+            title: '회원 탈퇴',
+            text: '정말로 탈퇴하시겠습니까? 탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.',
+            icon: 'warning',
+            input: 'password',
+            inputLabel: '본인 확인을 위해 비밀번호를 입력해주세요.',
+            inputPlaceholder: '비밀번호 입력',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: '탈퇴하기',
+            cancelButtonText: '취소',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off'
             }
-        } finally {
-            setIsWithdrawing(false);
-        }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                if (!result.value) {
+                    Swal.fire('오류', '비밀번호를 입력해주세요.', 'error');
+                    return;
+                }
+
+                try {
+                    await authAPI.deleteAccount(result.value);
+
+                    Swal.fire({
+                        title: '탈퇴 완료',
+                        text: '회원탈퇴가 완료되었습니다.',
+                        icon: 'success',
+                        confirmButtonColor: '#7c3aed'
+                    }).then(() => {
+                        localStorage.removeItem('accessToken');
+                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('user_id');
+                        localStorage.removeItem('user_name');
+                        localStorage.removeItem('savedLoginId_C');
+                        localStorage.removeItem('savedLoginPassword_C');
+                        navigate('/main');
+                    });
+                } catch (error) {
+                    console.error('Delete account failed:', error);
+                    const msg = error.message || '';
+                    if (msg.includes('비밀번호') || msg.includes('password') || msg.includes('mismatch')) {
+                        Swal.fire('오류', '비밀번호가 일치하지 않습니다.', 'error');
+                    } else {
+                        Swal.fire('오류', '예상치 못한 오류가 발생했습니다.', 'error');
+                    }
+                }
+            }
+        });
     };
 
     // DEBUG: Mount log
@@ -299,179 +284,6 @@ const MemberInfoC = ({ onHome }) => {
                 <p>© 2026 HearBe. All rights reserved.</p>
             </footer>
 
-            {/* 회원탈퇴 모달 */}
-            {showWithdrawModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    backdropFilter: 'blur(5px)'
-                }}>
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '1.5rem',
-                        padding: '2.5rem',
-                        width: '90%',
-                        maxWidth: '450px',
-                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-                        border: '1px solid #f3e8ff',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '1.5rem'
-                    }}>
-                        <h3 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#dc2626', margin: 0 }}>회원 탈퇴</h3>
-
-                        <p style={{ fontSize: '1.15rem', color: '#4b5563', lineHeight: '1.6', textAlign: 'center', margin: 0 }}>
-                            정말로 탈퇴하시겠습니까?<br />
-                            <span style={{ fontSize: '0.95rem', color: '#6b7280' }}>
-                                탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.<br />
-                                본인 확인을 위해 비밀번호를 입력해주세요.
-                            </span>
-                        </p>
-
-                        <input
-                            type="password"
-                            value={withdrawPassword}
-                            onChange={(e) => setWithdrawPassword(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmWithdraw(); }}
-                            placeholder="비밀번호 입력"
-                            style={{
-                                width: '100%',
-                                padding: '1rem 1.25rem',
-                                borderRadius: '0.75rem',
-                                border: '2px solid #e5e7eb',
-                                fontSize: '1.1rem',
-                                outline: 'none',
-                                transition: 'all 0.2s'
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = '#7c3aed'}
-                            onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                        />
-
-                        <div style={{ display: 'flex', gap: '0.75rem', width: '100%' }}>
-                            <button
-                                onClick={handleCloseWithdrawModal}
-                                style={{
-                                    flex: 1,
-                                    padding: '1rem',
-                                    fontSize: '1.1rem',
-                                    fontWeight: '700',
-                                    border: '2px solid #e5e7eb',
-                                    borderRadius: '0.75rem',
-                                    backgroundColor: 'white',
-                                    color: '#6b7280',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}
-                                onMouseOver={(e) => e.target.style.backgroundColor = '#f9fafb'}
-                                onMouseOut={(e) => e.target.style.backgroundColor = 'white'}
-                            >
-                                취소
-                            </button>
-                            <button
-                                onClick={handleConfirmWithdraw}
-                                style={{
-                                    flex: 1,
-                                    padding: '1rem',
-                                    fontSize: '1.1rem',
-                                    fontWeight: '700',
-                                    border: 'none',
-                                    borderRadius: '0.75rem',
-                                    backgroundColor: '#e53e3e',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    boxShadow: '0 4px 12px rgba(229, 62, 62, 0.3)'
-                                }}
-                                onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
-                                onMouseOut={(e) => e.target.style.backgroundColor = '#e53e3e'}
-                            >
-                                탈퇴하기
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Custom Alert Modal for C Type */}
-            {alertState.isOpen && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1100,
-                    backdropFilter: 'blur(5px)'
-                }}>
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '1.5rem',
-                        padding: '2.5rem',
-                        width: '90%',
-                        maxWidth: '400px',
-                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-                        border: '1px solid #f3e8ff',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '1.5rem'
-                    }}>
-                        <h3 style={{
-                            fontSize: '1.5rem',
-                            fontWeight: '800',
-                            color: alertState.type === 'error' ? '#e53e3e' : '#7c3aed',
-                            margin: 0
-                        }}>
-                            {alertState.type === 'error' ? '오류' : '알림'}
-                        </h3>
-
-                        <p style={{
-                            fontSize: '1.1rem',
-                            color: '#4b5563',
-                            lineHeight: '1.6',
-                            textAlign: 'center',
-                            margin: 0,
-                            whiteSpace: 'pre-line'
-                        }}>
-                            {alertState.message}
-                        </p>
-
-                        <button
-                            onClick={handleAlertClose}
-                            style={{
-                                width: '100%',
-                                padding: '1rem',
-                                fontSize: '1.1rem',
-                                fontWeight: '700',
-                                border: 'none',
-                                borderRadius: '0.75rem',
-                                backgroundColor: '#7c3aed',
-                                color: 'white',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)'
-                            }}
-                            onMouseOver={(e) => e.target.style.backgroundColor = '#6d28d9'}
-                            onMouseOut={(e) => e.target.style.backgroundColor = '#7c3aed'}
-                        >
-                            확인
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

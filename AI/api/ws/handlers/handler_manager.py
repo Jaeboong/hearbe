@@ -27,6 +27,7 @@ from .hearbe.hearbe_signup_flow import HearbeSignupFlowManager
 from .page_extract_manager import PageExtractManager
 from .page_focus import PageFocusManager
 from .coupang.login_page_state import LoginPageStateManager
+from .coupang.order_cancel_flow import CoupangOrderCancelFlowManager
 from ..feedback.action_feedback import ActionFeedbackManager
 from ..feedback.login_guard import LoginGuard
 from ..feedback.login_feedback import LoginFeedbackManager
@@ -107,6 +108,10 @@ class HandlerManager:
             session_manager=session_manager,
             login_feedback=self._login_feedback,
         )
+        self._coupang_order_cancel_flow = CoupangOrderCancelFlowManager(
+            sender=sender,
+            session_manager=session_manager,
+        )
         self._hearbe_session_gate = HearbeSessionGate(
             sender=sender,
             session_manager=session_manager,
@@ -137,6 +142,7 @@ class HandlerManager:
             login_feedback=self._login_feedback,
             hearbe_signup_flow=self._hearbe_signup_flow,
             hearbe_signup_b_flow=self._hearbe_signup_b_flow,
+            coupang_order_cancel_flow=self._coupang_order_cancel_flow,
             payment_keypad=self._payment_keypad,
             login_status=self._login_status,
             login_challenge=self._login_challenge,
@@ -185,6 +191,7 @@ class HandlerManager:
         self._login_autofill.cleanup_session(session_id)
         self._hearbe_signup_b_flow.cleanup_session(session_id)
         self._hearbe_signup_flow.cleanup_session(session_id)
+        self._coupang_order_cancel_flow.cleanup_session(session_id)
         self._hearbe_session_gate.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         self._hearbe_order_history.cleanup_session(session_id)
@@ -220,6 +227,7 @@ class HandlerManager:
         self._login_autofill.cleanup_session(session_id)
         self._hearbe_signup_b_flow.cleanup_session(session_id)
         self._hearbe_signup_flow.cleanup_session(session_id)
+        self._coupang_order_cancel_flow.cleanup_session(session_id)
         self._hearbe_session_gate.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         self._hearbe_order_history.cleanup_session(session_id)
@@ -249,6 +257,7 @@ class HandlerManager:
         self._login_page_state.cleanup_session(session_id)
         self._hearbe_signup_b_flow.cleanup_session(session_id)
         self._hearbe_signup_flow.cleanup_session(session_id)
+        self._coupang_order_cancel_flow.cleanup_session(session_id)
         self._order_detail.cleanup_session(session_id)
         if self._sender:
             await self._sender.cancel_tts(session_id)
@@ -296,6 +305,9 @@ class HandlerManager:
         if handled:
             return
         handled = await self._login_autofill.handle_mcp_result(session_id, data)
+        if handled:
+            return
+        handled = await self._coupang_order_cancel_flow.handle_mcp_result(session_id, data)
         if handled:
             return
         handled = await self._order_detail.handle_mcp_result(session_id, data)
@@ -352,6 +364,7 @@ class HandlerManager:
         await self._page_extract.handle_page_update(session_id, url, page_id)
         await self._hearbe_signup_b_flow.handle_page_update(session_id, url)
         await self._hearbe_signup_flow.handle_page_update(session_id, url, previous_url)
+        await self._coupang_order_cancel_flow.handle_page_update(session_id, url)
 
         # On login page entry, trigger autofill probe (no user text required).
         if page_type == "login":

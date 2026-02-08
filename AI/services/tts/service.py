@@ -106,6 +106,7 @@ class TTSService(ITTSService):
         audio_config = texttospeech.AudioConfig(
             audio_encoding=texttospeech.AudioEncoding.LINEAR16,
             sample_rate_hertz=self._config.sample_rate,
+            speaking_rate=self._config.speaking_rate,
         )
 
         # TTS 요청

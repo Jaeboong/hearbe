@@ -102,6 +102,17 @@ class PageFocusManager:
         except Exception:
             primary_page_id_int = None
 
+        # If a guided signup flow is active on the platform, keep focus pinned
+        # to the primary page_id to prevent background tabs from clearing flow state.
+        if (
+            self._session.get_context(session_id, "hearbe_b_signup_flow_active")
+            and primary_page_id_int is not None
+            and page_id != primary_page_id_int
+            and primary_kind == "platform"
+            and incoming_kind == "platform"
+        ):
+            return FocusDecision(accept=False, primary_page_id=primary_page_id_int, primary_host=str(primary_host))
+
         if primary_page_id_int == page_id:
             return FocusDecision(accept=True, primary_page_id=page_id, primary_host=str(primary_host))
 
@@ -151,4 +162,3 @@ class PageFocusManager:
             incoming_host,
         )
         return FocusDecision(accept=True, switched=True, primary_page_id=page_id, primary_host=incoming_host)
-

@@ -79,12 +79,15 @@ class DomFallbackManager:
 
         session = self._session.get_session(session_id)
         user_text = _last_user_text(session) if session else ""
+        history = session.conversation_history if session else []
+        history_len = len(history) if history else 0
         payload = {
             "tool_name": tool_name,
             "arguments": arguments or {},
             "error": error or "",
             "current_url": current_url or "",
             "user_text": user_text,
+            "history_len": history_len,
         }
         self._session.set_context(session_id, "dom_fallback_pending", payload)
         self._session.set_context(session_id, "dom_fallback_attempts", attempts + 1)
@@ -116,6 +119,24 @@ class DomFallbackManager:
         self._session.set_context(session_id, "dom_fallback_pending", None)
         session = self._session.get_session(session_id)
 
+        # 트리거 이후 새 사용자 입력이 있으면 DOM fallback 무시
+        trigger_history_len = pending.get("history_len", 0)
+        current_history = session.conversation_history if session else []
+        current_user_count = sum(
+            1 for m in (current_history or []) if m.get("role") == "user"
+        )
+        trigger_user_count = sum(
+            1 for m in (current_history or [])[:trigger_history_len] if m.get("role") == "user"
+        )
+        if current_user_count > trigger_user_count:
+            logger.info(
+                "DOM fallback skipped: new user input detected since trigger "
+                "(trigger_users=%d, current_users=%d)",
+                trigger_user_count,
+                current_user_count,
+            )
+            return True
+
         user_text = pending.get("user_text") or _last_user_text(session) or ""
         if not user_text:
             return False
@@ -129,6 +150,21 @@ class DomFallbackManager:
         )
 
         llm_result = await self._llm.generate_with_messages(messages, current_url)
+
+        # LLM 응답 전에도 새 사용자 입력 재확인
+        current_history_post = session.conversation_history if session else []
+        post_user_count = sum(
+            1 for m in (current_history_post or []) if m.get("role") == "user"
+        )
+        if post_user_count > trigger_user_count:
+            logger.info(
+                "DOM fallback discarded after LLM: new user input during LLM call "
+                "(trigger_users=%d, post_llm_users=%d)",
+                trigger_user_count,
+                post_user_count,
+            )
+            return True
+
         commands = self._pipeline.prepare_commands(
             session_id,
             llm_result.commands,

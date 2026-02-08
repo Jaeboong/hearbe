@@ -4,6 +4,7 @@ Command pipeline helpers for LLM/AI-next execution.
 """
 
 import logging
+import re
 from typing import Optional, Callable, List
 
 from core.interfaces import MCPCommand
@@ -75,6 +76,9 @@ class CommandPipeline:
         if self._command_queue:
             if interrupted():
                 return None
+
+            if _should_interrupt_for_order_detail(commands):
+                self._command_queue.interrupt(session_id)
 
             if not commands:
                 return await self._command_queue.enqueue_batch(
@@ -176,3 +180,17 @@ def _filter_extract_commands(commands: List) -> List:
     if removed:
         logger.info("Filtered %d extract command(s) from LLM output", removed)
     return filtered
+
+
+def _should_interrupt_for_order_detail(commands: List) -> bool:
+    for cmd in commands or []:
+        tool_name = getattr(cmd, "tool_name", "") or ""
+        if tool_name != "goto":
+            continue
+        args = getattr(cmd, "arguments", None) or {}
+        url = str(args.get("url") or "")
+        if not url:
+            continue
+        if re.search(r"/ssr/desktop/order/\d+/?$", url):
+            return True
+    return False
