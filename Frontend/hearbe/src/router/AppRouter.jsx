@@ -5,7 +5,7 @@ import MainLanding from '../pages/MainLanding';
 import BrandLanding from '../pages/BrandLanding';
 import InitialSetup from '../pages/InitialSetup/InitialSetup';
 import Intro from '../pages/Intro/Intro';
-import AudioPage from '../Audio/AudioPage';
+import AudioPage from '../pages/Audio/AudioPage';
 
 import LoginB from '../pages/Login/LoginB';
 import SignUpB from '../pages/SignUp/SignUpB';
@@ -57,15 +57,16 @@ function AppContent() {
     } else if (mode === 'big') {
       navigate('/B/login');
     } else {
-      navigate('/spline-test');
+      navigate('/A');
     }
   };
 
-  const handleSetupComplete = () => {
+  const handleSetupComplete = (granted = false) => {
+    setMicPermissionGranted(granted);
     setShowInitialSetup(false);
   };
 
-  if (showInitialSetup) {
+  if (showInitialSetup && location.pathname === '/main') {
     return <InitialSetup onComplete={handleSetupComplete} />;
   }
 
@@ -84,7 +85,7 @@ function AppContent() {
           />
         }
       />
-      <Route path="/spline-test" element={<AudioPage />} />
+      <Route path="/A/*" element={<AudioPage />} />
       <Route
         path="/B/login"
         element={
