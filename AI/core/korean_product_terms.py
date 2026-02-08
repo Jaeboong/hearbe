@@ -26,6 +26,7 @@ _SQM_RE = re.compile(r"(?i)(\d[\d,]*\.?\d*)\s*(\u33a1|m2|m²|m\^2)(?![A-Za-z0-9]
 _MIXED_PACK_RE = re.compile(
     r"(?i)(\d[\d,]*\.?\d*)\s*(ml|kg|g|l)\s*(?:x|×)\s*(\d+)\b"
 )
+_QUANTITY_RE = re.compile(r"(?i)\bquantity\b")
 _BONUS_1_1_RE = re.compile(r"(?<!\d)1\s*\+\s*1(?!\d)")
 _BONUS_2_1_RE = re.compile(r"(?<!\d)2\s*\+\s*1(?!\d)")
 _NUMERIC_XL_RE = re.compile(r"(?i)(?<![A-Za-z0-9])(\d+)\s*X\s*L(?![A-Za-z0-9])")
@@ -148,6 +149,7 @@ def format_product_terms_for_tts(value: Any) -> str:
     if not text:
         return text
 
+    text = _QUANTITY_RE.sub("수량", text)
     text = _BONUS_1_1_RE.sub("원 플러스 원", text)
     text = _BONUS_2_1_RE.sub("투 플러스 원", text)
     text = _MIXED_PACK_RE.sub(_format_mixed_pack, text)

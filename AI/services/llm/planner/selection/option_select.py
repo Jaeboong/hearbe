@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import re
+import time
 from typing import Optional, Dict, Any, List, Tuple
 
 from core.interfaces import LLMResponse, MCPCommand, SessionState
@@ -177,6 +178,9 @@ def _build_option_click_response(
         commands.append(extract_command)
 
     _clear_pending_option(session)
+    # 옵션 변경 후 extract_detail 결과로 인한 자동 상품 요약 TTS 억제
+    if isinstance(session.context, dict):
+        session.context["suppress_auto_product_summary_until"] = time.time() + 10
     return LLMResponse(
         text=f"옵션을 변경합니다: {option_name}",
         commands=commands,

@@ -447,17 +447,22 @@ class MCPHandler:
                 logger.error(f"HTML 파싱 실패: {e}")
 
         # HTML 파서가 스킵된 경우 (html_content 없음) fallback: 추출된 product_detail로 기본 정보 TTS
+        # 옵션 변경 후에는 자동 요약 억제 (suppress_auto_product_summary_until 플래그)
         if not suppress_outputs and not html_content and tool_name == "extract_detail":
-            detail = self._session.get_context(session_id, "product_detail") if self._session else None
-            if isinstance(detail, dict) and detail:
-                try:
-                    from services.llm.pipelines.read.product_info import _build_summary
-                    auto_summary = _build_summary(detail)
-                    if auto_summary and "찾지 못했" not in auto_summary:
-                        await self._sender.send_tts_response(session_id, auto_summary)
-                        logger.info("Auto product info TTS sent (fallback): session=%s", session_id)
-                except Exception as e:
-                    logger.error("Auto product info TTS failed: %s", e)
+            suppress_summary_until = self._session.get_context(session_id, "suppress_auto_product_summary_until", 0) if self._session else 0
+            if suppress_summary_until and time.time() < float(suppress_summary_until):
+                logger.info("Auto product info TTS suppressed (option change): session=%s", session_id)
+            else:
+                detail = self._session.get_context(session_id, "product_detail") if self._session else None
+                if isinstance(detail, dict) and detail:
+                    try:
+                        from services.llm.pipelines.read.product_info import _build_summary
+                        auto_summary = _build_summary(detail)
+                        if auto_summary and "찾지 못했" not in auto_summary:
+                            await self._sender.send_tts_response(session_id, auto_summary)
+                            logger.info("Auto product info TTS sent (fallback): session=%s", session_id)
+                    except Exception as e:
+                        logger.error("Auto product info TTS failed: %s", e)
 
         if not suppress_outputs and SUMMARIZER_AVAILABLE and detail_images:
             # OCR dedup: skip if same images were already processed for this session

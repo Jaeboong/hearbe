@@ -33,6 +33,18 @@ class LLMResponseParser:
         try:
             data = json.loads(content)
 
+            # data가 dict가 아니면 파싱 실패로 처리
+            if not isinstance(data, dict):
+                logger.error(
+                    "LLM response is not a dict: type=%s content=%s",
+                    type(data).__name__,
+                    truncate(content),
+                )
+                raise LLMParseError(
+                    "invalid_response_type",
+                    f"LLM 응답이 dict가 아닙니다: {type(data).__name__}",
+                )
+
             response_text = data.get("response", "")
             if isinstance(response_text, str):
                 response_text = response_text.strip()
@@ -59,6 +71,9 @@ class LLMResponseParser:
 
             commands: List[GeneratedCommand] = []
             for cmd in commands_data:
+                if not isinstance(cmd, dict):
+                    logger.warning("Skipping non-dict command: %s", cmd)
+                    continue
                 action = (
                     cmd.get("tool_name")
                     or cmd.get("action")
@@ -97,7 +112,7 @@ class LLMResponseParser:
             raise LLMParseError("json_parse", f"JSON 파싱 실패: {e}", e)
 
     def _format_details(self, details: Dict[str, Any]) -> str:
-        lines = ["???? ?? ?????."]
+        lines = ["상품 정보 안내입니다."]
         for key, value in details.items():
             if isinstance(value, dict):
                 lines.append(f"- {key}:")

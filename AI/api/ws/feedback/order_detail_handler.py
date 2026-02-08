@@ -15,6 +15,7 @@ from core.interfaces import MCPCommand
 from services.llm.generators.llm_generator import LLMGenerator
 
 from ..auth.token_manager import TokenManager
+from ..utils.temp_file_manager import TempFileManager
 from .order_detail_api import OrderDetailApiSender
 from .order_detail_constants import (
     CTX_ORDER_DETAIL_LAST_URL,
@@ -37,6 +38,7 @@ from .order_detail_utils import (
     is_order_detail_read_request,
     build_order_detail_summary,
     build_order_detail_actions,
+    build_order_detail_payment_tts,
     prune_data,
     truncate_text,
 )
@@ -56,6 +58,7 @@ class OrderDetailHandler:
         self._session = session_manager
         self._llm = llm_generator or LLMGenerator()
         self._api_sender = OrderDetailApiSender(sender, session_manager, token_manager=token_manager)
+        self._file_manager = TempFileManager()
 
     def handle_token_update(self, session_id: str, access_token: str, refresh_token: str) -> bool:
         return self._api_sender.handle_token_update(session_id, access_token, refresh_token)
@@ -181,6 +184,15 @@ class OrderDetailHandler:
 
         # Do not store order_id in order detail data to avoid reading it out.
         self._session.set_context(session_id, CTX_ORDER_DETAIL_DATA, order_data)
+        self._file_manager.save_json(
+            data={
+                "order_detail": order_data,
+                "page_url": page_url,
+            },
+            session_id=session_id,
+            category="order_detail",
+            filename_prefix="order_detail",
+        )
         order_id = extract_order_id_from_order_detail_url(page_url)
         logger.info(
             "Order detail extracted: session=%s order_id=%s items=%s",
@@ -201,8 +213,11 @@ class OrderDetailHandler:
             return True
 
         summary = build_order_detail_summary(order_data)
+        payment_tts = build_order_detail_payment_tts(order_data)
         actions = build_order_detail_actions(order_data)
         await self._sender.send_tts_response(session_id, summary)
+        if payment_tts:
+            await self._sender.send_tts_response(session_id, payment_tts)
         await self._sender.send_tts_response(session_id, actions)
         await self._sender.send_tts_response(session_id, ORDER_DETAIL_PROMPT)
         return True
@@ -216,6 +231,7 @@ class OrderDetailHandler:
         self._session.set_context(session_id, CTX_ORDER_DETAIL_REQUESTED, None)
         self._session.set_context(session_id, CTX_ORDER_DETAIL_DATA, None)
         self._api_sender.cleanup_session(session_id)
+        self._file_manager.cleanup_session(session_id)
 
     async def _ask_order_detail_llm(self, question: str, order_data: Dict[str, Any], page_url: str) -> str:
         if not question:

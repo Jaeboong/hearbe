@@ -103,6 +103,7 @@ def build_order_detail_summary(data: Dict[str, Any]) -> str:
     text = data.get("text") or {}
     items = data.get("items") or []
     payment = data.get("payment") or {}
+    payment_detail = data.get("payment_detail") or {}
 
     title = order.get("title") or (items[0].get("product_name") if items else "") or ""
     status = text.get("status") or ""
@@ -118,6 +119,61 @@ def build_order_detail_summary(data: Dict[str, Any]) -> str:
         parts.append(f"상품은 {title}입니다.")
     if total:
         parts.append(f"결제금액은 {total}입니다.")
+    return " ".join(parts)
+
+
+def build_order_detail_payment_tts(data: Dict[str, Any]) -> str:
+    payment = data.get("payment") or {}
+    payment_detail = data.get("payment_detail") or {}
+    text = data.get("text") or {}
+
+    total = format_won(
+        payment.get("total_payed_amount")
+        or payment_detail.get("total_payed_amount")
+        or text.get("total_price")
+    )
+    product_total = format_won(
+        payment.get("total_product_price")
+        or payment_detail.get("total_product_price")
+    )
+    shipping_fee = format_won(
+        payment.get("shipping_fee")
+        or payment_detail.get("shipping_fee")
+    )
+    discount = format_won(
+        payment.get("discount_amount")
+        or payment_detail.get("discount_amount")
+    )
+    method = (
+        payment.get("main_pay_type")
+        or payment.get("pay_type")
+        or payment_detail.get("pay_method")
+        or payment_detail.get("method")
+        or ""
+    )
+    bank = payment.get("bank_name") or payment_detail.get("bank_name") or ""
+
+    parts = []
+    if method and bank:
+        parts.append(f"결제 수단은 {method} {bank}입니다.")
+    elif method:
+        parts.append(f"결제 수단은 {method}입니다.")
+    elif bank:
+        parts.append(f"결제 수단은 {bank}입니다.")
+
+    breakdown_parts = []
+    if product_total:
+        breakdown_parts.append(f"상품 금액 {product_total}")
+    if shipping_fee:
+        breakdown_parts.append(f"배송비 {shipping_fee}")
+    if discount:
+        breakdown_parts.append(f"할인 {discount}")
+    if breakdown_parts:
+        parts.append(" ".join(breakdown_parts) + "입니다.")
+
+    if total and (method or breakdown_parts):
+        parts.append(f"총 결제 금액은 {total}입니다.")
+
     return " ".join(parts)
 
 
@@ -202,17 +258,22 @@ def build_order_items(order_data: Dict[str, Any]):
     raw_items = order_data.get("items") if isinstance(order_data, dict) else None
     if not isinstance(raw_items, list):
         return items
+    import logging
+    _logger = logging.getLogger(__name__)
     for raw in raw_items:
         if not isinstance(raw, dict):
+            _logger.debug("Skipping non-dict item: %s", raw)
             continue
         name = raw.get("product_name") or raw.get("vendor_item_name") or raw.get("name") or ""
         name = str(name).strip()
         if not name:
+            _logger.debug("Skipping item with no name: keys=%s", list(raw.keys()))
             continue
         price = coerce_price(raw.get("discounted_unit_price"))
         if price is None:
             price = coerce_price(raw.get("unit_price"))
         if price is None:
+            _logger.debug("Skipping item with no price: name=%s keys=%s", name[:30], list(raw.keys()))
             continue
         quantity = coerce_int(raw.get("quantity"), default=1)
         url = raw.get("product_url") or raw.get("url") or ""
@@ -228,6 +289,8 @@ def build_order_items(order_data: Dict[str, Any]):
                 deliver_url=deliver_url or None,
             )
         )
+    if not items and raw_items:
+        _logger.warning("No valid items from %d raw items. First item keys: %s", len(raw_items), list(raw_items[0].keys()) if raw_items else [])
     return items
 
 
@@ -271,6 +334,7 @@ __all__ = [
     "is_order_detail_read_request",
     "build_order_detail_summary",
     "build_order_detail_actions",
+    "build_order_detail_payment_tts",
     "format_won",
     "truncate_text",
     "prune_data",
