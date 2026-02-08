@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 from core.interfaces import MCPCommand, LLMResponse, SessionState
 from core.korean_datetime import format_date_for_tts
-from core.korean_numbers import extract_ordinal_index
+from core.korean_numbers import extract_ordinal_index, parse_korean_number
 from services.llm.sites.site_manager import get_page_type
 
 DETAIL_KEYWORDS = (
@@ -47,6 +47,9 @@ READ_KEYWORDS = (
     "확인",
     "조회",
 )
+
+_READ_COUNT_RE = re.compile(r"(\d+)\s*(개|건)\s*(만)?")
+_READ_COUNT_KO_RE = re.compile(r"([가-힣]+)\s*(개|건)\s*(만)?")
 
 
 def _normalize(text: str) -> str:
@@ -150,12 +153,35 @@ def _build_detail_commands(item: Dict[str, Any]) -> List[MCPCommand]:
     return commands
 
 
-def _build_order_list_summary_text(items: List[Dict[str, Any]]) -> str:
+def _extract_read_limit(text: str) -> tuple[Optional[int], bool]:
+    if not text:
+        return None, False
+
+    match = _READ_COUNT_RE.search(text)
+    if match:
+        value = int(match.group(1))
+        if value > 0:
+            return value, bool(match.group(3))
+
+    match = _READ_COUNT_KO_RE.search(text)
+    if match:
+        value = parse_korean_number(match.group(1))
+        if value and value > 0:
+            return value, bool(match.group(3))
+
+    return None, False
+
+
+def _build_order_list_summary_text(
+    items: List[Dict[str, Any]],
+    limit: Optional[int] = None,
+    suppress_more_prompt: bool = False,
+) -> str:
     if not items:
         return "주문 목록이 비어 있어요."
 
     total_count = len(items)
-    max_read = 4
+    max_read = 4 if limit is None else min(max(limit, 1), total_count)
     lines = []
     for idx, order in enumerate(items[:max_read], start=1):
         title = order.get("title") or "상품"
@@ -175,7 +201,7 @@ def _build_order_list_summary_text(items: List[Dict[str, Any]]) -> str:
     intro = f"주문 목록에 {total_count}건이 있어요. 주요 주문을 알려드릴게요."
     tts_text = intro + " " + ". ".join(lines) + "."
 
-    if total_count > max_read:
+    if total_count > max_read and not suppress_more_prompt:
         remain = total_count - max_read
         tts_text += f" 나머지 {remain}건도 읽어드릴까요?"
 
@@ -279,6 +305,20 @@ def handle_order_list_action(user_text: str, session: Optional[SessionState]) ->
 
     prompt_pending = bool(session.context.get("order_list_prompt_pending"))
     if prompt_pending:
+        read_limit, read_only = _extract_read_limit(text)
+        if read_limit is not None:
+            session.context["order_list_prompt_pending"] = False
+            summary = _build_order_list_summary_text(
+                items,
+                limit=read_limit,
+                suppress_more_prompt=read_only,
+            )
+            return LLMResponse(
+                text=summary,
+                commands=[],
+                requires_flow=False,
+                flow_type=None,
+            )
         if _is_affirmative(text):
             session.context["order_list_prompt_pending"] = False
             summary = _build_order_list_summary_text(items)
@@ -303,7 +343,8 @@ def handle_order_list_action(user_text: str, session: Optional[SessionState]) ->
         target = items[ordinal_index]
     if target is None:
         target = title_match or _find_by_title(items, text)
-    if target is None and len(items) == 1 and (has_detail_intent or ordinal_index is not None):
+    # ordinal/상품명 없이 상세 의도만 있으면 → 첫 번째 주문을 기본 타겟으로
+    if target is None and has_detail_intent and items:
         target = items[0]
 
     # 타겟이 있으면 바로 상세 이동
@@ -323,7 +364,12 @@ def handle_order_list_action(user_text: str, session: Optional[SessionState]) ->
     # 타겟 없이 읽기 의도만 있으면 → 목록 요약
     if has_read_intent and not has_detail_intent:
         session.context["order_list_prompt_pending"] = False
-        summary = _build_order_list_summary_text(items)
+        read_limit, read_only = _extract_read_limit(text)
+        summary = _build_order_list_summary_text(
+            items,
+            limit=read_limit,
+            suppress_more_prompt=read_only,
+        )
         return LLMResponse(
             text=summary,
             commands=[],

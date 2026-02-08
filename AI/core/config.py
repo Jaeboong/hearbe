@@ -59,6 +59,7 @@ class TTSConfig:
     """TTS (음성 합성) 설정 - Google Cloud TTS"""
     sample_rate: int = 24000
     streaming: bool = True
+    speaking_rate: float = 1.0
     google_credentials_path: Optional[str] = None
     google_voice_name: str = "ko-KR-Chirp3-HD-Leda"  # Chirp 3 HD 한국어 음성
 
@@ -257,6 +258,7 @@ class ConfigManager:
         tts = TTSConfig(
             sample_rate=self._get_env_int("TTS_SAMPLE_RATE", 24000),
             streaming=self._get_env_bool("TTS_STREAMING", True),
+            speaking_rate=self._get_env_float("TTS_SPEAKING_RATE", 1.0),
             google_credentials_path=self._get_env("GOOGLE_APPLICATION_CREDENTIALS") or None,
             google_voice_name=self._get_env("TTS_GOOGLE_VOICE", "ko-KR-Chirp3-HD-Leda")
         )
