@@ -9,6 +9,8 @@ from .context_selectors import (
     select_search_results,
     select_product_detail,
     select_cart_items,
+    select_order_detail,
+    select_order_list,
 )
 from .context_prompts import build_system_prompt
 
@@ -27,7 +29,10 @@ class ContextBuilder:
         search_results = select_search_results(session_context, conversation_history)
         product_detail = select_product_detail(session_context, conversation_history)
         cart_items = select_cart_items(session_context, conversation_history)
+        order_detail = select_order_detail(session_context, conversation_history)
+        order_list = select_order_list(session_context, conversation_history)
         previous_url = session_context.get("previous_url") if session_context else None
+        login_method_active = session_context.get("login_method_active") if session_context else None
 
         system_prompt = build_system_prompt(
             current_url=current_url,
@@ -35,7 +40,10 @@ class ContextBuilder:
             search_results=search_results,
             product_detail=product_detail,
             cart_items=cart_items,
+            order_detail=order_detail,
+            order_list=order_list,
             previous_url=previous_url,
+            login_method_active=login_method_active,
         )
 
         messages = [{"role": "system", "content": system_prompt}]

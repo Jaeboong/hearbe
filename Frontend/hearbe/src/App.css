@@ -1,5 +1,5 @@
 .theme-a {
-  background-color: #141C29 !important;
+  background-color: #171C28 !important;
   color: #FCD34D !important;
   min-height: 100vh;
 }
@@ -19,10 +19,8 @@
   padding: 0 4rem;
   box-sizing: border-box;
   flex: 1;
-  /* 본문이 공간을 다 차지하게 하여 푸터를 아래로 밈 */
 }
 
-/* 통일된 푸터 스타일 */
 .landing-footer {
   width: 100%;
   padding: 3rem 0;
@@ -30,13 +28,11 @@
   color: #94a3b8;
   font-size: 0.875rem;
   font-weight: 500;
-  border-top: 1px solid #f1f5f9;
+  border-top: none;
   background: white;
   margin-top: auto;
-  /* 공간이 남을 경우 맨 밑으로 이동 */
 }
 
-/* Header Styles */
 .landing-header {
   background-color: white;
   border-bottom: 1px solid #f1f1f1;
@@ -92,7 +88,6 @@
   background-color: #6d28d9;
 }
 
-/* Hero Section Styles */
 .hero-section {
   position: relative;
   border-radius: 4rem;
@@ -205,7 +200,6 @@
   transform: translateY(-3px);
 }
 
-/* Mode Card Styles */
 .mode-selection-area {
   scroll-margin-top: 8rem;
   padding-bottom: 8rem;
@@ -345,8 +339,7 @@
 
 .landing-footer {
   padding: 2rem 0;
-  border-top: 1px solid #f1f1f1;
-  background: white;
+  background: transparent;
   text-align: center;
 }
 
@@ -354,6 +347,24 @@
   font-size: 0.875rem;
   color: #9ca3af;
   font-weight: 700;
+}
+
+/* A형 전용 푸터 스타일 */
+.landing-footer-a {
+  width: 100%;
+  padding: 3rem 0;
+  text-align: center;
+  color: rgba(255, 240, 100, 0.7);
+  font-size: 1.5rem;
+  font-weight: 600;
+  background-color: #141C29;
+  border: none !important;
+  margin-top: auto;
+}
+
+.landing-footer-a p {
+  margin: 0;
+  color: rgba(255, 240, 100, 0.6);
 }
 
 @keyframes ping {
@@ -365,7 +376,6 @@
   }
 }
 
-/* How to Use Section */
 .how-to-use-section {
   display: flex;
   justify-content: center;
@@ -385,6 +395,66 @@
   border: 1px solid rgba(124, 58, 237, 0.05);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-sizing: border-box;
+}
+
+.how-to-label h3 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem;
+}
+
+.how-to-label p {
+  font-size: 1rem;
+  color: #9ca3af;
+  margin: 0;
+  font-weight: 500;
+}
+
+.steps-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.step-num {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: #f5f3ff;
+  color: #7c3aed;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  border: 2px solid #ede9fe;
+}
+
+.step-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+@media (max-width: 1024px) {
+  .how-to-use-container {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem 3rem;
+    text-align: center;
+  }
+
+  .steps-wrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 }
 
 .logo:hover {
@@ -417,4 +487,226 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.speciality-section {
+  padding: 6rem 0;
+  margin-bottom: 4rem;
+}
+
+.section-header.center {
+  text-align: center;
+}
+
+.section-subtitle.primary-color {
+  color: #7c3aed;
+}
+
+.speciality-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.spec-card {
+  border-radius: 2rem;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.spec-card.purple {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: white;
+  grid-column: span 7;
+}
+
+.spec-card.purple.large-h {
+  grid-row: span 1;
+  min-height: 280px;
+}
+
+.spec-card.white {
+  background: white;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  grid-column: span 5;
+}
+
+.spec-card.dark {
+  background: #1a1a2e;
+  color: white;
+  grid-column: span 7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.spec-card.dark.wide {
+  grid-column: span 7;
+}
+
+.spec-card h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 1rem 0 0.75rem;
+}
+
+.spec-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.spec-card.white h3 {
+  color: #1a1a1a;
+}
+
+.spec-card.white p {
+  color: #6b7280;
+}
+
+.spec-icon-box {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spec-icon-box.white-icon {
+  background: white;
+  color: #7c3aed;
+}
+
+.spec-icon-box.text-purple {
+  background: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid #ede9fe;
+}
+
+.spec-icon-box.text-purple-light {
+  background: #7c3aed;
+  color: white;
+}
+
+.spec-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.spec-tags span {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.spec-tag-badge {
+  display: inline-block;
+  background: #f5f3ff;
+  color: #7c3aed;
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 1rem;
+}
+
+.spec-content {
+  flex: 1;
+}
+
+.spec-visual {
+  flex-shrink: 0;
+}
+
+.bridge-visual {
+  width: 160px;
+  height: 100px;
+  background: #2a2a4a;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 1rem;
+}
+
+.mic-listening {
+  width: 24px;
+  height: 24px;
+  background: #7c3aed;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lines::before,
+.lines::after {
+  content: '';
+  width: 60px;
+  height: 8px;
+  background: #4a4a6a;
+  border-radius: 4px;
+}
+
+.lines::after {
+  width: 40px;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 1024px) {
+  .speciality-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .spec-card.purple,
+  .spec-card.white,
+  .spec-card.dark.wide {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 768px) {
+  .speciality-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spec-card.purple,
+  .spec-card.white,
+  .spec-card.dark.wide {
+    grid-column: span 1;
+  }
+
+  .spec-card.dark {
+    flex-direction: column;
+    text-align: center;
+  }
 }

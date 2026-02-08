@@ -13,6 +13,7 @@ import uuid
 from typing import Optional, Dict, Any, Callable
 from datetime import datetime
 from enum import Enum
+from asyncio import Queue
 
 import websockets
 from websockets.client import WebSocketClientProtocol
@@ -57,6 +58,9 @@ class WSClient:
         self._reconnect_task: Optional[asyncio.Task] = None
         self._receive_task: Optional[asyncio.Task] = None
         self._pending_requests: Dict[str, asyncio.Future] = {}
+        # Text inputs (console/scripted) should not be dropped during transient reconnects.
+        self._text_input_queue: "Queue[str]" = Queue()
+        self._text_input_sender_task: Optional[asyncio.Task] = None
         
     @property
     def is_connected(self) -> bool:
@@ -84,6 +88,7 @@ class WSClient:
         event_bus.subscribe(EventType.AUDIO_READY, self._on_audio_ready)  # PTT 오디오
         event_bus.subscribe(EventType.HOTKEY_PRESSED, self._on_hotkey_pressed)
         event_bus.subscribe(EventType.PAGE_URL_UPDATED, self._on_page_url_updated)
+        event_bus.subscribe(EventType.TEXT_INPUT_READY, self._on_text_input_ready)
         event_bus.subscribe(EventType.APP_SHUTDOWN, self._on_shutdown)
         logger.info("WSClient event handlers registered")
     
@@ -129,6 +134,14 @@ class WSClient:
     async def disconnect(self):
         """연결 해제"""
         self._running = False
+
+        if self._text_input_sender_task:
+            self._text_input_sender_task.cancel()
+            try:
+                await self._text_input_sender_task
+            except asyncio.CancelledError:
+                pass
+            self._text_input_sender_task = None
         
         # 수신 태스크 취소
         if self._receive_task:
@@ -296,7 +309,7 @@ class WSClient:
             return
         
         logger.info(f"Received {len(commands)} tool call(s)")
-        
+
         for i, cmd in enumerate(commands):
             tool_name = cmd.get("tool_name")
             arguments = cmd.get("arguments", {})
@@ -331,12 +344,29 @@ class WSClient:
         """TTS 청크 처리"""
         is_final = data.get("is_final", False)
         audio_hex = data.get("audio", "")
+        text = data.get("text") or ""
+        tts_id = data.get("tts_id") or ""
+        segment_index = data.get("segment_index")
+        segment_total = data.get("segment_total")
+
+        if text:
+            seg_label = ""
+            if isinstance(segment_index, int) and isinstance(segment_total, int) and segment_total > 0:
+                seg_label = f" [{segment_index + 1}/{segment_total}]"
+            logger.info(f"TTS text{seg_label}: {text}")
         
         if audio_hex:
             # TODO: TTS 오디오 재생 구현
             await publish(
                 EventType.TTS_AUDIO_RECEIVED,
-                data={"audio": bytes.fromhex(audio_hex), "is_final": is_final},
+                data={
+                    "audio": bytes.fromhex(audio_hex),
+                    "is_final": is_final,
+                    "text": text,
+                    "tts_id": tts_id,
+                    "segment_index": segment_index,
+                    "segment_total": segment_total,
+                },
                 source="network.ws_client"
             )
     
@@ -411,17 +441,48 @@ class WSClient:
             {"reason": "hotkey"}
         )
 
+    async def _on_text_input_ready(self, event):
+        """Queue text input to server (bypass ASR).
+
+        Important: the WS connection can drop/reconnect; do not lose inputs.
+        """
+        text = (event.data or "").strip()
+        if not text:
+            return
+        await self._text_input_queue.put(text)
+
+    async def _text_input_sender_loop(self):
+        """Send queued text inputs in order, waiting out reconnects."""
+        while self._running:
+            try:
+                text = await self._text_input_queue.get()
+            except asyncio.CancelledError:
+                return
+
+            if not self._running:
+                return
+
+            while self._running:
+                if not self.is_connected:
+                    await asyncio.sleep(0.5)
+                    continue
+                ok = await self.send_message(MessageType.USER_INPUT, {"text": text})
+                if ok:
+                    break
+                await asyncio.sleep(0.5)
+
     async def _on_page_url_updated(self, event):
         """Send page URL updates to server."""
         if not self.is_connected:
             return
         data = event.data or {}
         url = data.get("url")
+        page_id = data.get("page_id")
         if not url:
             return
         await self.send_message(
             MessageType.PAGE_UPDATE,
-            {"url": url}
+            {"url": url, "page_id": page_id}
         )
     
     async def _on_shutdown(self, _event):
@@ -431,6 +492,9 @@ class WSClient:
     async def start(self):
         """클라이언트 시작"""
         logger.info("Starting WSClient...")
+        self._running = True
+        if not self._text_input_sender_task:
+            self._text_input_sender_task = asyncio.create_task(self._text_input_sender_loop())
         await self.connect()
     
     async def stop(self):

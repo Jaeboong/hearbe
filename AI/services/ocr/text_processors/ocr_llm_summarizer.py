@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -9,18 +10,22 @@ from pathlib import Path
 import requests
 from typing import Dict, List, Tuple
 
-from product_type_detector import (
-    ProductType,
-    detect_product_type,
-    get_keywords_for_type,
-    get_type_description,
-    is_keyword_valid_for_type
-)
-
 try:
-    from .utils import compute_summary_hash, load_summary_cache, save_summary_cache
+    from .product_type_detector import (
+        ProductType,
+        detect_product_type,
+        get_keywords_for_type,
+        get_type_description,
+        is_keyword_valid_for_type
+    )
 except ImportError:
-    from utils import compute_summary_hash, load_summary_cache, save_summary_cache
+    from product_type_detector import (
+        ProductType,
+        detect_product_type,
+        get_keywords_for_type,
+        get_type_description,
+        is_keyword_valid_for_type
+    )
 
 try:
     from dotenv import load_dotenv
@@ -33,10 +38,14 @@ DEFAULT_INPUT = os.path.join("output", "샴푸_res_texts.json")
 DEFAULT_OUTPUT = os.path.join("output", "샴푸_texts_summary.json")
 
 try:
-    from ocr_text_preprocessor import load_and_preprocess_ocr_json
+    from .ocr_text_preprocessor import load_and_preprocess_ocr_json
     PREPROCESSOR_AVAILABLE = True
 except ImportError:
-    PREPROCESSOR_AVAILABLE = False
+    try:
+        from ocr_text_preprocessor import load_and_preprocess_ocr_json
+        PREPROCESSOR_AVAILABLE = True
+    except ImportError:
+        PREPROCESSOR_AVAILABLE = False
 
 
 def _load_ocr_texts(path: str, preprocess: bool = True) -> Tuple[List[str], Dict]:
@@ -96,14 +105,25 @@ def _build_prompt(texts: List[str], product_type: ProductType, size_table: str =
         "- **숫자/단위**: 용량, 사이즈(cm), 무게(g), 전압(V), 개수 등은 텍스트 그대로 정확히 찾으세요.\n"
         "- **안전 정보**: 유통기한, KC인증, 전격전압, 알레르기 주의사항 등 안전과 관련된 정보는 **원문 그대로** 추출하세요. 명백한 오타만 문맥에 맞게 수정하세요.\n"
         "- **소비기한**: 소비기한, 유통기한은 다루지 마세요.\n"
-        "- **🚫 선택형 옵션 목록 제외**: 아래와 같은 '선택지 나열' 형태의 PRODUCT INFO는 **요약에서 완전히 제외**하세요.\n"
-        "   - 계절: 봄&가을 / 여름 / 겨울\n"
-        "   - 두께감: 얇음 / 보통 / 두꺼움\n"
-        "   - 신축성: 좋음 / 보통 / 없음\n"
-        "   - 비침정도: 있음 / 보통 / 없음\n"
-        "   - 안감: 있음 / 없음 / 기모안감\n"
-        "   - 세탁방법: 손세탁, 드라이클리닝\n"
-        "   이런 형태는 OCR로 어떤 값이 '선택'되었는지 알 수 없으므로 잘못된 정보를 전달할 위험이 있습니다.\n"
+        "- **🚫 선택형 옵션 목록(PRODUCT INFO 스케일) 완전 제외**:\n"
+        "   쇼핑몰 상세페이지에는 '핏/두께감/촉감/신축성' 등의 카테고리별로 **3~4개 선택지를 나열한 스케일(척도)** 형태의 PRODUCT INFO가 자주 등장합니다.\n"
+        "   이 선택지들은 이미지 상에서 하나만 체크/강조되어 있지만, OCR은 **모든 선택지 텍스트를 동시에 추출**하므로 어떤 값이 실제 선택되었는지 알 수 없습니다.\n"
+        "   따라서 아래 규칙을 따르세요:\n\n"
+        "   **[인식 방법]** 다음 중 하나라도 해당하면 선택형 옵션입니다:\n"
+        "   - 카테고리명 + 슬래시(/)나 가운뎃점(·)으로 구분된 2~4개 선택지가 나열된 패턴\n"
+        "   - 영문+한글 병기 카테고리 헤더: EDITION TYPE/핏, THICKNESS/두께감, SOFT/촉감, ELASTICITY/신축성, SEASON/계절, LINING/안감, TRANSPARENCY/비침 등\n"
+        "   - 스케일(낮음→높음) 형태로 배치된 텍스트: 예) '얇음 - 적당함 - 두꺼움', '없음 - 약간 있음 - 좋음'\n\n"
+        "   **[제외 대상 카테고리와 흔한 선택지 변형]** (아래 단어와 정확히 일치하지 않아도, 의미가 유사하면 모두 제외):\n"
+        "   - 핏/핏감: 슬림핏, 슬림, 적당함, 보통, 레귤러, 루즈핏, 루즈, 오버핏\n"
+        "   - 두께감: 얇음, 얇은, 적당함, 보통, 두꺼움, 두꺼운\n"
+        "   - 촉감: 약간 뻣뻣함, 뻣뻣함, 까끌거림, 적당함, 보통, 부드러움, 부드러운\n"
+        "   - 신축성: 없음, 약간 있음, 보통, 좋음, 매우 좋음\n"
+        "   - 비침정도/비침: 있음, 약간 있음, 보통, 없음\n"
+        "   - 안감: 있음, 없음, 기모안감, 기모\n"
+        "   - 계절/시즌: 봄, 여름, 가을, 겨울, 봄&가을, 사계절\n"
+        "   - 세탁방법: 손세탁, 드라이클리닝, 기계세탁\n\n"
+        "   **[핵심 원칙]** 위 카테고리에 해당하는 선택형 정보는 설령 OCR 텍스트에 포함되어 있더라도 summary와 keywords 모두에서 **완전히 제외**하세요.\n"
+        "   단, 소재(100% 면 등)나 사이즈 표처럼 **사실 확인이 가능한 정보**는 제외 대상이 아닙니다.\n"
         "**💖 2단계: 매력 포인트 발견 (Rich Description)**\n"
         "- 딱딱한 스펙 외에, 포장지에 적힌 **설명 문구**를 적극적으로 찾으세요.\n"
         "- **(범용 예시)**:\n"
@@ -117,8 +137,10 @@ def _build_prompt(texts: List[str], product_type: ProductType, size_table: str =
         "2. **상세 설명**: \"이 제품은 [소재/스펙]이고, [주요 특징]이 돋보이는 제품이에요. [용도/상황]에 쓰기 좋을 것 같아요.\"\n"
         "3. **사이즈(의류만)**: 의류/신발이고 SIZE 표가 있다면, **모든 사이즈의 실측 치수를 자세히** 설명하세요.\n"
         "   - 예: \"사이즈는 M(허리 34, 엉덩이 67, 허벅지 38, 밑단 24.5, 총장 103), L(허리 36, 엉덩이 69, 허벅지 39.5, 밑단 25.5, 총장 105), XL(허리 38, 엉덩이 72, 허벅지 41, 밑단 26.5, 총장 107), 2XL(허리 40, 엉덩이 75, 허벅지 42.5, 밑단 27.5, 총장 108)로 나와요.\"\n"
-        "4. **사용/관리**: \"[세탁법/사용법/조리법]도 간단해요. [내용]하면 된답니다.\" (정보 있을 때만)\n"
-        "5. **안전 챙김**: \"아, 그리고 [주의사항/알레르기/정격전압] 정보가 있으니 꼼꼼히 확인해 주세요!\" (없으면 생략)\n\n"
+        "4. **사용/관리**: OCR 텍스트에 세탁법, 사용법, 조리법 등이 **명시적으로 적혀 있을 때만** 해당 내용을 그대로 전달하세요. "
+        "**⚠️ 텍스트에 관련 내용이 없으면 이 항목을 반드시 생략하세요. 절대로 추측하거나 일반 상식으로 채워 넣지 마세요.**\n"
+        "5. **안전 챙김**: OCR 텍스트에 주의사항, 알레르기, 정격전압 등이 **명시적으로 적혀 있을 때만** 전달하세요. "
+        "**텍스트에 없으면 반드시 생략하세요.**\n\n"
         "**출력 JSON 형식:**\n"
         "{\n"
         "  \"product_type\": \"자동 감지한 제품군\",\n"
@@ -151,9 +173,9 @@ def _build_prompt(texts: List[str], product_type: ProductType, size_table: str =
 
 
 def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
-    api_key = os.environ.get("GMS_KEY")
+    api_key = os.environ.get("GMS_API_KEY")
     if not api_key:
-        raise RuntimeError("GMS_KEY 환경변수가 설정되지 않았습니다.")
+        raise RuntimeError("GMS_API_KEY 환경변수가 설정되지 않았습니다.")
 
     model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions"
@@ -200,14 +222,20 @@ def _call_openai(prompt: Dict[str, str], max_retries: int = 3) -> Dict:
             if not output_text:
                 raise RuntimeError("LLM 응답 내용이 비어있습니다.")
 
-            if output_text.strip().startswith("```"):
-                lines = output_text.strip().split("\n")
-                output_text = "\n".join(lines[1:-1])
+            # JSON 객체 추출: 코드블록 감싸기, 전후 텍스트 등 다양한 LLM 출력 대응
+            json_match = re.search(r'\{[\s\S]*\}', output_text)
+            if json_match:
+                output_text = json_match.group()
 
             try:
                 return json.loads(output_text)
-            except json.JSONDecodeError as exc:
-                raise RuntimeError(f"LLM 응답이 유효한 JSON이 아닙니다: {exc}") from exc
+            except json.JSONDecodeError:
+                last_error = ValueError(f"LLM 응답이 유효한 JSON이 아닙니다: {output_text[:200]}")
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** attempt
+                    time.sleep(wait_time)
+                    continue
+                raise RuntimeError(f"LLM이 {max_retries}회 시도 후에도 유효한 JSON을 반환하지 않았습니다.") from last_error
 
         except requests.exceptions.RequestException as e:
             last_error = e
@@ -238,25 +266,11 @@ def summarize_texts(
     
     if product_type is None:
         product_type = detect_product_type(texts)
-    
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-    if use_cache:
-        summary_hash = compute_summary_hash(
-            texts=texts,
-            product_type=product_type.value,
-            model=model,
-            prompt_version=prompt_version,
-        )
-        cached = load_summary_cache(summary_hash)
-        if cached:
-            return cached
 
     prompt = _build_prompt(texts, product_type, size_table)
 
     summary = _call_openai(prompt)
-    if use_cache:
-        save_summary_cache(summary_hash, summary)
-    
+
     return summary
 
 

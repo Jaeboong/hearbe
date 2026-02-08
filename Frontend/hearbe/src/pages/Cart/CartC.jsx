@@ -1,14 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, ShoppingCart, Home, User } from 'lucide-react';
+import { ShoppingCart, Store, User, LogOut } from 'lucide-react';
 import { cartAPI } from '../../services/cartAPI';
+import { authAPI } from '../../services/authAPI';
+import '../MyPage/mypage-common.css';
 import './CartC.css';
+import logoC from '../../assets/logoC.png';
 
-export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }) {
+const CartC = ({ onBack, onClose, onHome, onCart, onMyPage, isEmbedded = false }) => {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
+    });
+
+    // localStorage에서 사용자 정보 로드
+    useEffect(() => {
+        const userName = localStorage.getItem('user_name');
+        setUserData({
+            name: userName || '회원',
+            email: '',
+        });
+    }, []);
+
+    const sidebarItems = [
+        { id: 'member-info', label: '회원 정보', path: '/C/member-info' },
+        { id: 'order-history', label: '주문 내역', path: '/C/order-history' },
+        { id: 'wishlist', label: '찜한 상품', path: '/C/wishlist' },
+        { id: 'cart', label: '장바구니', path: '/C/cart' },
+    ];
 
     // Platform ID to name mapping (A형과 동일)
     const platformNames = {
@@ -24,20 +48,42 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
             try {
                 setIsLoading(true);
                 setError(null);
+                setIsLoading(true);
+                setError(null);
                 const response = await cartAPI.getCart();
 
-                // Transform API response to CartC format
-                if (response.cart_items) {
-                    const transformedItems = response.cart_items.map(item => ({
-                        id: item.cart_item_id,
-                        name: item.name,
-                        price: item.price,
+                // 1. 응답 처리
+                let itemsList = [];
+                if (Array.isArray(response)) {
+                    itemsList = response;
+                } else if (response.data && Array.isArray(response.data.items)) {
+                    itemsList = response.data.items;
+                } else if (response.data && Array.isArray(response.data)) {
+                    itemsList = response.data;
+                } else if (response.items && Array.isArray(response.items)) {
+                    itemsList = response.items;
+                } else if (response.cartItems && Array.isArray(response.cartItems)) {
+                    itemsList = response.cartItems;
+                } else if (response.cart_items && Array.isArray(response.cart_items)) {
+                    itemsList = response.cart_items;
+                } else if (response.cart && Array.isArray(response.cart)) {
+                    itemsList = response.cart;
+                }
+
+
+                // 2. 데이터 변환
+                if (itemsList.length > 0) {
+                    const transformedItems = itemsList.map((item, index) => ({
+                        id: item.id || item.cart_item_id || item.cartId || item.cart_id || index,
+                        name: item.name || item.product_name || item.productName || '상품명 없음',
+                        price: item.price || 0,
                         quantity: item.quantity || 1,
-                        image: item.img_url || '📦',
-                        mallName: platformNames[item.platform_id] || `Platform ${item.platform_id}`,
-                        url: item.url
+                        image: item.img_url || item.imgUrl || item.image || item.thumbnail || '📦',
+                        mallName: platformNames[item.platform_id] || item.platform_name || item.platformName || item.mall_name || '기타 쇼핑몰',
                     }));
                     setCartItems(transformedItems);
+                } else {
+                    setCartItems([]);
                 }
             } catch (err) {
                 console.error('Failed to fetch cart items:', err);
@@ -50,7 +96,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
         fetchCartItems();
     }, []);
 
-    // 쇼핑몰별 그룹화 로직
     const groupedItems = cartItems.reduce((acc, item) => {
         if (!acc[item.mallName]) acc[item.mallName] = [];
         acc[item.mallName].push(item);
@@ -60,7 +105,6 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
     const handleRemoveItem = async (id) => {
         try {
             await cartAPI.deleteCart(id);
-            // API 호출 성공 시 로컬 상태 업데이트
             setCartItems(items => items.filter(item => item.id !== id));
         } catch (err) {
             console.error('Failed to delete cart item:', err);
@@ -71,139 +115,231 @@ export default function CartPage({ onBack, onClose, onHome, onCart, onMyPage, is
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    return (
-        <div className="cart-page-container" style={isEmbedded ? {
-            position: 'static',
-            width: '100%',
-            minHeight: 'auto',
-            background: 'transparent',
-            padding: 0,
-            margin: 0
-        } : {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'stretch',
-            margin: 0,
-            padding: 0,
-            background: '#fafafa'
-        }}>
-            {/* Header 섹션 (디자인 통일) - Embedded 모드에서는 숨김 */}
-            {!isEmbedded && (
-                <header className="mall-header-c">
-                    <div className="header-left-c">
-                        <div className="title-area-c" style={{ marginLeft: 0 }}>
-                            <div className="title-icon-box-c">
-                                <ShoppingCart size={24} />
+    const handleLogout = async () => {
+        try {
+            await authAPI.logout();
+            navigate('/main');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            navigate('/main');
+        }
+    };
+
+    if (isEmbedded) {
+        return (
+            <div className="cart-page-container" style={{
+                position: 'static',
+                width: '100%',
+                minHeight: 'auto',
+                background: 'transparent',
+                padding: 0,
+                margin: 0
+            }}>
+                <main className="cart-content" style={{ padding: 0 }}>
+                    <div className="cart-list-wrapper" style={{ marginBottom: 0 }}>
+                        {isLoading ? (
+                            <div className="empty-cart">
+                                <p>장바구니를 불러오는 중...</p>
                             </div>
-                            <div className="title-text-c">
-                                <h1>장바구니</h1>
-                                <span className="subtitle-c">Shopping Cart</span>
+                        ) : error ? (
+                            <div className="empty-cart">
+                                <p style={{ color: '#e53e3e' }}>{error}</p>
                             </div>
-                        </div>
-                    </div>
+                        ) : cartItems.length === 0 ? (
+                            <div className="empty-cart">
+                                <ShoppingCart className="empty-icon" />
+                                <p>장바구니가 비어있습니다</p>
+                            </div>
+                        ) : (
+                            Object.entries(groupedItems).map(([mallName, items]) => {
+                                const mallTotalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                                const mallTotalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
-                    <div className="header-right-c">
-                        <button className="nav-item-c" onClick={onHome || (() => navigate('/'))}>
-                            <div className="nav-icon-c"><Home size={24} /></div>
-                            <span>홈</span>
-                        </button>
-                        <button className="nav-item-c active">
-                            <div className="nav-icon-c"><ShoppingCart size={24} /></div>
-                            <span>장바구니</span>
-                        </button>
-                        <button className="nav-item-c" onClick={onMyPage || (() => navigate('/C/mypage'))}>
-                            <div className="nav-icon-c"><User size={24} /></div>
-                            <span>마이페이지</span>
-                        </button>
-                    </div>
-                </header>
-            )}
-
-            {/* Main Content */}
-            <main className="cart-content" style={isEmbedded ? { padding: 0 } : {}}>
-                <div className="cart-list-wrapper" style={isEmbedded ? { marginBottom: 0 } : {}}>
-                    {isLoading ? (
-                        <div className="empty-cart">
-                            <p>장바구니를 불러오는 중...</p>
-                        </div>
-                    ) : error ? (
-                        <div className="empty-cart">
-                            <p style={{ color: '#e53e3e' }}>{error}</p>
-                        </div>
-                    ) : cartItems.length === 0 ? (
-                        <div className="empty-cart">
-                            <ShoppingCart className="empty-icon" />
-                            <p>장바구니가 비어있습니다</p>
-                        </div>
-                    ) : (
-                        Object.entries(groupedItems).map(([mallName, items]) => {
-                            const mallTotalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-                            const mallTotalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-
-                            return (
-                                <section key={mallName} className="mall-group">
-                                    <div className="mall-header">
-                                        <div className="mall-indicator" />
-                                        <h2>{mallName}</h2>
-                                    </div>
-
-                                    <div className="item-grid">
-                                        {items.map(item => (
-                                            <div key={item.id} className="cart-item-card">
-                                                <div className="item-image-box">
-                                                    {item.image}
-                                                </div>
-                                                <div className="item-info">
-                                                    <h3>{item.name}</h3>
-                                                    <p className="item-price">{item.price.toLocaleString()}원</p>
-                                                </div>
-                                                <div className="item-quantity-badge">
-                                                    <span className="label">주문 수량</span>
-                                                    <span className="count">{item.quantity}개</span>
-                                                </div>
-                                                <button onClick={() => handleRemoveItem(item.id)} className="delete-button">
-                                                    <Trash2 size={18} /> 삭제하기
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="mall-footer">
-                                        <div className="mall-summary-detail">
-                                            <div className="summary-row">
-                                                <span className="summary-label">총 주문 수량 :</span>
-                                                <span className="summary-value">{mallTotalItems}개</span>
-                                            </div>
-                                            <div className="summary-row highlight">
-                                                <span className="summary-label">총 결제금액 :</span>
-                                                <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
-                                            </div>
+                                return (
+                                    <section key={mallName} className="mall-group">
+                                        <div className="cart-mall-name-header">
+                                            <div className="mall-indicator" />
+                                            <h2>{mallName}</h2>
                                         </div>
-                                        <button className="mall-pay-button" onClick={() => alert(`${mallName} 결제 페이지로 이동합니다.`)}>
-                                            <span>{mallName}에서 결제하기</span>
-                                            <ArrowLeft className="rotate-180" />
-                                        </button>
-                                    </div>
-                                </section>
-                            );
-                        })
-                    )}
+
+                                        <div className="item-grid">
+                                            {items.map(item => (
+                                                <div key={item.id} className="cart-item-card">
+                                                    <div className="item-image-box">
+                                                        {item.image && item.image.startsWith('http') ? (
+                                                            <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1rem' }} />
+                                                        ) : (
+                                                            item.image || '📦'
+                                                        )}
+                                                    </div>
+                                                    <div className="item-info">
+                                                        <h3>{item.name}</h3>
+                                                        <p className="item-price">{item.price.toLocaleString()}원</p>
+                                                    </div>
+                                                    <div className="item-quantity-badge-right">
+                                                        <span className="count">{item.quantity}개</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="mall-footer">
+                                            <div className="mall-summary-detail">
+                                                <div className="summary-row">
+                                                    <span className="summary-label">총 담은 수량 :</span>
+                                                    <span className="summary-value">{mallTotalItems}개</span>
+                                                </div>
+                                                <div className="summary-row highlight">
+                                                    <span className="summary-label">주문 예상 금액 :</span>
+                                                    <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                );
+                            })
+                        )}
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    return (
+        <div className="mypage-container">
+            {/* Header */}
+            <header className="mall-header-c">
+                <div className="header-left-c">
+                    <div className="title-area-c" style={{ marginLeft: 0, cursor: 'pointer' }} onClick={() => navigate('/main')}>
+                        <img src={logoC} alt="HearBe Logo" style={{ height: '70px', objectFit: 'contain' }} />
+                    </div>
                 </div>
 
-                {/* Total Summary Footer Removed */}
-            </main>
+                <div className="header-right-c">
+                    <button className="nav-item-c cursor-pointer" onClick={onHome || (() => navigate('/C/mall'))}>
+                        <div className="nav-icon-c"><Store size={24} /></div>
+                        <span>쇼핑몰</span>
+                    </button>
+                    <button className="nav-item-c cursor-pointer" onClick={handleLogout}>
+                        <div className="nav-icon-c"><LogOut size={24} /></div>
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </header>
 
-            {!isEmbedded && (
-                <footer className="landing-footer">
-                    <p>© 2026 HearBe. All rights reserved.</p>
-                </footer>
-            )}
+            <div className="mypage-layout">
+                {/* Sidebar */}
+                <aside className="mypage-sidebar">
+                    <div className="sidebar-profile-card">
+                        <div className="sidebar-avatar">
+                            <User size={40} color="#7c3aed" />
+                        </div>
+                        <div className="sidebar-profile-info">
+                            <h2 className="sidebar-name">{userData.name}님</h2>
+                            <span className="sidebar-badge">hearbe 회원</span>
+                        </div>
+                        <p className="sidebar-welcome">오늘도 즐거운 쇼핑 되세요!</p>
+                    </div>
+
+                    <div className="sidebar-menu-list">
+                        {sidebarItems.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => navigate(item.path)}
+                                className={`mp-sidebar-item cursor-pointer ${item.id === 'cart' ? 'active' : ''}`}
+                            >
+                                <span className="label">{item.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </aside>
+
+                {/* Main Content */}
+                <main className="mypage-content">
+                    <section className="dashboard-card full-height">
+                        <div className="cart-content-title-row">
+                            <div className="cart-content-title-icon">
+                                <ShoppingCart size={28} />
+                            </div>
+                            <h2 className="card-title-lg" style={{ marginBottom: 0 }}>장바구니</h2>
+                        </div>
+                        <div className="cart-content-body">
+                            {isLoading ? (
+                                <div className="cart-status-message">
+                                    장바구니를 불러오는 중...
+                                </div>
+                            ) : error ? (
+                                <div className="cart-status-message cart-error">
+                                    {error}
+                                </div>
+                            ) : cartItems.length === 0 ? (
+                                <div className="cart-status-message">
+                                    장바구니에 담긴 상품이 없습니다.
+                                </div>
+                            ) : (
+                                Object.entries(groupedItems).map(([mallName, items]) => {
+                                    const mallTotalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                                    const mallTotalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+                                    return (
+                                        <section key={mallName} className="mall-group">
+                                            <div className="cart-mall-name-header">
+                                                <div className="mall-indicator" />
+                                                <h2>{mallName}</h2>
+                                            </div>
+
+                                            <div className="item-grid">
+                                                {items.map(item => (
+                                                    <div key={item.id} className="cart-item-card">
+                                                        <div className="item-image-box">
+                                                            {item.image && item.image.startsWith('http') ? (
+                                                                <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1rem' }} />
+                                                            ) : (
+                                                                item.image || '📦'
+                                                            )}
+                                                        </div>
+                                                        <div className="item-info">
+                                                            <h3>{item.name}</h3>
+                                                            <p className="item-price">{item.price.toLocaleString()}원</p>
+                                                        </div>
+                                                        <div className="item-quantity-badge-right">
+                                                            <span className="count">{item.quantity}개</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="mall-footer">
+                                                <div className="mall-summary-detail">
+                                                    <div className="summary-row">
+                                                        <span className="summary-label">총 담은 수량 :</span>
+                                                        <span className="summary-value">{mallTotalItems}개</span>
+                                                    </div>
+                                                    <div className="summary-row highlight">
+                                                        <span className="summary-label">주문 예상 금액 :</span>
+                                                        <span className="summary-value price">{mallTotalPrice.toLocaleString()} 원</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </section>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </section>
+                </main>
+            </div>
+
+            <footer className="landing-footer">
+                <p>© 2026 HearBe. All rights reserved.</p>
+            </footer>
         </div>
     );
-}
+};
+
+export default CartC;

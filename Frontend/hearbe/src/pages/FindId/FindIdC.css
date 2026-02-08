@@ -1,17 +1,21 @@
-.find-id-container {
+.find-id-container-c {
+    height: 100vh;
     min-height: 100vh;
-    background-color: #f8f9fb;
+    background-color: #f8fafc;
     display: flex;
     flex-direction: column;
     font-family: 'Pretendard', sans-serif;
+    color: #1e293b;
+    position: relative;
+    overflow: hidden;
 }
 
 .back-button-circle-c {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    width: 60px;
-    height: 60px;
+    top: 30px;
+    left: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: white;
     border: none;
@@ -19,198 +23,248 @@
     justify-content: center;
     align-items: center;
     color: #8B5CF6;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     z-index: 10;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s;
 }
 
 .back-button-circle-c:hover {
-    transform: translateX(-5px);
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
-    background: #fdfbff;
+    transform: scale(1.1);
+    color: #8b5cf6;
 }
 
-.find-id-main {
+.find-id-main-c {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 20px;
+    height: 100%;
 }
 
-.find-id-card {
-    width: 100%;
-    max-width: 720px;
-    /* Matched to LoginC */
+.find-id-card-c {
+    width: 90%;
+    max-width: 500px;
     background: white;
-    padding: 6rem 5rem;
-    /* Matched to LoginC */
-    border-radius: 3.5rem;
-    /* Matched to LoginC */
-    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.08);
-    /* Matched to LoginC */
+    padding: 50px 50px;
+    border-radius: 32px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    max-height: 95vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.find-id-card-c::-webkit-scrollbar {
+    display: none;
+}
+
+.card-header-c {
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.card-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    width: 100%;
-}
-
-.mini-logo {
-    height: 4rem;
-    /* Matched to LoginC logo size */
-    margin-bottom: 1.5rem;
+.mini-logo-c {
+    height: 70px;
+    /* 로고 크기 축소 */
+    width: auto;
+    margin-bottom: 20px;
     object-fit: contain;
 }
 
-.card-header h1 {
-    font-size: 2rem;
+.card-header-c h1 {
+    font-size: 32px;
     font-weight: 800;
     color: #111827;
-    margin-bottom: 0.75rem;
+    margin-bottom: 10px;
 }
 
-.card-header p {
+.card-header-c p {
     color: #6b7280;
-    font-size: 1rem;
+    font-size: 15px;
     font-weight: 500;
 }
 
-.form-section {
+.form-section-c {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 16px;
 }
 
-.input-field {
+.input-field-c {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 8px;
 }
 
-.input-field label {
+.input-field-c label {
     display: block;
-    font-size: 0.95rem;
+    font-size: 15px;
     font-weight: 600;
     color: #374151;
     padding-left: 0.25rem;
+    margin-bottom: 0;
+    text-align: left;
 }
 
-.input-wrapper {
+.input-wrapper-c {
     position: relative;
     display: flex;
     align-items: center;
     background-color: #f9fafb;
-    /* Light gray from LoginC */
-    border-radius: 0.75rem;
-    /* Matched to LoginC */
-    height: 3.5rem;
-    /* Matched to LoginC */
+    border-radius: 16px;
     transition: all 0.2s;
 }
 
-.input-wrapper:focus-within {
+.input-wrapper-c:focus-within {
     background-color: white;
     box-shadow: 0 0 0 2px #7c3aed;
-    /* Purple focus ring */
 }
 
-.input-icon {
+.input-icon-c {
     position: absolute;
-    left: 1.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
     color: #9ca3af;
+    pointer-events: none;
 }
 
-.input-wrapper input {
+.input-wrapper-c input {
     width: 100%;
-    height: 100%;
-    padding: 0 1.25rem 0 3rem;
-    /* Left padding for icon */
-    border: none;
+    padding: 16px 20px 16px 50px;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 16px;
     background: transparent !important;
-    font-size: 1rem;
+    font-size: 16px;
     color: #1f2937;
     outline: none;
     font-weight: 500;
 }
 
-.input-wrapper input::placeholder {
+.input-wrapper-c input::placeholder {
     color: #d1d5db;
     font-weight: 500;
 }
 
-.flex-row {
+.flex-row-c {
     display: flex;
+    flex-direction: row;
+    /* Ensure row direction */
+    align-items: center;
+    /* Vertically align input and button */
+    width: 100%;
 }
 
-.flex-grow {
+.grow {
     flex-grow: 1;
 }
 
-.gap-2 {
-    gap: 0.5rem;
+.gap-2-c {
+    gap: 16px;
 }
 
-.secondary-btn {
-    padding: 0 1.25rem;
+.secondary-btn-c {
+    padding: 0;
+    width: 110px;
     background: #f3f4f6;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 16px;
     font-weight: 700;
     color: #4b5563;
     white-space: nowrap;
     cursor: pointer;
+    font-size: 14px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.black-btn {
-    padding: 0 1.5rem;
-    background: #111827;
+.black-btn-c {
+    padding: 0;
+    width: 110px;
+    background: #8b5cf6;
     color: white;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 16px;
     font-weight: 700;
     cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.code-input {
-    padding: 0.875rem 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
+.black-btn-c:hover {
+    background-color: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
 }
 
-.submit-full-btn {
-    margin-top: 1rem;
-    padding: 1.125rem;
-    border-radius: 1rem;
+.code-input-c {
+    width: 100%;
+    padding: 16px 20px;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 16px;
+    background-color: #f9fafb;
+    font-size: 16px;
+    color: #1f2937;
+    outline: none;
+    font-weight: 500;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.code-input-c:focus {
+    background-color: white;
+    box-shadow: 0 0 0 2px #7c3aed;
+}
+
+.submit-full-btn-c {
+    margin-top: 10px;
+    padding: 18px;
+    border-radius: 16px;
     border: none;
-    font-size: 1.1rem;
+    font-size: 18px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.submit-full-btn.active {
-    background: #7c3aed;
+.submit-full-btn-c.active {
+    background: #8b5cf6;
     color: white;
-    box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.25);
 }
 
-.submit-full-btn.disabled {
+.submit-full-btn-c.active:hover {
+    background-color: #7c3aed;
+    transform: translateY(-2px);
+}
+
+.submit-full-btn-c.disabled {
     background: #e5e7eb;
     color: #9ca3af;
     cursor: not-allowed;
 }
 
-/* Modal Styles */
 .modal-overlay-c {
     position: fixed;
     inset: 0;
@@ -280,9 +334,7 @@
     cursor: pointer;
 }
 
-/* .find-id-footer removed to use global .landing-footer */
-
-.animate-slide-down {
+.animate-slide-down-c {
     animation: slideDown 0.3s ease-out;
 }
 
@@ -295,5 +347,16 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .find-id-card-c {
+        padding: 30px 20px;
+        width: 90%;
+    }
+
+    .mini-logo-c {
+        height: 50px;
     }
 }

@@ -6,14 +6,49 @@
 
 import logging
 from typing import Any, Dict, Optional
+from urllib.parse import urljoin, urlparse
 
 from browser.action_utils import get_visible_buttons as get_visible_buttons_util
-from browser.extractors import extract_cart_dynamic
+from browser.extractors import (
+    extract_cart_dynamic,
+    extract_order_detail_dynamic,
+    extract_order_list_dynamic,
+)
 from browser.fallbacks.detail_fallback import apply_detail_option_fallback
 from browser.fallbacks.search_fallback import build_search_fallback_result
 from mcp.tool_utils import resolve_frame_context
 
 logger = logging.getLogger(__name__)
+
+
+def _pick_src_from_srcset(srcset: str) -> Optional[str]:
+    """Pick the most suitable URL from a srcset attribute."""
+    if not srcset:
+        return None
+    parts = [part.strip() for part in srcset.split(",") if part.strip()]
+    if not parts:
+        return None
+    # Prefer the last candidate (typically highest resolution).
+    candidate = parts[-1]
+    return candidate.split()[0] if candidate else None
+
+
+def _normalize_image_url(raw_url: str, base_url: str) -> Optional[str]:
+    if not raw_url:
+        return None
+    url = raw_url.strip()
+    if not url:
+        return None
+    if url.startswith(("data:", "blob:", "javascript:")):
+        return None
+    if url.startswith("//"):
+        url = f"https:{url}"
+    elif url.startswith("/") and base_url:
+        url = urljoin(base_url, url)
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        return None
+    return url
 
 
 class BrowserExtractionMixin:
@@ -72,6 +107,71 @@ class BrowserExtractionMixin:
         except Exception as e:
             logger.error(f"Get text failed: {e}")
             return {"success": False, "error": str(e)}
+
+    async def get_attribute_list(
+        self,
+        selector: str,
+        attribute: str,
+        frame_selector: Optional[str] = None,
+        frame_name: Optional[str] = None,
+        frame_url: Optional[str] = None,
+        frame_index: Optional[int] = None,
+        include_empty: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        요소 리스트에서 특정 attribute 값을 순서대로 추출
+
+        Args:
+            selector: CSS selector
+            attribute: attribute name
+            frame_selector: iframe CSS selector (optional)
+            frame_name: iframe name attribute (optional)
+            frame_url: iframe URL match (optional)
+            frame_index: iframe index (optional)
+            include_empty: 빈 값 포함 여부
+
+        Returns:
+            {"success": bool, "values": list, "count": int}
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser", "values": []}
+
+        try:
+            context_type, context, error = resolve_frame_context(
+                page,
+                frame_selector=frame_selector,
+                frame_name=frame_name,
+                frame_url=frame_url,
+                frame_index=frame_index,
+            )
+            if error:
+                return {"success": False, "error": error, "values": []}
+
+            locator = context.locator(selector) if context_type == "frame_locator" else context.locator(selector)
+            count = await locator.count()
+            values = []
+            for i in range(count):
+                item = locator.nth(i)
+                if attribute == "value":
+                    try:
+                        value = await item.input_value()
+                    except Exception:
+                        value = await item.get_attribute(attribute)
+                else:
+                    value = await item.get_attribute(attribute)
+                if value is None:
+                    if include_empty:
+                        values.append("")
+                    continue
+                value = value.strip()
+                if value or include_empty:
+                    values.append(value)
+
+            return {"success": True, "values": values, "count": len(values)}
+        except Exception as e:
+            logger.error(f"Get attribute list failed: {e}")
+            return {"success": False, "error": str(e), "values": []}
 
     async def extract(
         self,
@@ -241,26 +341,54 @@ class BrowserExtractionMixin:
                 img_locator = context.locator(image_selector) if context_type == "frame_locator" else context.locator(image_selector)
                 count = await img_locator.count()
                 max_items = min(count, image_limit) if image_limit > 0 else count
+                base_url = getattr(context, "url", None) or page.url or ""
+                seen = set()
+                attr_candidates = [image_attribute] if image_attribute else ["src"]
+                fallback_attrs = [
+                    "src",
+                    "data-src",
+                    "data-lazy-src",
+                    "data-original",
+                    "data-zoom",
+                    "data-image-src",
+                    "srcset",
+                    "data-srcset",
+                ]
+                for attr in fallback_attrs:
+                    if attr not in attr_candidates:
+                        attr_candidates.append(attr)
                 for i in range(max_items):
                     item = img_locator.nth(i)
-                    src = await item.get_attribute(image_attribute)
+                    src = None
+                    for attr in attr_candidates:
+                        value = await item.get_attribute(attr)
+                        if not value:
+                            continue
+                        if attr in ("srcset", "data-srcset"):
+                            value = _pick_src_from_srcset(value)
+                            if not value:
+                                continue
+                        src = value
+                        break
                     if not src:
                         continue
-                    src = src.strip()
-                    if src.startswith("//"):
-                        src = f"https:{src}"
-                    images.append(src)
+                    normalized = _normalize_image_url(src, base_url)
+                    if not normalized or normalized in seen:
+                        continue
+                    seen.add(normalized)
+                    images.append(normalized)
 
             # 동적 fallback: 옵션 필드가 없거나 실패한 경우
             if fallback_dynamic:
                 page_url = page.url or ""
                 if "coupang.com" in page_url:
                     try:
-                        dynamic_options = await apply_detail_option_fallback(page, detail)
-                        if dynamic_options:
-                            logger.info(f"Dynamic option extraction succeeded: {dynamic_options}")
+                        dynamic_extras = await apply_detail_option_fallback(page, detail)
+                        if dynamic_extras:
+                            keys = list(dynamic_extras.keys()) if isinstance(dynamic_extras, dict) else []
+                            logger.info("Dynamic detail extraction succeeded: keys=%s", keys)
                     except Exception as e:
-                        logger.warning(f"Dynamic option extraction failed: {e}")
+                        logger.warning(f"Dynamic detail extraction failed: {e}")
 
             return {
                 "success": True,
@@ -357,12 +485,16 @@ class BrowserExtractionMixin:
         try:
             try:
                 await page.wait_for_selector(
-                    "#mainContent [id^='item_'] input[type='checkbox']",
+                    "#mainContent [id^='item_'] input[type='checkbox'], "
+                    "#mainContent .cart-product input[type='checkbox'], "
+                    ".cart-product input[type='checkbox']",
                     timeout=3000
                 )
             except Exception:
                 pass
             data = await extract_cart_dynamic(page)
+            if isinstance(data, dict) and data.get("is_cart_page") is False:
+                return {"success": False, "error": "Not on cart page", "page_url": page.url}
             items = data.get("items") if isinstance(data, dict) else []
             summary = data.get("summary") if isinstance(data, dict) else {}
             return {
@@ -374,3 +506,43 @@ class BrowserExtractionMixin:
         except Exception as e:
             logger.error(f"Extract cart failed: {e}")
             return {"success": False, "error": str(e), "cart_items": []}
+
+    async def extract_order_detail(self) -> Dict[str, Any]:
+        """
+        Extract order detail data from order detail page.
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            data = await extract_order_detail_dynamic(page)
+            if not isinstance(data, dict) or not data:
+                return {"success": False, "error": "Not on order detail page", "page_url": page.url}
+            return {"success": True, "order_detail": data, "page_url": page.url}
+        except Exception as e:
+            logger.error(f"Extract order detail failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def extract_order_list(self) -> Dict[str, Any]:
+        """
+        Extract order list data from order list page.
+        """
+        page = await self._get_active_page()
+        if not page:
+            return {"success": False, "error": "Not connected to browser"}
+
+        try:
+            data = await extract_order_list_dynamic(page)
+            if not isinstance(data, dict):
+                return {"success": False, "error": "Not on order list page", "page_url": page.url}
+            orders = data.get("orders") if isinstance(data, dict) else []
+            return {
+                "success": True,
+                "order_list": orders or [],
+                "count": data.get("count") if isinstance(data, dict) else len(orders or []),
+                "page_url": page.url,
+            }
+        except Exception as e:
+            logger.error(f"Extract order list failed: {e}")
+            return {"success": False, "error": str(e), "order_list": []}

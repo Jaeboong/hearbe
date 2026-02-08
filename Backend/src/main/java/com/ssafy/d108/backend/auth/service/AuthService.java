@@ -1,19 +1,33 @@
 package com.ssafy.d108.backend.auth.service;
 
 import com.ssafy.d108.backend.auth.dto.FindIdRequest;
+import com.ssafy.d108.backend.auth.dto.FindIdByEmailRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.RefreshTokenRequest;
+import com.ssafy.d108.backend.auth.dto.RefreshTokenResponse;
+import com.ssafy.d108.backend.auth.dto.DeleteAccountRequest;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordBlindRequest;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordByWelfareRequest;
+import com.ssafy.d108.backend.auth.dto.ResetPasswordRequest;
 import com.ssafy.d108.backend.auth.dto.SignupRequest;
 import com.ssafy.d108.backend.auth.dto.WelfareCardRequest;
 import com.ssafy.d108.backend.auth.repository.UserRepository;
 import com.ssafy.d108.backend.auth.repository.WelfareCardRepository;
+import com.ssafy.d108.backend.auth.repository.SharingSessionLogRepository;
+import com.ssafy.d108.backend.cartItem.repository.CartItemRepository;
+import com.ssafy.d108.backend.member.repository.ProfileRepository;
+import com.ssafy.d108.backend.order.repository.OrderItemRepository;
+import com.ssafy.d108.backend.order.repository.OrderRepository;
+import com.ssafy.d108.backend.wishlist.repository.WishlistRepository;
 import com.ssafy.d108.backend.entity.User;
 import com.ssafy.d108.backend.entity.enums.UserType;
 import com.ssafy.d108.backend.entity.WelfareCard;
 import com.ssafy.d108.backend.global.auth.JwtTokenProvider;
 import com.ssafy.d108.backend.global.exception.DuplicateUserException;
 import com.ssafy.d108.backend.global.exception.InvalidPasswordException;
+import com.ssafy.d108.backend.global.exception.UnauthorizedException;
 import com.ssafy.d108.backend.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +49,14 @@ import java.util.Collections;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRedisService refreshTokenRedisService;
     private final WelfareCardRepository welfareCardRepository;
+    private final SharingSessionLogRepository sharingSessionLogRepository;
+    private final CartItemRepository cartItemRepository;
+    private final WishlistRepository wishlistRepository;
+    private final ProfileRepository profileRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final com.ssafy.d108.backend.global.util.AESUtil aesUtil;
@@ -167,13 +188,44 @@ public class AuthService {
 
         // 4. JWT 토큰 생성
         String accessToken = jwtTokenProvider.createToken(authentication, user.getId());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getId());
+        refreshTokenRedisService.save(user.getId(), refreshToken, jwtTokenProvider.getExpiration(refreshToken));
 
         return new LoginResponse(
                 user.getId(),
                 user.getName(),
                 user.getUserType(),
                 accessToken,
+                refreshToken,
                 "로그인 성공");
+    }
+
+    @Transactional
+    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
+        String refreshToken = request.getRefreshToken();
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
+            throw new UnauthorizedException("토큰이 유효하지 않습니다.");
+        }
+
+        Integer userId = jwtTokenProvider.getUserId(refreshToken);
+        if (!refreshTokenRedisService.matches(userId, refreshToken)) {
+            throw new UnauthorizedException("토큰이 유효하지 않습니다.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getUsername(),
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+
+        String newAccessToken = jwtTokenProvider.createToken(authentication, user.getId());
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getId());
+        refreshTokenRedisService.save(user.getId(), newRefreshToken, jwtTokenProvider.getExpiration(newRefreshToken));
+
+        return new RefreshTokenResponse(newAccessToken, newRefreshToken, "토큰 재발급 성공");
     }
 
     /**
@@ -202,7 +254,7 @@ public class AuthService {
      * 로그아웃
      */
     public void logout(Integer userId) {
-        // TODO: 추후 JWT 토큰 무효화(Redis Blacklist) 등 구현
+        refreshTokenRedisService.delete(userId);
     }
 
     /**
@@ -210,5 +262,93 @@ public class AuthService {
      */
     public boolean checkIdDuplicate(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    /**
+     * 아이디 찾기 (C형 - 이메일 인증)
+     */
+    public FindIdResponse findIdByEmail(FindIdByEmailRequest request) {
+        User user = userRepository.findByNameAndEmail(request.getName(), request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("일치하는 회원 정보가 없습니다."));
+
+        return new FindIdResponse(user.getUsername(), "아이디를 찾았습니다.");
+    }
+
+    /**
+     * 비밀번호 재설정 (C형 - 이메일 인증)
+     */
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("해당 이메일로 가입된 회원이 없습니다."));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    /**
+     * 비밀번호 재설정 (Blind - 로그인 사용자)
+     */
+    @Transactional
+    public void resetPasswordBlind(ResetPasswordBlindRequest request, Integer userId) {
+        if (!request.getNewPassword().equals(request.getNewPasswordCheck())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    /**
+     * 회원탈퇴
+     */
+    @Transactional
+    public Integer deleteAccount(DeleteAccountRequest request, Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 관련 데이터 삭제 (외래 키 제약 조건 해결)
+        orderItemRepository.deleteAllByUserId(userId);
+        orderRepository.deleteAllByUserId(userId);
+        cartItemRepository.deleteAllByUserId(userId);
+        wishlistRepository.deleteAllByUserId(userId);
+        sharingSessionLogRepository.deleteAllByHostUserId(userId);
+        profileRepository.deleteByUserId(userId);
+        welfareCardRepository.deleteByUserId(userId);
+        refreshTokenRedisService.delete(userId);
+
+        userRepository.delete(user);
+        return userId;
+    }
+
+    /**
+     * 비밀번호 재설정 (A형 - 복지카드 인증)
+     */
+    @Transactional
+    public void resetPasswordByWelfare(ResetPasswordByWelfareRequest request) {
+        String rawCardNumber = request.getWelfareCard().getCardNumber().replaceAll("[^0-9]", "");
+        String encryptedCardNumber = aesUtil.encrypt(rawCardNumber);
+        String encryptedCvc = aesUtil.encrypt(request.getWelfareCard().getCvc());
+
+        WelfareCard welfareCard = welfareCardRepository
+                .findByCardNumberAndCardCompanyAndIssueDateAndExpirationDateAndCvc(
+                        encryptedCardNumber,
+                        request.getWelfareCard().getCardCompany(),
+                        request.getWelfareCard().getIssueDate(),
+                        request.getWelfareCard().getExpirationDate(),
+                        encryptedCvc)
+                .orElseThrow(() -> new UserNotFoundException("해당 장애인 복지 카드로 가입된 회원이 없습니다."));
+
+        User user = welfareCard.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setSimplePassword(request.getNewPassword());
+        userRepository.save(user);
     }
 }

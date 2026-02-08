@@ -205,6 +205,56 @@ def _build_option_script() -> str:
     """
 
 
+def _build_extras_script() -> str:
+    # NOTE: Coupang uses utility-like class tokens that include brackets/parentheses.
+    # Using getElementsByClassName avoids CSS escaping issues for class selectors.
+    return r"""
+    () => {
+      const getText = (el) => (el && (el.innerText || el.textContent) || '').trim();
+      const uniq = (items) => {
+        const out = [];
+        const seen = new Set();
+        for (const item of items || []) {
+          const text = (item || '').trim();
+          if (!text) continue;
+          if (seen.has(text)) continue;
+          seen.add(text);
+          out.push(text);
+        }
+        return out;
+      };
+
+      // 1) Category breadcrumb (e.g., Home > Category > ...).
+      const breadcrumbClass = 'twc-flex twc-items-center twc-pb-[16px] twc-pt-[12px]';
+      const breadcrumbRaw = Array.from(document.getElementsByClassName(breadcrumbClass)).map(getText);
+      let categoryPath = uniq(breadcrumbRaw);
+      // On Coupang, the first breadcrumb item is typically the Home entry.
+      if (categoryPath.length > 0) categoryPath = categoryPath.slice(1);
+
+      // 2) "쿠팡 상품 정보" bullet items (key-value pairs like "용기 타입: 플라스틱병").
+      const infoItemClass = 'twc-list-disc twc-list-outside twc-text-[calc(var(--adjust-font-size)+12px)]';
+      const infoItems = uniq(Array.from(document.getElementsByClassName(infoItemClass)).map(getText));
+      const infoKv = {};
+      for (const line of infoItems) {
+        const idx = line.indexOf(':');
+        if (idx <= 0) continue;
+        const key = line.slice(0, idx).trim();
+        const value = line.slice(idx + 1).trim();
+        if (!key || !value) continue;
+        if (infoKv[key] === undefined) {
+          infoKv[key] = value;
+        }
+      }
+
+      return {
+        category_path: categoryPath,
+        coupang_product_info: infoItems,
+        coupang_product_info_kv: infoKv,
+      };
+    }
+    """
+
+
 async def extract_coupang_product_options(page) -> Dict[str, Any]:
     """
     Extract selected option values from Coupang product pages.
@@ -216,5 +266,20 @@ async def extract_coupang_product_options(page) -> Dict[str, Any]:
     try:
         script = _build_option_script()
         return await page.evaluate(script)
+    except Exception:
+        return {}
+
+
+async def extract_coupang_product_extras(page) -> Dict[str, Any]:
+    """
+    Extract additional info from Coupang product detail pages:
+    - category_path: breadcrumb categories (Home removed)
+    - coupang_product_info: bullet item lines
+    - coupang_product_info_kv: parsed key/value pairs from bullet lines
+    """
+    try:
+        script = _build_extras_script()
+        result = await page.evaluate(script)
+        return result if isinstance(result, dict) else {}
     except Exception:
         return {}

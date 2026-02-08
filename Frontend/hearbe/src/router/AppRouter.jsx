@@ -1,85 +1,201 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef } from 'react';
 
-// [페이지 컴포넌트]
 import MainLanding from '../pages/MainLanding';
+import BrandLanding from '../pages/BrandLanding';
+import InitialSetup from '../pages/InitialSetup/InitialSetup';
+import Intro from '../pages/Intro/Intro';
+import AudioPage from '../Audio/AudioPage';
 
-// [A형 페이지 임포트]
-import LoginA from '../pages/Login/LoginA';
-import SignUpA from '../pages/SignUp/SignUpA';
-import SelectMallA from '../pages/SelectMall/SelectMallA';
-import StoreBrowserA from '../pages/StoreBrowser/StoreBrowserA';
-import CartA from '../pages/Cart/CartA';
-import MemberInfoA from '../pages/MemberInfo_A/MemberInfoA';
-import OrderHistoryA from '../pages/OrderHistory_A/OrderHistoryA';
-import WishlistA from '../pages/Wishlist_A/WishlistA';
-import CardManagementA from '../pages/CardManagement_A/CardManagementA';
+import LoginB from '../pages/Login/LoginB';
+import SignUpB from '../pages/SignUp/SignUpB';
+import SelectMallB from '../pages/SelectMall/SelectMallB';
+import StoreBrowserB from '../pages/StoreBrowser/StoreBrowserB';
+import CartB from '../pages/Cart/CartB';
+import MemberInfoB from '../pages/MemberInfo/MemberInfoB';
+import OrderHistoryB from '../pages/OrderHistory/OrderHistoryB';
+import WishlistB from '../pages/Wishlist/WishlistB';
+import CardManagementB from '../pages/CardManagement_B/CardManagementB';
+import FindIdB from '../pages/FindId/FindIdB';
+import FindPasswordB from '../pages/FindPassword/FindPasswordB';
+import ChangePasswordB from '../pages/FindPassword/ChangePasswordB';
 
-// [C형 페이지 임포트]
 import LoginC from '../pages/Login/LoginC';
 import SignUpC from '../pages/SignUp/SignUpC';
 import SelectMallC from '../pages/SelectMall/SelectMallC';
-import StoreBrowserC from '../pages/StoreBrowser/StoreBrowserC';
 import CartC from '../pages/Cart/CartC';
-import MyPageC from '../pages/MyPage/MyPageC';
+import MemberInfoC from '../pages/MemberInfo/MemberInfoC';
+import OrderHistoryC from '../pages/OrderHistory/OrderHistoryC';
+import WishlistC from '../pages/Wishlist/WishlistC';
 import FindIdC from '../pages/FindId/FindIdC';
 import FindPasswordC from '../pages/FindPassword/FindPasswordC';
 
-// [S형 페이지 임포트]
-import LoginS from '../pages/Login/LoginS';
+import GuardianViewS from '../pages/GuardianView/GuardianViewS';
 
-/**
- * AppContent - BrowserRouter 내부에서 실행되는 컴포넌트
- * useNavigate와 같은 라우터 훅을 사용할 수 있음
- */
+
 function AppContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedMode, setSelectedMode] = useState('audio');
   const [micPermissionGranted, setMicPermissionGranted] = useState(false);
-  const [showInitialSetup, setShowInitialSetup] = useState(false);
+  const [showInitialSetup, setShowInitialSetup] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('app') === 'mcp') {
+      localStorage.setItem('hearbe_mcp_setup_completed', 'true');
+      return false;
+    }
+    return localStorage.getItem('hearbe_mcp_setup_completed') !== 'true';
+  });
   const modeSelectionRef = useRef(null);
 
-  const handleSetupComplete = (micGranted) => {
-    setMicPermissionGranted(micGranted);
+  const handleModeSelect = (mode) => {
+    setSelectedMode(mode);
+    if (mode === 'common') {
+      navigate('/C/login');
+    } else if (mode === 'sharing') {
+      navigate('/S/join');
+    } else if (mode === 'big') {
+      navigate('/B/login');
+    } else {
+      navigate('/spline-test');
+    }
+  };
+
+  const handleSetupComplete = () => {
     setShowInitialSetup(false);
   };
 
-  const handleModeSelect = (mode, label) => {
-    if (micPermissionGranted || mode === 'audio') {
-      const utterance = new SpeechSynthesisUtterance(`${label} 모드를 선택하셨습니다.`);
-      utterance.lang = 'ko-KR';
-      window.speechSynthesis.speak(utterance);
-    }
-    setSelectedMode(mode);
-
-    // 모드에 따라 분기 처리
-    if (mode === 'common') {
-      navigate('/C/login');
-    } else {
-      navigate('/A/login');
-    }
-  };
-
-  const handleReset = () => {
-    localStorage.clear();
-    window.location.reload();
-  };
+  if (showInitialSetup) {
+    return <InitialSetup onComplete={handleSetupComplete} />;
+  }
 
   return (
     <Routes>
-      {/* 메인 랜딩 페이지 */}
+      <Route path="/" element={<Navigate to="/intro" replace />} />
+      <Route path="/intro" element={<Intro />} />
+      <Route path="/guide" element={<BrandLanding />} />
       <Route
-        path="/"
+        path="/main"
         element={
           <MainLanding
-            handleReset={handleReset}
             handleModeSelect={handleModeSelect}
             modeSelectionRef={modeSelectionRef}
+            onOpenSetup={() => setShowInitialSetup(true)}
+          />
+        }
+      />
+      <Route path="/spline-test" element={<AudioPage />} />
+      <Route
+        path="/B/login"
+        element={
+          <LoginB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onLoginSuccess={() => navigate('/B/mall')}
+            onSignup={() => navigate('/B/signup')}
           />
         }
       />
 
-      {/* Type C Routes */}
+      <Route
+        path="/B/signup"
+        element={
+          <SignUpB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate('/B/login')}
+          />
+        }
+      />
+      <Route
+        path="/B/mall"
+        element={
+          <SelectMallB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+          />
+        }
+      />
+      <Route
+        path="/B/store"
+        element={
+          <StoreBrowserB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate('/B/mall')}
+            onHome={() => navigate('/main')}
+            onCart={() => navigate('/B/cart')}
+            onMyPage={() => navigate('/B/member-info')}
+          />
+        }
+      />
+      <Route
+        path="/B/cart"
+        element={
+          <CartB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/B/member-info"
+        element={
+          <MemberInfoB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/B/order-history"
+        element={
+          <OrderHistoryB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/B/wishlist"
+        element={
+          <WishlistB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/B/card-management"
+        element={
+          <CardManagementB
+            mode={selectedMode}
+            micPermissionGranted={micPermissionGranted}
+            onBack={() => navigate(-1)}
+            onHome={() => navigate('/main')}
+          />
+        }
+      />
+      <Route
+        path="/B/findId"
+        element={<FindIdB />}
+      />
+      <Route
+        path="/B/findPassword"
+        element={<FindPasswordB />}
+      />
+      <Route
+        path="/B/changePassword"
+        element={<ChangePasswordB />}
+      />
       <Route
         path="/C/login"
         element={
@@ -101,93 +217,75 @@ function AppContent() {
       />
       <Route
         path="/C/findPassword"
-        element={<FindPasswordC mode="common" onBack={() => navigate(-1)} />}
+        element={<FindPasswordC mode="common" onBack={() => navigate('/C/login')} />}
       />
       <Route
         path="/C/mall"
         element={
           <SelectMallC
             onBack={() => navigate('/C/login')}
-            onHome={() => navigate('/')}
-            onCart={() => navigate('/C/mypage', { state: { activeTab: 'cart' } })}
-            onMyPage={() => navigate('/C/mypage')}
-            onSelectMall={(mall) => navigate('/C/store', { state: { url: mall.url, name: mall.name } })}
+            onCart={() => navigate('/C/cart')}
+            onMyPage={() => navigate('/C/member-info')}
+            onSelectMall={(mall) => window.open(mall.url, '_blank')}
           />
         }
       />
       <Route
-        path="/C/store"
+        path="/C/order-history"
         element={
-          <StoreBrowserC
-            onBack={() => navigate('/C/mall')}
-            onHome={() => navigate('/')}
-            onCart={() => navigate('/C/mypage', { state: { activeTab: 'cart' } })}
-            onMyPage={() => navigate('/C/mypage')}
+          <OrderHistoryC
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
+      <Route
+        path="/C/wishlist"
+        element={
+          <WishlistC
+            onHome={() => navigate('/C/mall')}
+          />
+        }
+      />
+      <Route
+        path="/C/member-info"
+        element={
+          <MemberInfoC
+            onBack={() => navigate('/C/mypage')}
+            onHome={() => navigate('/C/mall')}
+            onCart={() => navigate('/C/cart')}
+            onMyPage={() => navigate('/C/member-info')}
+          />
+        }
+      />
+
+      <Route path="/C/mypage" element={<Navigate to="/C/member-info" replace />} />
       <Route
         path="/C/cart"
         element={
           <CartC
-            onClose={() => navigate(-1)}
-            onHome={() => navigate('/')}
-            onCart={() => navigate('/C/mypage', { state: { activeTab: 'cart' } })}
-            onMyPage={() => navigate('/C/mypage')}
+            onHome={() => navigate('/C/mall')}
           />
         }
       />
-      <Route
-        path="/C/mypage"
-        element={
-          <MyPageC
-            mode="common"
-            onBack={() => navigate(-1)}
-            onHome={() => navigate('/')}
-            onCart={() => navigate('/C/mypage', { state: { activeTab: 'cart' } })}
-            onMyPage={() => navigate('/C/mypage')}
-          />
-        }
-      />
-
-      {/* Type A Routes */}
-      <Route path="/A/login" element={<LoginA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
-      <Route path="/A/signup" element={<SignUpA mode={selectedMode} />} />
-      <Route path="/A/mall" element={<SelectMallA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
-      <Route path="/A/store" element={<StoreBrowserA mode={selectedMode} micPermissionGranted={micPermissionGranted} />} />
-      <Route path="/A/cart" element={<CartA mode={selectedMode} />} />
-      <Route path="/A/mypage" element={<Navigate to="/A/member-info" replace />} />
-      <Route path="/A/member-info" element={<MemberInfoA mode={selectedMode} />} />
-      <Route path="/A/order-history" element={<OrderHistoryA mode={selectedMode} />} />
-      <Route path="/A/wishlist" element={<WishlistA mode={selectedMode} />} />
-      <Route path="/A/card-management" element={<CardManagementA mode={selectedMode} />} />
-
-      {/* Flat Routes for compatibility */}
-      <Route path="/login" element={<Navigate to="/A/login" replace />} />
+      <Route path="/login" element={<Navigate to="/B/login" replace />} />
       <Route path="/signup" element={<Navigate to="/C/signup" replace />} />
       <Route path="/mall" element={<Navigate to="/C/mall" replace />} />
-      <Route path="/store" element={<Navigate to="/C/store" replace />} />
       <Route path="/cart" element={<Navigate to="/C/cart" replace />} />
       <Route path="/login-c" element={<Navigate to="/C/login" replace />} />
       <Route path="/signup-c" element={<Navigate to="/C/signup" replace />} />
       <Route path="/mall-c" element={<Navigate to="/C/mall" replace />} />
-      <Route path="/store-c" element={<Navigate to="/C/store" replace />} />
       <Route path="/mypage-c" element={<Navigate to="/C/mypage" replace />} />
-      <Route path="/login-s" element={<LoginS />} />
-
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/login-s" element={<Navigate to="/S/join" replace />} />
+      <Route path="/S/guardian-view" element={<Navigate to="/S/join" replace />} />
+      <Route path="/S/join" element={<GuardianViewS />} caseSensitive={false} />
+      <Route path="*" element={<Navigate to="/intro" replace />} />
     </Routes>
   );
 }
 
-/**
- * AppRouter - 애플리케이션의 최상위 라우터 컴포넌트
- * BrowserRouter를 포함하여 모든 라우팅 로직을 관리
- */
 export default function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AppContent />
     </BrowserRouter>
   );

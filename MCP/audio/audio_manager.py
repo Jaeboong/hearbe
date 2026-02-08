@@ -72,6 +72,7 @@ class AudioManager:
         self._has_partial_since_last_final = False
         self._pending_recording_start = False
         self._tts_playing = False
+        self._suppress_tts_until = 0.0
         
         logger.info(f"AudioManager initialized with hotkey: {hotkey}")
     
@@ -81,40 +82,7 @@ class AudioManager:
             return
             
         self.audio = pyaudio.PyAudio()
-        
-        # 입력 장치 목록 출력
-        info = self.audio.get_host_api_info_by_index(0)
-        num_devices = info.get('deviceCount')
-        
-        logger.info("Available input devices:")
-        for i in range(num_devices):
-            device_info = self.audio.get_device_info_by_host_api_device_index(0, i)
-            if device_info.get('maxInputChannels') > 0:
-                logger.info(f"  [{i}] {device_info.get('name')}")
 
-        if self.input_device_index is not None:
-            try:
-                device_info = self.audio.get_device_info_by_host_api_device_index(
-                    0, self.input_device_index
-                )
-                if device_info.get('maxInputChannels') > 0:
-                    logger.info(
-                        f"Using input device index {self.input_device_index}: "
-                        f"{device_info.get('name')}"
-                    )
-                else:
-                    logger.warning(
-                        f"Input device index {self.input_device_index} has no input channels; "
-                        "falling back to default device"
-                    )
-                    self.input_device_index = None
-            except Exception as e:
-                logger.warning(
-                    f"Invalid input device index {self.input_device_index}: {e}; "
-                    "falling back to default device"
-                )
-                self.input_device_index = None
-    
     def _start_recording(self):
         """녹음 시작"""
         if self.recording:
@@ -241,6 +209,7 @@ class AudioManager:
                 if self._tts_playing:
                     # Defer recording until TTS playback finishes
                     self._pending_recording_start = True
+                    self._suppress_tts_until = time.time() + 3.0
                     logger.info("TTS playing - deferring recording start")
                     return
                 if RECORDING_START_DELAY_SEC > 0:
@@ -322,10 +291,15 @@ class AudioManager:
         logger.info("AudioManager event handlers registered")
 
     async def _on_tts_audio_received(self, event):
+        # Ignore incoming TTS while user is barge-in recording
+        if self._pending_recording_start or self._hotkey_pressed:
+            if time.time() < self._suppress_tts_until:
+                return
         self._tts_playing = True
 
     async def _on_tts_playback_finished(self, event):
         self._tts_playing = False
+        self._suppress_tts_until = 0.0
         if self._pending_recording_start and self._hotkey_pressed and not self.recording:
             if RECORDING_START_DELAY_SEC > 0:
                 time.sleep(RECORDING_START_DELAY_SEC)

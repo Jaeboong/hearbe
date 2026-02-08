@@ -77,6 +77,22 @@ class OCRIntegrator:
         self._ocr_pipeline = None
         self._lock = asyncio.Lock()
 
+    async def warmup(self):
+        """서버 시작 시 OCR 파이프라인 및 모델을 미리 로드"""
+        logger.info("OCR warmup: loading pipeline and model...")
+        pipeline = self._get_pipeline()
+        if pipeline is None:
+            logger.warning("OCR warmup: pipeline import failed")
+            return
+
+        loop = asyncio.get_event_loop()
+        try:
+            from services.ocr.text_processors.korean_ocr import get_ocr_instance
+            await loop.run_in_executor(None, get_ocr_instance)
+            logger.info("OCR warmup: model loaded successfully")
+        except Exception as e:
+            logger.warning(f"OCR warmup: model load failed: {e}")
+
     def _get_pipeline(self):
         """OCR 파이프라인 레이지 로딩"""
         if self._ocr_pipeline is None:

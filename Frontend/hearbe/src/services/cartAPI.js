@@ -1,7 +1,6 @@
-// 공통 장바구니 API
 // A형과 C형에서 공통으로 사용
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+import { apiClient, API_BASE_URL } from './apiClient.js';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -14,11 +13,24 @@ const getAuthHeader = () => {
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
-// 공통 에러 핸들링
 const handleResponse = async (response) => {
-    const data = await response.json();
+    const text = await response.text();
+    let data;
+    try {
+        data = text ? JSON.parse(text) : {};
+    } catch (e) {
+        console.error('JSON Parse Error:', e);
+        data = { message: text };
+    }
+
     if (!response.ok) {
-        throw new Error(data.message || '요청이 실패했습니다.');
+        console.error('================ API ERROR INFO ================');
+        console.error('URL:', response.url);
+        console.error('Status:', response.status, response.statusText);
+        console.error('Body:', data);
+        console.error('================================================');
+
+        throw new Error(data.message || `요청 실패 (${response.status})`);
     }
     return data;
 };
@@ -37,9 +49,10 @@ export const cartAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/cart`, {
+            const response = await apiClient(`${API_BASE_URL}/cart`, {
                 method: 'GET',
                 headers: {
+                    'Content-Type': 'application/json',
                     ...getAuthHeader(),
                 },
             });
@@ -64,7 +77,7 @@ export const cartAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/cart`, {
+            const response = await apiClient(`${API_BASE_URL}/cart`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -94,7 +107,7 @@ export const cartAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/cart/${cartItemId}`, {
+            const response = await apiClient(`${API_BASE_URL}/cart/${cartItemId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,7 +136,7 @@ export const cartAPI = {
                 throw new Error('로그인이 필요합니다.');
             }
 
-            const response = await fetch(`${API_BASE_URL}/cart/${cartItemId}`, {
+            const response = await apiClient(`${API_BASE_URL}/cart/${cartItemId}`, {
                 method: 'DELETE',
                 headers: {
                     ...getAuthHeader(),

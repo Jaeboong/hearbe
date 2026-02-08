@@ -15,8 +15,17 @@ from ..rules import BaseRule
 from ..rules.site_access import SiteAccessRule
 from ..rules.select import SearchSelectRule
 from ..rules.search import SearchRule
+from ..rules.search_sort import SearchSortRule
+from ..rules.orderdetail import OrderDetailRule
 from ..rules.cart import CartRule
+from ..rules.login import LoginRule
+from ..rules.order_list import OrderListRule
+from ..rules.hearbe_nav import HearbeNavRule
+from ..rules.hearbe_mall_select import HearbeMallSelectRule
+from ..rules.hearbe_main_mode import HearbeMainModeRule
+from ..rules.hearbe_signup import HearbeSignupRule
 from ..rules.checkout import CheckoutRule
+from ..rules.logout import LogoutRule
 from ..rules.generic import GenericClickRule
 
 logger = logging.getLogger(__name__)
@@ -47,9 +56,18 @@ class CommandGenerator:
         # 규칙 인스턴스 생성
         self.rules: list[BaseRule] = [
             SiteAccessRule(self.site_manager),
+            HearbeNavRule(self.site_manager),
+            HearbeMallSelectRule(self.site_manager),
+            HearbeMainModeRule(self.site_manager),
+            HearbeSignupRule(self.site_manager),
             SearchSelectRule(self.site_manager),
             SearchRule(self.site_manager),
+            SearchSortRule(self.site_manager),
+            OrderDetailRule(self.site_manager),
             CartRule(self.site_manager),
+            OrderListRule(self.site_manager),
+            LogoutRule(self.site_manager),
+            LoginRule(self.site_manager),
             CheckoutRule(self.site_manager),
             GenericClickRule(self.site_manager),
         ]
@@ -151,6 +169,8 @@ class CommandGenerator:
             page_selectors = current_site.get_page_selectors(page_type)
             if page_selectors:
                 available_selectors = page_selectors.selectors
+        if current_url and "login.coupang.com/login/pincode" in current_url:
+            available_selectors = _filter_pincode_selectors(available_selectors)
         
         # LLM에게 위임
         try:
@@ -220,3 +240,17 @@ class CommandGenerator:
             result.response_text = f"재시도: {result.response_text}"
         
         return result
+
+
+def _filter_pincode_selectors(selectors: dict) -> dict:
+    if not selectors:
+        return selectors
+    allow_keys = {
+        "pincode_method_sms",
+        "pincode_method_email",
+        "pincode_method_submit",
+        "pincode_input",
+        "pincode_submit",
+    }
+    filtered = {k: v for k, v in selectors.items() if k in allow_keys}
+    return filtered or selectors

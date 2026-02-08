@@ -72,6 +72,20 @@ class ChromeLauncher:
         if self._config.headless:
             args.append("--headless=new")
 
+        # Chrome Extension 자동 로드
+        if self._config.extension_path:
+            extension_path = Path(self._config.extension_path).resolve()
+            if extension_path.exists() and extension_path.is_dir():
+                args.append(f"--load-extension={extension_path}")
+                logger.info(f"Loading Chrome extension from: {extension_path}")
+            else:
+                logger.warning(f"Extension path not found or not a directory: {extension_path}")
+
+        # Navigate to home URL on startup
+        if self._config.home_url:
+            args.append(self._config.home_url)
+            logger.info(f"Chrome will open to: {self._config.home_url}")
+
         return args
 
     async def start(self) -> bool:

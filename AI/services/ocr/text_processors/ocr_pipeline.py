@@ -1,10 +1,14 @@
 # OCR 전체 처리 파이프라인
 import argparse
+import logging
 import os
 import re
+import shutil
 import time
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+logger = logging.getLogger(__name__)
 
 try:
     from .korean_ocr import process_image, process_images_parallel
@@ -25,18 +29,7 @@ try:
         list_supported_sites,
     )
     from .table_reconstructor import reconstruct_size_table
-    from .utils import (
-        save_json,
-        compute_image_hash,
-        load_cache,
-        save_cache,
-        update_cache_metadata,
-        get_cache_stats,
-        compute_imageset_hash,
-        compute_urllist_hash,
-        load_pipeline_cache,
-        save_pipeline_cache,
-    )
+    from .utils import save_json
 except ImportError:
     from korean_ocr import process_image, process_images_parallel
     from ocr_text_preprocessor import filter_texts, preprocess_ocr_texts, extract_rec_texts_from_data
@@ -56,18 +49,7 @@ except ImportError:
         list_supported_sites,
     )
     from table_reconstructor import reconstruct_size_table
-    from utils import (
-        save_json,
-        compute_image_hash,
-        load_cache,
-        save_cache,
-        update_cache_metadata,
-        get_cache_stats,
-        compute_imageset_hash,
-        compute_urllist_hash,
-        load_pipeline_cache,
-        save_pipeline_cache,
-    )
+    from utils import save_json
 
 
 def _summary_only(summary: Dict) -> Dict:
@@ -80,7 +62,7 @@ _IMPORTANT_TOKENS = (
     "용량", "중량", "구성", "증정", "1+1", "2+1",
     "원", "%", "kg", "g", "ml", "l", "개", "입", "팩", "박스",
     # 의류 사이즈 관련
-    "SIZE", "사이즈", "허리", "총장", "영덩이", "왓밀위", "뜻밀위",
+    "SIZE", "사이즈", "허리", "총장", "엉덩이", "앞밑위", "뒷밑위",
     "가슴", "어깨", "소매", "밑단", "허벅지", "암홀", "기장",
     "M", "L", "XL", "2XL", "FREE", "프리"
 )
@@ -123,24 +105,13 @@ def _select_texts_by_importance(
 def process_product_image(
     image_path: str,
     output_dir: str = "output",
-    save_result: bool = True,
+    save_result: bool = False,
     verbose: bool = True,
     use_cache: bool = True
 ) -> Dict:
     start_time = time.time()
-    image_hash = None
 
-    if use_cache:
-        image_hash = compute_image_hash(image_path)
-        cached_summary = load_cache(image_hash)
-
-        if cached_summary:
-            update_cache_metadata(hit=True)
-            return cached_summary
-        else:
-            update_cache_metadata(hit=False)
-
-    ocr_result = process_image(image_path, output_dir=output_dir, save_vis=False)
+    ocr_result = process_image(image_path, output_dir=output_dir, save_vis=False, save_ocr_json=False)
     ocr_count = ocr_result.get("total_count", len(ocr_result.get("rec_texts", [])))
 
     raw_texts = ocr_result.get("rec_texts", [])
@@ -166,6 +137,16 @@ def process_product_image(
         if original_boxes:
             size_table_text = reconstruct_size_table(original_texts, original_boxes, original_scores)
 
+    # [DEBUG] 필터링된 텍스트 & 사이즈 테이블을 output에 JSON 저장
+    if save_result:
+        base_name = Path(image_path).stem
+        debug_data = {
+            "filtered_texts": filtered_texts,
+            "size_table": size_table_text,
+            "product_type": product_type.value,
+        }
+        save_json(debug_data, os.path.join(output_dir, f"{base_name}_debug.json"))
+
     summary = summarize_texts(
         filtered_texts,
         product_type,
@@ -180,14 +161,6 @@ def process_product_image(
     summary["filtered_count"] = len(filtered_texts)
     summary["processing_time"] = round(elapsed_time, 2)
 
-    if save_result:
-        base_name = Path(image_path).stem
-        output_path = os.path.join(output_dir, f"{base_name}_summary.json")
-        save_json(_summary_only(summary), output_path)
-
-    if use_cache and image_hash:
-        save_cache(image_hash, summary)
-
     return summary
 
 
@@ -195,24 +168,18 @@ def process_multiple_images(
     image_paths: List[str],
     output_dir: str = "output",
     max_workers: int = 4,
-    save_result: bool = True,
+    save_result: bool = False,
     verbose: bool = True,
     use_cache: bool = True
 ) -> Dict:
     start_time = time.time()
-    pipeline_hash = None
-
-    if use_cache:
-        pipeline_hash = compute_imageset_hash(image_paths)
-        cached_result = load_pipeline_cache(pipeline_hash)
-        if cached_result:
-            return cached_result
 
     ocr_results = process_images_parallel(
         image_paths,
         max_workers=max_workers,
         output_dir=output_dir,
-        save_vis=False
+        save_vis=False,
+        save_ocr_json=False
     )
     total_ocr = sum(r.get("total_count", 0) for r in ocr_results)
 
@@ -239,7 +206,8 @@ def process_multiple_images(
             "허리", "엉덩이", "총장", "밑위", "허벅지", "바지길이", "힙둘레", "밑단",
             "어깨", "가슴", "소매", "기장",
             "룸", "발볼", "무게", "굽높이", "발폭", "밑창길이",
-            "참고사이즈", "남성사이즈", "여성사이즈", "길이단위"
+            "참고사이즈", "남성사이즈", "여성사이즈", "길이단위",
+            "사이즈", "신발",
         ]
         size_image_result = None
         best_header_count = 0
@@ -259,6 +227,16 @@ def process_multiple_images(
             if size_boxes:
                 size_table_text = reconstruct_size_table(size_texts, size_boxes, size_scores)
 
+    # [DEBUG] 필터링된 텍스트 & 사이즈 테이블을 output에 JSON 저장
+    if save_result and image_paths:
+        first_name = Path(image_paths[0]).stem
+        debug_data = {
+            "filtered_texts": filtered_texts,
+            "size_table": size_table_text,
+            "product_type": product_type.value,
+        }
+        save_json(debug_data, os.path.join(output_dir, f"{first_name}_debug.json"))
+
     summary = summarize_texts(
         filtered_texts,
         product_type,
@@ -275,13 +253,10 @@ def process_multiple_images(
     summary["filtered_count"] = len(filtered_texts)
     summary["processing_time"] = round(elapsed_time, 2)
 
-    if save_result:
+    if save_result and image_paths:
         first_name = Path(image_paths[0]).stem
         output_path = os.path.join(output_dir, f"{first_name}_merged_summary.json")
         save_json(_summary_only(summary), output_path)
-
-    if use_cache and pipeline_hash:
-        save_pipeline_cache(pipeline_hash, summary)
 
     return summary
 
@@ -291,12 +266,11 @@ def process_product_from_urls(
     site: str = "auto",
     output_dir: str = "output",
     max_workers: int = 4,
-    save_result: bool = True,
+    save_result: bool = False,
     verbose: bool = True,
     use_cache: bool = True
 ) -> Dict:
     start_time = time.time()
-    pipeline_hash = None
 
     filtered_urls = filter_product_images(image_urls, site=site)
 
@@ -308,12 +282,6 @@ def process_product_from_urls(
             "source_urls": image_urls,
             "error": "no_images_after_filter"
         }
-
-    if use_cache:
-        pipeline_hash = compute_urllist_hash(filtered_urls, site)
-        cached_result = load_pipeline_cache(pipeline_hash)
-        if cached_result:
-            return cached_result
 
     download_dir = os.path.join(output_dir, "downloaded")
     local_paths = download_images(
@@ -340,13 +308,14 @@ def process_product_from_urls(
         use_cache=use_cache
     )
 
+    # 다운로드된 중간 이미지 정리
+    if os.path.exists(download_dir):
+        shutil.rmtree(download_dir, ignore_errors=True)
+
     elapsed_time = time.time() - start_time
     result["source_urls"] = filtered_urls
     result["site"] = site if site != "auto" else detect_site(filtered_urls[0]) if filtered_urls else "unknown"
     result["total_processing_time"] = round(elapsed_time, 2)
-
-    if use_cache and pipeline_hash:
-        save_pipeline_cache(pipeline_hash, result)
 
     return result
 
@@ -366,7 +335,6 @@ def main() -> int:
     parser.add_argument("--workers", "-w", type=int, default=4)
     parser.add_argument("--site", "-s", default="auto", choices=["auto", "coupang", "naver"])
     parser.add_argument("--no-save", action="store_true")
-    parser.add_argument("--no-cache", action="store_true", help="캐시 사용 안 함")
     parser.add_argument("--quiet", "-q", action="store_true")
 
     args = parser.parse_args()
@@ -378,7 +346,7 @@ def main() -> int:
                 output_dir=args.output_dir,
                 save_result=not args.no_save,
                 verbose=False,
-                use_cache=not args.no_cache
+                use_cache=False
             )
         elif args.inputs:
             result = process_multiple_images(
@@ -387,7 +355,7 @@ def main() -> int:
                 max_workers=args.workers,
                 save_result=not args.no_save,
                 verbose=False,
-                use_cache=not args.no_cache
+                use_cache=False
             )
         else:
             result = process_product_from_urls(
@@ -397,7 +365,7 @@ def main() -> int:
                 max_workers=args.workers,
                 save_result=not args.no_save,
                 verbose=False,
-                use_cache=not args.no_cache
+                use_cache=False
             )
 
         if args.output:
@@ -406,6 +374,8 @@ def main() -> int:
         return 0
 
     except Exception:
+        import traceback
+        traceback.print_exc()
         return 1
 
 

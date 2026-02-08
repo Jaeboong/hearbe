@@ -7,17 +7,15 @@ import hLogo from '../../assets/h-logo.png';
 const StoreBrowserS = () => {
   const navigate = useNavigate();
   const mediaRecorderRef = useRef(null);
-  
+
   const [isAiPanelOpen, setIsAiPanelOpen] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [voiceMemo, setVoiceMemo] = useState('');
   const [participants, setParticipants] = useState([]);
   const [recentKeywords, setRecentKeywords] = useState([]);
 
-  // 초기 데이터 로드 (DB 연동 구조)
   useEffect(() => {
     const fetchData = async () => {
-      // 가상 데이터 (실제 연동 시 API 호출로 대체)
       setParticipants([
         { id: 1, name: '서해령 (나)', role: 'host' },
         { id: 2, name: '김싸피', role: 'guest' }
@@ -27,7 +25,6 @@ const StoreBrowserS = () => {
     fetchData();
   }, []);
 
-  // 오디오 녹음 및 AI 서버 전송 함수
   const toggleRecording = async () => {
     if (!isRecording) {
       try {
@@ -37,10 +34,10 @@ const StoreBrowserS = () => {
         const chunks = [];
 
         mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-        
+
         mediaRecorder.onstop = async () => {
           const audioBlob = new Blob(chunks, { type: 'audio/wav' });
-          
+
           // AI 서버로 전송할 데이터 포장
           const formData = new FormData();
           formData.append('audio', audioBlob);
@@ -52,9 +49,9 @@ const StoreBrowserS = () => {
               body: formData,
             });
             const result = await response.json();
-            
+
             setVoiceMemo(result.text); // 서버가 보낸 STT 결과 텍스트
-            
+
             if (result.audioUrl) {
               const audio = new Audio(result.audioUrl); // 서버가 보낸 TTS 결과 음성
               audio.play();
@@ -106,7 +103,7 @@ const StoreBrowserS = () => {
                   <img src={hLogo} alt="Logo" className="w-5 h-5 brightness-0 invert" />
                   <span>AI 도우미</span>
                 </div>
-                <button onClick={() => setIsAiPanelOpen(false)}><ChevronDown size={20} /></button>
+                <button className="cursor-pointer" onClick={() => setIsAiPanelOpen(false)}><ChevronDown size={20} /></button>
               </div>
 
               <div className="p-6 space-y-6">
@@ -128,9 +125,8 @@ const StoreBrowserS = () => {
                   )}
                   <button
                     onClick={toggleRecording}
-                    className={`w-full py-4 rounded-2xl flex items-center justify-center space-x-2 font-bold transition-all shadow-md ${
-                      isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-[#4A78FF] text-white'
-                    }`}
+                    className={`w-full py-4 rounded-2xl flex items-center justify-center space-x-2 font-bold transition-all shadow-md ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-[#4A78FF] text-white'
+                      }`}
                   >
                     <Mic size={20} />
                     <span>{isRecording ? '녹음 중지' : 'AI에게 말하기'}</span>

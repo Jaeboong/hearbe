@@ -1,30 +1,28 @@
 package com.ssafy.d108.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "platforms")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Platform {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
 
-    @Column(name = "platform_name", length = 50, unique = true)
+    @Column(name = "platform_name", length = 50, unique = true, nullable = false)
     private String platformName;
 
     @Column(name = "base_url", length = 500, nullable = false)
     private String baseUrl;
+
+    public Platform(String platformName, String baseUrl) {
+        this.platformName = platformName;
+        this.baseUrl = baseUrl;
+    }
 }

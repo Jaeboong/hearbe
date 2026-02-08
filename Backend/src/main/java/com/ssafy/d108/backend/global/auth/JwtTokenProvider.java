@@ -31,6 +31,9 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration:3600000}") // 1 hour
     private long tokenValidityInMilliseconds;
 
+    @Value("${jwt.refresh-expiration:1209600000}") // 14 days
+    private long refreshTokenValidityInMilliseconds;
+
     private Key key;
 
     @PostConstruct
@@ -64,6 +67,21 @@ public class JwtTokenProvider {
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
                 .claim("userId", userId) // Custom claim
+                .claim("type", "access")
+                .setIssuedAt(new Date(now))
+                .setExpiration(validity)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String createRefreshToken(String username, Integer userId) {
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("userId", userId)
+                .claim("type", "refresh")
                 .setIssuedAt(new Date(now))
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -72,11 +90,7 @@ public class JwtTokenProvider {
 
     // Get Authentication from Token
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = getClaims(token);
 
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
                 .map(SimpleGrantedAuthority::new)
@@ -95,18 +109,18 @@ public class JwtTokenProvider {
 
     // Get UserId from Token
     public Integer getUserId(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = getClaims(token);
         return claims.get("userId", Integer.class);
+    }
+
+    public Date getExpiration(String token) {
+        return getClaims(token).getExpiration();
     }
 
     // Validate Token
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            getClaims(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
@@ -118,5 +132,47 @@ public class JwtTokenProvider {
             log.info("JWT claims string is empty.", e);
         }
         return false;
+    }
+
+    public boolean validateAccessToken(String token) {
+        try {
+            Claims claims = getClaims(token);
+            String type = claims.get("type", String.class);
+            return type == null || "access".equals(type);
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT Token", e);
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT Token", e);
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT Token", e);
+        } catch (IllegalArgumentException e) {
+            log.info("JWT claims string is empty.", e);
+        }
+        return false;
+    }
+
+    public boolean validateRefreshToken(String token) {
+        try {
+            Claims claims = getClaims(token);
+            String type = claims.get("type", String.class);
+            return "refresh".equals(type);
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT Token", e);
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT Token", e);
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT Token", e);
+        } catch (IllegalArgumentException e) {
+            log.info("JWT claims string is empty.", e);
+        }
+        return false;
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

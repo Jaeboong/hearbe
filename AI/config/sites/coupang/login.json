@@ -14,6 +14,11 @@
     "phone_submit_button": "button._phoneSubmitButton",
     "otp_submit_button": "#loginWithSmsCode, button#loginWithSmsCode, button[data-phase-visible='VERIFY_CODE']",
     "sms_login_keep_state": "#sms-login-keep-state",
-    "member_util": "button.member__util-trigger"
+    "member_util": "button.member__util-trigger",
+    "pincode_method_sms": "input.pincode-select__pincode-verification-type-sms",
+    "pincode_method_email": "input.pincode-select__pincode-verification-type-email",
+    "pincode_method_submit": "button.pincode-content__button.pincode-select__button",
+    "pincode_input": "input.pincode-input__pincode-input-box__pincode",
+    "pincode_submit": "button.pincode-content__button.pincode-input__button"
   }
 }

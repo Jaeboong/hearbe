@@ -8,7 +8,7 @@ Handles API calls, retries, and logging.
 import asyncio
 import logging
 import os
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from services.llm.errors.llm_errors import LLMClientError
 
@@ -24,7 +24,7 @@ def resolve_llm_api_key(explicit_key: Optional[str] = None) -> Optional[str]:
     Order:
     1) explicit_key (if provided)
     2) LLM_API_KEY_NAME -> env value
-    3) GMS_API_KEY, GMS_KEY, OPENAI_API_KEY
+    3) GMS_API_KEY, OPENAI_API_KEY
     """
     if explicit_key:
         return explicit_key
@@ -48,15 +48,19 @@ class LLMClient:
         base_url: str,
         model: str,
         max_tokens: int,
+        timeout_seconds: Optional[float] = None,
     ):
         self.api_key = resolve_llm_api_key(api_key)
         self.base_url = base_url
         self.model = model
         self.max_tokens = max_tokens
-        try:
-            self.timeout_seconds = float(os.environ.get("LLM_TIMEOUT_SECONDS", "20"))
-        except ValueError:
-            self.timeout_seconds = 20.0
+        if timeout_seconds is not None:
+            self.timeout_seconds = float(timeout_seconds)
+        else:
+            try:
+                self.timeout_seconds = float(os.environ.get("LLM_TIMEOUT_SECONDS", "20"))
+            except ValueError:
+                self.timeout_seconds = 20.0
         self._client = None
 
     @property
@@ -80,6 +84,8 @@ class LLMClient:
         current_url: str = "",
         text_len: Optional[int] = None,
         label: str = "",
+        response_format: Optional[Dict[str, Any]] = None,
+        max_tokens: Optional[int] = None,
     ) -> str:
         if label:
             logger.info(
@@ -105,13 +111,14 @@ class LLMClient:
             )
 
         token_param = "max_completion_tokens"
+        token_limit = max_tokens if max_tokens is not None else self.max_tokens
         log_llm_request(
             logger,
             model=self.model,
             base_url=self.base_url,
             messages=messages,
-            max_tokens=self.max_tokens,
-            response_format={"type": "json_object"},
+            max_tokens=token_limit,
+            response_format=response_format,
             token_param=token_param,
         )
 
@@ -119,13 +126,17 @@ class LLMClient:
         last_error = None
         for attempt in range(3):
             try:
+                create_args = {
+                    "model": self.model,
+                    "messages": messages,
+                    "max_completion_tokens": token_limit,
+                }
+                if response_format:
+                    create_args["response_format"] = response_format
                 response = await asyncio.wait_for(
                     asyncio.to_thread(
                         self.client.chat.completions.create,
-                        model=self.model,
-                        messages=messages,
-                        response_format={"type": "json_object"},
-                        max_completion_tokens=self.max_tokens,
+                        **create_args,
                     ),
                     timeout=self.timeout_seconds,
                 )

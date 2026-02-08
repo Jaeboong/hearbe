@@ -11,9 +11,14 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-from payment_ocr import run_ocr
-from digit_extractor import save_extracted_digits
-from digit_to_dom_mapper import save_mapping_result
+try:
+    from .payment_ocr import run_ocr
+    from .digit_extractor import save_extracted_digits
+    from .digit_to_dom_mapper import save_mapping_result
+except ImportError:
+    from payment_ocr import run_ocr
+    from digit_extractor import save_extracted_digits
+    from digit_to_dom_mapper import save_mapping_result
 
 
 def run_pipeline(

@@ -1,63 +1,118 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import hLogo from '../../assets/HearBe_logo_.png';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { Eye, EyeOff } from 'lucide-react';
+import logoC from '../../assets/logoC.png';
 import { authAPI } from '../../services/authAPI';
 import './LoginC.css';
 
-export default function LoginC() {
+const LoginC = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
+    const [rememberLogin, setRememberLogin] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        if (!id || !password) {
-            alert("아이디와 비밀번호를 입력해주세요.");
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            navigate('/C/mall');
             return;
         }
 
+        const savedId = localStorage.getItem('savedLoginId_C');
+        const savedPassword = localStorage.getItem('savedLoginPassword_C');
+        if (savedId) {
+            setId(savedId);
+            setRememberLogin(true);
+        }
+        if (savedPassword) {
+            setPassword(savedPassword);
+            setRememberLogin(true);
+        }
+        if (savedId && savedPassword) {
+            handleLogin(null, savedId, savedPassword, true);
+        }
+    }, []);
+
+    const handleLogin = async (e, loginId = id, loginPassword = password, isAuto = false) => {
+        if (e) e.preventDefault();
+
+        if (!loginId || !loginPassword) {
+            Swal.fire({
+                icon: 'warning',
+                text: '아이디와 비밀번호를 입력해주세요.',
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: '확인'
+            });
+            return;
+        }
+
+        setIsLoading(true);
         try {
-            // LoginRequest DTO requires 'username' and 'password'
-            const response = await authAPI.login({ username: id, password: password });
+            const response = await authAPI.login(loginId, loginPassword);
 
-            // Assuming response.data contains tokens or user info
-            // API Response format: ApiResponse<LoginResponse> -> data: LoginResponse
-            // LoginResponse fields needs to be checked. Usually it has accessToken/refreshToken/user info.
-            console.log("Login Success:", response);
 
-            // Save token if available (adjust based on actual response structure)
-            if (response.data && response.data.accessToken) {
-                localStorage.setItem('accessToken', response.data.accessToken);
-            }
-            if (response.data && response.data.refreshToken) {
-                localStorage.setItem('refreshToken', response.data.refreshToken);
+
+            if (rememberLogin) {
+                localStorage.setItem('savedLoginId_C', loginId);
+                localStorage.setItem('savedLoginPassword_C', loginPassword);
+            } else {
+                localStorage.removeItem('savedLoginId_C');
+                localStorage.removeItem('savedLoginPassword_C');
             }
 
-            // Save user info basics
-            if (response.data) {
-                localStorage.setItem('user', JSON.stringify(response.data));
+            if (response.data && response.data.id) {
+                localStorage.setItem('user_id', response.data.id);
+                localStorage.setItem('username', loginId);
+            }
+            if (response.data && response.data.name) {
+                localStorage.setItem('user_name', response.data.name);
             }
 
             navigate('/C/mall');
         } catch (error) {
             console.error("Login failed:", error);
-            alert(error.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
+            if (!isAuto) {
+                let errorMessage = error.message || "로그인에 실패했습니다.";
+
+                if (error.status === 404 || errorMessage.includes('존재하지') || errorMessage.includes('아이디')) {
+                    errorMessage = "회원이 아닙니다. \n회원가입을 진행해주세요.";
+                } else if (error.status === 401 || errorMessage.includes('비밀번호')) {
+                    errorMessage = "아이디 또는 비밀번호가 틀립니다.";
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: '로그인 실패',
+                    text: errorMessage,
+                    confirmButtonColor: '#7c3aed',
+                    confirmButtonText: '확인'
+                });
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="login-c-page">
-
-
             <main className="login-c-content">
                 <div className="login-c-card">
                     <div className="logo-area-c">
-                        <img src={hLogo} alt="HearBe Logo" className="logo-image-c" />
+                        <img
+                            src={logoC}
+                            alt="HearBe Logo"
+                            className="logo-image-c"
+                            onClick={() => navigate('/main')}
+                            style={{ cursor: 'pointer' }}
+                        />
                     </div>
 
-                    <form className="login-c-form" onSubmit={handleLogin}>
+                    <form className="login-c-form" onSubmit={(e) => handleLogin(e)}>
                         <input
                             type="text"
                             placeholder="아이디 입력"
@@ -75,29 +130,34 @@ export default function LoginC() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                             <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showPassword ? <EyeOff size={32} /> : <Eye size={32} />}
                             </button>
                         </div>
 
-                        <button type="submit" className="login-submit-btn-c">로그인</button>
+                        <button type="submit" className="login-submit-btn-c" disabled={isLoading}>
+                            {isLoading ? '로그인 중...' : '로그인'}
+                        </button>
 
                         <div className="login-keep-c">
-                            <input type="checkbox" id="keep" />
-                            <label htmlFor="keep">로그인 유지</label>
+                            <input
+                                type="checkbox"
+                                id="rememberLogin"
+                                checked={rememberLogin}
+                                onChange={(e) => setRememberLogin(e.target.checked)}
+                            />
+                            <label htmlFor="rememberLogin">로그인 유지</label>
                         </div>
 
                         <div className="login-links-c">
-                            <span onClick={() => navigate('/C/findId')}>아이디 찾기</span> | <span onClick={() => navigate('/C/findPassword')}>비밀번호 재설정</span> | <span onClick={() => navigate('/signup-c')}>회원가입</span>
+                            <Link to="/C/findId">아이디 찾기</Link> | <Link to="/C/findPassword">비밀번호 재설정</Link> | <Link to="/C/signup">회원가입</Link>
                         </div>
                     </form>
                 </div>
             </main>
 
-            <footer className="landing-footer">
-                <p>© 2026 HearBe. All rights reserved.</p>
-            </footer>
-
 
         </div>
     );
-}
+};
+
+export default LoginC;

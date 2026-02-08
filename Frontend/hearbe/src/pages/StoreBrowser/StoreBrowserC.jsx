@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Share2, ShoppingCart, User, Menu, X, Home, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import MyPage from '../MyPage/MyPageC';
+import MyPageC from '../MyPage/MyPageC';
+import CartC from '../Cart/CartC';
 import './StoreBrowserC.css';
 
 const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, onMyPage }) => {
@@ -17,7 +18,8 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
     const [showMeetingCode, setShowMeetingCode] = useState(false);
     const [meetingCode, setMeetingCode] = useState('');
     const [showMeetingRoom, setShowMeetingRoom] = useState(false);
-    // showCart state removed - integrated into MyPage
+    // showCart state - used for cart overlay
+    const [showCart, setShowCart] = useState(false);
     const [showMyPage, setShowMyPage] = useState(false);
     const [participants, setParticipants] = useState([
         { id: 1, name: '나 (방장)', role: 'host', isMe: true }
@@ -30,7 +32,6 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
      */
     // const fetchParticipants = async () => { ... }
 
-    // 화면 공유 시작 (회의 코드 생성)
     const handleShareButtonClick = () => {
         handleShareStart();
         setShowMainMenu(false); // Close main menu when share button is clicked
@@ -41,7 +42,6 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
         setMeetingCode(newCode);
         setShowMeetingRoom(true);
 
-        // 초기 방장 정보 세팅 (추후 DB로부터 현재 로그인 정보를 가져오도록 수정)
         setParticipants([{ id: Date.now(), name: '나 (방장)', role: 'host', isMe: true }]);
     };
 
@@ -56,9 +56,9 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
     };
 
     const menuItems = [
-        { id: 1, icon: <Home size={24} />, label: '홈', onClick: onHome || (() => navigate('/')) },
-        { id: 2, icon: <ShoppingCart size={24} />, label: '장바구니', onClick: () => navigate('/C/mypage', { state: { activeTab: 'cart' } }) },
-        { id: 3, icon: <User size={24} />, label: '마이페이지', onClick: onMyPage || (() => setShowMyPage(true)) },
+        { id: 1, icon: <Home size={24} />, label: '홈', onClick: onHome || (() => navigate('/C/mall')) }, // onHome은 그대로 유지
+        { id: 2, icon: <ShoppingCart size={24} />, label: '장바구니', onClick: () => navigate('/C/mypage/cart') }, // 장바구니 경로 변경
+        { id: 3, icon: <User size={24} />, label: '마이페이지', onClick: onMyPage || (() => navigate('/C/mypage/orders')) }, // 마이페이지 링크를 /C/mypage/orders로 변경
         { id: 4, icon: <Share2 size={24} />, label: '공유하기', onClick: handleShareButtonClick, highlight: true },
     ];
 
@@ -76,7 +76,7 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
 
             {/* 고정 뒤로가기 버튼 */}
             {!showMeetingRoom && (
-                <button onClick={onBack || (() => navigate(-1))} className="back-button-circle-c" aria-label="뒤로가기">
+                <button onClick={onBack || (() => navigate(-1))} className="back-button-circle-c cursor-pointer" aria-label="뒤로가기">
                     <ArrowLeft size={24} />
                 </button>
             )}
@@ -103,10 +103,10 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                             exit={{ y: 50, opacity: 0 }}
                             className="bottom-sharing-actions-c"
                         >
-                            <button onClick={() => setShowCart(true)} className="share-action-btn-c white-btn">
+                            <button onClick={() => setShowCart(true)} className="share-action-btn-c white-btn cursor-pointer">
                                 <ShoppingCart size={20} /> 장바구니
                             </button>
-                            <button onClick={handleCloseMeeting} className="share-action-btn-c purple-btn">
+                            <button onClick={handleCloseMeeting} className="share-action-btn-c purple-btn cursor-pointer">
                                 <X size={20} /> 공유 종료
                             </button>
                         </motion.div>
@@ -160,7 +160,7 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                                 {menuItems.map((item) => (
                                     <button
                                         key={item.id}
-                                        className="menu-panel-item-c"
+                                        className="menu-panel-item-c cursor-pointer"
                                         onClick={() => { item.onClick(); setShowMainMenu(false); }}
                                     >
                                         <div className="item-icon-c">{item.icon}</div>
@@ -175,7 +175,7 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setShowMainMenu(!showMainMenu)}
-                        className={`menu-toggle-btn-c ${showMainMenu ? 'active' : ''}`}
+                        className={`menu-toggle-btn-c cursor-pointer ${showMainMenu ? 'active' : ''}`}
                     >
                         {showMainMenu ? <X size={30} /> : <Menu size={30} />}
                     </motion.button>
@@ -197,8 +197,8 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
                             </div>
                             <p className="modal-info">이 코드를 상대방에게 알려주세요.</p>
                             <div className="modal-btns">
-                                <button onClick={() => setShowMeetingCode(false)} className="btn-close">취소</button>
-                                <button onClick={handleJoinMeeting} className="btn-confirm">입장하기</button>
+                                <button onClick={() => setShowMeetingCode(false)} className="btn-close cursor-pointer">취소</button>
+                                <button onClick={handleJoinMeeting} className="btn-confirm cursor-pointer">입장하기</button>
                             </div>
                         </motion.div>
                     </div>
@@ -208,12 +208,12 @@ const StoreBrowserC = ({ mallName: propName, mallUrl: propUrl, onBack, onHome, o
             {/* 페이지 전환 컴포넌트 */}
             {showCart && (
                 <div className="full-screen-overlay">
-                    <CartPage onClose={() => setShowCart(false)} onHome={onHome} />
+                    <CartC onClose={() => setShowCart(false)} onHome={onHome} />
                 </div>
             )}
             {showMyPage && (
                 <div className="full-screen-overlay">
-                    <MyPage onBack={() => setShowMyPage(false)} onHome={onHome} onCart={() => { setShowMyPage(false); setShowCart(true); }} />
+                    <MyPageC onBack={() => setShowMyPage(false)} onHome={onHome} onCart={() => { setShowMyPage(false); setShowCart(true); }} />
                 </div>
             )}
         </div>

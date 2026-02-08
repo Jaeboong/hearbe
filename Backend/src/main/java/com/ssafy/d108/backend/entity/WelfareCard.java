@@ -42,7 +42,7 @@ public class WelfareCard {
     @Column(name = "cvc", length = 255)
     private String cvc;
 
-    @Column(name = "issue_date", nullable = false)
+    @Column(name = "issue_date", nullable = true)
     private LocalDate issueDate;
 
     @Column(name = "expiration_date", length = 5, nullable = false)

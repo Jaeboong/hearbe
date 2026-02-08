@@ -1,121 +1,194 @@
-import { Volume2, Download } from 'lucide-react';
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { Volume2, Download, Mic, Headphones } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Swal from 'sweetalert2';
+import './InitialSetup.css';
+
+const STEPS = {
+    MCP_DOWNLOAD: 'mcp_download',
+    MIC_PERMISSION: 'mic_permission',
+    SPEAKER_TEST: 'speaker_test',
+    COMPLETED: 'completed',
+};
+
+const VOICE_PROGRAM_BASE_NAME = '음성지원프로그램';
 
 export default function InitialSetup({ onComplete }) {
-    const [showMicPermission, setShowMicPermission] = useState(true);
+    const [currentStep, setCurrentStep] = useState(STEPS.MCP_DOWNLOAD);
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
-    const [showSpeakerTest, setShowSpeakerTest] = useState(false);
-    const [showMcpDownloadPage, setShowMcpDownloadPage] = useState(false);
+    const [voiceProgramVersion, setVoiceProgramVersion] = useState('');
 
-    // 1. 마이크 권한 요청 및 단계 전환
+    useEffect(() => {
+        const loadVoices = () => window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+    }, []);
+
+    useEffect(() => {
+        if (currentStep === STEPS.COMPLETED) {
+            onComplete(true);
+        }
+    }, [currentStep, onComplete]);
+
+    // [최신 기능 통합]: 서버에서 음성 프로그램 최신 버전 정보를 가져옵니다.
+    useEffect(() => {
+        let mounted = true;
+        fetch('/downloads/voice-program-version.json', { cache: 'no-store' })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (!mounted || !data?.version) return;
+                setVoiceProgramVersion(data.version);
+            })
+            .catch(() => { });
+        return () => { mounted = false; };
+    }, []);
+
+    const voiceProgramDownloadFile = voiceProgramVersion
+        ? `${VOICE_PROGRAM_BASE_NAME}_${voiceProgramVersion}.zip`
+        : 'MCPDesktop.zip';
+
+    const handleMcpDownload = () => {
+        setCurrentStep(STEPS.MIC_PERMISSION);
+    };
+
     const handleMicPermission = async (granted) => {
         if (granted) {
             try {
                 await navigator.mediaDevices.getUserMedia({ audio: true });
                 setMicPermissionGranted(true);
             } catch (error) {
-                console.log('마이크 권한 거부됨');
+                console.error('마이크 권한 거부됨', error);
                 setMicPermissionGranted(false);
             }
         } else {
             setMicPermissionGranted(false);
         }
-        setShowMicPermission(false);
-        setShowSpeakerTest(true);
+        setCurrentStep(STEPS.SPEAKER_TEST);
     };
 
-    // 2. 스피커 테스트 완료 후 MCP 다운로드 페이지로 이동
     const handleSpeakerTest = () => {
-        setShowSpeakerTest(false);
-        setShowMcpDownloadPage(true);
-    };
-
-    // 3. MCP 설정 완료 처리 및 메인 이동
-    const handleMcpDownload = () => {
-        // 다시 뜨지 않도록 로컬스토리지에 저장
         localStorage.setItem('hearbe_mcp_setup_completed', 'true');
         onComplete(micPermissionGranted);
     };
 
-    // 브라우저 TTS 기능을 활용한 테스트 음성 재생
+    const handleSpeakerFailure = () => {
+        Swal.fire({
+            title: '소리가 안 들리시나요?',
+            html: '컴퓨터의 **음량 설정**과 **스피커 연결** 상태를 확인해 주세요.<br/>브라우저의 소리가 꺼져있을 수도 있습니다.',
+            icon: 'warning',
+            confirmButtonText: '다시 시도하기',
+            confirmButtonColor: '#7c3aed'
+        });
+    };
+
     const playTestSound = () => {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance('안녕하세요. 이 소리가 선명하게 들리나요?');
+        const utterance = new SpeechSynthesisUtterance('이 소리가 선명하게 들리시면 잘들림 버튼을 눌러주세요.');
+
         utterance.lang = 'ko-KR';
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(voice =>
+            (voice.lang === 'ko-KR' || voice.lang === 'ko_KR') &&
+            (voice.name.includes('Google') || voice.name.includes('Yuna') || voice.name.includes('Heami') || voice.name.includes('Sun-Hi'))
+        );
+
+        if (femaleVoice) {
+            utterance.voice = femaleVoice;
+        }
+
+        utterance.pitch = 1.1;
+        utterance.rate = 1.0;
+
         window.speechSynthesis.speak(utterance);
     };
 
-    // --- 단계 1: 마이크 권한 팝업 ---
-    if (showMicPermission) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-8 bg-[#F8F8FA]">
-                <div className="relative rounded-3xl p-12 max-w-2xl w-full shadow-2xl bg-white border border-[#7C3AED]/15">
-                    <div className="flex flex-col items-center text-center">
-                        <div className="relative w-24 h-24 rounded-2xl flex items-center justify-center bg-[#7C3AED] mb-6">
-                            <Volume2 className="w-12 h-12 text-white" />
+    if (currentStep === STEPS.COMPLETED) return null;
+
+    return (
+        <div className="setup-container">
+            <AnimatePresence mode="wait">
+                {currentStep === STEPS.MCP_DOWNLOAD && (
+                    <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        className="setup-card"
+                    >
+                        <div className="icon-box">
+                            <Download size={48} />
                         </div>
-                        <h2 className="text-4xl font-bold mb-4 text-[#1A1A1A]">음성 안내 권한</h2>
-                        <p className="text-xl mb-12 text-[#6B7280]">
-                            시각장애인을 위한 음성 안내 서비스를 제공합니다.<br />
-                            더 나은 쇼핑 경험을 위해 기능을 활성화하시겠습니까?
+                        <h2 className="setup-title">음성 보조 프로그램 설치</h2>
+                        <p className="setup-desc">
+                            음성 인식과 원격 음성 제어를 위해<br />
+                            보조 프로그램을 설치해 주세요.
                         </p>
-                        <div className="flex gap-4 w-full">
-                            <button onClick={() => handleMicPermission(false)} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#F3F4F6] border-2 border-[#E5E7EB] text-[#4B5563]">나중에</button>
-                            <button onClick={() => handleMicPermission(true)} className="flex-1 py-5 text-xl rounded-xl font-bold bg-[#7C3AED] text-white shadow-lg">활성화</button>
+                        <div className="btn-group">
+                            <button onClick={handleMcpDownload} className="btn-secondary-setup">나중에</button>
+                            <a
+                                href={encodeURI(`/downloads/${voiceProgramDownloadFile}`)}
+                                download
+                                onClick={handleMcpDownload}
+                                className="btn-primary-setup no-underline flex items-center justify-center"
+                                style={{ flex: 1.5 }}
+                            >
+                                지금 다운로드
+                            </a>
                         </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+                    </motion.div>
+                )}
 
-    // --- 단계 2: 스피커 테스트 팝업 ---
-    if (showSpeakerTest) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-8 bg-[#F8F8FA]">
-                <div className="relative max-w-4xl w-full rounded-[48px] p-20 shadow-2xl text-white"
-                    style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>
-                    <div className="flex flex-col items-center">
-                        <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}
-                            className="w-40 h-40 rounded-full flex items-center justify-center bg-white/20 border-2 border-white/40 mb-10 shadow-2xl">
-                            <Volume2 className="w-20 h-20 text-white" />
-                        </motion.div>
-                        <h2 className="text-6xl font-bold mb-5">스피커 테스트</h2>
-                        <button onClick={playTestSound} className="mb-16 px-12 py-6 rounded-2xl text-xl font-bold bg-white/25 border-2 border-white/40">소리 듣기</button>
-                        <div className="flex gap-6 w-full max-w-2xl">
-                            <button onClick={() => handleSpeakerTest()} className="flex-1 py-6 text-xl rounded-2xl font-semibold bg-white/15 border-2 border-white/25 text-white">안 들림</button>
-                            <button onClick={() => handleSpeakerTest()} className="flex-1 py-6 text-xl rounded-2xl font-bold bg-white text-[#7C3AED] shadow-xl">잘 들림 ✓</button>
+                {currentStep === STEPS.MIC_PERMISSION && (
+                    <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        className="setup-card"
+                    >
+                        <div className="icon-box">
+                            <Mic size={48} />
                         </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+                        <h2 className="setup-title">마이크 권한 허용</h2>
+                        <p className="setup-desc">
+                            HearBe는 음성 명령으로 쇼핑을 돕습니다.<br />
+                            원활한 사용을 위해 마이크 권한을 허용해 주세요.
+                        </p>
+                        <div className="btn-group">
+                            <button onClick={() => handleMicPermission(false)} className="btn-secondary-setup">건너뛰기</button>
+                            <button onClick={() => handleMicPermission(true)} className="btn-primary-setup">권한 허용하기</button>
+                        </div>
+                    </motion.div>
+                )}
 
-    // --- 단계 3: MCP 다운로드 페이지 ---
-    if (showMcpDownloadPage) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-8 bg-[#F8F8FA]">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                    className="relative max-w-4xl w-full rounded-[48px] p-16 shadow-2xl text-white"
-                    style={{ background: 'linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%)' }}>
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-28 h-28 rounded-full bg-white/25 border-2 border-white/40 flex items-center justify-center mb-8 shadow-xl">
-                            <Download className="w-14 h-14 text-white" />
+                {currentStep === STEPS.SPEAKER_TEST && (
+                    <motion.div
+                        key="step3"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        className="setup-card"
+                    >
+                        <div className="icon-box pulse">
+                            <Headphones size={48} />
                         </div>
-                        <h2 className="text-6xl font-bold mb-8">MCP 프로그램 설치</h2>
-                        <p className="text-2xl mb-16 opacity-90 leading-relaxed">음성 인식과 화면 공유 기능을 사용하려면<br />MCP 프로그램 설치가 필요합니다.</p>
-                        <div className="flex gap-6 w-full max-w-2xl">
-                            <button onClick={() => handleMcpDownload()} className="flex-1 py-6 text-xl rounded-2xl font-semibold bg-white/15 border-2 border-white/25 text-white">나중에</button>
-                            <a href="/hearbe-mcp-server.exe" download onClick={() => handleMcpDownload()}
-                                className="flex-1 py-6 text-xl rounded-2xl font-bold bg-white text-[#7C3AED] no-underline flex items-center justify-center gap-2 shadow-xl">다운로드</a>
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
-        );
-    }
+                        <h2 className="setup-title">스피커 확인</h2>
+                        <p className="setup-desc">
+                            안내 음성이 잘 들리는지 확인해 주세요.
+                        </p>
 
-    return null;
+                        <button onClick={playTestSound} className="test-sound-btn">
+                            <Volume2 size={24} />
+                            소리 재생하기
+                        </button>
+
+                        <div className="btn-group">
+                            <button onClick={handleSpeakerFailure} className="btn-secondary-setup">안 들려요</button>
+                            <button onClick={handleSpeakerTest} className="btn-primary-setup">잘 들려요</button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 }

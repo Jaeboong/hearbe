@@ -7,7 +7,8 @@ Tracks login submit attempts and announces successful navigation after login.
 
 from typing import Optional
 
-from services.llm.sites.site_manager import get_page_type, get_selector, get_site_manager
+from services.llm.sites.site_manager import get_page_type, get_selector
+from services.llm.generators.tts_generator import TTSGenerator
 
 
 class LoginFeedbackManager:
@@ -16,10 +17,13 @@ class LoginFeedbackManager:
     def __init__(self, session_manager, sender):
         self._session = session_manager
         self._sender = sender
+        self._tts = TTSGenerator()
 
     def clear_pending(self, session_id: str):
         if self._session:
             self._session.set_context(session_id, "login_submit_pending", False)
+            # Keep this flag short-lived; only relevant to the next successful navigation.
+            self._session.set_context(session_id, "login_autofill_used", False)
 
     def mark_login_submit_pending(self, session_id: str, commands, current_url: str):
         if not self._session or not commands:
@@ -74,24 +78,12 @@ class LoginFeedbackManager:
         if not self._session.get_context(session_id, "login_submit_pending", False):
             return
 
-        tts = self._build_login_success_tts(current_url)
+        # Clear pending first to prevent duplicate announcements if multiple
+        # sources (e.g., MCP tool result + page update) detect the navigation.
+        auto = bool(self._session.get_context(session_id, "login_autofill_used", False))
+        self._session.set_context(session_id, "login_submit_pending", False)
+        self._session.set_context(session_id, "login_autofill_used", False)
+
+        tts = self._tts.build_login_autofill_success(current_url) if auto else self._tts.build_login_success(current_url)
         if tts:
             await self._sender.send_tts_response(session_id, tts)
-        self._session.set_context(session_id, "login_submit_pending", False)
-
-    def _build_login_success_tts(self, current_url: str) -> str:
-        site = get_site_manager().get_site_by_url(current_url)
-        site_name = site.name if site and site.name else ""
-        page_type = get_page_type(current_url)
-        page_label = {
-            "home": "홈",
-            "search": "검색",
-            "product": "상품",
-            "cart": "장바구니",
-            "checkout": "결제",
-            "order": "주문",
-        }.get(page_type)
-        if page_label:
-            prefix = f"{site_name} " if site_name else ""
-            return f"로그인 완료되었습니다. {prefix}{page_label} 페이지로 이동했습니다."
-        return "로그인 완료되었습니다. 페이지가 이동되었습니다."

@@ -33,14 +33,21 @@ class LLMRoutingPolicy:
         }
         self.intent_confidence_threshold = 0.6
 
+    def _is_hearbe_navigation_rule(self, rule_result: CommandResult) -> bool:
+        # Hearbe typed-route navigation rules are intentionally "goto+wait" only.
+        # Treat them as deterministic rules (do not force LLM) even if NLU misclassifies intent.
+        return (
+            bool(rule_result.matched_rule)
+            and rule_result.matched_rule.startswith("hearbe_")
+            and self._is_navigation_only(rule_result)
+        )
+
     def decide(
         self,
         user_text: str,
         intent: IntentResult,
         rule_result: CommandResult,
     ) -> RoutingDecision:
-        if intent and intent.intent == IntentType.LOGIN:
-            return RoutingDecision(use_llm=True, reason="force_llm_login")
         if rule_result.matched_rule in ("empty",):
             return RoutingDecision(use_llm=False, reason="empty_input")
 
@@ -55,7 +62,9 @@ class LLMRoutingPolicy:
         if allow_rules is not None:
             if rule_result.matched_rule in allow_rules:
                 return RoutingDecision(use_llm=False, reason="intent_rule_match")
-            if self._is_low_confidence(rule_result) or self._is_navigation_only(rule_result):
+            if self._is_low_confidence(rule_result) or (
+                self._is_navigation_only(rule_result) and not self._is_hearbe_navigation_rule(rule_result)
+            ):
                 return RoutingDecision(use_llm=True, reason="intent_rule_mismatch_low_conf")
             return RoutingDecision(use_llm=False, reason="intent_rule_mismatch")
 

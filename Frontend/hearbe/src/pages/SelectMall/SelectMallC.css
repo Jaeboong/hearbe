@@ -11,7 +11,7 @@
 .mall-main-c {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 50px 20px 20px;
     text-align: center;
     flex: 1;
     /* 콘텐츠가 공간을 차지하게 하여 푸터를 밑으로 밈 */
@@ -19,16 +19,26 @@
 
 /* Header */
 .mall-header-c {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 60px;
+    padding: 15px 60px;
+    background: transparent;
+    backdrop-filter: none;
+    border-bottom: none;
+    transition: all 0.3s ease;
+}
+
+.mall-header-c.scrolled {
     background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid #f1f1f1;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 15px 60px;
+    /* Slight shrink effect */
 }
 
 .header-left-c {
@@ -44,10 +54,10 @@
 }
 
 .title-icon-box-c {
-    width: 54px;
-    height: 54px;
+    width: 60px;
+    height: 60px;
     background: #f5f3ff;
-    border-radius: 16px;
+    border-radius: 18px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,14 +65,14 @@
 }
 
 .title-text-c h1 {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 800;
     color: #1a1a1a;
     margin: 0;
 }
 
 .subtitle-c {
-    font-size: 12px;
+    font-size: 16px;
     color: #94a3b8;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -140,29 +150,27 @@
     font-weight: 800;
 }
 
-/* Main Hero */
-/* mall-main-c moved to top for better grouping */
 
 .mall-hero-c {
-    margin: 60px 0;
+    margin: 0 0 60px;
 }
 
 .mall-main-title-c {
-    font-size: 52px;
+    font-size: 62px;
     font-weight: 800;
     color: #1e293b;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     letter-spacing: -2px;
 }
 
 .voice-guide-badge-c {
     display: inline-block;
-    padding: 12px 24px;
+    padding: 18px 36px;
     background: rgba(139, 92, 246, 0.05);
     border: 1px solid rgba(139, 92, 246, 0.1);
-    border-radius: 30px;
+    border-radius: 35px;
     color: #8B5CF6;
-    font-size: 15px;
+    font-size: 22px;
     font-weight: 600;
 }
 
@@ -212,11 +220,11 @@
 
 .mall-card-new-c {
     position: relative;
-    width: 340px;
-    height: 480px;
+    width: 280px;
+    height: 400px;
     background: white;
-    border-radius: 50px;
-    padding: 35px;
+    border-radius: 40px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
@@ -226,7 +234,7 @@
 }
 
 .mall-card-new-c:hover {
-    transform: translateY(-15px);
+    transform: translateY(-12px);
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
 }
 
@@ -237,16 +245,22 @@
     z-index: 2;
 }
 
+.card-title-row-c {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .card-num-badge-c {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
     font-weight: 800;
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .card-link-icon-c {
@@ -258,9 +272,21 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 240px;
+    font-size: 180px;
     font-weight: 900;
     color: #f8f8f8;
+    z-index: 1;
+    pointer-events: none;
+    user-select: none;
+}
+
+.card-watermark-logo-c {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: auto;
     z-index: 1;
     pointer-events: none;
     user-select: none;
@@ -272,19 +298,18 @@
     flex-direction: column;
     justify-content: center;
     z-index: 2;
-    padding-top: 40px;
+    padding-top: 15px;
 }
 
 .mall-card-name-c {
-    font-size: 34px;
+    font-size: 28px;
     font-weight: 800;
     color: #1a1a1a;
-    margin-bottom: 12px;
+    margin: 0;
 }
 
 .mall-card-desc-c {
-    font-size: 18px;
-    /* 16px -> 18px */
+    font-size: 15px;
     color: #999;
     line-height: 1.5;
 }
@@ -297,8 +322,7 @@
 }
 
 .open-store-text-c {
-    font-size: 15px;
-    /* 13px -> 15px */
+    font-size: 14px;
     font-weight: 700;
     color: #ddd;
     letter-spacing: 1px;
@@ -306,11 +330,69 @@
 
 .open-store-arrow-c {
     color: #ddd;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .mall-card-new-c:hover .card-link-icon-c,
 .mall-card-new-c:hover .open-store-text-c,
 .mall-card-new-c:hover .open-store-arrow-c {
     color: #8B5CF6;
+}
+
+@media (max-width: 1024px) {
+    .mall-grid-container-c {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .mall-header-c {
+        padding: 15px 20px;
+    }
+
+    .title-text-c h1 {
+        font-size: 24px;
+    }
+
+    .subtitle-c {
+        font-size: 14px;
+    }
+
+    .header-right-c {
+        gap: 15px;
+    }
+
+    .nav-icon-c {
+        width: 48px;
+        height: 48px;
+    }
+
+    .back-button-circle-c {
+        top: 20px;
+        left: 20px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .mall-main-title-c {
+        font-size: 36px;
+        margin-bottom: 20px;
+    }
+
+    .mall-grid-container-c {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .mall-card-new-c {
+        width: 100%;
+        max-width: 340px;
+        height: auto;
+        min-height: 400px;
+    }
+
+    .header-left-dummy-c {
+        display: none;
+    }
 }
