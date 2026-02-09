@@ -100,13 +100,39 @@
 
 ## 4. Git Clone 이후 빌드/배포 절차
 
+### 4-0. 선행 조건 (웹서버)
+
+```bash
+# 아래 도구가 설치되어 있어야 함
+docker --version          # 29.x 이상
+docker compose version    # v5.x 이상
+node --version            # v24.x 이상
+npm --version             # 11.x 이상
+nginx -v                  # 1.24.x 이상
+```
+
 ### 4-1. Backend
 
 ```bash
 cd Backend
 cp .env.example .env
-# .env 값 수정
+```
 
+`.env` 필수 변경 항목 (나머지는 기본값 사용 가능):
+
+| 변수 | 설명 | 예시 |
+|---|---|---|
+| `SPRING_DATASOURCE_PASSWORD` | DB 비밀번호 | 임의 지정 |
+| `SPRING_DATA_REDIS_PASSWORD` | Redis 비밀번호 | 임의 지정 |
+| `JWT_SECRET` | JWT 서명 키 (256-bit 이상) | `openssl rand -base64 32` 로 생성 |
+| `ENCRYPTION_SECRET_KEY` | 암호화 키 (32 bytes) | `openssl rand -base64 32` 로 생성 |
+| `MYSQL_ROOT_PASSWORD` | MariaDB root 비밀번호 | 임의 지정 |
+| `MYSQL_PASSWORD` | MariaDB 앱 계정 비밀번호 | `SPRING_DATASOURCE_PASSWORD`와 동일하게 |
+| `PMA_PASSWORD` | phpMyAdmin 비밀번호 | `MYSQL_PASSWORD`와 동일하게 |
+| `REDIS_PASSWORD` | Redis 비밀번호 | `SPRING_DATA_REDIS_PASSWORD`와 동일하게 |
+| `COMPOSE_HOST_PORT` | Backend 외부 포트 | `8080` (기본값) |
+
+```bash
 docker compose build
 docker compose up -d
 
@@ -117,8 +143,8 @@ docker compose logs --tail=200 hearbe-backend
 검증:
 
 ```bash
-curl -i http://localhost:${COMPOSE_HOST_PORT}/health
-curl -i http://localhost:${COMPOSE_HOST_PORT}/ping
+curl -i http://localhost:8080/health
+curl -i http://localhost:8080/ping
 ```
 
 ### 4-2. Frontend
@@ -126,17 +152,35 @@ curl -i http://localhost:${COMPOSE_HOST_PORT}/ping
 ```bash
 cd Frontend/hearbe
 cp .env.example .env
-# 프로덕션 배포 시 .env.production 이 자동 적용됨 (Vite 빌드 모드 기준)
-
-npm install
-npm run build
-# 빌드 결과물은 dist/ 에 생성되며, Nginx가 직접 서빙
 ```
 
-참고:
-- 개발용 `.env`와 배포용 `.env.production`이 분리되어 있음
-- `.env.production`에 `VITE_API_BASE_URL`, `VITE_PEER_*`, `VITE_OCR_WELFARE_CARD_URL` 설정
-- `.env`에 `VITE_EMAILJS_*` 설정 (프로덕션 빌드 시 `.env`도 기본 로딩됨)
+환경 파일 구조 (Vite 빌드 동작):
+
+| 파일 | 용도 | 로딩 시점 |
+|---|---|---|
+| `.env` | 공통 변수 (EmailJS 등) | `npm run dev` + `npm run build` 모두 |
+| `.env.production` | 배포용 변수 (API URL, PeerJS 등) | `npm run build` 시에만 `.env`를 덮어씀 |
+
+- **로컬 개발**: `.env`의 `VITE_API_BASE_URL=http://localhost:8080` 사용
+- **프로덕션 배포**: `.env.production`의 `VITE_API_BASE_URL`이 우선 적용됨
+- `.env`의 EmailJS 키는 프로덕션 빌드에서도 함께 로딩됨 (Vite 기본 동작)
+
+프로덕션 배포 시 `.env.production` 확인 항목:
+
+| 변수 | 현재 값 | 비고 |
+|---|---|---|
+| `VITE_API_BASE_URL` | `https://i14d108.p.ssafy.io/api` | 도메인 변경 시 수정 |
+| `VITE_API_URL` | `https://i14d108.p.ssafy.io/api` | PeerJS 설정에서 참조 |
+| `VITE_PEER_HOST` | `i14d108.p.ssafy.io` | 도메인 변경 시 수정 |
+| `VITE_PEER_PORT` | `443` | HTTPS 기본 |
+| `VITE_PEER_SECURE` | `true` | HTTPS 사용 시 true |
+| `VITE_OCR_WELFARE_CARD_URL` | `https://jhserver.shop/api/v1/ocr/welfare-card` | AI 서버 도메인 |
+
+```bash
+npm install
+npm run build
+# 빌드 결과물: dist/ → Nginx가 직접 서빙
+```
 
 ### 4-3. AI (별도 서버/별도 환경)
 
@@ -217,60 +261,66 @@ curl -i http://localhost:8000/api/v1/health
 - 민감정보(API Key/비밀번호/시크릿)는 Git에 직접 커밋하지 않음
 - 실제 값은 배포 서버 시크릿 또는 `.env`에만 주입
 
-### 6-1. Backend 필수/주요 변수
+### 6-1. Backend 변수 (`Backend/.env.example` 기준)
+
+템플릿: `Backend/.env.example` → `Backend/.env`로 복사 후 값 수정
 
 - App/DB/Redis/JPA
-  - `SPRING_APPLICATION_NAME`
-  - `SPRING_DATASOURCE_URL`
-  - `SPRING_DATASOURCE_USERNAME`
-  - `SPRING_DATASOURCE_PASSWORD`
-  - `SPRING_DATA_REDIS_HOST`
-  - `SPRING_DATA_REDIS_PORT`
-  - `SPRING_DATA_REDIS_PASSWORD`
-  - `SPRING_JPA_HIBERNATE_DDL_AUTO`
+  - `SPRING_APPLICATION_NAME` — 앱 이름 (기본값: `hearbe-backend`)
+  - `SPRING_DATASOURCE_URL` — MariaDB JDBC URL (Docker 내부 호스트명 사용)
+  - `SPRING_DATASOURCE_USERNAME` — DB 계정 (기본값: `hearbe`)
+  - `SPRING_DATASOURCE_PASSWORD` — DB 비밀번호 (**반드시 변경**)
+  - `SPRING_DATA_REDIS_HOST` — Redis 호스트 (기본값: `hearbe-redis`)
+  - `SPRING_DATA_REDIS_PORT` — Redis 포트 (기본값: `6379`)
+  - `SPRING_DATA_REDIS_PASSWORD` — Redis 비밀번호 (**반드시 변경**)
+  - `SPRING_JPA_HIBERNATE_DDL_AUTO` — DDL 전략 (기본값: `update`)
 
 - Auth/암호화
-  - `JWT_SECRET`
-  - `JWT_EXPIRATION`
-  - `ENCRYPTION_SECRET_KEY`
+  - `JWT_SECRET` — JWT 서명 키, 256-bit 이상 (**반드시 변경**)
+  - `JWT_EXPIRATION` — 토큰 만료 시간(ms) (기본값: `3600000`)
+  - `ENCRYPTION_SECRET_KEY` — 암호화 키, 32 bytes (**반드시 변경**)
 
-- Compose 실행 제어
-  - `COMPOSE_HOST_PORT`
-  - `COMPOSE_HOST_LOG_PATH`
-  - `COMPOSE_APP_PROFILE`
+- Docker Compose 실행 제어
+  - `COMPOSE_HOST_PORT` — Backend 외부 바인딩 포트 (기본값: `8080`)
+  - `COMPOSE_HOST_LOG_PATH` — 로그 마운트 경로 (기본값: `./logs`)
+  - `COMPOSE_APP_PROFILE` — Spring 프로파일 (기본값: `dev`)
 
 - 인프라 컨테이너
-  - `MYSQL_ROOT_PASSWORD`
-  - `MYSQL_DATABASE`
-  - `MYSQL_USER`
-  - `MYSQL_PASSWORD`
-  - `PMA_HOST`
-  - `PMA_USER`
-  - `PMA_PASSWORD`
-  - `REDIS_PASSWORD`
+  - `MYSQL_ROOT_PASSWORD` — MariaDB root 비밀번호 (**반드시 변경**)
+  - `MYSQL_DATABASE` — DB명 (기본값: `hearbe`)
+  - `MYSQL_USER` — DB 계정 (기본값: `hearbe`)
+  - `MYSQL_PASSWORD` — DB 비밀번호 (`SPRING_DATASOURCE_PASSWORD`와 동일)
+  - `PMA_HOST` — phpMyAdmin 대상 호스트 (기본값: `hearbe-mariadb`)
+  - `PMA_USER` / `PMA_PASSWORD` — phpMyAdmin 접속 계정
+  - `REDIS_PASSWORD` — Redis 비밀번호 (`SPRING_DATA_REDIS_PASSWORD`와 동일)
 
 - 로깅
-  - `LOG_LEVEL`
-  - `APP_LOG_LEVEL`
-  - `SPRING_LOG_LEVEL`
-  - `SPRING_SECURITY_LOG_LEVEL`
-  - `SPRING_DATA_LOG_LEVEL`
-  - `HIBERNATE_SQL_LOG_LEVEL`
-  - `HIBERNATE_BINDER_LOG_LEVEL`
-  - `SPRING_JPA_SHOW_SQL`
+  - `LOG_LEVEL`, `APP_LOG_LEVEL`, `SPRING_LOG_LEVEL`, `SPRING_SECURITY_LOG_LEVEL`, `SPRING_DATA_LOG_LEVEL`
+  - `HIBERNATE_SQL_LOG_LEVEL`, `HIBERNATE_BINDER_LOG_LEVEL`, `SPRING_JPA_SHOW_SQL`
 
 ### 6-2. Frontend 변수
 
-- `VITE_API_BASE_URL`
-- `VITE_API_URL`
-- `VITE_OCR_WELFARE_CARD_URL`
-- `VITE_EMAILJS_SERVICE_ID`
-- `VITE_EMAILJS_TEMPLATE_ID`
-- `VITE_EMAILJS_PUBLIC_KEY`
-- `VITE_PEER_HOST`
-- `VITE_PEER_PORT`
-- `VITE_PEER_SECURE`
-- `VITE_SOCKET_SERVER_URL` (코드 참조 존재 시)
+템플릿: `Frontend/hearbe/.env.example` → `Frontend/hearbe/.env`로 복사 후 값 수정
+
+`.env` (공통, 개발+빌드 모두 로딩):
+
+- `VITE_API_BASE_URL` — Backend API URL (로컬: `http://localhost:8080`)
+- `VITE_OCR_WELFARE_CARD_URL` — AI OCR 엔드포인트
+- `VITE_EMAILJS_SERVICE_ID` — EmailJS 서비스 ID
+- `VITE_EMAILJS_TEMPLATE_ID` — EmailJS 템플릿 ID
+- `VITE_EMAILJS_PUBLIC_KEY` — EmailJS 공개 키
+
+`.env.production` (프로덕션 빌드 전용, `.env` 값을 덮어씀):
+
+- `VITE_API_BASE_URL` — 배포 도메인 API URL
+- `VITE_API_URL` — PeerJS 설정에서 참조하는 API URL
+- `VITE_PEER_HOST` — PeerJS 서버 호스트 (배포 도메인)
+- `VITE_PEER_PORT` — PeerJS 서버 포트 (`443`)
+- `VITE_PEER_SECURE` — HTTPS 사용 여부 (`true`)
+- `VITE_OCR_WELFARE_CARD_URL` — AI OCR 엔드포인트 (배포용)
+
+코드 참조만 존재 (기본값 폴백):
+- `VITE_SOCKET_SERVER_URL` — AI WebSocket URL (미설정 시 `http://localhost:4000`)
 
 ### 6-3. AI 변수 (코드 + compose 기준 최대 목록)
 
