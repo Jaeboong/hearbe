@@ -207,7 +207,10 @@ class HandlerManager:
         await self._audio_handler.handle_binary_audio(session_id, data)
 
     async def handle_user_input(self, session_id: str, data: dict):
-        await self._text_handler.handle_user_input(session_id, data.get("text", ""))
+        text = data.get("text", "")
+        if text.strip():
+            logger.info("[INPUT] Text: %s", text.strip())
+        await self._text_handler.handle_user_input(session_id, text)
 
     async def handle_user_confirm(self, session_id: str, data: dict):
         await self._text_handler.handle_user_confirm(session_id, data)

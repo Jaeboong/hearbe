@@ -5,6 +5,7 @@
 """
 
 import os
+import sys
 import logging
 import logging.handlers
 import time
@@ -380,7 +381,7 @@ def setup_logging(config: AppConfig):
     file_handler.setLevel(file_level)
     file_handler.setFormatter(formatter)
 
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(console_level)
     console_handler.setFormatter(formatter)
 

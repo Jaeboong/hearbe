@@ -182,6 +182,7 @@ class AudioHandler:
             )
 
             if is_final and asr_result.text.strip():
+                logger.info("[INPUT] ASR: %s", asr_result.text.strip())
                 await self._enqueue_text(session_id, asr_result.text)
 
         except Exception as e:

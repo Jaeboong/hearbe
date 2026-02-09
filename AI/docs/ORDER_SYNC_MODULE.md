@@ -151,7 +151,13 @@ if result.success:
       "quantity": 2,
       "url": "https://...",
       "img_url": "https://...",
-      "deliver_url": null
+      "deliver_url": null,
+      "coupang_product_number": "7689270513 - 20972233691",
+      "category_path": [
+        "Food",
+        "Beverages",
+        "Water"
+      ]
     }
   ]
 }

@@ -100,6 +100,7 @@ class WSSender:
             return
 
         try:
+            logger.info("[TTS OUTPUT] %s", text.strip() if text else "")
             tts_id = uuid.uuid4().hex[:10]
             text = _strip_urls(text)
             text = _normalize_line_breaks(text)

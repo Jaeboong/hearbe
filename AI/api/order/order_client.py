@@ -52,9 +52,11 @@ class OrderItem:
     url: Optional[str] = None
     img_url: Optional[str] = None
     deliver_url: Optional[str] = None
+    coupang_product_number: Optional[str] = None
+    category_path: Optional[List[str]] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        payload: Dict[str, Any] = {
             "name": self.name,
             "price": self.price,
             "quantity": self.quantity,
@@ -62,6 +64,11 @@ class OrderItem:
             "img_url": self.img_url,
             "deliver_url": self.deliver_url,
         }
+        if self.coupang_product_number:
+            payload["coupang_product_number"] = self.coupang_product_number
+        if self.category_path:
+            payload["category_path"] = self.category_path
+        return payload
 
 
 @dataclass

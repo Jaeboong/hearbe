@@ -198,6 +198,29 @@ def format_order_list_section(order_list: Optional[Any] = None) -> str:
     return "\n".join(lines)
 
 
+def format_order_history_recommendations_section(
+    recommendations: Optional[List[Dict[str, Any]]] = None,
+) -> str:
+    if not recommendations:
+        return ""
+
+    items = [item for item in recommendations if isinstance(item, dict)]
+    if not items:
+        return ""
+
+    lines = ["## Order History Recommendations (current)"]
+    for idx, item in enumerate(items, start=1):
+        entry = {
+            "index": idx,
+            "name": item.get("name"),
+            "purchase_count": item.get("purchaseCount") or item.get("purchase_count"),
+            "category_match": item.get("categoryMatch") or item.get("category_match"),
+            "coupang_product_number": item.get("coupangProductNumber") or item.get("coupang_product_number"),
+        }
+        lines.append(json.dumps(entry, ensure_ascii=True))
+    return "\n".join(lines)
+
+
 def format_url_context(current_url: str, previous_url: Optional[str]) -> str:
     if not previous_url:
         return ""

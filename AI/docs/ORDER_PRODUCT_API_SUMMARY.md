@@ -30,7 +30,15 @@ Request body:
       "quantity": 1,
       "url": "https://www.coupang.com/vp/products/7900128179?itemId=...",
       "img_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/320x320ex/image/...",
-      "deliver_url": "https://www.coupang.com/tracking/..."
+      "deliver_url": "https://www.coupang.com/tracking/...",
+      "coupang_product_number": "7689270513 - 20972233691",
+      "category_path": [
+        "식품",
+        "사과식초/땅콩버터 외",
+        "생수/음료",
+        "생수",
+        "국산생수"
+      ]
     }
   ]
 }
@@ -63,4 +71,3 @@ Request body (from `session.context["product_detail"]`):
 Notes:
 - `coupang_product_number` is derived from `product_detail["coupang_product_info_kv"]["쿠팡상품번호"]` (fallback parses `coupang_product_info`).
 - The AI server sends this best-effort only after `POST /api/orders` succeeds.
-
