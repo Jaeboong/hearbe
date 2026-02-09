@@ -1,7 +1,7 @@
 # HEARBE 포팅 매뉴얼
 
 - 프로젝트: HEARBE (시각장애인 음성 쇼핑 지원)
-- 작성일: 2026-02-08
+- 작성일: 2026-02-09
 - 제출 경로: `exec/PORTING_MANUAL.md`
 - 기준 리포지토리: `S14P11D108`
 
@@ -20,7 +20,12 @@
 
 ## 2. 빌드/런타임 버전
 
-### 2-1. 메인 웹서버 (AWS, 기존 유지)
+### 2-1. 개발 IDE
+
+- IntelliJ IDEA: 2025.3.1.1 (Backend 개발)
+- Visual Studio Code: 1.108.1 (Frontend, AI, 인프라)
+
+### 2-2. 메인 웹서버 (AWS, 기존 유지)
 
 - OS: Ubuntu 24.04.3 LTS
 - Kernel: 6.14.0-1018-aws
@@ -31,7 +36,7 @@
 - Docker Compose: v5.0.2
 - Nginx: 1.24.0
 
-### 2-2. AI 서버 (별도 서버, WSL2 기준 확인값)
+### 2-3. AI 서버 (별도 서버, WSL2 기준 확인값)
 
 - OS: Ubuntu 22.04.5 LTS (WSL2)
 - Kernel: 6.6.87.2-microsoft-standard-WSL2
@@ -40,23 +45,24 @@
 - Docker Compose: v5.0.1
 - GPU: NVIDIA Driver 560.94 / CUDA 12.6 (`/usr/lib/wsl/lib/nvidia-smi` 기준)
 
-### 2-3. Backend 기준 버전 파일
+### 2-4. Backend 기준 버전 파일
 
 - Java Toolchain: 17 (`Backend/build.gradle`)
 - Spring Boot: 3.5.9 (`Backend/build.gradle`)
+- WAS: Apache Tomcat 10.1.50 (Spring Boot 내장, Jakarta Servlet 6.0)
 - Dependency Management Plugin: 1.1.7 (`Backend/build.gradle`)
 - Gradle Wrapper: 8.14.3 (`Backend/gradle/wrapper/gradle-wrapper.properties`)
 - Docker Build Image: `gradle:8-jdk17` (`Backend/Dockerfile`)
 - Docker Runtime Image: `eclipse-temurin:17-jre` (`Backend/Dockerfile`)
 
-### 2-4. Frontend 기준 버전 파일
+### 2-5. Frontend 기준 버전 파일
 
 - React: 19.2.4 (`Frontend/hearbe/package.json`)
 - Vite: 7.2.4 (`Frontend/hearbe/package.json`)
 - React Router DOM: 6.28.0 (`Frontend/hearbe/package.json`)
 - PeerJS: 1.5.5 (`Frontend/hearbe/package.json`)
 
-### 2-5. AI 기준 버전 파일
+### 2-6. AI 기준 버전 파일
 
 - Base Image: `nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04` (`AI/Dockerfile`)
 - Python: 3.10 (컨테이너 설치) (`AI/Dockerfile`)
@@ -394,11 +400,14 @@ curl -i http://localhost:8000/api/v1/health
 
 ### 7-3. DB 덤프 제출
 
-- 제출 파일 예시: `exec/db_dump_20260209.sql`
-- 최신본 생성 예시:
+- 제출 파일: `exec/db_dump_20260209.sql` (2026-02-09 기준 최신본)
+- DB명: `hearbe` (MariaDB)
+- 덤프 재생성 시:
 
 ```bash
-mysqldump -h <DB_HOST> -u <DB_USER> -p <DB_NAME> > exec/db_dump_YYYYMMDD.sql
+docker exec hearbe-mariadb mariadb-dump \
+  -u root -p"${MYSQL_ROOT_PASSWORD}" \
+  --single-transaction hearbe > exec/db_dump_YYYYMMDD.sql
 ```
 
 ## 8. 외부 서비스 목록
@@ -561,8 +570,10 @@ AI 서버 측 (별도 서버에서 확인):
 
 ## 13. 제출 전 최종 체크리스트
 
-- [ ] `exec/PORTING_MANUAL.md` 최신화
-- [ ] `exec/PORTING_MANUAL_CHECKLIST.md` 완료 체크
-- [ ] `exec/db_dump_YYYYMMDD.sql` 첨부
-- [ ] AI 별도환경 실제 값/버전 반영
-- [ ] 외부 서비스 담당자/계정 정보 반영
+- [x] `exec/PORTING_MANUAL.md` 최신화 (2026-02-09)
+- [x] `exec/EXTERNAL_SERVICES.md` 외부 서비스 정보 문서화
+- [x] `exec/db_dump_20260209.sql` 첨부
+- [x] `exec/SIMULATE_MANUAL.md` 시연 시나리오
+- [x] IDE/WAS 버전 기재 (IntelliJ 2025.3.1.1, VSCode 1.108.1, Tomcat 10.1.50)
+- [x] AI 별도환경 실제 값/버전 반영
+- [ ] 외부 서비스 담당자/계정 관리 주체 확인
