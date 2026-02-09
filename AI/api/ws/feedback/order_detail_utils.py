@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 
 from api.order.order_client import OrderItem
+from .product_detail_utils import normalize_category_path
 from .order_detail_constants import ACTION_LABELS
 
 
@@ -279,6 +280,16 @@ def build_order_items(order_data: Dict[str, Any]):
         url = raw.get("product_url") or raw.get("url") or ""
         img_url = raw.get("img_url") or raw.get("image") or ""
         deliver_url = raw.get("deliver_url") or raw.get("tracking_url") or ""
+        coupang_product_number = (
+            raw.get("coupang_product_number")
+            or raw.get("coupangProductNumber")
+            or raw.get("coupang_product_no")
+            or raw.get("coupangProductNo")
+            or ""
+        )
+        category_path = normalize_category_path(
+            raw.get("category_path") or raw.get("categoryPath")
+        )
         items.append(
             OrderItem(
                 name=name,
@@ -287,6 +298,8 @@ def build_order_items(order_data: Dict[str, Any]):
                 url=url or None,
                 img_url=img_url or None,
                 deliver_url=deliver_url or None,
+                coupang_product_number=coupang_product_number or None,
+                category_path=category_path or None,
             )
         )
     if not items and raw_items:

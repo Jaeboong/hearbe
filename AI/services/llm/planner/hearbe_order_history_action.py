@@ -17,6 +17,7 @@ from core.korean_datetime import format_date_for_tts
 
 
 CTX_HEARBE_ORDER_HISTORY_DATA = "hearbe_order_history_data"
+CTX_HEARBE_ORDER_HISTORY_RECOMMENDED = "hearbe_order_history_recommended"
 CTX_HEARBE_ORDER_HISTORY_PROMPT_PENDING = "hearbe_order_history_prompt_pending"
 CTX_HEARBE_ORDER_HISTORY_FETCHING = "hearbe_order_history_fetching"
 
@@ -72,6 +73,24 @@ def _is_negative(text: str) -> bool:
         "됐어",
         "필요없어",
         "필요 없어",
+    ]
+    return any(word in text for word in keywords)
+
+
+def _is_recommendation_request(text: str) -> bool:
+    keywords = [
+        "추천",
+        "추천 상품",
+        "추천목록",
+        "추천 목록",
+        "자주 산",
+        "자주산",
+        "자주 구매",
+        "자주구매",
+        "많이 산",
+        "많이 구매",
+        "재구매",
+        "구매 추천",
     ]
     return any(word in text for word in keywords)
 
@@ -134,6 +153,35 @@ def _build_summary_text(orders: List[Dict[str, Any]]) -> str:
     return tts_text
 
 
+def _build_recommendation_text(items: List[Dict[str, Any]]) -> str:
+    if not items:
+        return "추천 상품 정보가 없습니다."
+
+    total = len(items)
+    max_read = 5
+    lines: List[str] = []
+    for idx, item in enumerate(items[:max_read], start=1):
+        name = str(item.get("name") or "").strip() or "상품"
+        count = item.get("purchaseCount") or item.get("purchase_count")
+        match = item.get("categoryMatch") or item.get("category_match")
+        suffix = ""
+        if match:
+            suffix = str(match).strip()
+        elif count is not None:
+            suffix = f"{count}회 구매"
+        if suffix:
+            lines.append(f"{idx}번 {name}, {suffix}")
+        else:
+            lines.append(f"{idx}번 {name}")
+
+    intro = f"자주 산 상품 추천은 {total}개입니다. "
+    tts_text = intro + ". ".join(lines) + "."
+    if total > max_read:
+        remain = total - max_read
+        tts_text += f" 나머지 {remain}개도 알려드릴까요?"
+    return tts_text
+
+
 def handle_hearbe_order_history_action(user_text: str, session: Optional[SessionState]) -> Optional[LLMResponse]:
     if not session or not session.context:
         return None
@@ -147,18 +195,31 @@ def handle_hearbe_order_history_action(user_text: str, session: Optional[Session
 
     prompt_pending = bool(session.context.get(CTX_HEARBE_ORDER_HISTORY_PROMPT_PENDING))
     orders_raw = session.context.get(CTX_HEARBE_ORDER_HISTORY_DATA)
+    recs_raw = session.context.get(CTX_HEARBE_ORDER_HISTORY_RECOMMENDED)
     orders: List[Dict[str, Any]] = []
+    recs: List[Dict[str, Any]] = []
     if isinstance(orders_raw, list):
         orders = [o for o in orders_raw if isinstance(o, dict)]
-    else:
+    if isinstance(recs_raw, list):
+        recs = [r for r in recs_raw if isinstance(r, dict)]
+    if not orders_raw and not recs_raw:
         # If the page handler is still fetching, don't fall back to LLM/extractors.
         if session.context.get(CTX_HEARBE_ORDER_HISTORY_FETCHING):
             return LLMResponse(
-                text="주문 내역을 불러오는 중입니다. 잠시만 기다려 주세요.",
+                text="?? ??? ???? ????. ??? ??? ???.",
                 commands=[],
                 requires_flow=False,
                 flow_type=None,
             )
+
+    if _is_recommendation_request(text):
+        session.context[CTX_HEARBE_ORDER_HISTORY_PROMPT_PENDING] = False
+        return LLMResponse(
+            text=_build_recommendation_text(recs),
+            commands=[],
+            requires_flow=False,
+            flow_type=None,
+        )
 
     # If we asked "읽어드릴까요?" then interpret yes/no first.
     if prompt_pending:

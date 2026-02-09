@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 CTX_HEARBE_ORDER_HISTORY_LAST_URL = "hearbe_order_history_last_url"
 CTX_HEARBE_ORDER_HISTORY_DATA = "hearbe_order_history_data"
+CTX_HEARBE_ORDER_HISTORY_RECOMMENDED = "hearbe_order_history_recommended"
 CTX_HEARBE_ORDER_HISTORY_PROMPT_PENDING = "hearbe_order_history_prompt_pending"
 CTX_HEARBE_ORDER_HISTORY_FETCHING = "hearbe_order_history_fetching"
 CTX_HEARBE_ORDER_HISTORY_FETCHED_AT = "hearbe_order_history_fetched_at"
@@ -104,6 +105,7 @@ class HearbeOrderHistoryHandler:
             return
         self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_LAST_URL, None)
         self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_DATA, None)
+        self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_RECOMMENDED, None)
         self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_PROMPT_PENDING, None)
         self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_FETCHING, None)
         self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_FETCHED_AT, None)
@@ -126,6 +128,17 @@ class HearbeOrderHistoryHandler:
             payload = result.get("data") or {}
             data = payload.get("data") if isinstance(payload, dict) and "data" in payload else payload
             orders = data.get("orders") if isinstance(data, dict) else None
+            recs = (
+                data.get("recommended_products")
+                or data.get("recommendedProducts")
+                or []
+            ) if isinstance(data, dict) else []
+            if isinstance(recs, list):
+                recs = [r for r in recs if isinstance(r, dict)]
+            else:
+                recs = []
+            if self._session:
+                self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_RECOMMENDED, recs)
             if isinstance(orders, list):
                 logger.info("Hearbe orders fetched: session=%s count=%d", session_id, len(orders))
                 return [o for o in orders if isinstance(o, dict)]
@@ -147,6 +160,17 @@ class HearbeOrderHistoryHandler:
                     payload = retry.get("data") or {}
                     data = payload.get("data") if isinstance(payload, dict) and "data" in payload else payload
                     orders = data.get("orders") if isinstance(data, dict) else None
+                    recs = (
+                        data.get("recommended_products")
+                        or data.get("recommendedProducts")
+                        or []
+                    ) if isinstance(data, dict) else []
+                    if isinstance(recs, list):
+                        recs = [r for r in recs if isinstance(r, dict)]
+                    else:
+                        recs = []
+                    if self._session:
+                        self._session.set_context(session_id, CTX_HEARBE_ORDER_HISTORY_RECOMMENDED, recs)
                     if isinstance(orders, list):
                         logger.info(
                             "Hearbe orders fetched after refresh: session=%s count=%d",
@@ -170,6 +194,6 @@ __all__ = [
     "HearbeOrderHistoryHandler",
     "is_hearbe_order_history_url",
     "CTX_HEARBE_ORDER_HISTORY_DATA",
+    "CTX_HEARBE_ORDER_HISTORY_RECOMMENDED",
     "CTX_HEARBE_ORDER_HISTORY_PROMPT_PENDING",
 ]
-

@@ -88,3 +88,14 @@ def select_order_list(
         if isinstance(order_list, (list, dict)) and order_list:
             return order_list
     return None
+
+
+def select_order_history_recommendations(
+    session_context: Optional[Dict[str, Any]] = None,
+    conversation_history: List[Dict[str, Any]] = None,
+) -> List[Dict[str, Any]]:
+    if session_context:
+        recs = session_context.get("hearbe_order_history_recommended") or session_context.get("order_history_recommendations")
+        if isinstance(recs, list) and recs:
+            return [r for r in recs if isinstance(r, dict)]
+    return []

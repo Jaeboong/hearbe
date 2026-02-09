@@ -260,7 +260,7 @@ const MainLanding = ({ handleModeSelect, modeSelectionRef, onOpenSetup }) => {
             mode={{
               id: 'common',
               label: 'TYPE C',
-              title: '멀티 쇼핑',
+              title: '일반 쇼핑',
               desc: <>음성과 시각의 조화로<br />더 쉽고 편리한 쇼핑 환경</>,
               tags: ['#음성&시각', '#스마트검색'],
               bgColor: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',

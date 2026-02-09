@@ -15,6 +15,7 @@ from .context_formatters import (
     format_cart_items_section,
     format_order_detail_section,
     format_order_list_section,
+    format_order_history_recommendations_section,
     format_url_context,
 )
 from .context_models import PageContext, get_page_context
@@ -90,6 +91,7 @@ def build_system_prompt(
     cart_items: List[Dict[str, Any]] = None,
     order_detail: Optional[Dict[str, Any]] = None,
     order_list: Optional[Any] = None,
+    order_history_recommendations: Optional[List[Dict[str, Any]]] = None,
     previous_url: Optional[str] = None,
     login_method_active: Optional[str] = None,
 ) -> str:
@@ -125,6 +127,11 @@ def build_system_prompt(
     order_list_section = (
         format_order_list_section(order_list)
         if page_context.page_type == "orderlist"
+        else ""
+    )
+    order_history_recommendations_section = (
+        format_order_history_recommendations_section(order_history_recommendations)
+        if page_context.page_type == "order_history"
         else ""
     )
     url_context_section = format_url_context(current_url, previous_url)
@@ -164,6 +171,7 @@ def build_system_prompt(
 {cart_items_section}
 {order_detail_section}
 {order_list_section}
+{order_history_recommendations_section}
 {login_constraints}
 ## Rules
 1. Respond with JSON only.

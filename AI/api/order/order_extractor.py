@@ -360,6 +360,11 @@ def extract_orders_from_page_data(page_data: Dict[str, Any]) -> List[OrderItem]:
                     url=item.get("url"),
                     img_url=item.get("img_url") or item.get("imgUrl"),
                     deliver_url=item.get("deliver_url") or item.get("deliverUrl"),
+                    coupang_product_number=(
+                        item.get("coupang_product_number")
+                        or item.get("coupangProductNumber")
+                    ),
+                    category_path=item.get("category_path") or item.get("categoryPath"),
                 ))
         return items
 
