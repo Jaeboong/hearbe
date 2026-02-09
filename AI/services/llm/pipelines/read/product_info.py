@@ -85,7 +85,6 @@ def _build_summary(detail: Dict[str, Any]) -> str:
         or ""
     )
     price = detail.get("price") or detail.get("final_price") or detail.get("sale_price") or ""
-    original_price = detail.get("original_price") or ""
     discount_rate = detail.get("discount_rate") or ""
     delivery = detail.get("delivery") or detail.get("rocket_delivery") or ""
 
@@ -94,14 +93,8 @@ def _build_summary(detail: Dict[str, Any]) -> str:
         parts.append(f"상품명은 {name}입니다.")
     if price:
         parts.append(f"현재 가격은 {_format_won(str(price))}입니다.")
-    if original_price or discount_rate:
-        label = []
-        if original_price:
-            label.append(f"정가 {_format_won(str(original_price))}")
-        if discount_rate:
-            label.append(f"할인율 {discount_rate}")
-        if label:
-            parts.append(f"{' '.join(label)}입니다.")
+    if discount_rate:
+        parts.append(f"할인율 {discount_rate}입니다.")
     if delivery:
         parts.append(f"배송 정보는 {delivery}입니다.")
 
