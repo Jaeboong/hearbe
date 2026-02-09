@@ -86,5 +86,4 @@
 | OpenAI API | `AI/.env` | `OPENAI_API_KEY` |
 | Google Cloud TTS | `AI/.env` + `AI/config/google-service-account.json` | `GOOGLE_APPLICATION_CREDENTIALS` |
 | EmailJS | `Frontend/hearbe/.env` | `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY` |
-| Gmail SMTP | `Backend/.env` | `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` |
 | PeerJS | `Frontend/hearbe/.env.production` | `VITE_PEER_HOST`, `VITE_PEER_PORT`, `VITE_PEER_SECURE` |
