@@ -10,20 +10,20 @@ import introAudio3 from '../../assets/audio/intro/intro_guide_3.wav';
 
 const STEPS = [
     {
-        title: '목소리만으로 완성하는 새로운 쇼핑 경험',
-        desc: '복잡한 화면 대신 당신의 목소리에 집중하는 스마트 쇼핑 파트너',
+        title: "목소리만으로 완성하는 쇼핑 경험",
+        desc: "복잡한 화면 대신 당신의 목소리에 집중하는 스마트 쇼핑 파트너",
         audioSrc: introAudio1,
         duration: 4000,
     },
     {
-        title: '보이지 않아도, 스스로 선택하는 즐거움',
-        desc: '원하는 상품을 말해보세요. 당신의 목소리로 완벽한 쇼핑을 완성합니다.',
+        title: "스스로 선택하는 쇼핑",
+        desc: "원하는 상품을 말해보세요. 당신의 목소리로 완벽한 쇼핑을 완성합니다.",
         audioSrc: introAudio2,
         duration: 4000,
     },
     {
-        title: '검색부터 결제까지, 당신의 목소리와 함께',
-        desc: '모든 과정을 친절한 음성으로 안내하여 스스로 완성하는 쇼핑을 지원합니다.',
+        title: "HearBe와 함께 시작",
+        desc: "모든 과정을 친절한 음성으로 안내하여 스스로 완성하는 쇼핑을 지원합니다.",
         audioSrc: introAudio3,
         duration: 4000,
     },
@@ -47,11 +47,10 @@ export default function Intro() {
                 setSplineFailed(true);
             }
         }, 8000);
-
         return () => clearTimeout(timeout);
     }, []);
 
-    const goToMain = () => {
+    const goToGuide = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
         setTimeout(() => navigate('/guide'), 850);
@@ -68,13 +67,12 @@ export default function Intro() {
 
                 if (!hasStarted) {
                     handleStart();
-                    return;
-                }
-
-                if (currentStep < STEPS.length - 1) {
-                    setCurrentStep((prev) => prev + 1);
                 } else {
-                    navigate('/guide');
+                    if (currentStep < STEPS.length - 1) {
+                        setCurrentStep(prev => prev + 1);
+                    } else {
+                        navigate('/guide');
+                    }
                 }
             }
         };
@@ -92,7 +90,7 @@ export default function Intro() {
             if (currentStep < STEPS.length - 1) {
                 setCurrentStep((prev) => prev + 1);
             } else {
-                goToMain();
+                goToGuide();
             }
         };
 
@@ -152,7 +150,7 @@ export default function Intro() {
     return (
         <div className="intro-container">
             <button className="skip-btn cursor-pointer" onClick={() => navigate('/guide')}>
-                건너뛰기
+                skip
             </button>
 
             <AnimatePresence>

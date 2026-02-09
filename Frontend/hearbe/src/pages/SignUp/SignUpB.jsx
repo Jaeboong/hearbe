@@ -5,12 +5,14 @@ import {
     Lock,
     Smartphone,
     Camera,
+    Upload,
     CreditCard,
     Check,
     ChevronRight,
     X,
     Eye,
-    EyeOff
+    EyeOff,
+    LoaderCircle
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import logo from '../../assets/logoA.png';
@@ -28,8 +30,50 @@ const formatPhoneNumber = (value) => {
 };
 
 const validatePassword = (password) => /^\d{6}$/.test(password);
+const OCR_LOW_CONFIDENCE_THRESHOLD = 0.8;
+const OCR_MAX_FILE_SIZE = 20 * 1024 * 1024;
 
-const SignUp = () => {
+const formatCardNumber = (value) => {
+    const digits = value.replace(/[^\d]/g, '').slice(0, 16);
+    const groups = digits.match(/.{1,4}/g);
+    return groups ? groups.join('-') : '';
+};
+
+const formatExpiry = (value) => {
+    const digits = value.replace(/[^\d]/g, '').slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+};
+
+const normalizeExpiry = (value) => {
+    if (!value) return '';
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+
+    if (/^\d{2}\/\d{2}$/.test(trimmed)) {
+        return trimmed;
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        const [year, month] = trimmed.split('-');
+        return `${month}/${year.slice(-2)}`;
+    }
+
+    if (/^\d{2}-\d{2}$/.test(trimmed)) {
+        return trimmed.replace('-', '/');
+    }
+
+    return formatExpiry(trimmed);
+};
+
+const FIELD_LABELS = {
+    company: '카드사',
+    number: '카드번호',
+    expiry: '유효기간',
+    cvc: 'CVC'
+};
+
+const SignUpB = () => {
     const navigate = useNavigate();
 
     // Form State
@@ -60,13 +104,28 @@ const SignUp = () => {
         expiry: '',
         cvc: ''
     });
+    const [isOcrLoading, setIsOcrLoading] = useState(false);
+    const [lowConfidenceFields, setLowConfidenceFields] = useState([]);
 
     // Terms Modal State
     const [showTermsModal, setShowTermsModal] = useState(false);
 
     // Camera Logic
     const videoRef = useRef(null);
+    const fileInputRef = useRef(null);
     const [stream, setStream] = useState(null);
+
+    const openCardModal = () => {
+        setShowCamera(true);
+        setModalStep('camera');
+        setLowConfidenceFields([]);
+    };
+
+    const closeCardModal = () => {
+        setShowCamera(false);
+        setModalStep('camera');
+        setLowConfidenceFields([]);
+    };
 
     const startCamera = async () => {
         try {
@@ -80,7 +139,10 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'error',
                 text: '카메라에 접근할 수 없습니다. 권한을 확인해주세요.',
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };
@@ -121,7 +183,10 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'warning',
                 text: idError,
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
             return;
         }
@@ -135,14 +200,20 @@ const SignUp = () => {
                 Swal.fire({
                     icon: 'success',
                     text: '사용 가능한 아이디입니다.',
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
             } else {
                 setIsIdAvailable(false);
                 Swal.fire({
                     icon: 'error',
                     text: '이미 사용 중인 아이디입니다.',
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
                 setIsIdChecked(true);
             }
@@ -150,61 +221,206 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'error',
                 text: error.message || "아이디 중복 확인에 실패했습니다.",
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
+            });
+        }
+    };
+
+    const captureFrameAsFile = () => new Promise((resolve, reject) => {
+        const video = videoRef.current;
+        if (!video || !video.videoWidth || !video.videoHeight) {
+            reject(new Error('카메라 화면을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.'));
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const context = canvas.getContext('2d');
+        if (!context) {
+            reject(new Error('이미지 처리를 시작할 수 없습니다.'));
+            return;
+        }
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                reject(new Error('촬영 이미지 생성에 실패했습니다.'));
+                return;
+            }
+
+            const capturedFile = new File(
+                [blob],
+                `welfare-card-${Date.now()}.jpg`,
+                { type: 'image/jpeg' }
+            );
+            resolve(capturedFile);
+        }, 'image/jpeg', 0.92);
+    });
+
+    const applyOcrResultToForm = (ocrResult) => {
+        const nextForm = {
+            company: (ocrResult?.card_company || '').trim(),
+            number: formatCardNumber(ocrResult?.card_number || ''),
+            expiry: normalizeExpiry(ocrResult?.expiration_date || ''),
+            cvc: (ocrResult?.cvc || '').replace(/[^\d]/g, '').slice(0, 3)
+        };
+        setCardForm(nextForm);
+
+        const confidence = ocrResult?.confidence || {};
+        const lowFields = Object.entries({
+            company: confidence.card_company,
+            number: confidence.card_number,
+            expiry: confidence.expiration_date,
+            cvc: confidence.cvc
+        }).reduce((acc, [fieldName, score]) => {
+            const hasValue = !!nextForm[fieldName];
+            const isLowConfidence = score == null || score < OCR_LOW_CONFIDENCE_THRESHOLD;
+            if (!hasValue || isLowConfidence) {
+                acc.push(fieldName);
+            }
+            return acc;
+        }, []);
+
+        setLowConfidenceFields(lowFields);
+        return lowFields;
+    };
+
+    const runWelfareCardOcr = async (file) => {
+        if (!file) return;
+        if (file.size > OCR_MAX_FILE_SIZE) {
+            Swal.fire({
+                icon: 'warning',
+                text: '이미지 파일은 최대 20MB까지 업로드할 수 있습니다.',
+                confirmButtonText: '확인'
+            });
+            return;
+        }
+
+        setIsOcrLoading(true);
+        try {
+            const ocrResult = await authAPI.ocrWelfareCard(file);
+            const lowFields = applyOcrResultToForm(ocrResult);
+            setModalStep('form');
+
+            if (lowFields.length > 0) {
+                const lowFieldLabels = lowFields.map((field) => FIELD_LABELS[field]).join(', ');
+                Swal.fire({
+                    icon: 'info',
+                    text: `인식 신뢰도가 낮은 항목(${lowFieldLabels})이 있습니다. 직접 확인 후 수정해주세요.`,
+                    confirmButtonText: '확인'
+                });
+            }
+        } catch (error) {
+            setModalStep('form');
+            setLowConfidenceFields(['company', 'number', 'expiry', 'cvc']);
+            Swal.fire({
+                icon: 'warning',
+                text: error.message || '카드 OCR 인식에 실패했습니다. 정보를 직접 입력해주세요.',
+                confirmButtonText: '확인'
+            });
+        } finally {
+            setIsOcrLoading(false);
+        }
+    };
+
+    const handleSnap = async () => {
+        try {
+            const capturedFile = await captureFrameAsFile();
+            await runWelfareCardOcr(capturedFile);
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                text: error.message || '카드 촬영에 실패했습니다.',
                 confirmButtonText: '확인'
             });
         }
     };
 
-    const handleSnap = () => {
-        setCardForm({
-            company: '신한카드',
-            number: '0000-0000-0000-0000',
-            expiry: '01/30',
-            cvc: '123'
-        });
-        setModalStep('form');
+    const handleFilePick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileSelect = async (e) => {
+        const selectedFile = e.target.files?.[0];
+        e.target.value = '';
+        await runWelfareCardOcr(selectedFile);
     };
 
     const handleCardFormChange = (e) => {
         const { name, value } = e.target;
-        setCardForm(prev => ({ ...prev, [name]: value }));
+        setCardForm((prev) => {
+            if (name === 'number') {
+                return { ...prev, number: formatCardNumber(value) };
+            }
+            if (name === 'expiry') {
+                return { ...prev, expiry: formatExpiry(value) };
+            }
+            if (name === 'cvc') {
+                return { ...prev, cvc: value.replace(/[^\d]/g, '').slice(0, 3) };
+            }
+            return { ...prev, [name]: value };
+        });
+
+        setLowConfidenceFields((prev) => prev.filter((field) => field !== name));
     };
 
     const handleCardRegister = () => {
+        if (!cardForm.company || !cardForm.number || !cardForm.expiry || !cardForm.cvc) {
+            Swal.fire({
+                icon: 'warning',
+                text: '복지카드 정보를 모두 입력해주세요.',
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
+            });
+            return;
+        }
+
         const today = new Date();
         const issueDate = today.toISOString().split('T')[0];
         setCardData({
-            ...cardForm,
+            company: cardForm.company.trim(),
+            number: formatCardNumber(cardForm.number),
+            expiry: normalizeExpiry(cardForm.expiry),
+            cvc: cardForm.cvc,
             issueDate
         });
-        setShowCamera(false);
-        setModalStep('camera');
+        closeCardModal();
         Swal.fire({
             icon: 'success',
             text: '복지카드가 등록되었습니다.',
-            confirmButtonText: '확인'
+            background: '#141C29',
+            color: '#FFF064',
+            confirmButtonColor: '#FFF064',
+            confirmButtonText: '<span style="color:#141C29">확인</span>'
         });
     };
 
     const handleSignUp = async () => {
         if (!isIdChecked || !isIdAvailable) {
-            Swal.fire({ icon: 'warning', text: '아이디 중복 확인이 필요합니다.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '아이디 중복 확인이 필요합니다.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!validatePassword(formData.password)) {
-            Swal.fire({ icon: 'warning', text: '비밀번호는 숫자 6자리를 입력해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '비밀번호는 숫자 6자리를 입력해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!formData.name) {
-            Swal.fire({ icon: 'warning', text: '이름을 입력해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '이름을 입력해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!cardData) {
-            Swal.fire({ icon: 'warning', text: '장애인 복지카드를 등록해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '장애인 복지카드를 등록해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
         if (!terms.term1 || !terms.term2) {
-            Swal.fire({ icon: 'warning', text: '필수 이용약관에 동의해주세요.', confirmButtonText: '확인' });
+            Swal.fire({ icon: 'warning', text: '필수 이용약관에 동의해주세요.', background: '#141C29', color: '#FFF064', confirmButtonColor: '#FFF064', confirmButtonText: '<span style="color:#141C29">확인</span>' });
             return;
         }
 
@@ -230,7 +446,10 @@ const SignUp = () => {
                 Swal.fire({
                     icon: 'success',
                     text: '가입 완료! HearBe 회원이 되신 것을 환영합니다.',
-                    confirmButtonText: '확인'
+                    background: '#141C29',
+                    color: '#FFF064',
+                    confirmButtonColor: '#FFF064',
+                    confirmButtonText: '<span style="color:#141C29">확인</span>'
                 });
                 navigate('/B/login');
             } else {
@@ -240,7 +459,10 @@ const SignUp = () => {
             Swal.fire({
                 icon: 'error',
                 text: error.message || "회원가입 중 오류가 발생했습니다.",
-                confirmButtonText: '확인'
+                background: '#141C29',
+                color: '#FFF064',
+                confirmButtonColor: '#FFF064',
+                confirmButtonText: '<span style="color:#141C29">확인</span>'
             });
         }
     };
@@ -341,7 +563,7 @@ const SignUp = () => {
                         <div className="input-section-a-new">
                             <label className="input-label-a-new">장애인 복지카드 등록</label>
                             {cardData ? (
-                                <div className="card-info-box-a-new" onClick={() => setShowCamera(true)}>
+                                <div className="card-info-box-a-new" onClick={openCardModal}>
                                     <div className="card-icon-wrapper-a-new">
                                         <CreditCard size={48} color="#FFF064" />
                                     </div>
@@ -352,7 +574,7 @@ const SignUp = () => {
                                     <ChevronRight size={32} color="#FFF064" />
                                 </div>
                             ) : (
-                                <div className="camera-trigger-a-new" onClick={() => setShowCamera(true)}>
+                                <div className="camera-trigger-a-new" onClick={openCardModal}>
                                     <Camera size={64} />
                                     <span>복지카드 촬영하기</span>
                                 </div>
@@ -385,40 +607,71 @@ const SignUp = () => {
             {showCamera && (
                 <div className="signup-modal-overlay-a-new">
                     <div className="signup-modal-box-a-new">
-                        <button className="modal-close-a-new" onClick={() => setShowCamera(false)}><X size={48} /></button>
+                        <button className="modal-close-a-new" onClick={closeCardModal}><X size={48} /></button>
 
                         {modalStep === 'camera' ? (
                             <div className="camera-modal-content-a-new">
                                 <h2 className="modal-title-a-new">카드 촬영</h2>
-                                <p className="modal-subtitle-a-new">복지카드 앞면이 가이드 안에 들어오게 해주세요.</p>
+                                <p className="modal-subtitle-a-new">복지카드 앞면이 가이드 안에 들어오게 해주세요. (최대 20MB, OCR 최대 45초)</p>
                                 <div className="camera-view-a-new">
                                     <video ref={videoRef} autoPlay playsInline muted />
                                     <div className="camera-guide-a-new" />
                                 </div>
-                                <button className="shutter-btn-a-new" onClick={handleSnap}>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="ocr-file-input-a-new"
+                                    onChange={handleFileSelect}
+                                />
+                                <button
+                                    className="shutter-btn-a-new"
+                                    onClick={handleSnap}
+                                    disabled={isOcrLoading}
+                                >
                                     <div className="shutter-inner-a-new" />
                                 </button>
+                                <button
+                                    className="upload-btn-a-new"
+                                    onClick={handleFilePick}
+                                    disabled={isOcrLoading}
+                                >
+                                    <Upload size={24} />
+                                    이미지 업로드
+                                </button>
+                                {isOcrLoading && (
+                                    <p className="ocr-status-text-a-new">
+                                        <LoaderCircle size={24} className="ocr-loading-icon-a-new" />
+                                        카드 정보를 인식 중입니다. 잠시만 기다려주세요.
+                                    </p>
+                                )}
                             </div>
                         ) : (
                             <div className="form-modal-content-a-new">
                                 <h2 className="modal-title-a-new">정보 확인</h2>
-                                <p className="modal-subtitle-a-new">인식된 정보가 정확한지 확인해주세요.</p>
+                                <p className="modal-subtitle-a-new">인식된 정보는 정확도 100%가 아닐 수 있습니다. 꼭 확인 후 수정해주세요.</p>
+                                {lowConfidenceFields.length > 0 && (
+                                    <div className="ocr-warning-box-a-new">
+                                        신뢰도가 낮거나 비어 있는 항목:
+                                        {` ${lowConfidenceFields.map((field) => FIELD_LABELS[field]).join(', ')}`}
+                                    </div>
+                                )}
                                 <div className="modal-form-a-new">
                                     <div className="modal-input-group-a-new">
-                                        <label>카드사</label>
+                                        <label className={lowConfidenceFields.includes('company') ? 'low-confidence-field-a-new' : ''}>카드사</label>
                                         <input type="text" name="company" value={cardForm.company} onChange={handleCardFormChange} />
                                     </div>
                                     <div className="modal-input-group-a-new">
-                                        <label>카드번호</label>
+                                        <label className={lowConfidenceFields.includes('number') ? 'low-confidence-field-a-new' : ''}>카드번호</label>
                                         <input type="text" name="number" value={cardForm.number} onChange={handleCardFormChange} />
                                     </div>
                                     <div className="modal-input-row-a-new">
                                         <div className="modal-input-group-a-new half">
-                                            <label>유효기간</label>
+                                            <label className={lowConfidenceFields.includes('expiry') ? 'low-confidence-field-a-new' : ''}>유효기간</label>
                                             <input type="text" name="expiry" value={cardForm.expiry} onChange={handleCardFormChange} placeholder="MM/YY" />
                                         </div>
                                         <div className="modal-input-group-a-new half">
-                                            <label>CVC</label>
+                                            <label className={lowConfidenceFields.includes('cvc') ? 'low-confidence-field-a-new' : ''}>CVC</label>
                                             <input type="text" name="cvc" value={cardForm.cvc} onChange={handleCardFormChange} maxLength={3} />
                                         </div>
                                     </div>
@@ -481,4 +734,4 @@ const SignUp = () => {
     );
 };
 
-export default SignUp;
+export default SignUpB;
