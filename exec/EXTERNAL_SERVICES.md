@@ -46,18 +46,7 @@
 | 적용 위치 | Frontend (`Frontend/hearbe/.env`) |
 | 참조 파일 | `Frontend/hearbe/src/services/emailService.js`, `Frontend/hearbe/.env.example` |
 
-### 2-2. Gmail SMTP
-
-| 항목 | 내용 |
-|---|---|
-| 용도 | Backend 이메일 발송 (아이디 찾기, 비밀번호 재설정) |
-| 과금 | 무료 (Google 계정 앱 비밀번호 사용) |
-| 발급 방법 | 1. Google 계정 → 보안 → 2단계 인증 활성화 → 2. 앱 비밀번호 생성 |
-| 환경변수 | `SPRING_MAIL_HOST=smtp.gmail.com`, `SPRING_MAIL_PORT=587`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` |
-| 적용 위치 | Backend (`Backend/.env`) |
-| 참조 파일 | `Backend/.env.example`, `Backend/src/main/resources/application.properties` |
-
-### 2-3. PeerJS + Google STUN
+### 2-2. PeerJS + Google STUN
 
 | 항목 | 내용 |
 |---|---|
