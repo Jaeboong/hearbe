@@ -815,13 +815,3 @@ AI 서버 측 (별도 서버에서 확인):
 | `https://jhserver.shop/api/v1/ocr/welfare-card` | AI OCR API | Frontend에서 직접 호출 |
 | `wss://jhserver.shop/ws` | AI WebSocket | Frontend에서 직접 호출 |
 | AI 내부 컨테이너 | `8000` | |
-
-## 13. 제출 전 최종 체크리스트
-
-- [x] `exec/PORTING_MANUAL.md` 최신화 (2026-02-09)
-- [x] `exec/EXTERNAL_SERVICES.md` 외부 서비스 정보 문서화
-- [x] `exec/db_dump_20260209.sql` 첨부
-- [x] `exec/SIMULATE_MANUAL.md` 시연 시나리오
-- [x] IDE/WAS 버전 기재 (IntelliJ 2025.3.1.1, VSCode 1.108.1, Tomcat 10.1.50)
-- [x] AI 별도환경 실제 값/버전 반영
-- [ ] 외부 서비스 담당자/계정 관리 주체 확인
