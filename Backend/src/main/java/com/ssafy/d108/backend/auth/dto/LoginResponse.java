@@ -16,6 +16,6 @@ public class LoginResponse {
     private String name;
     private UserType userType;
     private String accessToken;
-    private String refreshToken;
+    // refreshToken은 HttpOnly 쿠키로 전달되므로 응답 본문에서 제거
     private String message;
 }
