@@ -491,6 +491,11 @@ def _build_combined_report_md(
     lines.append("2. 실행 인사이트: 다음 스프린트에 유지할 것 1개/중단할 것 1개/새로 도입할 것 1개는?")
     lines.append("3. 리스크 인사이트: 일정/품질/협업 관점의 잠재 리스크와 선제 대응은?")
     lines.append("")
+    lines.append("### 졸업 프로젝트 마무리 3문항")
+    lines.append("1. 우리가 만든 결과물 중 '지속 운영 가능'한 부분과 '데모용'인 부분은 무엇인가?")
+    lines.append("2. 6주를 다시 한다면 1주차에 반드시 바꿀 의사결정 1개는 무엇인가?")
+    lines.append("3. 각자 포트폴리오에 넣을 대표 기여 1개와 근거(커밋 해시/Jira 이슈)는 무엇인가?")
+    lines.append("")
 
     return "\n".join(lines)
 
