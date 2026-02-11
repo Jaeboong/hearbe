@@ -187,41 +187,79 @@
 }
 
 .oh-item-qty {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 800;
-    color: #6b7280;
-    background: #f3f4f6;
-    padding: 0.35rem 0.8rem;
-    border-radius: 0.5rem;
+    color: #4b5563;
+    background: #f1f5f9;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    min-width: 4rem;
+    text-align: center;
+    margin: 0 1rem;
 }
 
 .order-id-actions {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    flex-direction: column;
+    gap: 0.5rem;
     flex-shrink: 0;
+    margin-left: auto;
 }
 
+.order-item-product-btn,
+.order-item-detail-btn,
 .order-item-deliver-btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
+    width: 6.5rem;
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
     font-weight: 700;
+    text-align: center;
+    border-radius: 0.6rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+/* 상품 조회: 테두리 보라색 */
+.order-item-product-btn {
+    color: #7c3aed;
+    background: white;
+    border: 1.5px solid #ddd6fe;
+}
+
+.order-item-product-btn:hover:not(:disabled) {
+    background: #f5f3ff;
+    border-color: #7c3aed;
+}
+
+/* 상세 조회: 연보라색 배경 */
+.order-item-detail-btn {
+    color: #7c3aed;
+    background: #f3e8ff;
+    border: 1.5px solid #f3e8ff;
+}
+
+.order-item-detail-btn:hover:not(:disabled) {
+    background: #e9d5ff;
+}
+
+/* 배송 조회: 진보라색 배경 */
+.order-item-deliver-btn {
     color: white;
     background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
     border: none;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.2);
-    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(124, 58, 237, 0.1);
 }
 
-.order-item-deliver-btn:hover {
+.order-item-deliver-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-    transform: translateY(-2px);
 }
 
+.order-item-product-btn:disabled,
+.order-item-detail-btn:disabled,
 .order-item-deliver-btn:disabled {
     background: #f3f4f6;
     color: #cbd5e1;
+    border-color: #e2e8f0;
     box-shadow: none;
     cursor: default;
     transform: none !important;
