@@ -5,6 +5,7 @@ import com.ssafy.d108.backend.auth.dto.FindIdByEmailRequest;
 import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.LoginResponseWrapper;
 import com.ssafy.d108.backend.auth.dto.RefreshTokenRequest;
 import com.ssafy.d108.backend.auth.dto.RefreshTokenResponse;
 import com.ssafy.d108.backend.auth.dto.DeleteAccountRequest;
@@ -168,7 +169,7 @@ public class AuthService {
     /**
      * 로그인
      */
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponseWrapper login(LoginRequest request) {
         // 1. 사용자 조회
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
@@ -191,13 +192,15 @@ public class AuthService {
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getId());
         refreshTokenRedisService.save(user.getId(), refreshToken, jwtTokenProvider.getExpiration(refreshToken));
 
-        return new LoginResponse(
+        LoginResponse response = new LoginResponse(
                 user.getId(),
                 user.getName(),
                 user.getUserType(),
                 accessToken,
-                refreshToken,
                 "로그인 성공");
+
+        // refreshToken은 Controller에서 HttpOnly 쿠키로 설정
+        return new LoginResponseWrapper(response, refreshToken);
     }
 
     @Transactional
@@ -218,8 +221,7 @@ public class AuthService {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 user.getUsername(),
                 null,
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-        );
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
         String newAccessToken = jwtTokenProvider.createToken(authentication, user.getId());
         String newRefreshToken = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getId());
