@@ -1,318 +1,422 @@
 # Logging Configuration Guide
 
-이 문서는 HEARBE 백엔드 애플리케이션의 로깅 설정 방법을 설명합니다.
+HEARBE 백엔드 애플리케이션의 로깅 설정 가이드입니다.
 
 ## 개요
 
-`application.properties` 파일은 하나만 사용하며, 환경 변수를 통해 개발/운영 환경의 로그 레벨을 제어합니다.
+로깅은 **`logback-spring.xml`** 파일에서 설정합니다. Spring Profile(dev/prod)에 따라 자동으로 다른 로그 레벨과 출력 방식이 적용됩니다.
 
-## Docker 구성
+---
 
-### docker-compose.yml 설정
+## 로그 레벨
 
-```yaml
-services:
-  hearbe-backend:
-    environment:
-      - SPRING_PROFILES_ACTIVE=${APP_PROFILE}  # dev 또는 prod 프로파일 주입
-      - LOG_PATH=/logs                          # 컨테이너 내부 로그 경로
-    volumes:
-      - ${HOST_LOG_PATH}:/logs                  # 호스트와 로그 폴더 연결
-    env_file:
-      - .env
+### 로그 레벨 우선순위
+```
+TRACE < DEBUG < INFO < WARN < ERROR
 ```
 
-### 환경별 Docker 설정
+레벨을 `INFO`로 설정하면: `INFO`, `WARN`, `ERROR`만 출력 (TRACE, DEBUG는 제외)
 
-**.env 파일 (현재 설정)**
-```properties
-# 애플리케이션 프로파일 및 Docker 설정
-APP_PROFILE=prod          # 환경: dev 또는 prod
-HOST_PORT=80              # 호스트 포트 (개발: 8080, 운영: 80)
-HOST_LOG_PATH=./logs      # 호스트의 로그 파일 저장 경로
+### 각 레벨의 용도
+
+| 레벨 | 용도 | 예시 |
+|-----|------|-----|
+| **TRACE** | 가장 상세한 정보 | SQL 파라미터 값, 메서드 진입/종료 |
+| **DEBUG** | 개발/디버깅 정보 | SQL 쿼리, 중요 변수 값 |
+| **INFO** | 일반 정보 (정상 흐름) | 서버 시작, API 호출 성공, 사용자 로그인 |
+| **WARN** | 경고 (주의 필요) | **유효성 검사 실패**, Deprecated 사용, 재시도 |
+| **ERROR** | 오류 (시스템 문제) | 예외 발생, DB 연결 실패, NPE |
+
+---
+
+## 코드에서 로그 사용하기
+
+### 올바른 로그 레벨 선택
+
+```java
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class UserService {
+    
+    public void registerUser(UserRequest request) {
+        // ✅ INFO: 정상 흐름
+        log.info("회원가입 시작: username={}", request.getUsername());
+        
+        // ✅ WARN: 유효성 검사 실패 (비즈니스 룰 위반)
+        if (!isValidEmail(request.getEmail())) {
+            log.warn("유효성 검사 실패: 이메일 형식 오류 - email={}", request.getEmail());
+            throw new ValidationException("Invalid email format");
+        }
+        
+        // ✅ DEBUG: 개발 시에만 필요한 상세 정보
+        log.debug("사용자 정보 저장 전 - request={}", request);
+        
+        try {
+            userRepository.save(user);
+            // ✅ INFO: 성공
+            log.info("회원가입 완료: userId={}", user.getId());
+        } catch (DataAccessException e) {
+            // ✅ ERROR: 시스템 오류
+            log.error("DB 저장 실패: username={}", request.getUsername(), e);
+            throw new DatabaseException("Failed to save user", e);
+        }
+    }
+    
+    // ✅ TRACE: 매우 상세한 정보 (개발 시에만)
+    private void validatePassword(String password) {
+        log.trace("비밀번호 검증 시작: length={}", password.length());
+        // ...
+    }
+}
 ```
 
-## 환경별 로그 레벨 설정
+### 트러블슈팅 시나리오별 로그 레벨
 
-### 개발 환경 (.env 파일)
+| 상황 | 레벨 | 예시 |
+|-----|------|-----|
+| 유효성 검사 실패 | WARN | 이메일 형식 오류, 필수 필드 누락 |
+| 권한 부족 | WARN | 관리자 권한 필요, 본인 데이터 아님 |
+| 비즈니스 룰 위반 | WARN | 중복 회원가입, 재고 부족 |
+| 외부 API 재시도 | WARN | 결제 API 타임아웃, 재시도 중 |
+| 시스템 예외 | ERROR | DB 연결 실패, NPE, 파일 읽기 실패 |
+| 치명적 오류 | ERROR | 서버 기동 실패, 설정 오류 |
 
-```properties
-# 애플리케이션 프로파일 설정
-APP_PROFILE=dev
-HOST_PORT=8080
-HOST_LOG_PATH=./logs
+---
 
-# 개발 환경: DEBUG, TRACE 레벨 사용
-LOG_LEVEL=DEBUG
-APP_LOG_LEVEL=DEBUG
-SPRING_LOG_LEVEL=INFO
-SPRING_SECURITY_LOG_LEVEL=INFO
-SPRING_DATA_LOG_LEVEL=INFO
-HIBERNATE_SQL_LOG_LEVEL=DEBUG
-HIBERNATE_BINDER_LOG_LEVEL=TRACE
-SPRING_JPA_SHOW_SQL=true
+## ⚠️ 유효성 검사 로그 추적하기
+
+### 명확한 답변: **Java 코드 수정 없이 가능합니다**
+
+Spring Boot가 이미 유효성 검사 실패 시 자동으로 로그를 남깁니다. `logback-spring.xml`에서 해당 로거만 활성화하면 됩니다.
+
+### 방법 1: XML 설정만 추가 (추천 ⭐)
+
+**logback-spring.xml에 딱 한 줄만 추가:**
+
+```xml
+<springProfile name="dev">
+    <!-- Spring의 유효성 검사 예외 로그 활성화 -->
+    <logger name="org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver" level="WARN" />
+</springProfile>
 ```
 
-### 운영 환경 (.env 파일)
+**효과:**
+- ✅ 유효성 검사 실패 시 자동 로그 출력
+- ✅ Java 코드 단 한 줄도 수정 안 해도 됨
+- ✅ Spring이 알아서 예외 정보를 로그로 남김
 
-```properties
-# 애플리케이션 프로파일 설정
-APP_PROFILE=prod
-HOST_PORT=80
-HOST_LOG_PATH=./logs
-
-# 운영 환경: WARN 레벨 사용 (logback-spring.xml 기준)
-# 특정 로거에 대해서만 환경 변수로 오버라이드 가능
-LOG_LEVEL=WARN
-APP_LOG_LEVEL=WARN
-SPRING_LOG_LEVEL=WARN
-SPRING_SECURITY_LOG_LEVEL=WARN
-SPRING_DATA_LOG_LEVEL=WARN
-HIBERNATE_SQL_LOG_LEVEL=WARN
-HIBERNATE_BINDER_LOG_LEVEL=WARN
-SPRING_JPA_SHOW_SQL=false
+**로그 예시:**
 ```
-
-## 환경별 설정 가이드
-
-### 개발 환경 (Development) 설정
-
-#### 1단계: `.env` 파일 생성
-
-```bash
-# .env.example을 복사하여 .env 파일 생성
-cp .env.example .env
-```
-
-#### 2단계: `.env` 파일 수정
-
-`.env` 파일을 열어서 다음 설정들을 **개발 환경**으로 변경:
-
-```properties
-# ===== 개발 환경 필수 설정 =====
-
-# 1. 애플리케이션 프로파일
-APP_PROFILE=dev
-HOST_PORT=8080
-HOST_LOG_PATH=./logs
-
-# 2. 로깅 설정 (상세한 로그 출력)
-LOG_LEVEL=DEBUG
-APP_LOG_LEVEL=DEBUG
-SPRING_LOG_LEVEL=INFO
-SPRING_SECURITY_LOG_LEVEL=INFO
-SPRING_DATA_LOG_LEVEL=INFO
-HIBERNATE_SQL_LOG_LEVEL=DEBUG
-HIBERNATE_BINDER_LOG_LEVEL=TRACE
-SPRING_JPA_SHOW_SQL=true
-
-# 3. 데이터베이스 설정 (로컬 또는 Docker)
-SPRING_DATASOURCE_URL=jdbc:mysql://hearbe-mariadb:3306/hearbe?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
-SPRING_DATASOURCE_USERNAME=hearbe
-SPRING_DATASOURCE_PASSWORD=1234
-SPRING_JPA_HIBERNATE_DDL_AUTO=update  # 개발: update, 운영: validate
-
-# 4. Redis 설정
-SPRING_DATA_REDIS_HOST=hearbe-redis
-SPRING_DATA_REDIS_PORT=6379
-SPRING_DATA_REDIS_PASSWORD=1234
-
-# 5. JWT 및 암호화 (개발용 키 사용)
-JWT_SECRET=YOUR_DEV_JWT_SECRET
-JWT_EXPIRATION=3600000
-ENCRYPTION_SECRET_KEY=thisisaverysecurekeyforaes256bit
-
-# 6. 이메일 설정 (테스트용)
-SPRING_MAIL_HOST=smtp.gmail.com
-SPRING_MAIL_PORT=587
-SPRING_MAIL_USERNAME=test@gmail.com
-SPRING_MAIL_PASSWORD=YOUR_APP_PASSWORD
-
-# 7. OpenVidu 설정 (로컬)
-OPENVIDU_URL=http://127.0.0.1:4443/
-OPENVIDU_SECRET=MY_SECRET
-```
-
-#### 3단계: Docker Compose 실행
-
-```bash
-docker-compose up -d
+2026-02-11 15:30:47.123 [http-nio-8080-exec-1] WARN org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity...]
 ```
 
 ---
 
-### 운영 환경 (Production) 설정
+### 방법 2: Grafana에서 검색으로 해결 (설정 변경 X)
 
-#### 1단계: `.env` 파일 준비
+유효성 검사가 실패하면 **HTTP 상태 코드가 400 (Bad Request)**으로 자동 응답됩니다.
 
-운영 서버에 `.env` 파일을 생성하거나 기존 파일 수정:
+**Grafana Explore에서:**
 
+```logql
+# 400 에러만 보기
+{job="hearbe-backend"} |= "400"
+
+# Bad Request 검색
+{job="hearbe-backend"} |= "Bad Request"
+
+# 유효성 검사 예외 검색
+{job="hearbe-backend"} |= "MethodArgumentNotValidException"
+```
+
+---
+
+### 방법 3: 명시적 로그 추가 (선택)
+
+더 명확한 메시지가 필요하다면 Java 코드에 직접 로그를 추가할 수도 있습니다.
+
+```java
+@Slf4j
+@PostMapping("/register")
+public ResponseEntity<?> register(@Valid @RequestBody UserRequest request) {
+    if (userService.existsByEmail(request.getEmail())) {
+        log.warn("유효성 검사 실패: 이메일 중복 - email={}", request.getEmail());
+        throw new DuplicateEmailException();
+    }
+    return ResponseEntity.ok(userService.register(request));
+}
+```
+
+**추천:** 처음에는 방법 1이나 2로 시작하고, 나중에 필요하면 방법 3 적용
+
+---
+
+## 환경별 로그 설정
+
+### 개발 환경 (dev)
+
+**특징:**
+- 콘솔 + 파일 모두 출력
+- SQL 쿼리 및 파라미터 출력
+- 우리 코드(com.ssafy.d108)는 DEBUG 레벨
+
+**적용 방법:**
 ```bash
-# 서버에서 .env 파일 편집
+# .env 파일
+COMPOSE_APP_PROFILE=dev
+```
+
+**로그 출력:**
+```
+2026-02-11 15:30:45.123 [main] INFO  com.ssafy.d108.Application - 서버 시작
+2026-02-11 15:30:46.456 [http-nio-8080-exec-1] DEBUG com.ssafy.d108.service.UserService - 회원가입 요청: user=test@test.com
+2026-02-11 15:30:46.789 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - insert into users (email, password) values (?, ?)
+2026-02-11 15:30:46.790 [http-nio-8080-exec-1] TRACE org.hibernate.type.descriptor.sql.BasicBinder - binding parameter [1] as [VARCHAR] - [test@test.com]
+2026-02-11 15:30:47.000 [http-nio-8080-exec-1] WARN  com.ssafy.d108.controller.UserController - 유효성 검사 실패: 이메일 중복
+```
+
+**설정 방법:**
+
+1. `.env` 파일 열기
+```bash
 vi .env
 ```
 
-#### 2단계: `.env` 파일 수정
-
-`.env` 파일을 열어서 다음 설정들을 **운영 환경**으로 변경:
-
+2. 프로파일을 dev로 설정
 ```properties
-# ===== 운영 환경 필수 설정 =====
-
-# 1. 애플리케이션 프로파일
-APP_PROFILE=prod
-HOST_PORT=80
-HOST_LOG_PATH=./logs
-
-# 2. 로깅 설정 (경고/에러만 출력)
-LOG_LEVEL=WARN
-APP_LOG_LEVEL=WARN
-SPRING_LOG_LEVEL=WARN
-SPRING_SECURITY_LOG_LEVEL=WARN
-SPRING_DATA_LOG_LEVEL=WARN
-HIBERNATE_SQL_LOG_LEVEL=WARN
-HIBERNATE_BINDER_LOG_LEVEL=WARN
-SPRING_JPA_SHOW_SQL=false
-
-# 3. 데이터베이스 설정 (운영 DB 정보)
-SPRING_DATASOURCE_URL=jdbc:mysql://hearbe-mariadb:3306/hearbe?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
-SPRING_DATASOURCE_USERNAME=hearbe
-SPRING_DATASOURCE_PASSWORD=STRONG_PRODUCTION_PASSWORD  # 강력한 비밀번호 사용
-SPRING_JPA_HIBERNATE_DDL_AUTO=validate  # 운영: validate (스키마 변경 금지)
-
-# 4. Redis 설정
-SPRING_DATA_REDIS_HOST=hearbe-redis
-SPRING_DATA_REDIS_PORT=6379
-SPRING_DATA_REDIS_PASSWORD=STRONG_REDIS_PASSWORD  # 강력한 비밀번호 사용
-
-# 5. JWT 및 암호화 (운영용 보안 키)
-JWT_SECRET=PRODUCTION_JWT_SECRET_256BIT_BASE64_ENCODED
-JWT_EXPIRATION=3600000
-ENCRYPTION_SECRET_KEY=PRODUCTION_ENCRYPTION_KEY_32BYTES
-
-# 6. 이메일 설정 (운영용)
-SPRING_MAIL_HOST=smtp.gmail.com
-SPRING_MAIL_PORT=587
-SPRING_MAIL_USERNAME=production@yourdomain.com
-SPRING_MAIL_PASSWORD=PRODUCTION_APP_PASSWORD
-
-# 7. OpenVidu 설정 (운영 서버)
-OPENVIDU_URL=https://your-openvidu-domain.com/
-OPENVIDU_SECRET=PRODUCTION_OPENVIDU_SECRET
+# .env 파일
+COMPOSE_APP_PROFILE=dev
+COMPOSE_HOST_PORT=8080
 ```
 
-#### 3단계: 보안 점검
+3. Docker Compose 재시작
+```bash
+docker-compose down
+docker-compose up -d --build
+```
+
+
+---
+
+### 운영 환경 (prod)
+
+**특징:**
+- 콘솔 + 파일 모두 출력
+- SQL 쿼리 숨김
+- WARN 이상만 출력 (INFO, DEBUG, TRACE 제외)
+- 우리 코드는 INFO 레벨
+
+**적용 방법:**
+```bash
+# .env 파일
+COMPOSE_APP_PROFILE=prod
+```
+
+**로그 출력:**
+```
+2026-02-11 15:30:45.123 [main] INFO  com.ssafy.d108.Application - 서버 시작
+2026-02-11 15:30:47.000 [http-nio-8080-exec-1] WARN  com.ssafy.d108.controller.UserController - 유효성 검사 실패: 이메일 중복
+2026-02-11 15:31:00.000 [http-nio-8080-exec-5] ERROR com.ssafy.d108.service.PaymentService - 결제 API 호출 실패
+```
+
+**설정 방법:**
+
+1. `.env` 파일 열기
+```bash
+vi .env
+```
+
+2. 프로파일을 prod로 설정
+```properties
+# .env 파일
+COMPOSE_APP_PROFILE=prod
+COMPOSE_HOST_PORT=80
+```
+
+3. Docker Compose 재시작
+```bash
+docker-compose down
+docker-compose up -d --build
+```
 
 > [!WARNING]
 > 운영 환경 배포 전 반드시 확인:
-> - 모든 비밀번호가 강력한 값으로 변경되었는지 확인
-> - `APP_PROFILE=prod` 설정 확인
-> - `LOG_LEVEL=WARN` 설정 확인
-> - `SPRING_JPA_HIBERNATE_DDL_AUTO=validate` 설정 확인
+> - `COMPOSE_APP_PROFILE=prod` 설정 확인
+> - 모든 민감한 정보(DB 비밀번호, JWT_SECRET 등) 변경
+> - `logback-spring.xml`의 prod 프로파일이 WARN 레벨인지 확인
 
-#### 4단계: Docker Compose 실행
+---
 
-```bash
-# 운영 환경에서 실행
-docker-compose up -d
+## logback-spring.xml 상세 설정
 
-# 로그 확인
-docker logs -f hearbe-backend
+### 전체 구조
+
+render_diffs(file:///c:/Users/SSAFY/Desktop/main_integration/Backend/src/main/resources/logback-spring.xml)
+
+### Package별 로거 설정
+
+```xml
+<!-- 우리 애플리케이션 코드 -->
+<logger name="com.ssafy.d108" level="DEBUG" />
+
+<!-- 특정 패키지만 더 상세히 -->
+<logger name="com.ssafy.d108.service.PaymentService" level="TRACE" />
+
+<!-- SQL 쿼리 -->
+<logger name="org.hibernate.SQL" level="DEBUG" />
+
+<!-- SQL 파라미터 값 -->
+<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+
+<!-- Spring Security (인증/인가) -->
+<logger name="org.springframework.security" level="INFO" />
+
+<!-- Spring Web (HTTP 요청) -->
+<logger name="org.springframework.web" level="DEBUG" />
 ```
 
 ---
 
-### 환경별 주요 차이점 요약
-
-| 설정 항목 | 개발 환경 (dev) | 운영 환경 (prod) |
-|----------|----------------|-----------------|
-| **APP_PROFILE** | `dev` | `prod` |
-| **HOST_PORT** | `8080` | `80` |
-| **LOG_LEVEL** | `DEBUG` | `WARN` |
-| **APP_LOG_LEVEL** | `DEBUG` | `WARN` |
-| **HIBERNATE_SQL_LOG_LEVEL** | `DEBUG` | `WARN` |
-| **HIBERNATE_BINDER_LOG_LEVEL** | `TRACE` | `WARN` |
-| **SPRING_JPA_SHOW_SQL** | `true` | `false` |
-| **SPRING_JPA_HIBERNATE_DDL_AUTO** | `update` | `validate` |
-| **비밀번호** | 간단한 값 가능 | 강력한 보안 값 필수 |
-| **로그 출력** | 콘솔 (많은 정보) | 콘솔 + 파일 (경고/에러만) |
-
-## 환경 변수 상세 설명
-
-### Docker 및 애플리케이션 설정
-
-| 변수명 | 개발 환경 | 운영 환경 | 용도 |
-|--------|----------|----------|------|
-| `APP_PROFILE` | dev | prod | Spring 프로파일 (개발/운영 환경 구분) |
-| `HOST_PORT` | 8080 | 80 | Docker 호스트 포트 매핑 |
-| `HOST_LOG_PATH` | ./logs | ./logs | 호스트의 로그 파일 저장 경로 |
-
-### 로깅 레벨 설정
-
-| 변수명 | 개발 환경 | 운영 환경 | 용도 |
-|--------|----------|----------|------|
-| `LOG_LEVEL` | DEBUG | WARN | 전체 애플리케이션 기본 로그 레벨 |
-| `APP_LOG_LEVEL` | DEBUG | WARN | 애플리케이션 패키지 (com.ssafy.d108) 로그 레벨 |
-| `SPRING_LOG_LEVEL` | INFO | WARN | Spring Framework 로그 레벨 |
-| `SPRING_SECURITY_LOG_LEVEL` | INFO | WARN | Spring Security 로그 레벨 |
-| `SPRING_DATA_LOG_LEVEL` | INFO | WARN | Spring Data 로그 레벨 |
-| `HIBERNATE_SQL_LOG_LEVEL` | DEBUG | WARN | Hibernate SQL 쿼리 로그 레벨 |
-| `HIBERNATE_BINDER_LOG_LEVEL` | TRACE | WARN | Hibernate 파라미터 바인딩 로그 레벨 |
-| `SPRING_JPA_SHOW_SQL` | true | false | JPA SQL 출력 여부 |
-
-## 로그 레벨 설명0                                                                                                                                                                           - **TRACE**: 가장 상세한 로그 (개발 전용, 파라미터 값 등)
-- **DEBUG**: 디버깅 정보 (개발 전용, SQL 쿼리 등)
-- **INFO**: 일반 정보 (애플리케이션 정상 동작 흐름)
-- **WARN**: 경고 메시지 (운영 환경 기본 레벨, 잠재적 문제 상황)
-- **ERROR**: 에러 메시지 (반드시 해결해야 할 오류)
-
-### logback-spring.xml 설정
-
-`logback-spring.xml` 파일에서 프로파일별 기본 로그 레벨을 정의합니다:
-
-```xml
-<!-- 개발 환경: DEBUG 레벨 -->
-<springProfile name="dev">
-    <root level="DEBUG"><appender-ref ref="CONSOLE" /></root>
-</springProfile>
-
-<!-- 운영 환경: WARN 레벨, 파일로 저장 -->
-<springProfile name="prod">
-    <root level="WARN">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
-    </root>
-</springProfile>
-```
-
-> [!NOTE]
-> `.env` 파일의 환경 변수(`LOG_LEVEL`, `APP_LOG_LEVEL` 등)는 특정 로거에 대한 세부 설정을 오버라이드할 수 있지만, `logback-spring.xml`의 `<root level>` 설정이 전체 애플리케이션의 기본 로그 레벨을 결정합니다.
-
 ## 로그 파일 관리
 
-### 로그 저장 위치
+### 파일 저장 위치
 
-- **컨테이너 내부**: `/logs`
-- **호스트**: `${HOST_LOG_PATH}` (기본값: `./logs`)
+- **컨테이너 내부**: `/logs/app.log`
+- **호스트**: `./logs/app.log` (docker-compose.yml 설정)
 
-### 로그 파일 확인
+### 로그 롤링 정책
+
+```xml
+<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+    <maxHistory>30</maxHistory>
+</rollingPolicy>
+```
+
+- 매일 자정에 로그 파일 롤링 (gzip 압축)
+- 최근 30일치만 보관
+- 예: `app.log.2026-02-10.gz`, `app.log.2026-02-11.gz`
+
+### 로그 확인 방법
 
 ```bash
-# 컨테이너 로그 확인 (실시간)
+# 실시간 로그 (콘솔)
 docker logs -f hearbe-backend
 
-# 호스트 로그 파일 확인
-ls -lh ./logs
-cat ./logs/application.log
+# 파일 로그 확인
+docker exec hearbe-backend tail -f /logs/app.log
+
+# 호스트에서 파일 확인
+cat ./logs/app.log
+
+# Grafana + Loki로 확인 (권장)
+http://localhost:3000
 ```
+
+---
+
+## Grafana + Loki 로그 모니터링
+
+### 로그 쿼리 예시
+
+**전체 로그:**
+```logql
+{job="hearbe-backend"}
+```
+
+**ERROR 로그만:**
+```logql
+{job="hearbe-backend"} |= "ERROR"
+```
+
+**유효성 검사 실패만:**
+```logql
+{job="hearbe-backend"} |= "유효성 검사 실패"
+```
+
+**특정 서비스 로그:**
+```logql
+{job="hearbe-backend", logger="com.ssafy.d108.service.UserService"}
+```
+
+**시간별 에러 개수:**
+```logql
+sum(count_over_time({job="hearbe-backend"} |= "ERROR" [1m]))
+```
+
+---
+
+## 로그 레벨 변경하기
+
+### 일시적 변경 (재시작 필요)
+
+`logback-spring.xml` 수정 후 컨테이너 재시작:
+
+```bash
+# 1. logback-spring.xml 수정
+vi src/main/resources/logback-spring.xml
+
+# 2. Docker 이미지 재빌드
+docker-compose up -d --build
+```
+
+### 특정 패키지만 변경
+
+```xml
+<!-- UserService만 TRACE 레벨로 -->
+<logger name="com.ssafy.d108.service.UserService" level="TRACE" />
+```
+
+---
+
+## Best Practices
+
+### ✅ DO
+
+```java
+// 구조화된 로그 (변수 포함)
+log.info("회원가입 완료: userId={}, email={}", user.getId(), user.getEmail());
+
+// 예외는 마지막 파라미터로
+log.error("결제 실패: orderId={}", orderId, exception);
+
+// 유효성 검사 실패는 WARN
+log.warn("유효성 검사 실패: 잘못된 이메일 형식 - {}", email);
+```
+
+### ❌ DON'T
+
+```java
+// 문자열 연결 (성능 저하)
+log.debug("User: " + user.getName() + ", Age: " + user.getAge());
+
+// 민감한 정보 노출
+log.info("비밀번호: {}", password);  // ❌
+
+// 시스템 오류가 아닌데 ERROR 사용
+log.error("이메일 형식 오류");  // ❌ WARN 사용해야 함
+```
+
+---
 
 ## 주의사항
 
 > [!WARNING]
-> 운영 환경에서는 반드시 `LOG_LEVEL=WARN`으로 설정하세요. DEBUG, TRACE 레벨은 성능 저하 및 민감한 정보 노출 위험이 있습니다. `logback-spring.xml`의 `prod` 프로파일은 기본적으로 `WARN` 레벨을 사용합니다.
+> **운영 환경 주의사항**
+> - DEBUG/TRACE 레벨 사용 금지 (성능 저하, 디스크 full)
+> - 민감한 정보(비밀번호, 토큰) 로그 출력 금지
+> - SQL 쿼리 로그 비활성화 (보안, 성능)
 
 > [!IMPORTANT]
-> `.env` 파일은 민감한 정보를 포함하므로 Git에 커밋하지 마세요. `.env.example`만 버전 관리에 포함됩니다.
+> **유효성 검사 로그 레벨**
+> - 유효성 검사 실패: **WARN** (비즈니스 룰 위반)
+> - 시스템 예외: **ERROR** (DB 오류, NPE 등)
+> - 정상 흐름: **INFO** (로그인 성공, 등록 완료)
 
-> [!NOTE]
-> `.env` 파일은 현재 운영 환경(`APP_PROFILE=prod`, `LOG_LEVEL=WARN`)으로 설정되어 있습니다. 로컬 개발 시에는 위의 **개발 환경 설정 가이드**를 참고하여 `.env` 파일을 수정하세요.
+> [!TIP]
+> **디버깅 팁**
+> - 특정 기능 문제 시 해당 패키지만 DEBUG로 변경
+> - Grafana에서 `|= "WARN"` 또는 `|= "ERROR"`로 필터링
+> - 운영 문제 발생 시 최근 ERROR 로그부터 확인
