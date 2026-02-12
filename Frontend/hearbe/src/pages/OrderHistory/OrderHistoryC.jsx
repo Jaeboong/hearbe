@@ -254,6 +254,13 @@ const OrderHistoryC = ({ onHome }) => {
                                                             <span className="oh-item-qty">{item.quantity}</span>
                                                             <div className="order-id-actions">
                                                                 <button
+                                                                    className={`order-item-product-btn ${item.productUrl ? 'cursor-pointer' : ''}`}
+                                                                    onClick={() => item.productUrl && window.open(item.productUrl, '_blank')}
+                                                                    disabled={!item.productUrl}
+                                                                >
+                                                                    상품조회
+                                                                </button>
+                                                                <button
                                                                     className={`order-item-deliver-btn ${item.deliverUrl ? 'cursor-pointer' : ''}`}
                                                                     onClick={() => item.deliverUrl && window.open(item.deliverUrl, '_blank')}
                                                                     disabled={!item.deliverUrl}

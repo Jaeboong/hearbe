@@ -8,6 +8,7 @@ import com.ssafy.d108.backend.auth.dto.FindIdResponse;
 import com.ssafy.d108.backend.auth.dto.CheckIdRequest;
 import com.ssafy.d108.backend.auth.dto.LoginRequest;
 import com.ssafy.d108.backend.auth.dto.LoginResponse;
+import com.ssafy.d108.backend.auth.dto.LoginResponseWrapper;
 import com.ssafy.d108.backend.auth.dto.RefreshTokenRequest;
 import com.ssafy.d108.backend.auth.dto.RefreshTokenResponse;
 import com.ssafy.d108.backend.auth.dto.ResetPasswordByWelfareRequest;
@@ -56,9 +57,23 @@ public class AuthController {
      */
     @Operation(summary = "로그인", description = "아이디/비밀번호로 로그인")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request,
+            jakarta.servlet.http.HttpServletResponse response) {
+
+        LoginResponseWrapper wrapper = authService.login(request);
+
+        // refreshToken을 HttpOnly 쿠키로 설정 (XSS 공격 방어)
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("refreshToken", wrapper.getRefreshToken());
+        cookie.setHttpOnly(true); // JavaScript 접근 차단
+        cookie.setSecure(true); // HTTPS only (운영 환경)
+        cookie.setPath("/");
+        cookie.setMaxAge(14 * 24 * 60 * 60); // 14일
+        cookie.setAttribute("SameSite", "Strict"); // CSRF 방어
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(ApiResponse.success(wrapper.getLoginResponse()));
     }
 
     /**
@@ -66,9 +81,28 @@ public class AuthController {
      */
     @Operation(summary = "토큰 재발급", description = "Refresh Token으로 Access Token 재발급")
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(@Valid @RequestBody RefreshTokenRequest request) {
-        RefreshTokenResponse response = authService.refreshToken(request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(
+            @org.springframework.web.bind.annotation.CookieValue(value = "refreshToken", required = false) String refreshToken,
+            jakarta.servlet.http.HttpServletResponse response) {
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new com.ssafy.d108.backend.global.exception.UnauthorizedException("인증 정보가 없습니다.");
+        }
+
+        RefreshTokenResponse tokenResponse = authService.refreshToken(new RefreshTokenRequest(refreshToken));
+
+        // 새 refreshToken을 HttpOnly 쿠키로 설정
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("refreshToken",
+                tokenResponse.getRefreshToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(14 * 24 * 60 * 60); // 14일
+        cookie.setAttribute("SameSite", "Strict");
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(ApiResponse.success(tokenResponse));
     }
 
     /**

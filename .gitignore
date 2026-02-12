@@ -576,3 +576,6 @@ Frontend/hearbe/.env.production
 Frontend/hearbe/public/downloads/*
 !Frontend/hearbe/public/downloads/DOWNLOADS_DUMMY.txt
 !Frontend/hearbe/public/downloads/voice-program-version.json
+
+
+Jira/reports/
