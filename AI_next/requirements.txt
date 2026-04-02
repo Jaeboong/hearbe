@@ -1,0 +1,27 @@
+# AI_next 의존성 (ASR + TTS + OCR + WebSocket)
+
+# === Web Framework ===
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+websockets>=12.0
+python-dotenv>=1.0.0
+
+# === ASR (Faster-Whisper) ===
+soundfile>=0.12.1
+numpy>=1.24.0
+scipy>=1.10.0
+
+# === TTS (Google Cloud) ===
+google-cloud-texttospeech>=2.16.0
+
+# === OCR (PaddleOCR) ===
+Pillow>=10.2.0
+paddleocr>=2.7.0
+
+# === NLU (KoELECTRA intent classification) ===
+transformers>=4.36.0
+safetensors>=0.4.0
+
+# === HTTP ===
+httpx>=0.26.0
+aiohttp>=3.9.0

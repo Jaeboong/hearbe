@@ -1,0 +1,43 @@
+# AI_next/docker-compose.yml
+version: "3.8"
+
+services:
+  ai-next-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hearbe-next
+    image: ai-next-server:${TAG:-latest}
+    ports:
+      - "8001:8001"
+    environment:
+      - GMS_API_KEY=${GMS_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/config/google-service-account.json
+      - HF_HUB_DISABLE_XET=1
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+      - huggingface-cache:/root/.cache/huggingface
+      - paddleocr-cache:/root/.paddleocr
+    command:
+      ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:
+    external: true
+    name: ai_huggingface-cache
+  paddleocr-cache:
+    external: true
+    name: ai_paddleocr-cache
