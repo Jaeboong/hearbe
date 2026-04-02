@@ -1,0 +1,142 @@
+[
+  {
+    "label_id": 0,
+    "label": "unknown",
+    "class_idx": 0
+  },
+  {
+    "label_id": 68,
+    "label": "go_hearbe",
+    "class_idx": 1
+  },
+  {
+    "label_id": 69,
+    "label": "search_products",
+    "class_idx": 2
+  },
+  {
+    "label_id": 70,
+    "label": "click_order_history",
+    "class_idx": 3
+  },
+  {
+    "label_id": 71,
+    "label": "click_cart",
+    "class_idx": 4
+  },
+  {
+    "label_id": 72,
+    "label": "click_login",
+    "class_idx": 5
+  },
+  {
+    "label_id": 73,
+    "label": "click_logout",
+    "class_idx": 6
+  },
+  {
+    "label_id": 74,
+    "label": "read_current_page_actions",
+    "class_idx": 7
+  },
+  {
+    "label_id": 75,
+    "label": "read_search_results",
+    "class_idx": 8
+  },
+  {
+    "label_id": 76,
+    "label": "select_search_result",
+    "class_idx": 9
+  },
+  {
+    "label_id": 77,
+    "label": "read_product_info",
+    "class_idx": 10
+  },
+  {
+    "label_id": 78,
+    "label": "update_product_option",
+    "class_idx": 11
+  },
+  {
+    "label_id": 79,
+    "label": "click_add_to_cart",
+    "class_idx": 12
+  },
+  {
+    "label_id": 80,
+    "label": "click_buy_now",
+    "class_idx": 13
+  },
+  {
+    "label_id": 81,
+    "label": "read_reviews",
+    "class_idx": 14
+  },
+  {
+    "label_id": 82,
+    "label": "click_wishlist",
+    "class_idx": 15
+  },
+  {
+    "label_id": 83,
+    "label": "read_cart_items",
+    "class_idx": 16
+  },
+  {
+    "label_id": 84,
+    "label": "select_cart_item",
+    "class_idx": 17
+  },
+  {
+    "label_id": 85,
+    "label": "unselect_cart_item",
+    "class_idx": 18
+  },
+  {
+    "label_id": 86,
+    "label": "adjust_item_quantity",
+    "class_idx": 19
+  },
+  {
+    "label_id": 87,
+    "label": "read_order_amount",
+    "class_idx": 20
+  },
+  {
+    "label_id": 88,
+    "label": "read_payment_order_info",
+    "class_idx": 21
+  },
+  {
+    "label_id": 89,
+    "label": "submit_payment",
+    "class_idx": 22
+  },
+  {
+    "label_id": 91,
+    "label": "read_order_detail",
+    "class_idx": 23
+  },
+  {
+    "label_id": 92,
+    "label": "click_track_delivery",
+    "class_idx": 24
+  },
+  {
+    "label_id": 93,
+    "label": "request_exchange_return",
+    "class_idx": 25
+  },
+  {
+    "label_id": 94,
+    "label": "delete_order_history",
+    "class_idx": 26
+  },
+  {
+    "label_id": 95,
+    "label": "read_option_info",
+    "class_idx": 27
+  }
+]

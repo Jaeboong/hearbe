@@ -1,0 +1,197 @@
+[
+  {
+    "label_id": 0,
+    "label": "unknown",
+    "class_idx": 0
+  },
+  {
+    "label_id": 4,
+    "label": "go_hearbe",
+    "class_idx": 1
+  },
+  {
+    "label_id": 5,
+    "label": "go_coupang",
+    "class_idx": 2
+  },
+  {
+    "label_id": 6,
+    "label": "read_current_page_actions",
+    "class_idx": 3
+  },
+  {
+    "label_id": 7,
+    "label": "read_hearbe_guide",
+    "class_idx": 4
+  },
+  {
+    "label_id": 8,
+    "label": "go_mall",
+    "class_idx": 5
+  },
+  {
+    "label_id": 10,
+    "label": "click_shared_shopping_entry",
+    "class_idx": 6
+  },
+  {
+    "label_id": 11,
+    "label": "click_app_download",
+    "class_idx": 7
+  },
+  {
+    "label_id": 12,
+    "label": "input_id",
+    "class_idx": 8
+  },
+  {
+    "label_id": 13,
+    "label": "input_password",
+    "class_idx": 9
+  },
+  {
+    "label_id": 14,
+    "label": "check_keep_login",
+    "class_idx": 10
+  },
+  {
+    "label_id": 15,
+    "label": "uncheck_keep_login",
+    "class_idx": 11
+  },
+  {
+    "label_id": 16,
+    "label": "click_login",
+    "class_idx": 12
+  },
+  {
+    "label_id": 17,
+    "label": "click_find_id",
+    "class_idx": 13
+  },
+  {
+    "label_id": 18,
+    "label": "click_find_password",
+    "class_idx": 14
+  },
+  {
+    "label_id": 19,
+    "label": "click_signup",
+    "class_idx": 15
+  },
+  {
+    "label_id": 20,
+    "label": "click_check_id_duplicate",
+    "class_idx": 16
+  },
+  {
+    "label_id": 21,
+    "label": "input_name",
+    "class_idx": 17
+  },
+  {
+    "label_id": 22,
+    "label": "click_view_terms",
+    "class_idx": 18
+  },
+  {
+    "label_id": 23,
+    "label": "read_terms",
+    "class_idx": 19
+  },
+  {
+    "label_id": 24,
+    "label": "check_terms_agreement",
+    "class_idx": 20
+  },
+  {
+    "label_id": 25,
+    "label": "submit_signup",
+    "class_idx": 21
+  },
+  {
+    "label_id": 26,
+    "label": "input_phone_number",
+    "class_idx": 22
+  },
+  {
+    "label_id": 27,
+    "label": "input_password_confirm",
+    "class_idx": 23
+  },
+  {
+    "label_id": 28,
+    "label": "input_email",
+    "class_idx": 24
+  },
+  {
+    "label_id": 29,
+    "label": "read_available_marketplaces",
+    "class_idx": 25
+  },
+  {
+    "label_id": 30,
+    "label": "click_logout",
+    "class_idx": 26
+  },
+  {
+    "label_id": 31,
+    "label": "click_go_coupang",
+    "class_idx": 27
+  },
+  {
+    "label_id": 32,
+    "label": "click_cart",
+    "class_idx": 28
+  },
+  {
+    "label_id": 33,
+    "label": "click_my_page",
+    "class_idx": 29
+  },
+  {
+    "label_id": 34,
+    "label": "read_page",
+    "class_idx": 30
+  },
+  {
+    "label_id": 35,
+    "label": "click_change_password",
+    "class_idx": 31
+  },
+  {
+    "label_id": 36,
+    "label": "click_delete_account",
+    "class_idx": 32
+  },
+  {
+    "label_id": 37,
+    "label": "click_order_detail",
+    "class_idx": 33
+  },
+  {
+    "label_id": 38,
+    "label": "click_product_view",
+    "class_idx": 34
+  },
+  {
+    "label_id": 39,
+    "label": "go_order_history",
+    "class_idx": 35
+  },
+  {
+    "label_id": 40,
+    "label": "read_order_history_recent",
+    "class_idx": 36
+  },
+  {
+    "label_id": 41,
+    "label": "read_frequent_products",
+    "class_idx": 37
+  },
+  {
+    "label_id": 42,
+    "label": "read_recommended_products",
+    "class_idx": 38
+  }
+]

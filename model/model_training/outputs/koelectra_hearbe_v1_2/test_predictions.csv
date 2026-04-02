@@ -1,0 +1,1747 @@
+﻿text,label_id,label,class_idx,true_class_idx,pred_class_idx,true_label,pred_label,confidence
+지금 메인 화면인데 로그인 눌러?,16,click_login,12,12,12,click_login,click_login,0.6080343
+좀 바로 쿠팡 이동 들어가 해줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.46833
+"지금 로그인 페이지 보고 있는데, 로그인 버튼 눌러줘 해줘",16,click_login,12,12,12,click_login,click_login,0.6070382
+요즘 방 정리 해야겠다,0,unknown,0,0,0,unknown,unknown,0.8254969
+바로 지금 로그인 페이지인데 비밀 번호 찾기 열어줘 해줄래?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6024482
+바로 지금 화면 뭐야 가능?,34,read_page,30,30,30,read_page,read_page,0.6772894
+"지금 히어비 홈에 와 있어, 공유 쇼핑 들어가줘 해줄래?",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7502051
+일단 이영약관 읽어줘,23,read_terms,19,19,19,read_terms,read_terms,0.65393007
+지금 로그인 화면인데 지금 쇼핑몰 페이지인데 쿠팡 페이지 열어줘,5,go_coupang,2,2,27,go_coupang,click_go_coupang,0.43887278
+지금 주문내역 보고 있는데 지금 상품조회 눌러,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6976945
+바로 마이페이지 해줄래?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6660868
+지금 로그인 화면인데 회원가입 페이지인데 회원가입 완료 버튼 눌러,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5990573
+좀 장바고니에 넣어줘 해줄래?,32,click_cart,28,28,28,click_cart,click_cart,0.67437726
+아침에 식물 물주기 해야겠다,0,unknown,0,0,0,unknown,unknown,0.8306283
+당장 주문목록 쪽으로 이동해 부탁해,39,go_order_history,35,35,35,go_order_history,go_order_history,0.73498577
+회원가입 해줄래?,19,click_signup,15,15,15,click_signup,click_signup,0.5439922
+바로 희어비 메인으로 가 해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76542956
+일단 지금 히어비 가이드 읽어줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7866991
+지금 회원가입 화면인데 비밀번호 찾기 눌러,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6014365
+지금 주문내역 보고 있는데 선택 해제해?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73212504
+이번에 추천 리스트 읽어줘 해줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76362115
+지금 장바구니 보고 있는데 앱 다운로드 버튼 열어 할래?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7589952
+바로비번호변경하기들어가,35,click_change_password,31,31,31,click_change_password,click_change_password,0.69577265
+좀 쇼핑몰 페이지 화면에서 마이페이지 열어줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.67023283
+지금 좀 쿠팡 가기 눌러 해줄래?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47069988
+좀 지금 회원가입 페이지인데 이름 입력해,21,input_name,17,17,17,input_name,input_name,0.65689325
+바로 비번호 확인 값 넣어 해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.51179343
+일단 로과웃 실행해줘 가능해?,30,click_logout,26,26,26,click_logout,click_logout,0.69188625
+지금 좀 희어비 메인으로 가줘 해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7639553
+지금 로그인 화면인데 바로 회원탈퇴 열어,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78749996
+지금 쇼핑 화면인데 로그인 페이지 화면에서 자동 로긴 체크 풀어줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7398153
+좀 회원가입 페이지 화면에서 아이 디 넣어줘,12,input_id,8,8,8,input_id,input_id,0.58924836
+지금 바로 주문 상세 보기 열어줘 해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6721426
+좀 아뒤 찾기 열어 가능?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.74792534
+일단 쿠팡으로 이동 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.42761645
+먼저 최근 산거 읽어줘 해줄래?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.745065
+좀 비번호 변경하기 열어?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70322865
+좀 지금 체크 꺼 해봐,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7371367
+바로 쇼핑몰 목록 읽어줘 해줄래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69580835
+일단 공유 쇼핑 입장 버튼 눌러,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7498353
+좀 가입 등록해?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.59554684
+지금 회원가입 페이지인데 아이디 칸에 적어?,12,input_id,8,8,8,input_id,input_id,0.59770274
+이번에 추천 상품부터 소개해줘~,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76669675
+일단 지금 마이페이지 눌러?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.67004395
+좀 지금 전화번호 값 넣어,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69965255
+바로 히어비로 가?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76667804
+일단 지금 이메일 입력 해봐,28,input_email,24,24,24,input_email,input_email,0.6536502
+빨리 내가반복해서산상품알려줘 좀,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7274699
+연락처입력해?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.65392286
+지금 메인 화면인데 공유 쇼핑 입장 버튼 클릭 해봐,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75362307
+이번에 주문내역 화면으로 이동해 해줄래?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7218668
+지금 로그인 화면인데 장바구니 눌러,32,click_cart,28,28,28,click_cart,click_cart,0.6662422
+이번 가을 회의 시간 기록해줘,0,unknown,0,0,0,unknown,unknown,0.82991195
+바로 지금 로그인해,16,click_login,12,12,12,click_login,click_login,0.6015734
+일단 체크 꺼?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7347878
+일단 바로 이름 넣어,21,input_name,17,17,17,input_name,input_name,0.65117955
+퇴근 후 산책 시간 정리해줘,0,unknown,0,0,0,unknown,unknown,0.8296061
+지금 주문목록 페이지로 이동해,39,go_order_history,35,35,35,go_order_history,go_order_history,0.73193806
+바로 이용약관 동의 체크?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.5967486
+지금 회원가입 화면인데 지금 로그인 페이지인데 로그인 유지 꺼줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73407197
+지금 주문내역 보고 있는데 회원탈퇴 클릭 할래?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78828216
+아침에 산책 할까?,0,unknown,0,0,0,unknown,unknown,0.828348
+바로 카트 열어 해봐,32,click_cart,28,28,28,click_cart,click_cart,0.6590419
+지금 메인 화면인데 쇼핑몰 페이지 화면에서 내 정보 페이지 보여,33,click_my_page,29,29,29,click_my_page,click_my_page,0.65169245
+지금 희어비 접속해줘?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76032114
+바로 히어비 홈 화면에서 앱 다운로드 버튼 눌러 해줘,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75474983
+지금 로그인 화면인데 지금 히어비 가이드 읽어줘?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7882631
+일단 로그인 페이지 화면에서 아뒤 칸에 적어줘 해줘,12,input_id,8,8,8,input_id,input_id,0.5988653
+일단 로그인 페이지 화면에서 아이 디 칸에 적어줘 해줄래?,12,input_id,8,8,8,input_id,input_id,0.5953481
+일단 메일 주소 넣어줄래?,28,input_email,24,24,24,input_email,input_email,0.64680326
+지금 주문내역 보고 있는데 로긴 들어가?,16,click_login,12,12,12,click_login,click_login,0.6030955
+"지금 네이버 쇼핑 페이지 보고 있는데, 희어비로 이동해줘",4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76473856
+일단 비밀번호 적어?,13,input_password,9,9,9,input_password,input_password,0.5640114
+바로 아뒤 값 넣어?,12,input_id,8,8,8,input_id,input_id,0.6013794
+지금 메인 화면인데 이용약관 뭐야 가능?,23,read_terms,19,19,19,read_terms,read_terms,0.64866155
+좀 지금 장바구니에 추가해줘,32,click_cart,28,28,28,click_cart,click_cart,0.67416066
+좀 지금 화면 읽어줘 해줘,23,read_terms,19,19,30,read_terms,read_page,0.69468445
+바로 아이디 적어 해봐,12,input_id,8,8,8,input_id,input_id,0.5957821
+회원가입 페이지에서 메일 주소 넣어줘 해,28,input_email,24,24,24,input_email,input_email,0.6489356
+회원가입페이지화면에서가입최종제출해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.18336645
+지금 주문내역 보고 있는데 좀 아이 디 사용 가능 여부 확인해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.76024675
+일단 지금 회원탈퇴 들어가?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7824545
+바로 지금 로그인 페이지인데 비밀번호 넣어 해줘,13,input_password,9,9,9,input_password,input_password,0.57053715
+지금 회원가입 화면인데 회원가입 페이지에서 아이디 입력해봐,12,input_id,8,8,8,input_id,input_id,0.5981867
+좀 지금 체크 끄기 해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73694783
+지금 회원가입 화면인데 바로 지금 화면 말해,34,read_page,30,30,30,read_page,read_page,0.72176
+이번에 많이 구매한 상품 목록 읽어줘 해줄래?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7458664
+지금 메인 화면인데 비밀번호 입력해줘 가능해?,13,input_password,9,9,9,input_password,input_password,0.56510955
+좀 주문내역 페이지 화면에서 주문 상세 화면으로 가 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6695575
+좀 지금 전화번호 입력 해봐,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6995586
+지금 쇼핑 화면인데 쇼핑몰 페이지 화면에서 현재 페이지와 기능 안내해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.579757
+일단 비번호 변경하기 가능?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.69999486
+좀 지금 이용약관 요약해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6547477
+지금 로그인 화면인데 지금 로그인 페이지인데 로그인 상태 유지 해제해줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73826057
+오늘 주문목록 메뉴로 들어가 해줘!!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.73209584
+비번호 입력 할래?,13,input_password,9,9,9,input_password,input_password,0.5619331
+추천해주는상품말해줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7627672
+지금 장바구니 보고 있는데 로그인 페이지 화면에서 쇼핑몰 페이지로 넘어가줘?,8,go_mall,5,5,5,go_mall,go_mall,0.6472226
+회원가입페이지인데비밀번호확인칸에적어줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.44033402
+좀 지금 이름 적어 해봐,21,input_name,17,17,17,input_name,input_name,0.6538038
+이번 주말 게임 할까?,0,unknown,0,0,0,unknown,unknown,0.82745767
+지금 주문내역 보고 있는데 지금 아이디 중복 확인해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7956268
+지금 로긴 페이지인데 아뒤 찾기 진행해줘,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7474867
+일단 내 주문목록 보이는 화면으로 가줘,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7291116
+당장 내 구매 빈도 높은 상품 읽어줘 해줄래?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75133395
+일단 쇼핑몰 화면 열어주세요,8,go_mall,5,5,5,go_mall,go_mall,0.6438203
+지금 로그인 화면인데 비밀번호 찾기 가능?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5984693
+다시 내가요새새뭘샀지? 해줄래?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7237624
+지금 주문내역 보고 있는데 회원가입 페이지에서 아이디 입력해줘,12,input_id,8,8,8,input_id,input_id,0.6003339
+추천 목록 읽어줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7607976
+지금 주문내역 보고 있는데 회원가입 페이지 화면에서 비밀번호 확인 칸에 적어,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.50302935
+지금 바로 쿠팡으로 열어 해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.45268753
+일단 추천해줄 상품 알려줘 해줘~,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76466393
+지금 쇼핑 화면인데 이메일 주소 입력해,28,input_email,24,24,24,input_email,input_email,0.64625263
+바로 마이페이지 확인해,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66404384
+좀 바로 비밀번호 확인 입력?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5056448
+로그인 페이지에서 히어비 소개해,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.77497864
+바로 지금 가능한 쇼핑몰 알려줘 해줄래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.7007056
+빨리 내게 맞는 추천 상품 말해줘!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76460636
+지금 선택해 가능?,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.5050504
+회원가입 페이지 화면에서 비번호 확인 칸에 적어줘 해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5076382
+지금 로그인 화면인데 로그인 페이지 화면에서 회원가입 시작해줘,19,click_signup,15,15,15,click_signup,click_signup,0.55214083
+지금 주문내역 보고 있는데 읽기 해,34,read_page,30,30,30,read_page,read_page,0.6886388
+지금 장바구니 보고 있는데 이용약관 뭐야,23,read_terms,19,19,19,read_terms,read_terms,0.6446538
+좀 지금 회원탈퇴 들어가 해,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7835084
+지금 주문 상세 화면으로 가줘 해줄래?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.66927654
+지금 로그인 유지 체크 해제해주세요 해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73933595
+지금 메인 화면인데 바로 회원탈퇴,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78431606
+지금 회원가입 화면인데 지금 약관 확인 버튼 눌러,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6613113
+지금전화번호작성해줘?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.68958807
+"지금 로그인 화면인데 지금 회원가입 페이지 보고 있는데, 아이디 입력해줘",12,input_id,8,8,8,input_id,input_id,0.60281795
+지금 메인 화면인데 주문내역 페이지 화면에서 주문 상세 화면으로 가줘?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6688096
+바로 전화번호 써 해,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6976789
+지금 장바구니 보고 있는데 지금 회원가입 페이지인데 약관 동의 선택해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.60002375
+지금 메인 화면인데 이용약관 보기 눌러 가능?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6828547
+바로이용약관보기눌러,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6448692
+지금 쇼핑 화면인데 로그인 페이지 화면에서 회원가입 버튼 눌러,19,click_signup,15,15,15,click_signup,click_signup,0.548351
+바로 회원가입 페이지인데 성함 입력해,21,input_name,17,17,17,input_name,input_name,0.6527108
+히어브 안내 읽어줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78669935
+바로 지금 히어브 가이드 읽어줘 해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7889032
+지금 주문내역 보고 있는데 체크해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.30142537
+좀 바로 비밀번호 변경하기 들어가,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70135605
+지금 바로 장바고니에 넣어줘,32,click_cart,28,28,28,click_cart,click_cart,0.6767727
+일단 아뒤 중복 확인 해줄래?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7956892
+내가 요새 뭘 샀지?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72234946
+오늘 자주 구매한 상품 목록 알려줘 해줘~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7478498
+바로 장바 구니에 넣어줘,32,click_cart,28,28,28,click_cart,click_cart,0.6754253
+좀 주문내역 페이지에서 쿠팡 페이지 열어줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.40452126
+지금 로그인 화면인데 이름 써,21,input_name,17,17,17,input_name,input_name,0.6490517
+지금 메인 화면인데 로과웃해줘 할래?,30,click_logout,26,26,26,click_logout,click_logout,0.6922959
+일단 바로 회원가입 눌러 해줘,19,click_signup,15,15,15,click_signup,click_signup,0.5550431
+일단 바로 비밀번호 값 넣어?,13,input_password,9,9,9,input_password,input_password,0.56827325
+일단 지금 쇼핑몰 페이지인데 로과웃 눌러줘 해,30,click_logout,26,26,26,click_logout,click_logout,0.68777174
+지금 앱 다운로드 실행해,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75246286
+일단 상품조회 진행해,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69627774
+바로 내 정보 페이지 보여주세요,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6432881
+지금 아이디 중복 확인 해줄래?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79463077
+"좀 지금 쇼핑몰 페이지 보고 있는데, 장바구니 열어 해줘",32,click_cart,28,28,28,click_cart,click_cart,0.6687715
+먼저 내가 산 것들 보는 페이지로 가,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72884786
+지금 회원가입 페이지 화면에서 회웝가입 등록해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.594988
+일단 로그인 열어?,16,click_login,12,12,12,click_login,click_login,0.603777
+히어브 홈에서 쇼핑몰로 가,8,go_mall,5,5,5,go_mall,go_mall,0.63859725
+아이디 중복 확인 들어가 가능?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7974291
+성함 입력해주세요 해줄래?,21,input_name,17,17,17,input_name,input_name,0.6520611
+비밀번호변경하기눌러할래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6970154
+지금 쇼핑 화면인데 로그아웃 해봐,30,click_logout,26,26,26,click_logout,click_logout,0.6829089
+지금 장바구니 보고 있는데 이메일 값 넣어,28,input_email,24,24,24,input_email,input_email,0.6409025
+좀 로그인 페이지에서 아이 디 입력해줄래?,12,input_id,8,8,8,input_id,input_id,0.59011054
+로그인 페이지 화면에서 비밀 번호 찾기 열어줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60062057
+지금 회웝가입 페이지인데 이름 입력해,21,input_name,17,17,17,input_name,input_name,0.65631235
+빨리 내 주문 기록 페이지로 가 해줄래?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72957087
+지금 좀 아이디 찾기 눌러 해줄래?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7526556
+당장 내가 자주 사는 상품 말해줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75287354
+좀 찜목록 페이지 화면에서 상품 정보 확인해?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6848096
+바로 지금 비밀번호 찾기 진행해,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6030639
+지금 쇼핑 화면인데 지금 비밀번호 변경하기 진행해,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6998504
+지금 회원가입 페이지인데 회원가입 완료 버튼 눌러 해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.6033449
+지금 바로 회원탈퇴 눌러 해봐,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7862862
+지금 히어브 안내 읽어줘 해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7863112
+최근 주문 정보 알려줘~,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74573845
+일단 로그인 유지 체크 해제해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73594016
+바로 히어브 홈 화면에서 앱 다운로드 버튼 눌러줘 해,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75581646
+지금 비밀번호 변경 화면 열어주세요 해줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6993776
+일단 체크 꺼 가능?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73552364
+지금 아뒤 넣어 해,12,input_id,8,8,8,input_id,input_id,0.6029284
+일단 상품 페이지 보여 해줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6936046
+로그인 페이지인데 쇼핑몰로 가줘 해,8,go_mall,5,5,5,go_mall,go_mall,0.6493794
+일단 바로 지금 화면 읽어 해,34,read_page,30,30,30,read_page,read_page,0.7175826
+지금 추천 리스트 읽어줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7618825
+바로 회원가입 페이지에서 회원가입 등록해줘?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.6054186
+이번에 추천 품목 읽어줘 해줘?,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7648792
+로긴 유지 선택해,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.62703246
+지금 많이 구매한 상품 목록 읽어줘!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75299835
+바로 비밀번호 변경하기 열어 해줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7027377
+로그인 페이지 화면에서 회원가 입 버튼 눌러줘 해줘,19,click_signup,15,15,15,click_signup,click_signup,0.5529823
+로그인유지체크해,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.61345387
+지금 장바구니 보고 있는데 회원가입 페이지 화면에서 이메일 칸에 적어,28,input_email,24,24,24,input_email,input_email,0.65087485
+바로 지금 마이페이지,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66198236
+빨리 자주 사는 품목 말해줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75024897
+로그인 페이지에서 자동 로그인 체크해줘?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.59165776
+지금 장바구니 보고 있는데 회원가입 페이지 화면에서 비번호 확인 칸에 적어줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.506295
+지금 메인 화면인데 회원가입 페이지에서 약관 동의 체크박스 눌러,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6020932
+좀 쇼핑하러 가,8,go_mall,5,5,5,go_mall,go_mall,0.63001496
+좀 로그인 페이지 화면에서 쇼핑몰로 가줘 해봐,8,go_mall,5,5,5,go_mall,go_mall,0.64898324
+지금 메인 화면인데 아이디 찾기 클릭 해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7535567
+지금 주문내역 보고 있는데 지금 히어브 접속해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76277614
+지금 메인 화면인데 히어비 홈 화면에서 쇼핑몰 화면 열어,8,go_mall,5,5,5,go_mall,go_mall,0.6462693
+히어비홈에서쇼핑몰로이동해봐,8,go_mall,5,5,5,go_mall,go_mall,0.6074009
+지금 메인 화면인데 메인 페이지 화면에서 공유 쇼핑 입장해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.74707866
+지금 로그인 화면인데 지금 가능한 작업 알려줄래?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5836972
+바로 좀 아뒤 칸에 적어줘,12,input_id,8,8,8,input_id,input_id,0.60070825
+지금 내 주문목록 보이는 화면으로 가줘 좀~,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7291491
+지금 장바구니 보고 있는데 로그인 페이지 화면에서 자동 로긴 체크 풀어줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7389038
+지금 메인 화면인데 주문 상세 조회 열어 할래?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6762281
+일단 로그인 페이지에서 가입 화면 열어줘?,19,click_signup,15,15,15,click_signup,click_signup,0.5480252
+지금 메인 화면인데 좀 쇼핑몰 목록 읽어,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6971161
+지금 로그인 화면인데 앱 다운로드 버튼 클릭 할래?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7587623
+이번에 최근 주문 상황 설명해줘?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7493627
+쇼핑몰페이지화면에서마이페이지확인해?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.61099917
+지금 회원가입 화면인데 지금 회원정보 페이지인데 현재 화면 설명해줘,34,read_page,30,30,30,read_page,read_page,0.72255415
+바로 지금 히어비 가이드 읽어,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7856774
+비밀번호입력할래?,13,input_password,9,9,9,input_password,input_password,0.5471139
+바로 지금 히어브 사용법 알려줘 해줄래?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7859988
+지금 바로 회웝가입 들어가 해줄래?,19,click_signup,15,15,15,click_signup,click_signup,0.546813
+일단 희어비 홈에서 앱 받기 해줘,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7562019
+지금 방금 주문한 것까지 포함해서 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.73496574
+"일단 지금 쇼핑몰 페이지 보고 있는데, 가능한 쇼핑몰 읽어줘 해",29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.7014239
+메인페이지인데공유쇼핑입장해줘,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7241775
+지금 메인 화면인데 바로 비번 찾기 시작해,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6032726
+지금 회원가입 화면인데 비밀번호 입력해 해줘,13,input_password,9,9,9,input_password,input_password,0.5665679
+좀 가장 최신 주문 내역 읽어줘 요~,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74898344
+지금 장바구니 보고 있는데 회원가입 제출 해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60028607
+바로 쇼핑몰 들어가 해줘,8,go_mall,5,5,5,go_mall,go_mall,0.64749414
+바로 지금 회원정보 페이지인데 비밀번호 변경 메뉴로 가줘 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6998112
+장바고니에 담아,32,click_cart,28,28,28,click_cart,click_cart,0.671377
+좀 쿠팡 페이지로 넘어가줘 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.42205063
+좀 비번호 칸에 적어줘 해줄래?,13,input_password,9,9,9,input_password,input_password,0.5531032
+바로 아뒤 중복 확인 들어가 해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7953125
+로그인 상태 유지로 바꿔줘?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6300467
+지금 로그인 화면인데 바로 체크 풀어,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73527575
+지금 장바구니 보고 있는데 회원가입 페이지 화면에서 약관 동의 선택해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.5939341
+지금 가능한 작업 알려줘 부탁해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58298427
+회원가입 페이지에서 이용 약관 동의 체크해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.5994527
+지금 회원가입 화면인데 쇼핑몰 들어가 가능?,8,go_mall,5,5,5,go_mall,go_mall,0.6418809
+지금 최근 주문 확인 페이지로 가?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.6572575
+오늘 내가 볼 추천 상품 읽어줘 요!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76547116
+지금 현재 페이지 정보 및 가능한 작업 뭐야 해줄래?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5847932
+바로 회원가입 페이지 화면에서 이용 약관 화면 보여줘 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6813359
+일단 쇼핑몰 페이지에서 내 정보 페이지 보여 해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.65303594
+"지금 장바구니 보고 있는데 지금 회원가입 페이지 보고 있는데, 이름 입력해줘",21,input_name,17,17,17,input_name,input_name,0.6564649
+로그인 페이지인데 회웝가입 버튼 눌러,19,click_signup,15,15,15,click_signup,click_signup,0.5465094
+좀 히어비로 가 해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76571655
+먼저 자주구매한상품목록알려줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7498766
+좀 주문 상세 조회 눌러 할래?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67549473
+바로그인 유지 켜 해봐,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6224475
+지금 로그인 화면인데 비밀번호 확인 입력해?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.50647074
+지금 로그인 화면인데 회원가입 해,19,click_signup,15,15,15,click_signup,click_signup,0.5385238
+지금 쇼핑 화면인데 쿠팡으로 이동해,5,go_coupang,2,2,2,go_coupang,go_coupang,0.394629
+로그인페이지화면에서자동로그인체크풀어,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7165538
+지금 장바구니 보고 있는데 전화번호 값 넣어,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6975837
+지금 메인 화면인데 상품조회 열어,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69713503
+일단 장바고니 담아줄래?,32,click_cart,28,28,28,click_cart,click_cart,0.67723155
+지금 주문내역 보고 있는데 로그인 페이지에서 회원가입으로 이동해?,19,click_signup,15,15,15,click_signup,click_signup,0.5502148
+일단 상품 조회 눌러줘 해봐,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69328266
+지금 로그인 페이지인데 로그인 상태 유지로 바꿔 해줄래?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.638435
+다음 주 지하철 시간 설명해줘,0,unknown,0,0,0,unknown,unknown,0.8304092
+바로 지금 쇼핑몰 페이지인데 쿠팡 화면 열어줘 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.45632425
+일단 바로긴 들어가,16,click_login,12,12,12,click_login,click_login,0.59571916
+일단 요새 많이 산 상품 알려달라 부탁해~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.74827206
+바로과웃 실행해줘 가능해?,30,click_logout,26,26,26,click_logout,click_logout,0.6924437
+이번에 요즘 내가가 산 주문내역 알려줘 좀?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.71607786
+바로 이메일 작성해,28,input_email,24,24,24,input_email,input_email,0.64854836
+지금 회원가입 화면인데 지금 주문내역 페이지인데 현재 페이지 읽어,34,read_page,30,30,30,read_page,read_page,0.72543114
+로긴 페이지인데 로긴 상태 유지로 바꿔줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63573897
+좀 가능한 작업 알려줘?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5801432
+일단 내 취향 추천 상품 알려 해줘!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76437485
+"지금 히어비 홈에 와 있어, 앱 다운로드 버튼 눌러?",11,click_app_download,7,7,7,click_app_download,click_app_download,0.75675434
+지금 쇼핑 화면인데 좀 아이 디 입력해줄래?,12,input_id,8,8,8,input_id,input_id,0.59112775
+회웝가입 눌러,19,click_signup,15,15,15,click_signup,click_signup,0.50464016
+오늘 내가 볼 추천 상품 읽어줘 부탁해!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76467705
+바로 회원가입 페이지에서 이메일 작성해,28,input_email,24,24,24,input_email,input_email,0.65488166
+지금 회원가입 페이지 화면에서 이영약관 동의 항목 체크해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6033503
+지금 주문내역 페이지에서 현재 페이지 읽어?,34,read_page,30,30,30,read_page,read_page,0.72850925
+일단 로그인 페이지인데 아이디 찾기 열어 해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75446707
+지금 바로과웃 눌러 해줄래?,30,click_logout,26,26,26,click_logout,click_logout,0.6891569
+좀 바로 지금 화면 알려줘 해,34,read_page,30,30,30,read_page,read_page,0.7159709
+다시 최근주문부터읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7432024
+자주 사는 품목 말해줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7509009
+바로 자주 사는 품목 말해줘!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75237805
+바로 내 정보 페이지 보여줘 해,33,click_my_page,29,29,29,click_my_page,click_my_page,0.64434826
+빨리 추천 목록 읽어줘 부탁!!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76306635
+바로 지금 로긴 상태 유지 해제해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73773515
+당장 내 구매 빈도 높은 상품 읽어줘!!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75293255
+지금 쇼핑 화면인데 비밀번호 입력 가능?,13,input_password,9,9,9,input_password,input_password,0.56227744
+"좀 지금 회원가입 페이지 보고 있는데, 회원가입 제출해줘?",25,submit_signup,21,21,21,submit_signup,submit_signup,0.6092299
+일단 로그인 페이지에서 로긴 버튼 눌러줘 해,16,click_login,12,12,12,click_login,click_login,0.6035749
+지금 회원가입 화면인데 회원탈퇴 진행해봐,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78741556
+바로 지금 쿠팡 이동 열어,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.46864852
+지금 로그인 페이지 화면에서 자동 로그인 체크 풀어 해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73776
+로가웃,30,click_logout,26,26,26,click_logout,click_logout,0.668897
+"지금 로그인 페이지 보고 있는데, 현재 페이지 정보 읽어",6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5735228
+지금 로그인 페이지에서 비밀 번호 재설정 페이지로 가줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.55214167
+바로 쇼핑몰 페이지에서 장바구니 담아 해,32,click_cart,28,28,28,click_cart,click_cart,0.6639607
+지금 쇼핑 화면인데 바로 쇼핑몰 접속해줘?,8,go_mall,5,5,5,go_mall,go_mall,0.64598626
+지금 회원정보 페이지인데 비밀 번호 변경 메뉴로 가줘 해봐,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70049506
+"지금 메인 화면인데 지금 회원가입 페이지 보고 있는데, 비밀 번호 입력해줘",13,input_password,9,9,9,input_password,input_password,0.55831933
+지금 메인 화면인데 상품 페이지 보여줘?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6849327
+지금 비번 변경 시작해줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.69976187
+오늘 요즘내가산주문내역알려줘 좀,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7199169
+오늘 주문내역화면으로이동해!!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7216725
+바로 쇼핑몰 페이지에서 장바구니 담아줘,32,click_cart,28,28,28,click_cart,click_cart,0.6664224
+바로 지금 비밀번호 변경하기 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7026279
+"지금 장바구니 보고 있는데 로그인 페이지 보고 있는데, 로그인 버튼 눌러",16,click_login,12,12,12,click_login,click_login,0.6022245
+다시 추천천해줄상품알려줘 해줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.762621
+지금 바로 주문 상세 조회 눌러 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6781549
+지금 로그인 페이지인데 지금 가능한 작업 알려 해봐,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58677244
+"좀 지금 로그인 페이지 보고 있는데, 현재 페이지 정보 읽어 해봐",6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5770709
+주문내역 페이지 화면에서 지금 가능한 작업 알려?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5828022
+좀 지금 회원가입 눌러 해줘,19,click_signup,15,15,15,click_signup,click_signup,0.55413777
+지금 회원가입 페이지에서 아이디 입력해줄래?,12,input_id,8,8,8,input_id,input_id,0.6018705
+일단 회원가입 페이지에서 전화번호 칸에 적어줘 해봐,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.70057446
+일단 내가 볼 추천 상품 읽읽어줘 부탁해~,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7626254
+바로 요즘 내가 산 주문내역 알려줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7352171
+앱 다운로드 버튼 클릭?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7521803
+바로 아이디 입력 해봐,12,input_id,8,8,8,input_id,input_id,0.5957919
+당장 요즘 주문한 내역 읽어줘 부탁,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74490464
+일단 로그인 페이지 화면에서 로그인 유지 켜 해줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6356383
+일단 바로 동의 처리해줘?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.59087527
+먼저 자주주문한상품읽어줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7507389
+좀 히어비 메인으로 가,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76085305
+지금 쇼핑 화면인데 성함 입력해 해봐,21,input_name,17,17,17,input_name,input_name,0.65638673
+일단 지금 주문내역 보고 있는데 회원가입 페이지에서 아이디 입력해줘,12,input_id,8,8,8,input_id,input_id,0.6009765
+지금 주문내역 보고 있는데 지금 이름 적어,21,input_name,17,17,17,input_name,input_name,0.6554635
+아이디 찾기 클릭 할래?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75089914
+좀 비밀번호 재설정 페이지로 가주세요,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5497843
+지금 로그인 화면인데 쇼핑몰 페이지인데 쿠팡으로 이동해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.38930783
+지금 쇼핑 화면인데 히어브 안내 읽어,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7841666
+일단 공유 쇼핑 입장 버튼 열어 해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75360805
+지금 회원가입 페이지에서 메일 주소 넣어줘 해봐,28,input_email,24,24,24,input_email,input_email,0.65179604
+비번호 넣어 해줄래?,13,input_password,9,9,9,input_password,input_password,0.5644213
+일단 주문 상세 조회 들어가,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67279005
+지금회웝가입,19,click_signup,15,15,15,click_signup,click_signup,0.35654125
+지금 주문내역 보고 있는데 지금 비밀번호 변경 메뉴로 가줘?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6989239
+바로 체크 켜,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.27829513
+지금 로그인 화면인데 아뒤 찾기 눌러?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75134784
+지금 쇼핑 화면인데 좀 휴대폰 번호 입력해,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6742172
+지금 로그인 화면인데 앱 다운로드 실행해줘,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7571229
+지금 쇼핑 화면인데 아이디 값 넣어 할래?,12,input_id,8,8,8,input_id,input_id,0.5920084
+회원가입 제출?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.6002611
+지금 바로 주문 상세 조회해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6767674
+"지금 회웝가입 페이지 보고 있는데, 비밀 번호 확인 입력해줘",27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5021821
+지금 로그인 해줄래?,16,click_login,12,12,12,click_login,click_login,0.59767324
+좀 주문 상세 보기 열어줘 부탁해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6728037
+일단 바로 전화번호 적어 해봐,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6983488
+좀 주문내역 페이지 화면에서 이 페이지 정보 안내해줘,34,read_page,30,30,30,read_page,read_page,0.66221166
+바로 상품조회 진행해 가능?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6964604
+지금로그인페이지인데로그인유지체크해줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.61577106
+지금 메인 화면인데 지금 가능한 작업 알려줘?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58650094
+회웝가입 페이지 화면에서 이메일 칸에 적어,28,input_email,24,24,24,input_email,input_email,0.6516219
+바로 이메일 넣어,28,input_email,24,24,24,input_email,input_email,0.647931
+최근 주문 내역 말해줘!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.749313
+일단 이메일 넣어 해,28,input_email,24,24,24,input_email,input_email,0.65043974
+좀 아이디 중복 확인 눌러 해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7977888
+지금 이용약관 뭐야 해봐,23,read_terms,19,19,19,read_terms,read_terms,0.6529132
+바로 회원가입 페이지 화면에서 비밀번호 넣어 해,13,input_password,9,9,9,input_password,input_password,0.57204187
+지금 장바구니 보고 있는데 로그인 페이지에서 로그인 상태 유지로 바꿔줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.635195
+지금 회원가입 화면인데 회원가입 페이지에서 이용약관 설명해줘?,23,read_terms,19,19,19,read_terms,read_terms,0.6586406
+바로 전화번호 써 해줘,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69994307
+바로 마이페이지 눌러,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6607256
+일단 주문목록 메뉴로 들어가 해줄래?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.73276377
+지금 쇼핑 화면인데 이용약관 동의 체크 해봐,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.60528713
+지금 로그인 화면인데 회원가입 페이지에서 약관 동의 선택해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.59902424
+일단 회원가입 페이지 화면에서 이용 약관 화면 보여줘 해줘,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68246156
+좀 비밀 번호 입력해줘 가능해?,13,input_password,9,9,9,input_password,input_password,0.5638837
+좀 회원가입 페이지에서 약관 보기로 이동해,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.66219777
+지금 장바구니 보고 있는데 히어비로 이동해?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7645745
+일단 이영약관 보기 눌러줘 해,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68234086
+지금 쿠팡 이동 들어가,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4785177
+오늘 자주 산 물건들 말해줘!!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75094193
+지금 회원가입 화면인데 비밀번호 변경하기 열어 가능?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7024223
+지금 주문내역 페이지에서 상품 상세 보기 열어 해줄래?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6591393
+지금로그인상태유지해제해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.72620606
+지금 쇼핑 화면인데 지금 화면 요약해 해봐,34,read_page,30,30,30,read_page,read_page,0.70050794
+바로 지금 로그인 페이지인데 지금 가능한 작업 알려 해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5872756
+바로 지금 공유 쇼핑 입장 버튼 눌러?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7522666
+일찍 잘까 지금?,0,unknown,0,0,0,unknown,unknown,0.39400366
+지금 회원가입 화면인데 회원가입 페이지 화면에서 약관 동의 체크박스 눌러줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6030253
+지금 쇼핑 화면인데 앱 다운로드 버튼 눌러?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7604433
+지금 주문내역 보고 있는데 회원탈퇴 클릭,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7867664
+지금 메인 화면인데 지금 비번호 값 넣어,13,input_password,9,9,9,input_password,input_password,0.5691805
+좀 이영약관 읽어 해,23,read_terms,19,19,19,read_terms,read_terms,0.6531992
+바로 전화번호 적어 가능?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.70030355
+지금 로그아웃 처리해?,30,click_logout,26,26,26,click_logout,click_logout,0.68476444
+최근 내 주문내역 확인해줘?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7378726
+"지금 주문내역 보고 있는데 지금 주문내역 페이지 보고 있는데, 주문 상세 조회 눌러줘",37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67388254
+"일단 지금 히어비 홈 보고 있는데, 공유 쇼핑 입장 버튼 눌러줘 해봐",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75445455
+지금 메인 화면인데 회원가입 페이지 화면에서 약관 보기 열어,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.66794336
+지금 주문내역 보고 있는데 좀 이름 입력해봐,21,input_name,17,17,17,input_name,input_name,0.65447235
+지금 회원가입 화면인데 계정 나갈게 로과웃해 가능?,30,click_logout,26,26,26,click_logout,click_logout,0.6893834
+지금 회원가입 화면인데 로그인 페이지인데 아이디 찾기 열어,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7533754
+먼저 주문내역 화면으로 이동해~,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7331293
+바로 주문내역 페이지 화면에서 이 페이지 정보 안내해,34,read_page,30,30,30,read_page,read_page,0.6723332
+쇼핑몰페이지에서마이페이지로이동해?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.27342355
+지금 계정 나갈게 로가웃해 가능?,30,click_logout,26,26,26,click_logout,click_logout,0.6858273
+지금 바로긴 눌러 해,16,click_login,12,12,12,click_login,click_login,0.6056534
+지금 주문내역 보고 있는데 지금 회원정보 페이지인데 현재 화면 설명해,34,read_page,30,30,30,read_page,read_page,0.7191098
+당장 최근 주문 요약해줘?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7456052
+일단 바로 지금 화면 뭐야 해,34,read_page,30,30,30,read_page,read_page,0.68694067
+먼저 ﻿주문목록으로 이동해,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7323322
+지금 로그인 유지 체크 해제 할래?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73834616
+쇼핑하러 가 해,8,go_mall,5,5,5,go_mall,go_mall,0.62751085
+지금 쿠팡 이동 클릭 해봐,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47887322
+지금 메인 화면인데 현재 페이지 정보 및 가능한 작업 말해?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58656216
+회원가입 페이지에서 이용 약관 설명해줘,23,read_terms,19,19,19,read_terms,read_terms,0.64652383
+지금 장바구니 보고 있는데 주문 상세 조회 클릭 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6749352
+지금 메인 화면인데 쇼핑몰 페이지인데 쇼핑몰 목록 읽어줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6965376
+쇼핑몰페이지인데이용가능한쇼핑몰알려줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.68481755
+오늘 ﻿자주 산 상품 읽어줘!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7523225
+지금 장바구니 보고 있는데 쿠팡으로 넘어가줘 해?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.42966354
+쇼핑몰페이지에서장바고니보여줘,32,click_cart,28,28,28,click_cart,click_cart,0.66369325
+오늘 최근 주문 내역 말해줘?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74598175
+지금 로그인 화면인데 지금 쇼핑몰 들어가,8,go_mall,5,5,5,go_mall,go_mall,0.64741623
+지금 주문내역 보고 있는데 이용약관 보기,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6662897
+"일단 회원정보 페이지 보고 있는데, 회원탈퇴 눌러 해",36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78817654
+지금 메인 화면인데 이용약관 동의 항목 체크해봐,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.60534006
+일단 지금 전화번호 적어 해,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69906527
+지금 쇼핑 화면인데 로그인 페이지에서 로그인 상태 유지로 바꿔줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63651794
+좀 바로 비밀번호 변경 메뉴로 가줘 해봐,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7004698
+지금 장바구니 보고 있는데 로그인 페이지에서 비밀번호 넣어줘,13,input_password,9,9,9,input_password,input_password,0.57222605
+마이페이지확인해줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6629943
+지금 로그인 화면인데 아이디 복구 페이지로 가줘?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.73807657
+이번에 많이 구매한 상품 목록 읽어줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7534153
+바로 쇼핑몰 접속해주세요?,8,go_mall,5,5,5,go_mall,go_mall,0.64851636
+지금 메인 화면인데 비번호 재설정 페이지로 가주세요,18,click_find_password,14,14,14,click_find_password,click_find_password,0.54305404
+지금 주문내역 보고 있는데 지금 공유 쇼핑 입장 버튼 열어,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7558056
+잠깐 식단 계산해줘,0,unknown,0,0,0,unknown,unknown,0.82248515
+지금 장바구니 보고 있는데 로그인 페이지 화면에서 비번호 칸에 적어줘,13,input_password,9,9,9,input_password,input_password,0.5586908
+지금 장바구니 보고 있는데 주문 상세 화면으로 가,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6713866
+이번에 내가볼추천상품읽어줘 좀!!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76421064
+회원가입 제출해 할래?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60450774
+다시 추천 리스트 읽어줘 부탁해,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7638399
+지금 회원가입 페이지에서 전화번호 작성해줘?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7002916
+바로 메인 페이지 화면에서 공유 쇼핑 들어가 해줄래?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7508873
+지금 이름 값 넣어 해줘,21,input_name,17,17,17,input_name,input_name,0.6509952
+아침에 청소 할까?,0,unknown,0,0,0,unknown,unknown,0.8268476
+좀 내가 자주 사는 상품 말해줘~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7520156
+지금 쇼핑 화면인데 지금 로그인 페이지인데 비밀 번호 찾기 진행해줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.59919715
+로그아웃,30,click_logout,26,26,26,click_logout,click_logout,0.6642892
+지금 로그인 화면인데 로그인 유지 꺼줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7395985
+좀 지금 회원가입 페이지인데 회원가 입 완료 버튼 눌러줘 해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5925509
+지금 쇼핑 화면인데 좀 현재 페이지 읽어줘,34,read_page,30,30,30,read_page,read_page,0.7256279
+지금히어비가이드읽어줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7781779
+일단 주문내역 페이지에서 상품 상세 보기 열어 해줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.661612
+좀 로그인 페이지 화면에서 비밀번호 찾기 열어 해봐,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6057229
+지금 장바구니 보고 있는데 아뒤 찾기 눌러?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7516667
+좀 지금 회원가입 페이지인데 비밀번호 재입력해?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.4020366
+지금 장바구니 담아,32,click_cart,28,28,28,click_cart,click_cart,0.658964
+지금 비밀번호 확인 넣어 해,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5104052
+일단 회원탈퇴 진행해줘 부탁해,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7832541
+지금 메인 화면인데 앱 다운로드 버튼 눌러?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7578327
+"좀 지금 희어비 홈 보고 있는데, 공유 쇼핑 입장 버튼 눌러줘",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7546964
+좀 지금 가입 끝내 해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.58713824
+로긴 페이지에서 자동 로긴 체크 풀어,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7353471
+지금 주문내역 보고 있는데 아뒤 찾기,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7357217
+좀 지금 회원정보 페이지인데 비밀번호 변경 메뉴로 가줘 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7003147
+지금 가능한 쇼핑몰 읽어 할래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69939667
+지금 영어공부 확인해줘,0,unknown,0,0,0,unknown,unknown,0.82697046
+지금 회원가입 페이지인데 쇼핑몰로 가줘?,8,go_mall,5,5,5,go_mall,go_mall,0.64855987
+바로 지금 쇼핑몰 페이지인데 지금 갈 수 있는 쇼핑몰 읽어줘?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69890857
+당장 많이 산 상품 알려줘~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7524388
+먼저 추천해줄 상품 알려줘 부탁,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76641405
+지금 쿠팡 이동 눌러 할래?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4735357
+바로 초기 화면으로 이동해줘 부탁해,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7223454
+당장 구매 횟수 많은 상품 알려줘~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7530428
+빨리 지금 주문목록 페이지로 이동해,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7333172
+회원가입 클릭 해봐,19,click_signup,15,15,15,click_signup,click_signup,0.54353166
+많이 샀던 상품들 보여줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7471871
+지금 장바구니 보고 있는데 쿠팡 이동 클릭 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47567487
+일단 히어비 가이드 알려줘 해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7850549
+아이디입력할래?,12,input_id,8,8,8,input_id,input_id,0.5904124
+지금 쇼핑 화면인데 좀 히어비 메인으로 가줘?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.764478
+"좀 쇼핑몰 페이지 보고 있는데, 히어비 가이드 읽어줘 해줘",7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78850794
+"일단 지금 히어브 홈 보고 있는데, 공유 쇼핑 입장 버튼 눌러줘 해",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7538596
+지금 메인 화면인데 바로 공유 쇼핑 입장 버튼 눌러줘,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7522686
+지금 화면 말해 해봐,34,read_page,30,30,30,read_page,read_page,0.71645075
+주문목록페이지로가 해줘!!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72927445
+"지금 쇼핑 화면인데 지금 메인 페이지 보고 있는데, 앱 다운로드 버튼 눌러줘",11,click_app_download,7,7,7,click_app_download,click_app_download,0.7587598
+쇼핑몰 페이지에서 장바고니 담아줘 해봐,32,click_cart,28,28,28,click_cart,click_cart,0.67359674
+일단 아뒤 입력 해줄래?,12,input_id,8,8,8,input_id,input_id,0.6037339
+일단 찜목록 페이지에서 상품조회 눌러줘 해줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6914978
+지금 로그인 화면인데 앱 설치 시작해봐,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75996464
+"바로 히어비 홈 보고 있는데, 공유 쇼핑 입장 버튼 눌러 해봐",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.753036
+좀 지금 쇼핑몰 페이지인데 이용 가능한 쇼핑몰 알려 해줄래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.70039225
+쇼핑몰 페이지에서 가능한 쇼핑몰 읽어줘 해줄래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.70063883
+좀 바로가웃 눌러 해줘,30,click_logout,26,26,26,click_logout,click_logout,0.68956524
+좀 지금 주문내역 페이지인데 현재 페이지 읽어줘 해줘,34,read_page,30,30,30,read_page,read_page,0.7267806
+지금 주문내역 보고 있는데 이름 값 넣어 할래?,21,input_name,17,17,17,input_name,input_name,0.65563625
+체크표시해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.49871862
+지금 회원가입 화면인데 상품조회 진행해 할래?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69682205
+지금 로과웃 눌러줘 해,30,click_logout,26,26,26,click_logout,click_logout,0.68897915
+회원가입페이지에서이용약관동의체크해줘?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.5521808
+바로 이용약관 읽기 해,23,read_terms,19,19,19,read_terms,read_terms,0.64170843
+일단 쿠팡 이동 클릭 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47887105
+지금 회원가입 화면인데 가능한 작업 알려줄래?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5695736
+"좀 회원정보 페이지 보고 있는데, 회원탈퇴 눌러 해",36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7874046
+바로 회원가입 페이지 화면에서 아이디 넣어줘 해줄래?,12,input_id,8,8,8,input_id,input_id,0.596905
+다시 요즘 주문한 내역 읽어줘 좀?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74476373
+바로 쿠팡으로 이동 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.43009967
+좀 주문내역 페이지에서 페이지 상태 읽어줘 해줘,34,read_page,30,30,30,read_page,read_page,0.72098756
+먼저 방금 주문한 것까지 포함해서 읽어줘 요!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7362747
+바로 비밀번호 칸에 적어줘 해줘,13,input_password,9,9,9,input_password,input_password,0.55584013
+일단 회원탈퇴?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7807878
+지금 메인 화면인데 바로긴 상태 유지로 바꿔줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6362112
+지금 주문내역 보고 있는데 지금 비밀번호 확인 넣어,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.50820553
+일단 이용약관 보기 진행해 가능?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68169475
+좀 공유 쇼핑 입장 버튼 해줄래?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75349927
+"지금 장바구니 보고 있는데 회원가입 페이지 보고 있는데, 전화번호 입력해",26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7020517
+지금 메인 화면인데 바로그아웃해,30,click_logout,26,26,26,click_logout,click_logout,0.68544906
+로과웃 진행해봐,30,click_logout,26,26,26,click_logout,click_logout,0.6884962
+일단 지금 공유 쇼핑 입장 버튼 열어 해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.753743
+좀 바로 비번호 확인 써?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5092156
+바로 회웝가입 완료 버튼 눌러 해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.56735325
+지금 주문내역 보고 있는데 이용약관 보기 눌러,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.67702734
+지금 회원가입 화면인데 주문내역 페이지 화면에서 주문 자세히 보기 해줘?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.669311
+지금 주문내역 보고 있는데 지금 로그인 페이지인데 로긴 실행해줘,16,click_login,12,12,12,click_login,click_login,0.6039673
+지금 메인 화면인데 회원가입 페이지 화면에서 회원가 입 제출해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5994259
+지금 장바구니 보고 있는데 로그인 페이지 화면에서 로긴해줘,16,click_login,12,12,12,click_login,click_login,0.6029135
+지금 로그인 화면인데 지금 이용 약관 요약해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6481198
+지금 주문내역 보고 있는데 좀 쿠팡으로 이동해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44710255
+"일단 지금 로그인 페이지 보고 있는데, 비번호 찾기 눌러줘 해줘",18,click_find_password,14,14,14,click_find_password,click_find_password,0.6068193
+좀 바로 비밀번호 찾기?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.59079987
+주문상세화면으로가줘부탁해,37,click_order_detail,33,33,35,click_order_detail,go_order_history,0.548703
+좀 로그인 페이지 화면에서 히어비 사용법 알려줘 해봐,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78660196
+집에서 가계부 기록해줘,0,unknown,0,0,0,unknown,unknown,0.82150954
+좀 쿠팡 페이지 화면에서 초기 화면으로 이동해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.73727673
+지금 회원정보 페이지에서 계정 삭제 시작해,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7790479
+지금 장바구니 보고 있는데 앱 다운로드 버튼 진행해?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7588004
+로그아웃처리해,30,click_logout,26,26,26,click_logout,click_logout,0.67933804
+지금 메인 화면인데 비밀번호 입력해 해봐,13,input_password,9,9,9,input_password,input_password,0.5680716
+바로 좀 쿠팡이 가기 눌러줘 해봐,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4631914
+좀 추천 리스트 읽어줘!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7617719
+지금 상품조회 눌러 해봐,38,click_product_view,34,34,34,click_product_view,click_product_view,0.696444
+좀 히어비 홈 화면에서 앱 다운로드 버튼 눌러줘 해줄래?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7523812
+바로 장바고니 열어줘?,32,click_cart,28,28,28,click_cart,click_cart,0.6747768
+지금 바로긴 상태 유지로 바꿔줘?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63486964
+지금 회원가입 화면인데 회원가입 페이지 화면에서 이름 작성해,21,input_name,17,17,17,input_name,input_name,0.65429306
+회원가입 페이지 화면에서 이용 약관 화면 보여줘?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68076175
+회웝가입 페이지 화면에서 이름 작성해줘,21,input_name,17,17,17,input_name,input_name,0.6540414
+지금 쇼핑 화면인데 주문내역 페이지 화면에서 이 페이지 정보 안내해줘?,34,read_page,30,30,30,read_page,read_page,0.6348943
+좀 이름 넣어 해봐,21,input_name,17,17,17,input_name,input_name,0.652572
+먼저 내가 산 것들 보는 페이지로 가?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7281051
+바로 ﻿주문목록으로 이동해 해봐,39,go_order_history,35,35,35,go_order_history,go_order_history,0.73372483
+바로 이영약관 동의 항목 체크해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6013148
+지금 요즘 주문한 내역 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7427938
+아뒤 찾기 들어가 해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.74481493
+당장 추천 상품들 설명해줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76481754
+지금 주문내역 페이지에서 쿠팡 페이지 열어줘 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.39127058
+지금 회원가입 화면인데 쇼핑몰로 가줘,8,go_mall,5,5,5,go_mall,go_mall,0.64820844
+지금 주문 상세 보기 열어 해봐,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67577416
+방 정리할까 잠깐?,0,unknown,0,0,0,unknown,unknown,0.826875
+지금비번호변경하기,35,click_change_password,31,31,31,click_change_password,click_change_password,0.68368226
+지금 로그인 화면인데 로그인 페이지 화면에서 자동 로그인 체크 풀어줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73805976
+일단 로그인 페이지 화면에서 히어비 가이드 읽어,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78975254
+지금 좀 쿠팡으로 이동해?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44069642
+지금 비번호 변경하기 눌러 가능?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70139205
+지금 바로가웃해,30,click_logout,26,26,26,click_logout,click_logout,0.68524694
+지금 회원가입 화면인데 장바고니 담아줘 가능?,32,click_cart,28,28,28,click_cart,click_cart,0.67659736
+지금 주문내역 보고 있는데 주문 상세 보기 열어줘 부탁해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6713136
+로긴실행해,16,click_login,12,12,12,click_login,click_login,0.59369266
+일단 로그인 페이지인데 로그인 상태 유지로 바꿔줘 해줄래?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63769406
+바로 지금 로그인 페이지인데 로그인 상태 유지 해제해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7389642
+가능한 작업 알려줘?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.57376814
+쇼핑몰 페이지 화면에서 마이페이지 열어,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66855353
+지금 장바구니 보고 있는데 아이 디 복구 페이지로 가줘 부탁해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7265914
+바로 지금 쇼핑몰 페이지인데 쿠팡으로 이동해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.38652268
+좀 로긴해 가능?,16,click_login,12,12,12,click_login,click_login,0.60393465
+일단 체크해줘 할래?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.46212208
+"지금 주문내역 보고 있는데 지금 회원가입 페이지 보고 있는데, 비밀 번호 확인 입력해줘",27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.49667004
+지금 회원가입 화면인데 아이디 복구 페이지로 가주세요 해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7323749
+바로 지금 주문내역 페이지인데 주문 상세 화면으로 가 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6716058
+좀 회원가입 페이지 화면에서 이영약관 화면 보여줘 해줘,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68089336
+좀 지금 살만한 추천 상품 읽어줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7625427
+지금 회원정보 페이지에서 비밀번호 변경 메뉴로 가 해줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7002205
+좀 로그인 페이지에서 비밀번호 넣어줘 해봐,13,input_password,9,9,9,input_password,input_password,0.57176596
+지금 회원가입 화면인데 지금 회원정보 페이지인데 회원 탈퇴 처리해줘?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78487206
+바로 비밀 번호 확인값 넣어 해봐,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5043584
+좀 쿠팡 이동 진행해?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4716669
+지금 주문내역 보고 있는데 쇼핑몰 페이지인데 로그아웃 진행해,30,click_logout,26,26,26,click_logout,click_logout,0.6879654
+이번에 내게 맞는 추천 상품 말해줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7649448
+좀 자동 로긴 체크해주세요 해봐,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6254539
+지금 쇼핑몰 페이지인데 로가웃 눌러,30,click_logout,26,26,26,click_logout,click_logout,0.68568355
+최신 주문부터 순서대로 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7458572
+지금 장바구니 보고 있는데 이름 적어,21,input_name,17,17,17,input_name,input_name,0.64966345
+지금 아뒤 써 할래?,12,input_id,8,8,8,input_id,input_id,0.60195
+일단 주문목록들어가!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72253823
+저녁에 게임 할까?,0,unknown,0,0,0,unknown,unknown,0.8281266
+지금 회원가입 페이지 화면에서 비번호 확인 칸에 적어줘 해줄래?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5068493
+"지금 회원가입 화면인데 지금 회원가입 페이지 보고 있는데, 회원가입 제출해줘?",25,submit_signup,21,21,21,submit_signup,submit_signup,0.6097583
+바로 지금 화면 읽어줘,29,read_available_marketplaces,25,25,30,read_available_marketplaces,read_page,0.7085069
+커피 마실까 잠깐,0,unknown,0,0,0,unknown,unknown,0.8175153
+좀 지금 회원가입 페이지인데 쇼핑몰로 가 해줄래?,8,go_mall,5,5,5,go_mall,go_mall,0.6457133
+지금 주문 상세 화면으로 가 해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67261475
+지금 회원가입 화면인데 바로 계정 나갈게 로가웃해,30,click_logout,26,26,26,click_logout,click_logout,0.68648565
+지금 자주 담는 상품 읽어줘 해줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.749098
+지금 바로 현재 페이지 정보 및 가능한 작업 읽어 해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58855754
+당장 주문목록으로 가줘 해줘,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7335961
+지금 쇼핑 화면인데 상품조회 들어가 해봐,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69703186
+좀 공유 쇼핑 들어가주세요,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.74922925
+로그인 유지 체크 해제 해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73588187
+지금 장바구니 보고 있는데 로그인 페이지 화면에서 비밀 번호 칸에 적어줘,13,input_password,9,9,9,input_password,input_password,0.55947024
+지금 회원가입 화면인데 히어비 홈 화면에서 앱 다운로드 실행해,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75826716
+바로 쿠팡 이동 클릭 할래?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4732322
+이용약관 읽어주세요 해,23,read_terms,19,19,19,read_terms,read_terms,0.6559362
+로긴유지꺼줘부탁해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7358565
+좀 아이디 넣어 해줘,12,input_id,8,8,8,input_id,input_id,0.59305143
+좀 바로 이메일 써 해줘,28,input_email,24,24,24,input_email,input_email,0.6524813
+바로 이용 약관 설명해줘 가능해?,23,read_terms,19,19,19,read_terms,read_terms,0.64981794
+지금 이용 약관 읽어줘 해봐,23,read_terms,19,19,19,read_terms,read_terms,0.64445543
+일단 바로 이름 적어?,21,input_name,17,17,17,input_name,input_name,0.6502025
+로그인 페이지 화면에서 비밀 번호 칸에 적어줘,13,input_password,9,9,9,input_password,input_password,0.5606523
+지금 메인 화면인데 찜목록 페이지에서 상품조회 눌러줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.68755984
+일단 쇼핑몰 페이지 화면에서 마이페이지 열어줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6706789
+잠깐 청소 해볼래?,0,unknown,0,0,0,unknown,unknown,0.8203639
+지금 추천 상품부터 소개해줘!!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7657008
+지금 쇼핑 화면인데 바로 계정 로그아웃해줘?,30,click_logout,26,26,26,click_logout,click_logout,0.6886032
+일단 로그인 페이지에서 아이 디 입력해줄래?,12,input_id,8,8,8,input_id,input_id,0.58947754
+바로 가장최근주문알려줘~,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74745667
+바로 지금 아뒤 중복 확인?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79268223
+요즘 공원 가서 바람 쐴까?,0,unknown,0,0,0,unknown,unknown,0.82943857
+좀 지금 로그인 페이지인데 아이디 찾기 열어 해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7553584
+지금 메인 화면인데 자동 로그인 체크해줘?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.620119
+바로 상품조회 열어 해줄래?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6953252
+좀 회원탈퇴 들어가 가능?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7846038
+"좀 지금 쇼핑몰 페이지 보고 있는데, 가능한 쇼핑몰 읽어 해",29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.7018721
+바로그인 페이지에서 히어브 메인으로 가줘 해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7656427
+좀 바로 아이디 중복 확인 열어 해줄래?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7965469
+쇼핑몰페이지화면에서쿠팡화면열어줘,31,click_go_coupang,27,27,2,click_go_coupang,go_coupang,0.33669066
+좀 쇼핑몰 페이지 화면에서 쿠팡 화면 열어 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.456474
+지금 회원가입 화면인데 회원탈퇴 열어,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7845224
+오늘 주문목록 페이지로 가 요!!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7305853
+좀 바로 회원가입 열어?,19,click_signup,15,15,15,click_signup,click_signup,0.55232525
+"로그인 페이지 보고 있는데, 현재 페이지 정보 읽어줘",6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.56871235
+회원탈퇴해봐,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78026783
+바로 이용 약관 화면 보여?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.67392933
+바로 좀 상품 페이지 보여줘?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6883371
+일단 회원가입 버튼 눌러줘?,19,click_signup,15,15,15,click_signup,click_signup,0.55514973
+좀 지금 추천 상품 뭐 있는지 알려줘 요,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.764094
+지금 쇼핑몰 페이지인데 쿠팡 화면 열어 해줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.45906255
+지금 메인 화면인데 로긴 유지 선택 해제해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.74041176
+이번에 최근 주문 상황 설명해줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74883884
+지금히어비로열어,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7616614
+일단 쿠팡 가기 눌러,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4767699
+지금 장바구니 보고 있는데 로그인 페이지에서 아이디 찾기 진행해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7546678
+지금 주문 상세 조회 눌러?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6769635
+지금 장바구니 보고 있는데 회원가입 페이지 화면에서 이용 약관 화면 보여줘,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6795517
+오늘 요새 많이 산 상품 알려달라 요!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7498973
+지금 주문내역 보고 있는데 앱 다운로드 버튼 클릭 해,11,click_app_download,7,7,7,click_app_download,click_app_download,0.759016
+바로 이영약관 동의 항목 체크해주세요 해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.60187835
+일단 지금 로그인 페이지인데 로긴 유지 꺼줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7394041
+"일단 지금 회원가입 페이지 보고 있는데, 회원가 입 제출해줘",25,submit_signup,21,21,21,submit_signup,submit_signup,0.6028092
+일단 아이디 입력해 해봐,12,input_id,8,8,8,input_id,input_id,0.59387696
+지금 쇼핑 화면인데 바로 현재 페이지 정보 및 가능한 작업 읽어,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5896239
+"바로 지금 로그인 페이지 보고 있는데, 로긴 버튼 눌러줘",16,click_login,12,12,12,click_login,click_login,0.60610443
+지금 회원가입 화면인데 회원 탈퇴 처리해줘?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7884463
+지금 로그인 화면인데 지금 메인 페이지인데 공유 쇼핑 시작해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7529656
+지금 쇼핑 화면인데 공유 쇼핑 입장 버튼 진행해 할래?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75349987
+일단 지금 내 정보 페이지 보여 해,33,click_my_page,29,29,29,click_my_page,click_my_page,0.64429164
+지금 로그인 화면인데 아이디 중복 확인 들어가,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7970403
+지금 쇼핑 화면인데 회원가입 페이지 화면에서 이메일 주소 입력해,28,input_email,24,24,24,input_email,input_email,0.6505128
+지금 메인 화면인데 비번호 확인값 넣어줘 부탁해,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5110771
+지금 회원가입 화면인데 지금 비번호 찾기 들어가,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60059303
+지금 주문내역 보고 있는데 바로 비번호 확인 값 넣어,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.51135373
+지금 메인 화면인데 로그인 페이지 화면에서 회원가입으로 이동해줘,19,click_signup,15,15,15,click_signup,click_signup,0.552413
+지금 메인 화면인데 회원가입 페이지 화면에서 전화번호 입력해?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7021419
+희어비안내읽어줘가능해?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.64492816
+바로 회원가입 페이지인데 아이디 중복 조회해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7976539
+지금 로그인 화면인데 현재 페이지 정보 읽어줘?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5728095
+지금 메인 화면인데 지금 쇼핑몰 페이지인데 장바고니 담아줘,32,click_cart,28,28,28,click_cart,click_cart,0.6757258
+지금 할 수 있는 거 말해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5459149
+지금 메인 화면인데 히어브 안내 읽어줘 가능해?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78462714
+좀 지금 회웝가입,19,click_signup,15,15,15,click_signup,click_signup,0.4576685
+지금 쇼핑 화면으로 가 해봐,8,go_mall,5,5,5,go_mall,go_mall,0.56967497
+지금가능한쇼핑몰알려줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6730851
+지금 로그인 화면인데 비밀번호 변경하기 진행해 해봐,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7016772
+내가 볼 추천 상품 읽어줘!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7661067
+바로 지금 살만한 추천 상품 읽어줘 해봐,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7626719
+좀 지금 비밀 번호 확인 칸에 적어줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5035309
+지금 쇼핑 화면인데 바로 이름 적어,21,input_name,17,17,17,input_name,input_name,0.6541492
+로그인 페이지 화면에서 회웝가입 버튼 눌러줘 해줘,19,click_signup,15,15,15,click_signup,click_signup,0.54697883
+지금 장바구니 보고 있는데 로그인 페이지에서 히어비 소개해,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.77958435
+아이디 찾기 들어가 해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.74544054
+지금 로그인 화면인데 비밀번호 확인 써 가능?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5005108
+좀 최근 내 주문내역 확인해줘~,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7442345
+좀 비번호 재입력해봐,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.37252995
+지금쇼핑몰페이지인데히어비소개해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7707092
+지금쇼핑몰페이지인데로그아웃진행해봐,30,click_logout,26,26,26,click_logout,click_logout,0.6792796
+좀 바로 아이디 복구 페이지로 가줘 해줘,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7379748
+지금 로그인 페이지인데 아이 디 찾기 눌러줘 해줄래?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7414979
+바로 마이페이지 눌러 가능?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66764975
+바로 지금 장바구니 담아 해줄래?,32,click_cart,28,28,28,click_cart,click_cart,0.6738221
+바로 비밀번호 바꾸기 진행해 해?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.690798
+주문내역 페이지 화면에서 가능한 명령어 읽어 해봐,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5836812
+지금 쇼핑 화면인데 로그인 페이지에서 로그인 유지 선택 해제해줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73934543
+일단 아뒤 중복 확인 진행해 해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7971431
+바로 히어비 가이드 알려줘 해줄래?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78320724
+지금 로그인 화면인데 지금 회원가입 페이지인데 아이디 중복 확인해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7980829
+지금 로그인 화면인데 바로 주문 상세 보기 열어,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67316717
+곧 음악 목록 요약해줘,0,unknown,0,0,0,unknown,unknown,0.7850058
+비번호써해봐,13,input_password,9,9,9,input_password,input_password,0.5628986
+바로 쇼핑몰 페이지 화면에서 로그아웃 눌러줘 해줘,30,click_logout,26,26,26,click_logout,click_logout,0.68720734
+지금 쇼핑 화면인데 회원가입 페이지에서 아뒤 중복 검사해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79551893
+일단 바로 비밀번호 변경 메뉴로 가줘?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6991222
+오늘 밤 운동 계획 요약해줘,0,unknown,0,0,0,unknown,unknown,0.8292048
+일단 바로 쿠팡으로 열어 해봐,5,go_coupang,2,2,2,go_coupang,go_coupang,0.45506984
+지금 주문내역 보고 있는데 바로 전화번호 써,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6988407
+바로그인 페이지인데 비번 찾기 시작해줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6055362
+지금 로그인 해봐,16,click_login,12,12,12,click_login,click_login,0.5956396
+최근 주문부터 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7444408
+지금 주문내역 보고 있는데 주문내역 페이지에서 상품 상세 보기 열어줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.64694774
+바로긴 유지 체크 해제해주세요 해봐,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.74084866
+지금 비밀번호 입력해 해?,13,input_password,9,9,9,input_password,input_password,0.56691897
+바로 비번호 확인 넣어 해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5105746
+지금 메인 화면인데 주문내역 페이지에서 쿠팡 페이지 열어,5,go_coupang,2,2,2,go_coupang,go_coupang,0.39509588
+지금 로그인 화면인데 지금 회원가입 들어가,19,click_signup,15,15,15,click_signup,click_signup,0.51365757
+지금 회원가입 화면인데 히어비로 가 할래?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7697342
+지금 메인 화면인데 지금 화면 읽어?,34,read_page,30,30,30,read_page,read_page,0.7199935
+바로 처음 페이지로 돌아가줘 해,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.73545843
+일단 주문 상세 보기 열어 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6755005
+바로 쇼핑몰 화면 열어?,8,go_mall,5,5,5,go_mall,go_mall,0.63904345
+일단 지금 회원가입 페이지인데 비밀번호 확인값 넣어 해줄래?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5117213
+바로 회원가 입으로 이동해줘 가능해?,19,click_signup,15,15,15,click_signup,click_signup,0.55202276
+일단 로그인 페이지 화면에서 이 화면에서 할 수 있는 것 알려줘 해줄래?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.57750213
+좀 마이페이지 들어가?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.67063767
+"지금 장바구니 보고 있는데 지금 쇼핑몰 페이지 보고 있는데, 로그아웃 눌러",30,click_logout,26,26,26,click_logout,click_logout,0.68663365
+좀 쇼핑몰 페이지 열어 해줘,8,go_mall,5,5,5,go_mall,go_mall,0.64409417
+일단 메인 페이지 화면에서 공유 쇼핑 시작해줘,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7520879
+일단 바로 히어비로 이동?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7670122
+지금 마이페이지 눌러 해줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6660198
+지금 회원가입 화면인데 쇼핑몰 페이지 화면에서 쇼핑몰 목록 읽어줘?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69928205
+지금 회원정보 페이지 화면에서 현재 페이지 읽어줘?,34,read_page,30,30,30,read_page,read_page,0.7278238
+지금 쇼핑 화면인데 지금 회원가입 페이지인데 이름 칸에 적어,21,input_name,17,17,17,input_name,input_name,0.6528882
+아침에 도서관 가고 싶다,0,unknown,0,0,0,unknown,unknown,0.8271032
+좀 이용약관 동의 항목 체크해주세요,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6006401
+"바로 지금 회원정보 페이지 보고 있는데, 비밀번호 변경하기 눌러 해",35,click_change_password,31,31,31,click_change_password,click_change_password,0.70124274
+로긴유지선택해,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6245421
+자주 산 물건들 말해줘!!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75434476
+내일 회의 시간 설명해줘,0,unknown,0,0,0,unknown,unknown,0.82769835
+지금 장바구니 보고 있는데 회원 탈퇴 처리해줄래?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7874458
+바로 여기서 뭐 할 수 있어 해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.54589754
+지금 쇼핑 화면인데 공유 쇼핑 참여해?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7544146
+"바로 지금 회원정보 페이지 보고 있는데, 회원탈퇴 눌러 해줄래?",36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7880344
+지금 로그인 화면인데 지금 쇼핑몰 페이지인데 로과웃 눌러줘,30,click_logout,26,26,26,click_logout,click_logout,0.6849758
+지금 로그인 화면인데 지금 로그인 페이지인데 로그인 유지 꺼,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73647773
+가장 최근 주문 알려줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7471557
+지금 로그인 화면인데 지금 쇼핑몰 페이지인데 쿠팡 페이지로 넘어가줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.44314128
+지금 비번호 확인 값 넣어 해,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.51268023
+일단 지금 메인 페이지인데 앱 다운로드 버튼 눌러?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7591206
+바로 마이페이지 열어 해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66410714
+지금 주문내역 보고 있는데 지금 가능한 작업 알려줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58950955
+빨리 추천 품목 읽어줘 좀~,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7644666
+이용약관 말해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6416299
+바로 비밀 번호 변경 메뉴로 가줘 해봐,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7002489
+바로 지금 내 정보 페이지 보여줘 해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6439613
+바로 장바구니 페이지 화면에서 상품조회 눌러줘 해줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69332385
+지금 로그인 화면인데 아이디 중복 확인 열어?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.798389
+"지금 로그인 화면인데 장바구니 페이지 보고 있는데, 현재 페이지 읽어줘",34,read_page,30,30,30,read_page,read_page,0.71894944
+아이 디 찾기 눌러 해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7295742
+바로긴 유지 꺼줘 해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7401314
+지금 히어비 홈 화면에서 앱 다운로드 실행해?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7560265
+바로 비번호 찾기 들어가 해줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60245407
+당장 요새 많이 산 상품 알려달라!!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7507456
+잠깐 창문 열기 해야겠다,0,unknown,0,0,0,unknown,unknown,0.82353264
+바로 지금 가능한 쇼핑몰 말해,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6968667
+좀 바로 회웝가입 열어?,19,click_signup,15,15,15,click_signup,click_signup,0.5460173
+지금 쇼핑 화면인데 지금 쇼핑몰 페이지인데 히어비 소개해줘?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.783508
+좀 이용약관 보기 진행해 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.67835146
+지금 장바구니 보고 있는데 이용약관 알려줘 가능?,23,read_terms,19,19,19,read_terms,read_terms,0.65736115
+좀 지금 회원가입 페이지인데 비밀 번호 확인값 넣어줘 해줄래?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.50723046
+지금 회원가입 페이지 화면에서 회원가입 등록해줘?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60748166
+지금 메인 화면인데 장바구니 담아?,32,click_cart,28,28,28,click_cart,click_cart,0.66475815
+바로 쇼핑몰 페이지 화면에서 쿠팡이 화면 열어줘 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.45430666
+일단 지금 주문 상세 조회 들어가 해줄래?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6770959
+바로 회원탈퇴 열어,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7776981
+바로 좀 희어비 메인으로 가줘 해봐,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76452893
+좀 아뒤 넣어?,12,input_id,8,8,8,input_id,input_id,0.60555834
+지금 쇼핑 화면인데 바로 비번호 값 넣어,13,input_password,9,9,9,input_password,input_password,0.5681188
+바로 최근 주문 정보 알려줘!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7464094
+지금 쇼핑 화면인데 로그인 페이지 화면에서 비밀번호 칸에 적어줘?,13,input_password,9,9,9,input_password,input_password,0.5606774
+지금 회원가입 화면인데 회웝가입 등록해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.6004055
+지금 쇼핑 화면인데 바로 가능한 쇼핑몰 읽어,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.70090204
+지금 장바구니 보고 있는데 로긴 유지 켜줘 부탁해,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63274187
+바로 아뒤 찾기 눌러?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7469539
+지금 주문내역 보고 있는데 주문 상세 조회?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6722016
+지금 메인 화면인데 비번호 찾기 진행해?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6066428
+일단 주문 조회하는 화면으로 이동 해봐,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7081203
+일단 로긴 눌러?,16,click_login,12,12,12,click_login,click_login,0.60411453
+일단 히어브 안내 읽어?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7818607
+지금이용가능한쇼핑몰알려줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.657839
+일단 추천해주는 상품 말해줘?,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.763885
+지금 회웝가입 페이지인데 비밀번호 재입력해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.39359868
+지금 장바구니 보고 있는데 비밀번호 변경하기 가능?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6990287
+일단 로그인 페이지 화면에서 아이 디 칸에 적어줘?,12,input_id,8,8,8,input_id,input_id,0.59841764
+지금 로그인 페이지 화면에서 히어비 가이드 읽어줘 해줄래?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7877013
+오늘 요일이 뭐지?,0,unknown,0,0,0,unknown,unknown,0.8142493
+지금 로그인 화면인데 지금 로그인 상태 유지 해제해줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7382215
+공유쇼핑들어가주세요해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7457909
+지금 주문내역 페이지 화면에서 주문 상세 화면으로 가?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6690009
+일단 지금 이메일 넣어 해,28,input_email,24,24,24,input_email,input_email,0.6521436
+지금 장바구니 보고 있는데 성함 입력해 해?,21,input_name,17,17,17,input_name,input_name,0.64929837
+빨리 살 만한 추천 상품 알려줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7607499
+일단 좀 쿠팡 페이지로 넘어가 해줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.42232883
+일단 로그인 페이지에서 로그인 상태 유지로 바꿔,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6361014
+회원탈퇴 클릭 해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7814196
+지금 로그인 화면인데 로긴 페이지에서 히어비 메인으로 가줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7647841
+바로 지금 주문내역 페이지인데 현재 페이지 읽어줘?,34,read_page,30,30,30,read_page,read_page,0.7286022
+지금 쇼핑 화면인데 바로 비번호 입력해줘,13,input_password,9,9,9,input_password,input_password,0.56811684
+이용약관 동의 체크 할래?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.5999524
+지금 내 뭐샀노 좀!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7191121
+바로 회원가입 페이지에서 아이디 중복 검사해줘?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7950218
+지금 바로 이름 써?,21,input_name,17,17,17,input_name,input_name,0.64779824
+지금 메인 화면인데 마이페이지 열어?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66837806
+바로 비밀번호 변경하기 진행해?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70150113
+바로 체크해?,14,check_keep_login,10,10,20,check_keep_login,check_terms_agreement,0.48084834
+회웝가입 제출해 할래?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.59677786
+지금 로그인 화면인데 아뒤 찾기 진행해 해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7515425
+좀 바로 지금 화면 말해,34,read_page,30,30,30,read_page,read_page,0.72329295
+지금 장바고니 열어줘 해줄래?,32,click_cart,28,28,28,click_cart,click_cart,0.6745575
+지금 회원가입 화면인데 지금 이용 가능한 쇼핑몰 알려줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.701109
+지금 회원가입 페이지 화면에서 비밀번호 확인 칸에 적어줘 해봐,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5094788
+일단 바로 이용약관 뭐야?,23,read_terms,19,19,19,read_terms,read_terms,0.65148103
+일단 아이디 중복 확인 해,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7949663
+일단 쇼핑몰 페이지인데 쇼핑몰 목록 읽어줘 해줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.696186
+일단 이름 칸에 적어주세요 해,21,input_name,17,17,17,input_name,input_name,0.6512573
+이번 여름 회의 시간 계산해줘,0,unknown,0,0,0,unknown,unknown,0.8306266
+일단 지금 쇼핑몰 페이지인데 쿠팡 메인으로 가줘 해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.40097037
+주문내역 페이지 화면에서 가능한 명령어 읽어줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5830222
+지금 쇼핑몰 페이지에서 내 정보 페이지 보여 해,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6523054
+좀 추천해줄 상품 알려줘 좀,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76338494
+당장 최근 주문 요약해줘!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7473437
+지금 메인 화면인데 아이디 적어?,12,input_id,8,8,8,input_id,input_id,0.6002186
+좀 이용약관 보기 해줄래?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.67031753
+혼자 스터디 계획 설명해줘,0,unknown,0,0,0,unknown,unknown,0.8281059
+지금 메인 화면인데 지금 히어비로 가,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76657915
+지금 장바구니 보고 있는데 현재 페이지 정보 및 가능한 작업 알려줘 가능?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.587315
+일단 바로 상품조회,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6945049
+좀 비밀 번호 바꾸기 진행해줘 가능해?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6928863
+일단 바로그인 들어가 해봐,16,click_login,12,12,12,click_login,click_login,0.59795946
+일단 로그아웃해줘 할래?,30,click_logout,26,26,26,click_logout,click_logout,0.68726486
+메인페이지화면에서공유쇼핑입장해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7260852
+좀 내가 뭐샀노? 요?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7212923
+바로 지금 화면 뭐야,34,read_page,30,30,30,read_page,read_page,0.69781435
+지금 쇼핑 화면인데 네이버 쇼핑 페이지에서 히어비 접속해줘?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.75937545
+일단 회원가입 페이지에서 아이디 중복 검사해줘?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7952113
+지금비번호찾기진행해,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5849534
+좀 바로 아이디 복구 페이지로 가줘 해줄래?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.74010396
+"지금 쇼핑몰 페이지 보고 있는데, 장바구니 열어 해",32,click_cart,28,28,28,click_cart,click_cart,0.6687032
+이용 약관 보기 눌러 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6763195
+로그인 페이지 화면에서 비밀번호 찾기 눌러줘 해줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6048328
+지금 장바구니 담아줘 할래?,32,click_cart,28,28,28,click_cart,click_cart,0.6726712
+좀 회웝가입 버튼 눌러줘 해줘,19,click_signup,15,15,15,click_signup,click_signup,0.54890233
+지금 메인 화면인데 아이디 중복 조회해,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.795413
+지금 바로 주문 상세 보기 열어줘 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67368484
+﻿추천 상품 읽어줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76416624
+일단 지금 장바고니에 넣어줘 해줘,32,click_cart,28,28,28,click_cart,click_cart,0.67485344
+쇼핑몰 페이지 화면에서 마이페이지 확인해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66612947
+비번호찾기눌러?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.586434
+연결 가능한 쇼핑몰 안내해봐,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.70040137
+바로그아웃 해,30,click_logout,26,26,26,click_logout,click_logout,0.6785056
+지금 장바구니 보고 있는데 이용약관 요약해 할래?,23,read_terms,19,19,19,read_terms,read_terms,0.6566013
+지금 주문내역 보고 있는데 좀 비밀번호 확인 입력해?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.507897
+로긴 진행해줘,16,click_login,12,12,12,click_login,click_login,0.6048281
+지금 메인 화면인데 앱 설치 시작해줘?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7607986
+지금 이용 약관 보기 눌러줘 해줘,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6804785
+지금 회원가입 화면인데 이용약관 보기 들어가 가능?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6846833
+바로 지금 화면 말해,34,read_page,30,30,30,read_page,read_page,0.7247934
+지금 로그인 열어,16,click_login,12,12,12,click_login,click_login,0.6003269
+일단 바로그인 상태 유지로 바꿔줘 해줄래?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63554424
+지금 장바구니 보고 있는데 이메일 작성해줘,28,input_email,24,24,24,input_email,input_email,0.6442864
+바로 비번호 재입력해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.37385198
+지금 회원가입 화면인데 이름 써?,21,input_name,17,17,17,input_name,input_name,0.65259004
+바로 좀 쇼핑몰 목록 읽어,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6982646
+좀 지금 이용 약관 화면 보여줘,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6744222
+일단 쇼핑몰 페이지인데 카트 열어 해줘,32,click_cart,28,28,28,click_cart,click_cart,0.6583574
+바로 지금 이용약관 보기 눌러 해줘,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6822496
+좀 주문내역 페이지에서 주문 상세 조회 눌러 해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67596966
+지금 아뒤 중복 확인 들어가 가능?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7955631
+바로 찜목록 페이지에서 상품조회 눌러 해,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6945444
+지금 최근 주문만 읽어줘 해봐!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.75106496
+이번에 요즘 내가 산 주문내역 알려줘 해봐,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7369894
+저녁에 식단 말해줘,0,unknown,0,0,0,unknown,unknown,0.82687217
+일단 이메일 입력해?,28,input_email,24,24,24,input_email,input_email,0.647902
+일단 회원가입 페이지 화면에서 비번호 넣어줘 해줄래?,13,input_password,9,9,9,input_password,input_password,0.5681646
+지금 장바구니 보고 있는데 장바고니에 넣어?,32,click_cart,28,28,28,click_cart,click_cart,0.6768396
+"지금 쇼핑 화면인데 지금 회원가입 페이지 보고 있는데, 이용 약관 동의 체크해줘",24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.603507
+비밀번호 변경 메뉴로 가 해,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6980569
+지금 주문내역 보고 있는데 비번호 변경하기 눌러줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7008554
+지금 바로 이름 적어,21,input_name,17,17,17,input_name,input_name,0.6511442
+바로 지금 체크 표시해,14,check_keep_login,10,10,20,check_keep_login,check_terms_agreement,0.38657612
+일단 지금 공유 쇼핑 들어가줘 해봐,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75304854
+지금 로그인 페이지에서 로그인 처리해,16,click_login,12,12,12,click_login,click_login,0.6045867
+좀 바로 아이디 중복 확인 눌러,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7976456
+좀 회원가입 페이지 화면에서 성함 입력해봐,21,input_name,17,17,17,input_name,input_name,0.6502493
+"지금주문내역페이지보고있는데,쿠팡으로이동해?",5,go_coupang,2,2,2,go_coupang,go_coupang,0.4345076
+지금 메인 화면인데 지금 로그인 페이지인데 히어비로 이동해봐,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7652866
+빨리 내 주문 록 페이지로 가?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7231109
+지금 쇼핑 화면인데 회원가입 페이지 화면에서 성함 입력해줘,21,input_name,17,17,17,input_name,input_name,0.6518711
+"지금회원가입페이지보고있는데,회웝가입제출해줘",25,submit_signup,21,21,15,submit_signup,click_signup,0.4953822
+지금 장바구니 보고 있는데 비밀번호 써,13,input_password,9,9,9,input_password,input_password,0.5624408
+지금 주문내역 보고 있는데 지금 회웝가입,19,click_signup,15,15,15,click_signup,click_signup,0.49930432
+일단 지금 회원가입 페이지인데 회웝가입 완료 버튼 눌러줘 해줄래?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.57904637
+"지금 히어비 홈에 와 있어, 앱 다운로드 진행해줘",11,click_app_download,7,7,7,click_app_download,click_app_download,0.75542504
+지금 장바구니 보고 있는데 지금 히어비 사용법 알려,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78063285
+지금 로그인 화면인데 로그인 페이지 화면에서 아이디 찾기 열어,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75399417
+일단 쇼핑몰 들어가 해,8,go_mall,5,5,5,go_mall,go_mall,0.64457554
+바로 이영약관 말해,23,read_terms,19,19,19,read_terms,read_terms,0.64270014
+로긴 들어가 해줄래?,16,click_login,12,12,12,click_login,click_login,0.6053713
+일단 바로 아이디 복구 페이지로 가 해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.73733246
+지금 로그인 화면인데 지금 쿠팡으로 가,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44282812
+바로 가능한 쇼핑몰 읽기 해,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6986619
+좀 로과웃 눌러줘,30,click_logout,26,26,26,click_logout,click_logout,0.6866404
+지금 회원가입 페이지인데 이름 작성해,21,input_name,17,17,17,input_name,input_name,0.6552474
+장바 구니 클릭 해봐,32,click_cart,28,28,28,click_cart,click_cart,0.66813314
+좀 내요새산게머노 부탁,39,go_order_history,35,35,35,go_order_history,go_order_history,0.6841367
+지금 장바구니 보고 있는데 바로 비번 찾기 시작해줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6054065
+일단 지금 앱 다운로드 버튼 해봐,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75768006
+지금 회원가입 화면인데 지금 체크 표시해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.37601656
+지금 아이디 찾기 들어가 할래?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75122845
+지금 메인 화면인데 지금 회원가입 페이지인데 아이디 사용 가능 여부 확인해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7724618
+지금 회원가입 화면인데 이름 넣어?,21,input_name,17,17,17,input_name,input_name,0.6542631
+좀 휴대폰 번호 입력해,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6712278
+당장 구매 횟수 많은 상품 알려줘?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75260425
+이번에 추천해주는 상품 말해줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76447576
+당장 요즘주문한내역읽어줘 해줘?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7372027
+"쇼핑몰 페이지 보고 있는데, 마이페이지 열어",33,click_my_page,29,29,29,click_my_page,click_my_page,0.6675027
+지금 쇼핑 화면인데 전화번호 값 넣어 할래?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.700135
+요즘 독서 해볼래?,0,unknown,0,0,0,unknown,unknown,0.82550746
+지금 메인 화면인데 지금 쇼핑몰로 가,8,go_mall,5,5,5,go_mall,go_mall,0.64476764
+지금 주문내역 보고 있는데 아이디 적어,12,input_id,8,8,8,input_id,input_id,0.60137403
+지금 메인 화면인데 지금 화면 뭐야,34,read_page,30,30,30,read_page,read_page,0.6889719
+지금 쇼핑 화면인데 체크 표시해 해봐,14,check_keep_login,10,10,20,check_keep_login,check_terms_agreement,0.52864486
+좀 앱 다운로드 버튼 진행해 할래?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75562984
+바로 장바구니에 추가해줘,32,click_cart,28,28,28,click_cart,click_cart,0.6722373
+주문한 거 보는 페이지로 가,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7286181
+바로 희어비 홈 화면에서 쇼핑몰 화면 열어줘,8,go_mall,5,5,5,go_mall,go_mall,0.6509399
+오늘 스터디 계획 기록해줘,0,unknown,0,0,0,unknown,unknown,0.8287823
+일단 바로 회웝가입 해줄래?,19,click_signup,15,15,15,click_signup,click_signup,0.5426308
+지금 메인 화면인데 상품조회 진행해?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69707507
+일단 현재 페이지 정보 읽어줘 해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5687139
+로그인 페이지에서 회원가입 버튼 눌러줘?,19,click_signup,15,15,15,click_signup,click_signup,0.55105966
+좀 회원가입 눌러,19,click_signup,15,15,15,click_signup,click_signup,0.5456214
+바로로 추천 목록 읽어줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76295066
+지금 회원가입 화면인데 지금 아이 디 중복 확인해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7910591
+지금 쇼핑 화면인데 로그인 페이지 화면에서 비번호 찾기 열어줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6055533
+지금 쇼핑 화면인데 이용약관 읽어 가능?,23,read_terms,19,19,19,read_terms,read_terms,0.6601053
+지금 쇼핑몰 페이지인데 쿠팡 페이지 열어줘?,5,go_coupang,2,2,27,go_coupang,click_go_coupang,0.43068883
+지금 회원가입 화면인데 이용약관 화면 보여주세요 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.67605764
+일단 지금 체크 표시해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.37811983
+바로 자주 주문한 상품 읽어줘?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75330174
+지금 쇼핑 화면인데 회원 탈퇴 처리해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7897432
+좀 바로 이용약관 보기 열어 해,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6839088
+지금 메인 화면인데 지금 이메일 적어,28,input_email,24,24,24,input_email,input_email,0.6542169
+일단 내주문내역페이지로가,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72334725
+바로 좀 아이디 칸에 적어?,12,input_id,8,8,8,input_id,input_id,0.59853625
+좀 로그인해줘 가능해?,16,click_login,12,12,12,click_login,click_login,0.60436726
+이용약관 읽어 가능?,23,read_terms,19,19,19,read_terms,read_terms,0.6555411
+지금 장바구니 보고 있는데 회원탈퇴 진행해?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7885599
+좀 지금 아이디 넣어 해줘,12,input_id,8,8,8,input_id,input_id,0.59618944
+회원가입 페이지 화면에서 이영약관 설명해줘?,23,read_terms,19,19,19,read_terms,read_terms,0.655606
+지금 바로 카트 열어 해줄래?,32,click_cart,28,28,28,click_cart,click_cart,0.6656385
+바로 공유 쇼핑 들어가주세요?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7504554
+먼저 주문 내역 확인하는 곳으로 가~,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7227243
+일단 로그인 페이지에서 로그인 상태 유지로 바꿔 해,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63716173
+좀 주문내역 페이지에서 페이지 상태 읽어?,34,read_page,30,30,30,read_page,read_page,0.7244855
+지금 쇼핑 화면인데 로그인 페이지에서 로그인 유지 체크해줘?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63456076
+지금 이용 약관 읽어줘?,23,read_terms,19,19,19,read_terms,read_terms,0.64526993
+지금 좀 공유 쇼핑 시작해줘,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.750279
+좀 찜목록 페이지 화면에서 상품 정보 확인해,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6843133
+지금 쇼핑 화면인데 아이디 입력,12,input_id,8,8,8,input_id,input_id,0.59660983
+바로 지금 히어브 가이드 읽어줘 해줄래?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78671163
+주문내역 페이지인데 주문 상세 화면으로 가줘 해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67014045
+지금 장바구니에 넣어 가능?,32,click_cart,28,28,28,click_cart,click_cart,0.6744228
+지금 쇼핑 화면인데 지금 화면 말해 할래?,34,read_page,30,30,30,read_page,read_page,0.7241158
+지금 로그인 화면인데 바로 전화번호 입력,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69825226
+지금 쇼핑 화면인데 지금 아뒤 중복 확인 열어,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79738617
+일단 로과웃 눌러줘 해줘,30,click_logout,26,26,26,click_logout,click_logout,0.6894086
+좀 네이버 쇼핑 페이지에서 히어브 접속해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76191276
+약관 동의 체크박스 눌러주세요 해줄래?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6029922
+좀 바로 비번호 확인 써 해줄래?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.51074624
+지금 장바구니 보고 있는데 비밀번호 확인 값 넣어 가능?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5068213
+좀 반복 구매한 상품 읽어줘 해줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75366163
+지금 회원가입 페이지인데 비밀 번호 재입력해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.39505064
+일단 지금 비번호 확인 써?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.50988615
+지금 장바구니 보고 있는데 로그인 처리해 할래?,16,click_login,12,12,12,click_login,click_login,0.60860527
+일단 바로가웃 눌러 해줘,30,click_logout,26,26,26,click_logout,click_logout,0.6901785
+이영약관 동의 항목 체크해주세요?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6044164
+일단 바로 공유 쇼핑 입장 버튼 눌러 해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7528376
+일단 바로 전화번호 값 넣어?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7017305
+바로 주문조회하는화면으로이동,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7078885
+바로 아뒤 넣어 해,12,input_id,8,8,8,input_id,input_id,0.6023145
+지금 쇼핑 화면인데 현재 페이지 정보 및 가능한 작업 읽기 해봐,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58718115
+주문 상세 조회 진행해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6744438
+지금 장바구니 보고 있는데 바로그아웃해,30,click_logout,26,26,26,click_logout,click_logout,0.6861352
+일단 쇼핑몰 페이지 화면에서 내 정보 페이지 보여줘 해줄래?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6475268
+바로 지금 회원탈퇴 눌러 해봐,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78642905
+지금 회원가입 화면인데 지금 회원가입 페이지인데 아이디 칸에 적어,12,input_id,8,8,8,input_id,input_id,0.59844863
+가능한 쇼핑몰 읽어 해봐,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6997258
+지금 쇼핑 화면인데 로긴 처리해 해봐,16,click_login,12,12,12,click_login,click_login,0.60913986
+"지금 쇼핑 화면인데 로그인 페이지 보고 있는데, 비밀번호 찾기 눌러",18,click_find_password,14,14,14,click_find_password,click_find_password,0.60613084
+"지금회원가입페이지보고있는데,이메일입력해",28,input_email,24,24,24,input_email,input_email,0.64681965
+좀 쇼핑몰 페이지에서 장바구니 보여 해줘,32,click_cart,28,28,28,click_cart,click_cart,0.6694507
+좀 로그인 페이지 화면에서 쇼핑몰 페이지로 넘어가 해줄래?,8,go_mall,5,5,5,go_mall,go_mall,0.6464618
+최근 주문 몇 건인지 알려줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74498445
+로그인 처리해봐,16,click_login,12,12,12,click_login,click_login,0.59933347
+지금 현재 페이지 정보 및 가능한 작업 말해 해봐,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.59098524
+지금 메인 화면인데 좀 상품 페이지 보여,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6831618
+지금 주문내역 보고 있는데 바로 이메일 넣어,28,input_email,24,24,24,input_email,input_email,0.64942604
+당장 주문 리스트 페이지 열어줘?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72584224
+좀 지금 상품조회 눌러 해줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6954743
+지금 비번호 입력 가능?,13,input_password,9,9,9,input_password,input_password,0.56209654
+이용약관 보기 들어가 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68014
+좀 로그인 페이지에서 로그인 처리해,16,click_login,12,12,12,click_login,click_login,0.60100913
+지금 로그인 화면인데 로그인 페이지 화면에서 로그인 유지 켜줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63529086
+좀 계정 로그아웃해줘,30,click_logout,26,26,26,click_logout,click_logout,0.6800749
+좀 바로 주문 상세 조회 들어가,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67625713
+지금 쇼핑 화면인데 히어브 메인 페이지 화면에서 히어브 서비스 설명해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.784026
+지금 메인 화면인데 회원정보 페이지에서 계정 삭제 시작해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7798891
+좀 지금 쿠팡으로 가?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.4548732
+지금 메인 화면인데 지금 이메일 주소 입력해봐,28,input_email,24,24,24,input_email,input_email,0.6499675
+지금 회원가입 화면인데 비번호 찾기 눌러,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6044521
+지금 주문내역 보고 있는데 바로긴 들어가,16,click_login,12,12,12,click_login,click_login,0.594647
+잠깐스터디계획확인해줘,0,unknown,0,0,0,unknown,unknown,0.8249521
+일단 쇼핑몰 페이지에서 마이페이지 들어가줘 해줄래?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6727737
+지금 회원가입 화면인데 주문 상세 조회 클릭 해봐,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6779259
+지금 쇼핑 화면인데 쇼핑몰 페이지에서 장바구니 담아,32,click_cart,28,28,28,click_cart,click_cart,0.6636221
+바로 메인 페이지 화면에서 공유 쇼핑 들어가?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7537034
+히어비 가이드 읽어주세요,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7819747
+좀 바로 이메일 넣어 해줘,28,input_email,24,24,24,input_email,input_email,0.6534271
+지금 메인 화면인데 이용 약관 화면 보여줘 부탁해,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.67848617
+일단 상품조회 눌러,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6951661
+지금 장바구니 보고 있는데 지금 로그인 페이지인데 로그인 유지 꺼줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7374781
+지금 메인 화면인데 지금 로그인 들어가,16,click_login,12,12,12,click_login,click_login,0.60402966
+회웝가입 완료 버튼 눌러?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.56786245
+지금 로그인 화면인데 주문 상세 보기 열어주세요,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67203873
+일단 지금 쿠팡 이동 눌러 해줄래?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47299346
+일단 내 정보 페이지 보여줘 해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.64434713
+회웝가입 페이지에서 메일 주소 넣어줘,28,input_email,24,24,24,input_email,input_email,0.6509267
+지금 메인 화면인데 회원가입 마무리해?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.59014237
+지금 로그인 화면인데 아이디 중복 확인 해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7966112
+지금 쇼핑 화면인데 회원가입 페이지 화면에서 회원가 입 제출해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5981739
+지금 아이디 찾기 시작해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.74642354
+지금 로그인 페이지에서 자동 로그인 체크 풀어줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7356032
+지금 쇼핑 화면인데 이영약관 설명해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6577046
+지금 로그인 화면인데 앱 다운로드 실행해봐,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7566499
+아침에 음악 듣기 하고 싶다,0,unknown,0,0,0,unknown,unknown,0.8286578
+지금 로그인 화면인데 로긴 상태 유지로 바꿔줘?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6368006
+지금 바로 회웝가입 제출해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60134095
+일단 좀 이름 입력해?,21,input_name,17,17,17,input_name,input_name,0.6503571
+지금쇼핑몰페이지인데히어브로이동해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.73218924
+바로 회원가입 페이지에서 약관 동의 선택해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.5930503
+좀 최근 주문 내역 말해줘!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74838406
+지금 로긴 유지 꺼줘 해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7387397
+지금 회원가입 화면인데 이름 입력,21,input_name,17,17,17,input_name,input_name,0.6528128
+먼저 추천 상품 요약해줘?,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76618254
+점심에 식단 기록해줘,0,unknown,0,0,0,unknown,unknown,0.82772636
+지금 전화번호 써 해줄래?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.702116
+바로 지금 히어브 사용법 알려줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7854319
+바로 지금 히어비로 이동 해,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7682446
+바로 연락처 입력해주세요 해줘,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.67692876
+일단 로그인 페이지인데 비밀번호 재설정 페이지로 가줘 해줄래?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.55496234
+지금 장바구니 보고 있는데 아뒤 중복 확인 열어 가능?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7966225
+지금 비번호 찾기 진행해줘 가능해?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6055788
+지금 회원가입 화면인데 지금 희어비 가이드 읽어줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78913814
+지금 회원가입 페이지인데 아뒤 중복 확인해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7962879
+지금 주문내역 보고 있는데 회원 탈퇴 처리해줘?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7881758
+바로 지금 아뒤 찾기 들어가?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7484579
+지금 장바구니 보고 있는데 지금 히어브로 이동해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7608783
+이번에 구매추천상품알려줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76468384
+바로 회원가입 페이지인데 이메일 칸에 적어줘,28,input_email,24,24,24,input_email,input_email,0.6499584
+지금 메인 화면인데 쇼핑몰 페이지 화면에서 연결 가능한 쇼핑몰 안내해줘?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.698189
+지금 로그인 화면인데 가입 끝내 가능?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5665037
+좀 지금 회원가입 페이지인데 이메일 작성해줘,28,input_email,24,24,24,input_email,input_email,0.65295565
+"일단 지금 주문내역 페이지 보고 있는데, 쿠팡으로 이동해?",5,go_coupang,2,2,2,go_coupang,go_coupang,0.441373
+지금 구매 횟수 많은 상품 알려줘 해줄래?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7491994
+아뒤찾기눌러,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7395638
+바로 쿠팡으로 열어?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.4559095
+좀 장바구니 담아줘,32,click_cart,28,28,28,click_cart,click_cart,0.6663772
+바로 좀 비번호 칸에 적어줘 해줘,13,input_password,9,9,9,input_password,input_password,0.5548978
+좀 로그인 페이지 화면에서 히어비 가이드 읽어줘 해봐,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7892043
+바로 주문내역 페이지 화면에서 주문 상세 화면으로 가줘 해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6703676
+지금 로그인 화면인데 쿠팡 페이지로 넘어가줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4299628
+지금 메인 화면인데 회원가입 페이지에서 성함 입력해줘,21,input_name,17,17,17,input_name,input_name,0.6495882
+바로과웃 눌러줘?,30,click_logout,26,26,26,click_logout,click_logout,0.6895188
+지금 쿠팡으로 넘어가주세요 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44358417
+일단 주문 내역 확인하는 곳으로 가 요!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.722262
+바로 히어비 메인 페이지 화면에서 히어비 서비스 설명해,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7852432
+지금 추천 상품 뭐 있는지 알려줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76446605
+지금 장바구니 보고 있는데 바로 회웝가입 마무리해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5824642
+지금 로그인 화면인데 쿠팡 이동 들어가,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47605592
+바로 쇼핑몰 페이지로 넘어가줘 해봐,8,go_mall,5,5,5,go_mall,go_mall,0.64614385
+바로 회원가입 페이지 화면에서 비밀번호 확인 칸에 적어줘 해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.50783306
+이영약관 읽어 해줄래?,23,read_terms,19,19,19,read_terms,read_terms,0.65398514
+회원가입 페이지에서 가입 완료 처리해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5956016
+지금 바로 마이페이지 눌러 해줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66879624
+지금 쇼핑 화면인데 바로 이용약관 읽어,23,read_terms,19,19,19,read_terms,read_terms,0.6563535
+빨리 주문목록 쪽으로 이동해,39,go_order_history,35,35,35,go_order_history,go_order_history,0.73060036
+지금 회원가입 화면인데 쿠팡으로 들어가 가능?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.43198305
+먼저 최신순으로 읽어줘!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7380646
+좀 희어비 홈 화면에서 공유 쇼핑 입장 버튼 눌러줘?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75330424
+바로 지금 이용약관 읽어 해줘,23,read_terms,19,19,19,read_terms,read_terms,0.65743005
+바로 공유 쇼핑 입장 버튼 눌러 해줘,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7509636
+지금 가능한 쇼핑몰 읽어주세요 해줄래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69793874
+지금 쇼핑 화면인데 주문 상세 조회 눌러?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6759365
+쇼핑몰페이지화면에서쿠팡으로이동해?,31,click_go_coupang,27,27,2,click_go_coupang,go_coupang,0.34349364
+쇼핑몰페이지인데쇼핑몰목록읽어줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.68278205
+일단 이메일 작성해,28,input_email,24,24,24,input_email,input_email,0.64747417
+먼저 최근 주문 몇 건인지 알려줘!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74762416
+내일 헬스장 다녀올까?,0,unknown,0,0,0,unknown,unknown,0.8272802
+지금 회원가입 화면인데 가능한 쇼핑몰 읽어,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.7006699
+저녁에 공부 할까?,0,unknown,0,0,0,unknown,unknown,0.82823724
+퇴근하고 일기 쓰기 하기 싫다,0,unknown,0,0,0,unknown,unknown,0.82624745
+바로 이용약관 보기 해,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6758776
+지금 회원가입 화면인데 로그인 페이지 화면에서 비밀 번호 작성해줘,13,input_password,9,9,9,input_password,input_password,0.5662489
+바로그인 페이지에서 회원가입으로 이동해봐,19,click_signup,15,15,15,click_signup,click_signup,0.54936075
+지금 메인 화면인데 바로 가입 끝내,25,submit_signup,21,21,21,submit_signup,submit_signup,0.55268544
+지금 쇼핑 화면인데 이름 넣어?,21,input_name,17,17,17,input_name,input_name,0.65455276
+일단 바로 쿠팡으로 들어가 해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44849464
+바로 공유 쇼핑 입장 버튼 들어가 해줘,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7488563
+좀상품페이지보여줘?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6604822
+지금 바로 이용약관 보기 열어 해,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6831684
+비번호 작성해?,13,input_password,9,9,9,input_password,input_password,0.56659913
+지금 쇼핑 화면인데 지금 아이 디 중복 확인해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79152006
+좀 내가 볼 추천 상품 읽어줘!!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7658722
+좀 바로 이용약관 읽어 해,23,read_terms,19,19,19,read_terms,read_terms,0.65553004
+지금 쇼핑 화면인데 지금 주문내역 페이지인데 상품 정보 확인해,38,click_product_view,34,34,34,click_product_view,click_product_view,0.68975925
+바로 이메일 작성해줄래?,28,input_email,24,24,24,input_email,input_email,0.6524586
+일단 지금 카트 열어 해,32,click_cart,28,28,28,click_cart,click_cart,0.66549784
+지금 바로그인 들어가?,16,click_login,12,12,12,click_login,click_login,0.60182434
+"좀 지금 주문내역 페이지 보고 있는데, 주문 상세 조회 눌러",37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67613417
+일단 회웝가입 버튼 눌러줘 가능해?,19,click_signup,15,15,15,click_signup,click_signup,0.5519916
+지금 로그인 화면인데 로긴해줘,16,click_login,12,12,12,click_login,click_login,0.60944784
+지금 주문내역 보고 있는데 가능한 쇼핑몰 뭐야 할래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6998525
+바로 회원가입 페이지에서 약관 내용 읽어줘 해줘,23,read_terms,19,19,19,read_terms,read_terms,0.64962536
+바로 지금 쇼핑몰 페이지인데 마이페이지 들어가 해줄래?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6722352
+바로 주문목록 들어가 부탁!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7256999
+지금쇼핑몰페이지인데마이페이지확인해줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.58326566
+일단 가장 최신 주문 내역 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74762493
+바로 좀 아이디 중복 조회해,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7932634
+지금 좀 로긴 유지 선택해줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63642347
+지금 로가웃 눌러줘?,30,click_logout,26,26,26,click_logout,click_logout,0.6878085
+지금 좀 상품 페이지 보여 해,38,click_product_view,34,34,34,click_product_view,click_product_view,0.68717235
+지금 로그인 화면인데 몰로 가,8,go_mall,5,5,5,go_mall,go_mall,0.6291061
+바로 회원가입 페이지 화면에서 이영약관 화면 보여줘 해줘,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68217915
+바로 주문내역 페이지에서 쿠팡 페이지 열어 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.39535922
+상품 조회 눌러 해줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69081604
+히어비로 이동?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7597377
+이번에 내가 산 것들 보는 페이지로 가 해봐,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72800314
+지금 쇼핑 화면인데 이용약관 뭐야 해봐,23,read_terms,19,19,19,read_terms,read_terms,0.65177476
+일단 바로 이용약관 보기 열어 해,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.68307835
+요즘 영화 보기 해야겠다,0,unknown,0,0,0,unknown,unknown,0.8310625
+일단 로그인 페이지 화면에서 로그인 유지 켜줘 해봐,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6363938
+바로 지금 로그인 페이지인데 비밀번호 재설정 페이지로 가줘 해봐,18,click_find_password,14,14,14,click_find_password,click_find_password,0.55524457
+지금 주문내역 보고 있는데 회원가입 페이지 화면에서 약관 동의 선택해,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.59108
+좀 지금 로그인 들어가 해,16,click_login,12,12,12,click_login,click_login,0.6077137
+바로 쇼핑몰 페이지에서 가능한 쇼핑몰 읽어줘 해,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.7022798
+히어브홈에서쇼핑몰로이동해줘,8,go_mall,5,5,5,go_mall,go_mall,0.5841296
+바로 쿠팡으로 가 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.4567192
+지금 주문내역 페이지 화면에서 지금 가능한 작업 알려 해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5821725
+바로 쇼핑몰 페이지에서 히어비 안내 읽어 해,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7882235
+바로그인 페이지 화면에서 로그인해,16,click_login,12,12,12,click_login,click_login,0.592699
+지금 메인 화면인데 지금 로그인 페이지인데 히어비로 이동해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7658781
+바로 회원가입 열어 해줄래?,19,click_signup,15,15,15,click_signup,click_signup,0.55070186
+지금 쇼핑 화면인데 히어비 홈 화면에서 앱 다운로드 버튼 눌러,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75791585
+지금 회원가입 화면인데 앱 받기 해줘,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7605122
+당장장 오늘의 추천 상품 말해줘!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76605475
+다시 요즘 주문한 내역 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74493647
+히어브안내읽어줘?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78286
+바로 지금 로그인 페이지인데 지금 가능한 작업 알려줘 해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58625346
+오늘 일정 뭐였지?,0,unknown,0,0,0,unknown,unknown,0.41996753
+일단 좀 로긴 유지 켜줘 해줄래?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63324505
+지금 쇼핑 화면인데 지금 마이페이지 들어가,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6674591
+일단 지금 로그인 페이지인데 비번호 재설정 페이지로 가줘 해,18,click_find_password,14,14,14,click_find_password,click_find_password,0.54960227
+지금 로그인 화면인데 좀 쿠팡 페이지로 넘어가,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4159315
+지금 쇼핑몰 페이지인데 로과웃 눌러줘 해,30,click_logout,26,26,26,click_logout,click_logout,0.6890762
+아이디찾기진행해가능?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7520334
+"지금 장바구니 보고 있는데 히어비 홈 보고 있는데, 앱 다운로드 버튼 눌러",11,click_app_download,7,7,7,click_app_download,click_app_download,0.7591529
+내일 영화 보기 하고 싶다,0,unknown,0,0,0,unknown,unknown,0.82835156
+지금 메인 화면인데 공유 쇼핑 입장 버튼 진행해 가능?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7541473
+지금 주문내역 보고 있는데 성함 입력해줘,21,input_name,17,17,17,input_name,input_name,0.6485121
+지금 쇼핑 화면인데 좀 상품 페이지 보여줘?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.67979544
+지금 장바구니 보고 있는데 비밀 번호 확인 입력해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5031791
+체크끄기?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7319616
+지금 장바고니 담아 가능?,32,click_cart,28,28,28,click_cart,click_cart,0.67586154
+좀 쿠팡으로 이동해봐,5,go_coupang,2,2,2,go_coupang,go_coupang,0.4465279
+내일병원예약요약해줘,0,unknown,0,0,0,unknown,unknown,0.8277201
+좀쿠팡으로이동해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.36596793
+비밀번호변경하기해,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6918543
+지금 로그인 화면인데 쇼핑몰 접속해주세요,8,go_mall,5,5,5,go_mall,go_mall,0.6477931
+좀 회원정보 페이지인데 비밀번호 변경 메뉴로 가줘 해줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7009475
+당장 내가볼추천상품읽어줘 요!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7641254
+지금 메인 화면인데 로긴 유지 선택해줘?,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63813686
+지금 로그인 페이지에서 회원가입 버튼 눌러?,19,click_signup,15,15,15,click_signup,click_signup,0.55022657
+지금 좀 비밀번호 확인 입력해줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.510813
+지금 로그인 페이지에서 비밀번호 재설정 페이지로 가줘?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5538882
+지금 회원가입 페이지인데 회웝가입 완료 버튼 눌러줘 해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.58334136
+쇼핑몰 이동 해봐,8,go_mall,5,5,5,go_mall,go_mall,0.6169651
+지금 주문내역 보고 있는데 히어브 메인 페이지 화면에서 히어브 서비스 설명해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78359646
+회원가입페이지에서쇼핑몰로이동해줘,8,go_mall,5,5,5,go_mall,go_mall,0.6136901
+"좀 회원가입 페이지 보고 있는데, 이메일 입력해",28,input_email,24,24,24,input_email,input_email,0.6528011
+지금 회웝가입 제출해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5967173
+좀 쿠팡 이동 할래?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.46009415
+쇼핑몰 페이지 화면에서 로그아웃 진행해?,30,click_logout,26,26,26,click_logout,click_logout,0.6896194
+일단 비번호 적어 할래?,13,input_password,9,9,9,input_password,input_password,0.56474847
+지금 쇼핑 화면인데 지금 주문내역 페이지인데 주문 상세 화면으로 가,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6671349
+"지금 메인 화면인데 회원가입 페이지 보고 있는데, 전화번호 입력해",26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7011483
+쿠팡으로 넘어가주세요 해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44383055
+지금 장바구니 보고 있는데 비밀번호 입력 해봐,13,input_password,9,9,9,input_password,input_password,0.56561184
+좀 장바구니 페이지 화면에서 상품조회 눌러줘 해줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6918921
+일단 쿠팡 이동 열어 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47599
+"히어비 홈에 와 있어, 공유 쇼핑 들어가 해",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7527668
+당장 반복 구매한 상품 읽어줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75402045
+지금 쇼핑 화면인데 바로 쇼핑몰 목록 읽어,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6983306
+빨리 추천아이템알려줘~,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7634139
+좀 회원가입 페이지 화면에서 약관 동의 체크박스 눌러줘 해봐,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.60361266
+"지금 메인 화면인데 쇼핑몰 페이지 보고 있는데, 로그아웃 눌러",30,click_logout,26,26,26,click_logout,click_logout,0.6853849
+바로 회원가입 페이지에서 이용약관 보기 눌러?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6828833
+가장 많이 산 상품부터 알려줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75060344
+지금 쇼핑 화면인데 지금 회원탈퇴 들어가,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7847183
+좀 지금 히어브 가이드 읽어줘 해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78881556
+지금 쇼핑 화면인데 지금 이용 약관 요약해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6514974
+지금 바로과웃 눌러,30,click_logout,26,26,26,click_logout,click_logout,0.68547195
+바로 쇼핑몰 페이지에서 히어비 안내 읽어 해봐,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7869686
+다시 구매 횟수 많은 상품 알려줘~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7537597
+당장 자주 주문한 상품 읽어줘~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7519937
+바로 지금 회원가입 페이지인데 이름 작성해,21,input_name,17,17,17,input_name,input_name,0.6553126
+바로 이영약관 보기 눌러줘?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6789181
+지금 쇼핑 화면인데 아뒤 중복 확인 해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79409003
+바로 지금 회웝가입 들어가 해줘,19,click_signup,15,15,15,click_signup,click_signup,0.54669654
+일단 비번호 입력 해줘,13,input_password,9,9,9,input_password,input_password,0.5681747
+바로 화면 정보 알려줘 해봐,34,read_page,30,30,30,read_page,read_page,0.6885994
+바로 좀 로그인 유지 켜줘 해,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6261107
+좀 바로 전화번호 써 해줄래?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7030596
+지금 장바구니 보고 있는데 이용약관 동의 체크 할래?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.605342
+좀 지금 비번호 적어 해봐,13,input_password,9,9,9,input_password,input_password,0.56510246
+지금 아이디 중복 확인 열어 할래?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7971845
+지금 장바구니 보고 있는데 탈퇴 메뉴 열어줘 부탁해,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7565352
+지금 회원가입 화면인데 지금 계정 나갈게 로그아웃해,30,click_logout,26,26,26,click_logout,click_logout,0.6865018
+지금 바로 장바구니에 넣어?,32,click_cart,28,28,28,click_cart,click_cart,0.67337567
+이번에 주문목록 쪽으로 이동해 부탁~,39,go_order_history,35,35,35,go_order_history,go_order_history,0.72740203
+지금 로그인 화면인데 회원가입 제출해 가능?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60741204
+바로 좀 쿠팡으로 넘어가줘 해봐,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44678456
+히어비 홈 화면에서 쇼핑몰 화면 열어 해줄래?,8,go_mall,5,5,5,go_mall,go_mall,0.64857656
+좀 상품 조회 눌러줘 해,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69386834
+주말 음악 목록 확인해줘,0,unknown,0,0,0,unknown,unknown,0.827854
+지금 회원가입 화면인데 가능한 쇼핑몰 말해 가능?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6997247
+바로 비밀번호 찾기 가능?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.59674895
+점심 먹고 강변 가고 싶다,0,unknown,0,0,0,unknown,unknown,0.821298
+좀 히어비 홈 화면에서 공유 쇼핑 입장 버튼 눌러 해,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75248075
+지금 가능한 쇼핑몰 읽기 해,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6998665
+메인 페이지 화면에서 쇼핑몰 페이지로 넘어가 해,8,go_mall,5,5,5,go_mall,go_mall,0.6481255
+"지금 장바구니 보고 있는데 지금 쇼핑몰 페이지 보고 있는데, 쿠팡 이동 클릭해줘?",31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47715864
+일단 지금 쇼핑몰로 가 해,8,go_mall,5,5,5,go_mall,go_mall,0.6483766
+바로그인 페이지에서 히어비 메인으로 가 해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76586044
+이메일 입력 할래?,28,input_email,24,24,24,input_email,input_email,0.6452425
+로그인페이지화면에서이화면에서할수있는것알려줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5698362
+"지금 메인 화면인데 쇼핑몰 페이지 보고 있는데, 쿠팡 이동 클릭해줘",31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47608382
+좀 지금 회원탈퇴 눌러 해봐,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7854834
+당장 요즘 내가 산 주문내역 알려줘 부탁해~,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.741017
+좀 지금 상품 정보 확인해봐,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6879732
+먼저 자주 담는 상품 읽어줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7490409
+일단 현재 페이지 정보 및 가능한 작업 읽어 해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58830696
+일단 지금 회웝가입 열어 해,19,click_signup,15,15,15,click_signup,click_signup,0.54692173
+지금 내 정보 페이지 보여줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6498621
+지금 쇼핑 화면인데 로그인 페이지 화면에서 아뒤 찾기 진행해줘,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75022656
+일단 지금 로그인 페이지인데 비밀 번호 재설정 페이지로 가줘 해,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5565331
+이번에 내가 뭐샀멘 해봐!!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.71814996
+바로 지금 로그인 들어가 해,16,click_login,12,12,12,click_login,click_login,0.60568976
+지 주문목록 들어가,39,go_order_history,35,35,35,go_order_history,go_order_history,0.70305973
+지금 메인 화면인데 회원가입 페이지에서 약관 안내해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6441805
+바로 지금 비번호 값 넣어 해,13,input_password,9,9,9,input_password,input_password,0.5675771
+"지금 장바구니 보고 있는데 지금 회원가입 페이지 보고 있는데, 전화번호 입력해봐",26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.70186025
+바로 지금 전화번호 넣어?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7002798
+일단 희어비로 이동해주세요 해봐,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7662259
+히어비 홈에서 앱 다운로드 진행해,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75643146
+내 구매 빈도 높은 상품 읽어줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75285083
+현재 페이지 정보 및 가능한 작업 읽기 해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.59019226
+"로그인 페이지 보고 있는데, 회원가입 버튼 눌러?",19,click_signup,15,15,15,click_signup,click_signup,0.553553
+점심 먹고 물 마시기 해볼래?,0,unknown,0,0,0,unknown,unknown,0.82635
+"지금 회원가입 화면인데 히어비 홈에 와 있어, 공유 쇼핑 들어가줘",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.74475914
+회원가입 페이지 화면에서 약관 보기 열어?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6708148
+좀 쇼핑몰 들어가 해,8,go_mall,5,5,5,go_mall,go_mall,0.6418483
+지금 주문내역 보고 있는데 히어비 소개해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.779311
+바로 회원정보 페이지에서 계정 삭제 시작해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7810677
+회원가입페이지화면에서이메일칸에적어줘?,28,input_email,24,24,24,input_email,input_email,0.5454672
+지금 회원가입 화면인데 지금 로그인 페이지인데 로그인 유지 선택 해제해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73622
+체크 켜 해봐,14,check_keep_login,10,10,20,check_keep_login,check_terms_agreement,0.4429459
+지금 장바구니 보고 있는데 비밀번호 찾기 들어가?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6046506
+지금 장바구니 보고 있는데 비번호 값 넣어 가능?,13,input_password,9,9,9,input_password,input_password,0.56641805
+바로 지금 현재 페이지 정보 및 가능한 작업 알려줘?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5872202
+지금 쇼핑 화면인데 회원정보 페이지 화면에서 현재 페이지 읽어줘,34,read_page,30,30,30,read_page,read_page,0.7260629
+일단 지금 전화번호 적어,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6982312
+좀 장바구니 페이지 화면에서 상품조회 눌러줘?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6934242
+지금 쇼핑 화면인데 쿠팡 이동 해,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.46766093
+지금 바로 비번호 적어,13,input_password,9,9,9,input_password,input_password,0.56471753
+바로 지금 비밀번호 변경하기 들어가 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7037032
+지금 바로 이메일 입력 해줘,28,input_email,24,24,24,input_email,input_email,0.6542465
+"지금 회원가입 화면인데 지금 회원가입 페이지 보고 있는데, 아이 디 입력해줘",12,input_id,8,8,8,input_id,input_id,0.5823723
+이번 가을 영어공부 만들어줘,0,unknown,0,0,0,unknown,unknown,0.82384646
+바로 히어브 안내 읽어,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78402704
+지금 주문내역 보고 있는데 이메일 값 넣어?,28,input_email,24,24,24,input_email,input_email,0.64733475
+바로 쿠팡으로 열어 가능?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.45244607
+지금 상품조회 눌러줄래?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6957663
+회웝가입 완료 버튼 눌러줘?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5716797
+일단 바로 이용약관 알려줘 해줘,23,read_terms,19,19,19,read_terms,read_terms,0.65794784
+좀 지금 로그인 페이지인데 로긴 유지 체크해줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.631831
+지금 장바구니 보고 있는데 비번호 찾기 들어가 가능?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60593975
+일단 바로 가능한 쇼핑몰 알려줘 해줄래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.70087135
+지금 회원가입 화면인데 지금 가능한 쇼핑몰 요약해,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6998678
+좀 히어브 메인 페이지 화면에서 히어브 서비스 설명해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78594965
+좀 현재 페이지 정보 읽어줘 해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5714499
+집에서지하철시간요약해줘,0,unknown,0,0,0,unknown,unknown,0.82365966
+로그인 페이지에서 쇼핑몰 페이지로 넘어가줘?,8,go_mall,5,5,5,go_mall,go_mall,0.64689744
+일단 회원탈퇴 들어가 할래?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78339165
+지금 주문내역 보고 있는데 주문내역 페이지에서 현재 페이지 읽어줘?,34,read_page,30,30,30,read_page,read_page,0.72481036
+지금 회원가입 화면인데 쿠팡 페이지 화면에서 초기 화면으로 이동해?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.73242414
+지금 바로 아뒤 복구 페이지로 가줘 해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7255255
+지금 쇼핑 화면인데 지금 쇼핑몰 페이지인데 쿠팡으로 이동해봐,5,go_coupang,2,2,27,go_coupang,click_go_coupang,0.3894189
+지금 주문내역 보고 있는데 아뒤 중복 확인 열어 가능?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7969088
+장바구니로 이동해 해?,32,click_cart,28,28,28,click_cart,click_cart,0.6690098
+주문자세히보기해봐,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.4814407
+지금 장바구니 보고 있는데 장바구니에 추가해봐,32,click_cart,28,28,28,click_cart,click_cart,0.6686569
+지금 쿠팡 이동 눌러 해줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47600406
+바로 전화번호 넣어?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6986058
+일단 지금 약관 확인 버튼 눌러 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6703816
+지금 쇼핑 화면인데 로그인 들어가 가능?,16,click_login,12,12,12,click_login,click_login,0.6007655
+아이디 중복 확인 열어 해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7960991
+지금 회원 탈퇴 처리해줄래?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7833208
+일단 희어비 메인으로 가,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.758684
+아뒤써할래?,12,input_id,8,8,8,input_id,input_id,0.58595
+회원정보 페이지에서 지금 화면 내용 읽어 해봐,34,read_page,30,30,30,read_page,read_page,0.71836007
+바로 ﻿자주 산 상품 읽어줘 좀!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75246406
+지금 쇼핑 화면인데 회원가입 페이지 화면에서 아이디 중복 조회해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79579115
+지금 주문내역 페이지에서 현재 페이지 읽어줘 해줘,34,read_page,30,30,30,read_page,read_page,0.72696793
+이번 주말 낮잠 해볼래?,0,unknown,0,0,0,unknown,unknown,0.8281604
+지금 회원가입 페이지에서 약관 동의 선택해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.59500664
+바로 지금 비번호 변경하기 들어가 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70352757
+지금 회원가입 페이지인데 비번호 확인 칸에 적어줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5106541
+일단 바로 비밀번호 찾기 해봐,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5974953
+바로 이용약관 동의 항목 체크해주세요 해줄래?,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6021746
+지금 주문내역 보고 있는데 지금 마이페이지 진행해,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6685343
+좀 쇼핑몰 접속해,8,go_mall,5,5,5,go_mall,go_mall,0.64416254
+지금 회원가입 페이지 화면에서 약관 보기 열어 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6711058
+지금 이 화면에서 할 수 있는 것 알려줘 해봐,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5781798
+다시 내 근래 뭘 샀당가 해줘?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7228123
+현재페이지정보및가능한작업요약해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.55208176
+지금 로그인 화면인데 아이디 중복 확인해 해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79783136
+지금 장바구니 보고 있는데 회원가입 페이지 화면에서 전화번호 입력해?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7020838
+다시 주문내역 탭으로 가줘!!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7291509
+지금 쇼핑 화면인데 회원가 입 제출해줘?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60581714
+일단 지금 장바고니에 추가해,32,click_cart,28,28,28,click_cart,click_cart,0.67482144
+일단 지금 이용약관 뭐야 해줄래?,23,read_terms,19,19,19,read_terms,read_terms,0.6514976
+지금 장바구니 보고 있는데 회원가입 페이지인데 비밀번호 재입력해,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.39835292
+일단 회원가입 진행해?,19,click_signup,15,15,15,click_signup,click_signup,0.55053824
+바로그인 페이지 화면에서 히어브 가이드 읽어줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7913838
+일단 지금 이용약관 알려줘?,23,read_terms,19,19,19,read_terms,read_terms,0.654799
+지금 로그인 화면인데 이용 약관 화면 보여줘?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.67805856
+"바로 지금 쇼핑몰 페이지 보고 있는데, 히어비 가이드 읽어 해줘",7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7888786
+지금 주문내역 보고 있는데 지금 히어비로 들어가,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7694255
+회원가입제출,25,submit_signup,21,21,21,submit_signup,submit_signup,0.57526547
+쇼핑몰 페이지인데 쿠팡 화면 열어?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.46327472
+지금 주문내역 보고 있는데 마이페이지 해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6645449
+지금 내 주문내역 페이지로 가~,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7266433
+희어비 메인으로 가,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7544867
+지금 회원가입 화면인데 좀 이용 약관 요약해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6431094
+지금 체크해 해봐,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.38845098
+"지금 회웝가입 페이지 보고 있는데, 이용약관 보기 눌러줘",22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6828447
+지금 쇼핑 화면인데 성함 입력해주세요,21,input_name,17,17,17,input_name,input_name,0.6554384
+일단 지금 로긴해,16,click_login,12,12,12,click_login,click_login,0.5993644
+상픔조회 눌러줘 해줄래?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6779076
+지금 쇼핑 화면인데 로그인해줘?,16,click_login,12,12,12,click_login,click_login,0.5988195
+지금 회원가입 화면인데 쇼핑몰 이동 해봐,8,go_mall,5,5,5,go_mall,go_mall,0.64632803
+앱다운로드버튼해봐,11,click_app_download,7,7,7,click_app_download,click_app_download,0.74384147
+지금 로그인 화면인데 비번호 입력 해봐,13,input_password,9,9,9,input_password,input_password,0.5655217
+지금 회원탈퇴 눌러 해줄래?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.78623223
+지금 로그인 페이지인데 비번호 재설정 페이지로 가줘 해봐,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5525452
+내게 맞는 추천 상품 말해줘!!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76508874
+오늘 추천해줄상품알려줘 부탁해?,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7631033
+일단 지금 추천 상상품 뭐 있는지 알려줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7565614
+바로 지금 주문내역 보고 있는데 회원가입 페이지에서 아이디 입력해줘,12,input_id,8,8,8,input_id,input_id,0.6009521
+지금 장바구니 보고 있는데 지금 회원가입 페이지인데 전화번호 입력해봐,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.70168924
+일단 탈퇴 메뉴 열어 해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7637968
+바로 마이페이지 해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6601586
+바로 지금 히어비로 이동해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76846313
+일단 지금 이용약관 알려줘 해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6535176
+지금주문내역페이지인데주문자세히보기해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.3757961
+지금 쇼핑 화면인데 메인으로 돌아가,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.62695396
+일단 지금 공유 쇼핑 입장 버튼 들어가 해줄래?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7470715
+좀 비번호 찾기 진행해 할래?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6048851
+지금 메인 화면인데 로그인 페이지 화면에서 비밀번호 칸에 적어줘?,13,input_password,9,9,9,input_password,input_password,0.5610326
+지금 주문내역 보고 있는데 회원가입 페이지 화면에서 약관 동의 선택해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.59735376
+바로 재구매많이한상품알려줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75026864
+바로 좀 현재 페이지 읽어줘 해봐,34,read_page,30,30,30,read_page,read_page,0.7247425
+일단 로그아웃 처리해 해봐,30,click_logout,26,26,26,click_logout,click_logout,0.68838483
+바로전화번호값넣어,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.67949027
+지금 주문내역 보고 있는데 지금 상품 정보 확인해봐,38,click_product_view,34,34,34,click_product_view,click_product_view,0.68377894
+지금 주문내역 보고 있는데 희어비 홈에서 쇼핑몰 접속해줘,8,go_mall,5,5,5,go_mall,go_mall,0.64817727
+바로 아이디 찾기 눌러 가능?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75097585
+쿠팡페이지로넘어가줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.3947425
+지금 메인 화면인데 상픔조회 눌러,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6852302
+지금 회원가입 화면인데 회원가입 페이지 화면에서 휴대폰 번호 입력해줘,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6776108
+지금화면뭐야,34,read_page,30,30,30,read_page,read_page,0.39310917
+요즘 동네 한 바퀴 가서 바람 쐴까?,0,unknown,0,0,0,unknown,unknown,0.81015325
+좀 주문내역 페이지 화면에서 주문 상세 화면으로 가줘 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6693517
+지금 주문내역 보고 있는데 쇼핑몰 페이지 화면에서 마이페이지 열어,33,click_my_page,29,29,29,click_my_page,click_my_page,0.671224
+일단 바로 이용약관 뭐야 해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6489665
+먼저 구매추천상품알려줘 좀~,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76493585
+지금 쇼핑 화면인데 아뒤 값 넣어,12,input_id,8,8,8,input_id,input_id,0.6004477
+좀 히어비 메인으로 가줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76333296
+지금 회원가입 화면인데 주문 자세히 보기 해줄래?,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.67353624
+바로 성함 입력해주세요 해,21,input_name,17,17,17,input_name,input_name,0.65280634
+처음 페이지로 돌아가줘 해줄래?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.72448003
+바로 지금 이메일 입력 해봐,28,input_email,24,24,24,input_email,input_email,0.65474194
+바로 회원가입 페이지 화면에서 비밀번호 확인 칸에 적어줘 해,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5084173
+지금 주문내역 보고 있는데 이메일 값 넣어 가능?,28,input_email,24,24,24,input_email,input_email,0.6495447
+지금 쇼핑 화면인데 로그인 해,16,click_login,12,12,12,click_login,click_login,0.59682274
+바로 쇼핑몰 페이지인데 쿠팡 이동 클릭해줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47381765
+일단 좀 쇼핑몰 목록 읽어줘 해줄래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6944198
+지금 장바구니 보고 있는데 바로그아웃해줘,30,click_logout,26,26,26,click_logout,click_logout,0.68690884
+일단 쇼핑몰 페이지에서 장바 구니 보여줘 해봐,32,click_cart,28,28,28,click_cart,click_cart,0.668114
+지금 로그인 유지 꺼줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73832035
+지금 장바구니 보고 있는데 앱 다운로드 버튼 클릭 해,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7591599
+지금 회원가입 페이지 화면에서 회원가 입 등록해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.6009466
+지금 로그인 화면인데 회원가입 등록해,25,submit_signup,21,21,21,submit_signup,submit_signup,0.6011794
+일단 바로 아뒤 찾기 열어 해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7455068
+추천할 만한 상품 알려줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76179683
+좀 탈퇴 메뉴 열어 해줄래?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.76279306
+먼저 최근 주문 목록 말해줘!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7480084
+지금 주문내역 보고 있는데 좀 쿠팡으로 이동해봐,5,go_coupang,2,2,2,go_coupang,go_coupang,0.4517182
+일단 바로 체크해줘,14,check_keep_login,10,10,20,check_keep_login,check_terms_agreement,0.40229046
+지금 회원가입 화면인데 로그인 처리해,16,click_login,12,12,12,click_login,click_login,0.6050728
+지금 주문내역 페이지인데 주문 상세 화면으로 가 해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6701875
+바로 회원정보 페이지에서 탈퇴 메뉴 열어줘 해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.77972275
+지금 쇼핑 화면인데 주문내역 페이지에서 현재 페이지 읽어줘,34,read_page,30,30,30,read_page,read_page,0.7243249
+지금 회원가입 눌러?,19,click_signup,15,15,15,click_signup,click_signup,0.5493145
+바로그인 페이지 화면에서 자동 로긴 체크 풀어줘 해줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73971814
+좀 가능한 쇼핑몰 요약해 할래?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6973844
+지금 쇼핑 화면인데 쇼핑몰 페이지에서 쿠팡이 접속해줘,5,go_coupang,2,2,27,go_coupang,click_go_coupang,0.429399
+바로 지금 화면 알려줘 가능?,34,read_page,30,30,30,read_page,read_page,0.72202945
+지금 주문내역 보고 있는데 동의 처리해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.59158015
+지금 회원가입 화면인데 전화번호 써?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.7009203
+좀 지금 회원가입 페이지인데 약관 확인 버튼 눌러줘?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.66261667
+지금 메인 화면인데 쇼핑몰 페이지 화면에서 마이페이지 확인해줘,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6690601
+지금 회원가입 화면인데 회원가입 제출,25,submit_signup,21,21,21,submit_signup,submit_signup,0.6006962
+장바고니 페이지에서 상품 페이지 보여줘,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6804894
+일단 지금 아뒤 입력 해줄래?,12,input_id,8,8,8,input_id,input_id,0.6030114
+좀 체크 켜?,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.38641036
+지금 회원가입 화면인데 지금 쇼핑몰 들어가,8,go_mall,5,5,5,go_mall,go_mall,0.6463462
+지금 쇼핑 화면인데 히어비 홈에서 앱 다운로드 진행해줘,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7601959
+바로 비밀번호 찾기 진행해줘 가능해?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.6039223
+바로 지금 마이페이지 해,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6653002
+히어브안내읽어줘가능해?,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78347045
+좀 상픔조회 눌러줘?,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6840284
+마이페이지열어,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66243285
+지금 바로 비번호 확인 써 해줄래?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5105962
+지금 주문내역 보고 있는데 읽기 할래?,34,read_page,30,30,30,read_page,read_page,0.6831306
+일단 이용 가능한 쇼핑몰 알려줘 해봐,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.7004231
+좀 아이디 중복 확인 열어?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7958329
+회원가입 눌러 해봐,19,click_signup,15,15,15,click_signup,click_signup,0.5460804
+"일단 지금 로그인 페이지 보고 있는데, 로그인 버튼 눌러줘?",16,click_login,12,12,12,click_login,click_login,0.60616726
+지금 장바 구니 담아줘 해,32,click_cart,28,28,28,click_cart,click_cart,0.67687154
+바로 아뒤 중복 확인 들어가 할래?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79501724
+다시 최신순으로읽어줘 좀!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7410111
+지금 쇼핑 화면인데 로그인해줘 가능?,16,click_login,12,12,12,click_login,click_login,0.5967145
+바로 회원가입 제출 해줄래?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60406667
+지금 장바구니 보고 있는데 아뒤 중복 확인?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7922726
+일단 바로 이메일 써 해줘,28,input_email,24,24,24,input_email,input_email,0.6540416
+좀 아뒤 중복 확인 진행해 해봐,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7965963
+오늘 가장최근주문알려줘 부탁해,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7414278
+지금 로그인 화면인데 지금 체크해줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.35508054
+좀 회원가입 페이지 화면에서 이메일 칸에 적어 해,28,input_email,24,24,24,input_email,input_email,0.652943
+지금전화번호작성해,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6909614
+지금 로그인 화면인데 회원가입 페이지 화면에서 이메일 주소 입력해봐,28,input_email,24,24,24,input_email,input_email,0.64849555
+지금 메인 화면인데 비번호 적어 가능?,13,input_password,9,9,9,input_password,input_password,0.5675412
+지금 로그인 화면인데 비번호 변경하기 들어가 할래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70287085
+좀 내 근래 뭘 샀당가 부탁해?,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7233311
+좀 로그인 페이지 화면에서 회원가 입 시작해줘,19,click_signup,15,15,15,click_signup,click_signup,0.54519004
+지금 로그인 페이지인데 아뒤 찾기 열어줘,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7493754
+좀 아뒤 중복 조회해줘?,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7924424
+바로 ﻿최근 주문내역 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74457693
+지금 쇼핑 화면인데 전화번호 적어 해봐,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69727445
+지금 로그인 화면인데 쇼핑몰 페이지 화면에서 로그아웃 처리해,30,click_logout,26,26,26,click_logout,click_logout,0.6904078
+주문내역 페이지 화면에서 쿠팡으로 이동해,5,go_coupang,2,2,2,go_coupang,go_coupang,0.43896064
+일단 내 정보 페이지 보여줘?,33,click_my_page,29,29,29,click_my_page,click_my_page,0.64244556
+"바로 지금 쇼핑몰 페이지 보고 있는데, 히어브 가이드 읽어줘 해줄래?",7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78955775
+지금 쇼핑 화면인데 회원가입 진행해 할래?,19,click_signup,15,15,15,click_signup,click_signup,0.5552972
+일단 지금 회원가입 페이지인데 이메일 작성해줘?,28,input_email,24,24,24,input_email,input_email,0.6528579
+바로 최근주문몇건인지알려줘~,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74515027
+일단 계정 삭제 시작해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7799681
+좀 바로 계정 로그아웃해줘,30,click_logout,26,26,26,click_logout,click_logout,0.6835442
+좀 쇼핑몰 접속해주세요 해,8,go_mall,5,5,5,go_mall,go_mall,0.6492706
+지금 바로 비밀번호 변경하기 열어 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7040834
+바로 회원가입 페이지 화면에서 약관 보기 열어 해봐,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6721394
+쿠팡 가기 눌러줘 해봐,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47607046
+지금 쇼핑 화면인데 바로 이용약관 말해,23,read_terms,19,19,19,read_terms,read_terms,0.6543602
+일단 체크 표시해 해봐,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.50293344
+좀 아뒤 중복 확인 눌러 해줘,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7963416
+좀 주문목록 페이지로 가 부탁해!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.73212117
+바로회원가입열어,19,click_signup,15,15,15,click_signup,click_signup,0.54744375
+좀 히어브 메인으로 가줘 해봐,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7631481
+지금 쇼핑 화면인데 전화번호 입력 해,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6995207
+지금 메인 화면인데 앱 설치 시작해?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.76171273
+주문 상세 화면으로 가 해줘,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6738331
+좀 쿠팡 페이지로 넘어가 해봐,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4153986
+지금 아이 디 복구 페이지로 가주세요 해줘,17,click_find_id,13,13,13,click_find_id,click_find_id,0.723627
+일단 바로 전화번호 입력,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69823605
+지금 쇼핑 화면인데 선택해?,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.32221276
+지금 회원가입 화면인데 로긴 유지 꺼줘,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.7377467
+좀 바로 아이디 찾기 진행해,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7498014
+로그인페이지화면에서아뒤찾기시작해줘,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7451676
+바로 주문내역 페이지에서 페이지 상태 읽어?,34,read_page,30,30,30,read_page,read_page,0.72488266
+지금 회원가입 화면인데 지금 아이디 값 넣어,12,input_id,8,8,8,input_id,input_id,0.5984693
+바로 회원가입 페이지에서 회웝가입 등록해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5878109
+바로그인 페이지에서 비밀 번호 재설정 페이지로 가줘 해줄래?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.54918736
+다시 최근 주문 상황 설명해줘~,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74805266
+좀 쇼핑몰 페이지인데 쿠팡 페이지로 넘어가줘 해봐,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.43340826
+지금 장바구니 보고 있는데 장바고니에 추가해줘,32,click_cart,28,28,28,click_cart,click_cart,0.675151
+좀 바로 현재 페이지 정보 및 가능한 작업 알려줘 해줄래?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5910238
+"지금 메인 화면인데 지금 회원가입 페이지 보고 있는데, 이메일 입력해줘",28,input_email,24,24,24,input_email,input_email,0.6500028
+이번주수면시간알려줘,0,unknown,0,0,0,unknown,unknown,0.7769447
+좀 전화번호 써?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69741434
+지금 주문내역 보고 있는데 지금 회원가입 페이지인데 이메일 입력해?,28,input_email,24,24,24,input_email,input_email,0.6512514
+지금 주문내역 보고 있는데 히어비로 가 가능?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7705466
+지금 회원탈퇴,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.77396023
+좀 회원가입 페이지 화면에서 이용약관 화면 보여?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6788071
+좀 쿠팡 이동 해줄래?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.46086988
+좀 지금 앱 다운로드 버튼 해봐,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7576531
+일단 이메일 넣어 해줄래?,28,input_email,24,24,24,input_email,input_email,0.65220666
+일단 지금 쇼핑몰 이동 해줄래?,8,go_mall,5,5,5,go_mall,go_mall,0.6447818
+히어브 홈에서 앱 받기 해줘,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7563803
+좀 지금 회원정보 페이지인데 비번호 변경 화면 열어줘 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.700856
+좀 바로 주문 상세 보기 열어 해봐,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6744744
+지금 쇼핑 화면인데 지금 회원정보 페이지인데 비번호 변경 메뉴로 가줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6970456
+일단 많이 샀던 상품들 보여줘 해줄래?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75145704
+지금 회원가입 화면인데 바로 아뒤 중복 확인 열어,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7980729
+바로아이디찾기눌러,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7408436
+지금 메인 화면인데 로그인 페이지 화면에서 현재 페이지와 기능 안내해,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5807304
+일단 바로 비밀번호 변경하기 열어 해줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7036555
+"좀 지금 히어브 홈 보고 있는데, 공유 쇼핑 입장 버튼 눌러줘 해",10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7542679
+지금 주문내역 보고 있는데 이용약관 화면 보여줘?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.66915846
+로그인페이지에서자동로긴체크해줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.5788132
+로그인 페이지 화면에서 현재 페이지와 기능 안내해줘?,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5750794
+"지금 장바구니 보고 있는데 히어비 홈에 와 있어, 앱 다운로드 진행해",11,click_app_download,7,7,7,click_app_download,click_app_download,0.7597434
+"좀 지금 메인 페이지 보고 있는데, 앱 다운로드 버튼 눌러?",11,click_app_download,7,7,7,click_app_download,click_app_download,0.7590029
+지금 메인 화면인데 로그인 유지 켜줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6337529
+좀 히어비 홈 화면에서 공유 쇼핑 입장 버튼 눌러?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7529198
+지금 주문내역 보고 있는데 지금 로그인해,16,click_login,12,12,12,click_login,click_login,0.6022669
+지금 장바구니 보고 있는데 이메일 넣어 가능?,28,input_email,24,24,24,input_email,input_email,0.6494109
+이영약관 설명해줘 가능해?,23,read_terms,19,19,19,read_terms,read_terms,0.6577097
+다시 자주 주문한 상품 읽어줘 좀!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75325006
+지금 체크해 가능?,14,check_keep_login,10,10,20,check_keep_login,check_terms_agreement,0.37136987
+좀 자주산물건들말해줘!!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7476235
+지금 주문내역 보고 있는데 회웝가입 가능?,19,click_signup,15,15,15,click_signup,click_signup,0.49420512
+"지금 회원가입 화면인데 지금 히어비 홈 보고 있는데, 앱 다운로드 버튼 눌러",11,click_app_download,7,7,7,click_app_download,click_app_download,0.7613909
+지금 메인 화면인데 비번호 변경하기 해봐,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70166564
+지금 주문내역 페이지 화면에서 주문 자세히 보기 해,37,click_order_detail,33,33,33,click_order_detail,click_order_detail,0.6707176
+바로 이름 넣어 할래?,21,input_name,17,17,17,input_name,input_name,0.65411854
+지금 메인 화면인데 비밀번호 작성해줘?,13,input_password,9,9,9,input_password,input_password,0.56925094
+지금 쇼핑 화면인데 지금 장바고니 담아줘,32,click_cart,28,28,28,click_cart,click_cart,0.679549
+일단 쿠팡 이동 클릭 해줄래?,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47827256
+지금 로그인 화면인데 지금 공유 쇼핑 입장 버튼 열어,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7518634
+바로 상품조회,38,click_product_view,34,34,34,click_product_view,click_product_view,0.6923486
+좀 아뒤 입력 해줄래?,12,input_id,8,8,8,input_id,input_id,0.6042279
+지금 좀 쿠팡으로 넘어가줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44453818
+지금 메인 화면인데 로긴 유지 켜줘 부탁해,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6348185
+지금 주문내역 보고 있는데 이름 써?,21,input_name,17,17,17,input_name,input_name,0.6499856
+일단 지금 전화번호 적어?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6996059
+바로 회원가입 페이지 화면에서 비밀번호 확인 칸에 적어 해봐,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5068784
+이번에 내가산것들보는페이지로가!!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7015954
+일단 전화번호 입력 해줘,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.69952804
+로그인 페이지 화면에서 로그인해줘?,16,click_login,12,12,12,click_login,click_login,0.6003646
+요즘 물 마시기 해야겠다,0,unknown,0,0,0,unknown,unknown,0.82898945
+지금 로그인 페이지에서 히어비 메인으로 가?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7666743
+지금 장바구니 보고 있는데 아이 디 넣어줄래?,12,input_id,8,8,8,input_id,input_id,0.58027977
+지금 장바구니 보고 있는데 쿠팡으로 가 할래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.4486924
+바로 비밀 번호 찾기 진행해봐,18,click_find_password,14,14,14,click_find_password,click_find_password,0.5977576
+지금 주문내역 보고 있는데 비밀번호 찾기 열어,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60827434
+지금 회원가입 페이지인데 아뒤 칸에 적어줘 해줄래?,12,input_id,8,8,8,input_id,input_id,0.5906762
+일단 오늘의 추천 상품 말해줘?,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76570714
+지금 로그인 화면인데 지금 화면 내용 읽어,34,read_page,30,30,30,read_page,read_page,0.7116421
+좀 회원가입 페이지 화면에서 이영약관 설명해줘,23,read_terms,19,19,19,read_terms,read_terms,0.65394026
+다시 최근 주문부터 읽어줘 해봐?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74772084
+빨리 반복 구매한 상품 읽어줘 부탁!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7537503
+다시 내가 반복해서 산 상품 알려줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7483914
+일단 좀 아이 디 찾기 눌러줘?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7407172
+좀 로그인 페이지 화면에서 로그인 유지 켜 해봐,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6350973
+지금 주문내역 보고 있는데 체크해?,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.27722445
+바로 주문내역 페이지에서 쿠팡 페이지 열어줘 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.3941981
+좀 바로 체크 켜 해줘,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.5056724
+좀 바로 비번호 변경하기 열어 해봐,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7041598
+지금 메인 화면인데 바로 장바고니 담아,32,click_cart,28,28,28,click_cart,click_cart,0.67497486
+"지금 로그인 화면인데 히어비 홈에 와 있어, 앱 다운로드 버튼 눌러",11,click_app_download,7,7,7,click_app_download,click_app_download,0.7592435
+지금 로그인 유지 체크 해줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.6253769
+바로회원가입등록해줘?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5113486
+지금 장바구니 보고 있는데 쇼핑몰 접속해줘,8,go_mall,5,5,5,go_mall,go_mall,0.6487965
+일단 내 요새 산게 머노 해봐~,39,go_order_history,35,35,35,go_order_history,go_order_history,0.71433556
+지금 회원가입 화면인데 지금 회원가입 페이지인데 이메일 작성해,28,input_email,24,24,24,input_email,input_email,0.65092427
+바로 회원탈퇴 진행해,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7808097
+일단 바로그인 상태 유지 해제해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73381174
+지금 메인 화면인데 공유 쇼핑 입장 버튼?,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7520157
+지금 회원정보 페이지인데 비밀 번호 변경 화면 열어줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.69899684
+지금 회원가입 화면인데 이용 약관 화면 보여주세요,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6791833
+바로 회원정보 페이지에서 회원 탈퇴 처리해줘,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.782493
+바로 히어비 홈 화면에서 앱 다운로드 버튼 눌러 해줄래?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.75519496
+좀 자주 담는 상품 읽어줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7483728
+바로 이용 가능한 쇼핑몰 알려줘 해줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.70049477
+지금 메인 화면인데 로그인 페이지 화면에서 로그인 유지 체크 해제해줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73898005
+지금 회원가입 화면인데 지금 쿠팡 이동 눌러,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.47585505
+요새많이산상품알려달라!!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.74706084
+일단 지금 비번호 찾기 열어 해줘,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60512644
+지금 회원가입 페이지인데 회원가 입 완료 버튼 눌러줘?,25,submit_signup,21,21,21,submit_signup,submit_signup,0.593314
+다시 많이 샀던 상품들 보여줘 부탁해,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7522718
+좀 지금 공유 쇼핑 입장 버튼 해봐,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.75060725
+오늘 내가 반복해서 산 상품 알려줘!!,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7479086
+바로 쇼핑몰 페이지에서 쿠팡이 가기 눌러줘,31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.46367717
+지금 화면 요약해 할래?,34,read_page,30,30,30,read_page,read_page,0.7070439
+지금 회원가입 화면인데 지금 비밀번호 확인 칸에 적어줘,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.50929374
+일단 지금 이름 넣어,21,input_name,17,17,17,input_name,input_name,0.65041906
+지금 장바구니 눌러 해줄래?,32,click_cart,28,28,28,click_cart,click_cart,0.6544927
+회원가입 페이지 화면에서 약관 동의 체크박스 눌러줘 해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.6033769
+아이디 복구 페이지로 가줘 해줘,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7342578
+일단 비밀 번호 변경 메뉴로 가줘 해,35,click_change_password,31,31,31,click_change_password,click_change_password,0.70023745
+먼저 최근주문기록들려줘 해줄래?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.73448545
+일단 회원가입 페이지인데 아이디 칸에 적어줘 해봐,12,input_id,8,8,8,input_id,input_id,0.59744173
+히어비 홈 화면에서 앱 다운로드 버튼 눌러 해,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7533881
+좀 추천 리스트 읽어줘 부탁,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76263994
+회원가입 페이지 화면에서 회원가 입 제출해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.5999606
+좀 상품 정보 확인해주세요,38,click_product_view,34,34,34,click_product_view,click_product_view,0.68666124
+좀 최근 주문 정보 알려줘 해봐!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.7466391
+다시 추천 품목 읽어줘 요!!,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76545227
+좀 비밀 번호 변경 메뉴로 가줘,35,click_change_password,31,31,31,click_change_password,click_change_password,0.6992669
+먼저 최근 산거 읽어줘,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74526066
+지금 주문내역 보고 있는데 비밀번호 찾기 클릭 해봐,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60525286
+지금 쇼핑 화면인데 회원가입 페이지에서 이용 약관 설명해줘,23,read_terms,19,19,19,read_terms,read_terms,0.6401013
+"희어비 홈에 와 있어, 앱 다운로드 버튼 눌러줘 해줄래?",11,click_app_download,7,7,7,click_app_download,click_app_download,0.752306
+좀 지금 회원탈퇴 열어 해,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7817237
+지금 쇼핑 화면인데 초기 화면으로 이동해줘,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7278003
+지금 로그인 화면인데 쇼핑몰 페이지에서 연결 가능한 쇼핑몰 안내해,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69955105
+일단 아뒤 찾기 눌러 가능?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7491255
+지금 바로 비번 찾기 시작해,18,click_find_password,14,14,14,click_find_password,click_find_password,0.60056424
+"일단 히어비 홈 보고 있는데, 앱 다운로드 버튼 눌러?",11,click_app_download,7,7,7,click_app_download,click_app_download,0.7593364
+일단 히어비로 가 해줄래?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.7693918
+지금 장바구니 보고 있는데 지금 화면 뭐야 가능?,34,read_page,30,30,30,read_page,read_page,0.6790784
+오늘 자주 산 물건들 말해줘~,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75056815
+일단 추천 상품부터 소개해줘~,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.7656971
+지금 ﻿추천 상품 읽어줘,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76485574
+당장 많이구매한상품목록읽어줘 부탁?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7456107
+이번 겨울 운동 계획 알려줘,0,unknown,0,0,0,unknown,unknown,0.8288016
+희어비로 이동해?,4,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.76155263
+지금 회원가입 화면인데 지금 현재 페이지 정보 및 가능한 작업 뭐야,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.58317435
+"지금 로긴 페이지 보고 있는데, 회원가 입 버튼 눌러줘",19,click_signup,15,15,15,click_signup,click_signup,0.5555327
+지금 로그인 화면인데 지금 전화번호 써,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6982687
+지금 회원가입 화면인데 이 페이지 정보 안내해,34,read_page,30,30,30,read_page,read_page,0.6813063
+좀 이메일 작성해?,28,input_email,24,24,24,input_email,input_email,0.6522147
+바로 회원가 입 진행해줘 가능해?,19,click_signup,15,15,15,click_signup,click_signup,0.5502006
+지금 로그인 화면인데 비번호 재설정 페이지로 가줄래?,18,click_find_password,14,14,14,click_find_password,click_find_password,0.54893386
+쇼핑몰 페이지인데 쇼핑몰 목록 읽어줘 해줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6951095
+바로 회원가입 페이지 화면에서 휴대폰 번호 입력해,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6815208
+지금 주문내역 보고 있는데 쿠팡으로 넘어가줘 해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44651422
+지금 로그인 화면인데 회원가입 페이지에서 회원가입 등록해줘,25,submit_signup,21,21,21,submit_signup,submit_signup,0.60646814
+지금 쇼핑 화면인데 로긴해 할래?,16,click_login,12,12,12,click_login,click_login,0.602125
+지금 장바구니 보고 있는데 좀 이름 입력해줘,21,input_name,17,17,17,input_name,input_name,0.6533746
+이용 가능한 쇼핑몰 알려줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.6982553
+지금 메인 화면인데 히어비 가이드 알려줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.7772714
+일단 체크 꺼 해봐,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73443484
+내일 운동 계획 확인해줘,0,unknown,0,0,0,unknown,unknown,0.8313077
+다시 ﻿자주 산 상품 읽어줘?,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.75339
+바로 메인 페이지인데 공유 쇼핑 입장해줘,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7423414
+지금 회원가입 화면인데 바로 선택 해제해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.72455513
+일단 바로 마이페이지 들어가,33,click_my_page,29,29,29,click_my_page,click_my_page,0.66844344
+지금 쇼핑 화면인데 좀 로긴 유지 켜줘,14,check_keep_login,10,10,10,check_keep_login,check_keep_login,0.63383704
+바로 지금 로그인 페이지인데 아이디 찾기 열어 해줄래?,17,click_find_id,13,13,13,click_find_id,click_find_id,0.75270784
+좀 지금 메인 페이지인데 이 화면에서 할 수 있는 것 알려줘 해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.5831348
+지금 주문내역 보고 있는데 체크해줘?,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.27487907
+바로 지금 쇼핑몰 페이지인데 쿠팡 메인으로 가줘 해줄래?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.40501797
+먼저 주문 조회하는 화면으로 이동,39,go_order_history,35,35,35,go_order_history,go_order_history,0.71543735
+지금 최근 주문 내역 해줘!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74166125
+이번에 최신순으로로 읽어줘 좀!!,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.73909223
+지금 쇼핑몰 페이지인데 로그아웃 눌러줘,30,click_logout,26,26,26,click_logout,click_logout,0.6775281
+지금 장바구니 보고 있는데 마이페이지 열어줘 부탁해,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6690869
+일단 장바구니 페이지 화면에서 상품조회 눌러줘 해봐,38,click_product_view,34,34,34,click_product_view,click_product_view,0.69431466
+바로 주문내역 페이지 화면에서 쿠팡으로 이동해,5,go_coupang,2,2,2,go_coupang,go_coupang,0.44223788
+지금 가능한 쇼핑몰 읽기?,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69985974
+지금 장바구니 보고 있는데 앱 다운로드 버튼 가능?,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7590901
+"지금 메인 화면인데 지금 회원가입 페이지 보고 있는데, 전화번호 입력해줘",26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.70185137
+이용 약관 보기 눌러줘 해줄래?,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6801491
+"지금 장바구니 보고 있는데 지금 회원가입 페이지 보고 있는데, 이름 입력해",21,input_name,17,17,17,input_name,input_name,0.6560192
+쿠팡으로 이동해 해봐,31,click_go_coupang,27,27,2,click_go_coupang,go_coupang,0.43194252
+지금 주문내역 보고 있는데 로그인 페이지에서 자동 로그인 체크 풀어줘?,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.73780394
+이번에 추천해줄상품알려줘 좀,42,read_recommended_products,38,38,38,read_recommended_products,read_recommended_products,0.76331794
+지금 장바구니 보고 있는데 쇼핑몰 페이지 화면에서 현재 페이지와 기능 안내해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.57706004
+바로그인 페이지 화면에서 회원가입 버튼 눌러줘 해봐,19,click_signup,15,15,15,click_signup,click_signup,0.55602795
+지금 회원가입 화면인데 지금 이용약관 보기 열어,22,click_view_terms,18,18,18,click_view_terms,click_view_terms,0.6819758
+회원탈퇴 진행해 가능?,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.7828564
+지금 쇼핑몰 페이지에서 마이페이지 들어가줘 해봐,33,click_my_page,29,29,29,click_my_page,click_my_page,0.6692323
+지금 회원가입 화면인데 메인 페이지 화면에서 앱 다운로드 버튼 눌러,11,click_app_download,7,7,7,click_app_download,click_app_download,0.7546405
+바로 이용약관 읽기 해봐,23,read_terms,19,19,19,read_terms,read_terms,0.6445052
+바로 지금 체크 켜 해줄래?,24,check_terms_agreement,20,20,10,check_terms_agreement,check_keep_login,0.5407056
+바로 가장 최근 주문 알려줘 해줄래?,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74911505
+바로 비번호 입력 해봐,13,input_password,9,9,9,input_password,input_password,0.56451875
+지금 장바구니 보고 있는데 로그인 페이지인데 쇼핑몰로 가줘,8,go_mall,5,5,5,go_mall,go_mall,0.64851224
+좀 이름 적어 가능?,21,input_name,17,17,17,input_name,input_name,0.6518738
+좀 최근구매내역읽어줘 해봐,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.745819
+지금 메인 화면인데 아이디 중복 확인,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.79463637
+일단 약관 읽어줘 해줄래?,23,read_terms,19,19,19,read_terms,read_terms,0.6452401
+회원가입 페이지 화면에서 비밀 번호 확인 칸에 적어줘 해줄래?,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5006567
+지금 주문내역 보고 있는데 로그인 페이지 화면에서 현재 페이지와 기능 안내해줘,6,read_current_page_actions,3,3,3,read_current_page_actions,read_current_page_actions,0.57900095
+지금 주문내역 화면으로 이동해!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7311599
+지금 장바구니 보고 있는데 로그인 페이지에서 아이디 입력해,12,input_id,8,8,8,input_id,input_id,0.59923553
+좀 바로 공유 쇼핑 입장 버튼 해봐,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.74877983
+먼저 내근래뭘샀당가 부탁!,39,go_order_history,35,35,35,go_order_history,go_order_history,0.7231842
+지금 로그인 화면인데 지금 희어비 소개해줘,7,read_hearbe_guide,4,4,4,read_hearbe_guide,read_hearbe_guide,0.78489244
+내가 반복해서 산 상품 알려줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.7496316
+지금 회원가입 화면인데 지금 화면 읽어 할래?,34,read_page,30,30,30,read_page,read_page,0.7145629
+다음 달 산책 시간 기록해줘,0,unknown,0,0,0,unknown,unknown,0.8288556
+지금 쇼핑 화면인데 쇼핑몰 페이지 화면에서 쇼핑몰 목록 읽어줘,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.69919753
+좀 바로 아이디 찾기 눌러 해봐,17,click_find_id,13,13,13,click_find_id,click_find_id,0.7509063
+좀 바로 비번호 확인 값 넣어 해,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.512812
+지금 메인 화면인데 체크해 가능?,14,check_keep_login,10,10,20,check_keep_login,check_terms_agreement,0.48948574
+좀 지금 회원정보 페이지인데 탈퇴 메뉴 열어,36,click_delete_account,32,32,32,click_delete_account,click_delete_account,0.77907866
+바로 선택 해제해,15,uncheck_keep_login,11,11,11,uncheck_keep_login,uncheck_keep_login,0.71942854
+지금 로그인 화면인데 쿠팡으로 열어 가능?,5,go_coupang,2,2,2,go_coupang,go_coupang,0.4410453
+바로 히어비 홈 화면에서 공유 쇼핑 입장 버튼 눌러,10,click_shared_shopping_entry,6,6,6,click_shared_shopping_entry,click_shared_shopping_entry,0.7521036
+회웝가입 페이지 화면에서 이름 작성해줘?,21,input_name,17,17,17,input_name,input_name,0.6544623
+바로 비번호 변경하기 열어 해줄래?,35,click_change_password,31,31,31,click_change_password,click_change_password,0.7040932
+지금 전화번호 입력해?,26,input_phone_number,22,22,22,input_phone_number,input_phone_number,0.6991522
+"좀 지금 주문내역 페이지 보고 있는데, 쿠팡으로 이동해봐",5,go_coupang,2,2,2,go_coupang,go_coupang,0.44423097
+지금 메인 화면인데 히어비 홈 화면에서 쇼핑몰 화면 열어줘,8,go_mall,5,5,5,go_mall,go_mall,0.64885783
+"지금쇼핑몰페이지보고있는데,쿠팡이이동클릭해줘",31,click_go_coupang,27,27,27,click_go_coupang,click_go_coupang,0.4576385
+좀 지금 쇼핑몰 페이지인데 쿠팡으로 이동해줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.38981527
+지금 회원가입 화면인데 가능한 쇼핑몰 말해 해봐,29,read_available_marketplaces,25,25,25,read_available_marketplaces,read_available_marketplaces,0.7000939
+좀 비번호 확인 넣어,27,input_password_confirm,23,23,23,input_password_confirm,input_password_confirm,0.5109614
+최근 주문 확인 페이지로 가,39,go_order_history,35,35,35,go_order_history,go_order_history,0.6896616
+바로 가장 최근 주문 알려줘 해봐,40,read_order_history_recent,36,36,36,read_order_history_recent,read_order_history_recent,0.74922436
+지금 회원가입 화면인데 쿠팡 메인으로 가줘,5,go_coupang,2,2,2,go_coupang,go_coupang,0.42565653
+지금 쇼핑 화면인데 바로 아뒤 중복 확인 눌러,20,click_check_id_duplicate,16,16,16,click_check_id_duplicate,click_check_id_duplicate,0.7963496
+다시 많이구매한상품목록읽어줘,41,read_frequent_products,37,37,37,read_frequent_products,read_frequent_products,0.74726564
+바로 회원가입 페이지에서 이영약관 동의 체크해줘,24,check_terms_agreement,20,20,20,check_terms_agreement,check_terms_agreement,0.5997592

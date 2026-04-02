@@ -1,0 +1,1711 @@
+﻿text,label_id,label,class_idx,true_class_idx,pred_class_idx,true_label,pred_label,confidence
+이 화면 기능 읽어줘 해줄래 지금,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8061853
+장바구니 말고 바로 주문해,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86613905
+방금 본 상픔 기준으로 장바꾸니에 담긴 상품 읽어줘 해주이소,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.77833295
+먼저 화면 기준으로 가능한 명령 알려줘 좀 해봐,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81477505
+방금 본 상품 기준으로 이번엔 이거 장바구니로 보내 좀,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7322391
+주문 정보 읽어줘 가능해,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6304324
+카트로 바로 가,71,click_cart,4,4,4,click_cart,click_cart,0.7118813
+이번엔구매했던내역화면띄워줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7538358
+오후공부계획체크해줘,0,unknown,0,0,0,unknown,unknown,0.9264028
+바로 로그인해 부탁해 바로,72,click_login,5,5,5,click_login,click_login,0.8418527
+지금 화면에서 이번엔 검샥 결과를 하나씩 불러줘 부탁드립니다,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74700975
+이번 주문 기준으로 이번엔 용량 일 옵션으로 바꿔 해주세요,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8368677
+현재 페이지에서삭제 요청 실행해줘 해주이소,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8298195
+위시리스트추가해줘 부탁해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8350039
+방금 본 상픔 기준으로 일단 검샥 목록에서 이거 눌러,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7682023
+이번 주문 기준으로 무선 이어폰 검색해 바로,69,search_products,2,2,2,search_products,search_products,0.84263486
+이번엔 색상 사이즈 옵션 읽어줘 바로,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78402615
+방금본상품기준으로이주문반품요청할게부탁해,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8191933
+이번 주문 기준으로 먼저 검샥 결과에서 눈에 띄는 것 읽어줘 부탁해 해봐,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74484336
+내 장바구니 내역 읽어줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7896517
+이 물건 정보 한 번 훑어줘 해주세요,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75576824
+먼저 지금 보이는 항목 하나 열어줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7630298
+방금 본 상품 기준으로 먼저 로그인부터 할게 먼저,72,click_login,5,5,5,click_login,click_login,0.8399575
+지금 주문 정보 한 번 정리해줘 부탁드립니다 해봐,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6375684
+지금 화면에서 이번엔 이 주문 반품 요청할게,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83005387
+잠깐 히어비 홈페이지 열어줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85399693
+방금 본 상픔 기준으로 지금 카트 담기 실행해주이소 가능해 지금,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7335523
+주문 내역 탭 눌러 부탁드립니다,70,click_order_history,3,3,3,click_order_history,click_order_history,0.756865
+지금 지금 보이는 항목 하나열어줘 바로,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7629364
+급한데 지금 바로 결재할게 해봐,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83792776
+방금 본 상품 기준으로 바로 가능한 버튼들 설명해줘 부탁해 부탁,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81582636
+방금 본 상품 기준으로 이번엔 로그아웃 처리해줘,73,click_logout,6,6,6,click_logout,click_logout,0.83318686
+쇼핑끝났으니히어비로복귀해지금,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8544296
+내일 회의 시간 기록해줘,0,unknown,0,0,0,unknown,unknown,0.9284937
+이번 주문 기준으로 이번엔 자동로그인 해제하고 로그아웃해 좀,73,click_logout,6,6,6,click_logout,click_logout,0.8285934
+지금 상위 검색 결과 알려줘 해주세요,75,read_search_results,8,8,8,read_search_results,read_search_results,0.752192
+지금 담긴 물건들 가격 같이 알려줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78151214
+방금본상품기준으로일단주문합계금액확인해줘부탁드립니다,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7727416
+이번 주문 기준으로 바로쇼핑 끝났으니 히어비로 복귀해 부탁드립니다,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85091513
+이번 주문 기준으로 먼저 품절 아닌 옵션만 읽어줘 부탁드립니다,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7797114
+이번 주문 기준으로 잠깐 나중에 보게 찜해둬 좀 해주이소,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8395392
+배송조회 눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7755633
+지금 화면에서 먼저 로그인 단계로 넘어가,72,click_login,5,5,5,click_login,click_login,0.8388129
+주문내역 삭제해줘 해주세요,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8419085
+먼저 카트 항목 선택해 부탁해 지금,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7975838
+지금 결제 예정 금액 말는 하지 말고,0,unknown,0,0,0,unknown,unknown,0.92609435
+먼저 배송 추적 페이지로 가줘 해봐,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77774936
+지금 화면에서 급한데 담기 버튼 눌러줘 해주세요,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7143106
+바로 지금 보이는 항목 하나 열어줘 해줄래,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7655998
+지금 화면에서 배송 현황 확인 버튼 눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77996385
+지금화면에서 바로 이거 바로 살게 좀,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86708343
+방금 본 상품 기준으로 일단 교환 처리 시작해줘 부탁드립니다,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83262503
+급한데 이 페이지 가능한 작업 목록 보여줘 부탁해,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8150626
+일단이거말고다른색상있는지검샥해줘바로,69,search_products,2,2,2,search_products,search_products,0.83454955
+지금 화면에서 이 항목 주문 수량 조정해줘 해봐,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82667583
+급한데 내역에서 이 건 삭제해주세요,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84655464
+지금 화면에서 지금내 계정으로 로그인할래 해주세요,72,click_login,5,5,5,click_login,click_login,0.84212106
+배송지랑 결제수단 포함해서 읽어줘 가능해 부탁,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.5861203
+이번엔 상품 상세 설명 알려줘 부탁드립니다,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7381503
+이번엔 결재 버튼 실행해 지금,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83907384
+지금 위시리스트에 추가해 부탁드립니다,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83688074
+급한데 이 주문 건 자세히 알려줘 가능해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.59677184
+현재페이지에서먼저지금선택만해제해줘해줄래,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79695743
+급한데 사진 리부 있는지 읽어줘 해주이소,81,read_reviews,14,14,14,read_reviews,read_reviews,0.44883454
+이번 주문기준으로 옵선 정보 읽어주세요 좀,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7865908
+먼저 장바꾸니 목록으로 이동 해주세요 지금,71,click_cart,4,4,4,click_cart,click_cart,0.71815497
+현재 페이지에서 이번엔 총 결제금액 얼마야 부탁드립니다,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7741806
+지금 화면에서 일단 리뷰 많은 상품으로 들어가줘 바로,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7605982
+절대 구매하기 눌러줘 취소해,0,unknown,0,0,0,unknown,unknown,0.9090652
+이번 주문 기준으로 이번엔 선택한 상품 수량만 수정해줘 해봐,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8256348
+먼저 담긴 물건 확인하자 해줄래,71,click_cart,4,4,4,click_cart,click_cart,0.7185428
+방금 본 상픔 기준으로 급한데 로가웃 버튼 눌러줘해줘,73,click_logout,6,6,6,click_logout,click_logout,0.82778656
+선택가능한옵선만알려줘좀,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7834081
+지금 체크박스 꺼줘 부탁드립니다 바로,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79266447
+로가웃 버튼 눌러주세요 해줘,73,click_logout,6,6,6,click_logout,click_logout,0.83132803
+일단 주문조회 페이지 들어가 부탁해,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7622404
+지금 지금 담아둔 상픔 뭐 있어 부탁해,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7881313
+이번엔 결제 완료까지 진행해줘 해주세요 해봐,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8423818
+방금 본 상픔 기준으로 이 제품 담기 클릭해줘 부탁드립니다,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.71847373
+이번 주 운동 계획 세워줘,0,unknown,0,0,0,unknown,unknown,0.9220655
+현재 페이지에서 이번엔 카트 목록 하나씩 말해줘부탁해,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7891072
+이번 주문 기준으로 급한데 용량 일 옵션으로 바꿔 가능해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8358232
+지금 화면에서 일단 주문 히스토리에서 빼줘 부탁해 바로,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8461538
+잠깐 택배 어디쯤인지 조회해줘 좀,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78011835
+이번 주문 기준으로 급한데 주문 정보 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.63441813
+바로 구매해,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8573952
+현재 페이지에서 바로 최근 주문내역 보게 이동해줘 해주세요,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7579154
+지금 총 결재금액 얼마야 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7698289
+이번엔 무선 이어폰 검색해,69,search_products,2,2,2,search_products,search_products,0.8421209
+현재 페이지에서 계정 로그인 진행해 해주세요,72,click_login,5,5,5,click_login,click_login,0.842258
+일단 히어비 홈페이지 열어줘 부탁드립니다 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8525699
+주문조회 페이지 들어가 지금,70,click_order_history,3,3,3,click_order_history,click_order_history,0.76145494
+지금검샥결과에서두번째거선택해줘해줄래,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76063436
+절대 장바구니 목록으로 이동는 하지 말고,0,unknown,0,0,0,unknown,unknown,0.92790097
+지금한번에구매하기눌러,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.866057
+현재 페이지에서 이 물건 정보 한 번 훑어줘 좀 부탁,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7591854
+지금 담아둔 상품 보러 가 해줘,71,click_cart,4,4,4,click_cart,click_cart,0.72080326
+주문 합계 금액 확인해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.76907676
+먼저 주문 확정하고 결제해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8397069
+이번엔 배송추적 페이지로 가줘 바로,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77715653
+이 주문 내역 지우기 해줘 부탁해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84750336
+할인 적용된 최종 금액 알려줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.770438
+먼저 로그인 상태 해제해 지금,73,click_logout,6,6,6,click_logout,click_logout,0.8214512
+이번엔 히어비 홈페이지 열어줘 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85409147
+먼저 운송장 흐름 확인해줘 가능해,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7804083
+이번엔 받는 사람 주소 상품 정보 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62881744
+방금 본 상픔 기준으로 일단 이 물건 주문 대상으로 선택해 해줄래,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.794967
+이번 주문 기준으로 주문 상세 요약해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.56939906
+먼저 이 물건 정보 한 번 훑어줘 해봐,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7538916
+검샥된 상픔 목록 확인해줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7383477
+먼저배송조회눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.76812965
+지금 내 주문 배송조회 들어가 가능해 해봐,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78072304
+지금 카트로 바로 가 먼저,71,click_cart,4,4,4,click_cart,click_cart,0.71859163
+일단 교환 요청 페이지 열어줘 해줘 먼저,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83296406
+현재페이지에서지금결제예정금액말해줘가능해,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7688317
+먼저 로그인 단계로 넘어가,72,click_login,5,5,5,click_login,click_login,0.8365201
+현재 페이지에서 일단 이 주문 내역 지우기 해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84809965
+방금 본 상픔 기준으로 잠깐 주문 상세 요약해줘 가능해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.581371
+이번 주문 기준으로 잠깐 전체 선택 해제해줘 좀,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.80071557
+이번 주문 기준으로 이번엔 이거 찜 목록에 담아 좀 부탁,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8399031
+현재페이지에서사이즈를이 칠 영으로바꿔줘가능해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83502156
+방금 본 상품 기준으로 장바꾸니 조회해줘,71,click_cart,4,4,4,click_cart,click_cart,0.7170135
+먼저주문 요약 정보 말해줘 해줘 부탁,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.5125858
+잠깐 옵선 로 변경해줘 해줄래,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8313383
+방금 본 상품 기준으로 잠깐 어떤 상품 결제하는지 읽어줘 가능해 해주이소,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.63041514
+지금 화면에서 특정 상품만 골라줘 해주이소,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7907537
+방금 본 상품 기준으로 지금 별점 낮은리뷰부터 보여줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7585944
+바로 옵션 리스트위에서부터 읽어줘 좀 해봐,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78037286
+현재 페이지에서 먼저 내 주문목록으로 가 해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75697535
+장바구니 열어줘 부탁드립니다 해봐,71,click_cart,4,4,4,click_cart,click_cart,0.709376
+두 번째 상품만 선택해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7835242
+생수 검샥해주라 해주세요 부탁,69,search_products,2,2,2,search_products,search_products,0.84223217
+방금 본 상픔 기준으로 급한데 최근리뷰 요약해줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7509205
+바로 쿠팡 로그인하러 가 가능해,72,click_login,5,5,5,click_login,click_login,0.84034216
+현재 페이지에서 잠깐 즉시 구매 진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86800915
+일인용 전기포트 검색해,69,search_products,2,2,2,search_products,search_products,0.83689016
+급한데 주문 정보 읽어주라 좀 바로,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.636777
+이번엔 결과 리스트 간단히 말해줘 좀,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7495869
+지금 화면에서 일단 이 제품 어떤 건지 설명해줘 가능해,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7554523
+최근 주문 내역 보게 이동해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7463659
+방금 본 상품 기준으로 바로 쿠팡 말고 히어비 홈으로 돌아가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8505992
+급한데 이거 말고 다른 색상 있는지 검색해줘,69,search_products,2,2,2,search_products,search_products,0.83970237
+방금본상품기준으로배송추적페이지로가줘부탁해부탁,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77701473
+먼저 옵선 정보 읽어줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.77870226
+오늘 날씨 체크해줘,0,unknown,0,0,0,unknown,unknown,0.9255807
+급한데 계정 연결 끊어줘,73,click_logout,6,6,6,click_logout,click_logout,0.8281252
+잠깐 쿠팡 말고 히어비 홈으로 돌아가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8507741
+지금 화면에서 바로 주문 상세 내역 설명해줘 해봐,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.56894284
+이번엔 장바꾸니 페이지 열기,71,click_cart,4,4,4,click_cart,click_cart,0.71697676
+먼저 결제 전 주문 내역 확인해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62782615
+이번 주문 기준으로 먼저 닭가슴살 찾아줘,69,search_products,2,2,2,search_products,search_products,0.8417531
+급한데 택배 조회 화면 열어줘 부탁,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7787215
+방금 본 상품 기준으로 결제 완료 처리해줘 가능해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8405664
+이번 주 수면 기록 기록해줘,0,unknown,0,0,0,unknown,unknown,0.92685974
+이번 주문 기준으로 잠깐 실사용자 후기 알려줘 해줄래 부탁,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75862503
+결과상품들순서대로말해줘좀,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7459701
+방금 본 상품 기준으로 지금 카트 목록 하나씩 말해줘 가능해 바로,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78746486
+지금 쿠팡에서 비타민 찾아봐,69,search_products,2,2,2,search_products,search_products,0.8412556
+카트 담기 실행해줘해주세요,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73307025
+선택한 상픔 해제해줘 해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7977416
+지금 화면에서 주문 기록 보러 가자 해줄래,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7604291
+바로 배송 상태 확인해줘 가능해,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77967954
+현재페이지에서바로두번째옵션선택해줘부탁드립니다해봐,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8342862
+바로 반품 진행 버튼 눌러줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8296378
+먼저 히어비 홈 탭으로 넘어가 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85427994
+현재 페이지에서 이번엔 주문 상세 항목 정리해줘 가능해 지금,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5730248
+이번 주문 기준으로 잠깐 리부 많은 상픔으로 들어가줘 부탁드립니다 바로,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7659633
+바로 검색 결과에서 눈에 띄는 것 읽어줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7510683
+아예 한 번 담아둘게 장바구니 추가는 하지마,0,unknown,0,0,0,unknown,unknown,0.9270817
+내 주문목록으로 가 부탁드립니다 해주이소,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7438408
+일단 결제수단이랑 배송상태 포함해서 읽어줘 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5730407
+방금 본 상품 기준으로 먼저 가능한 버튼들 설명해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81551397
+지금 화면에서 이번엔 검색 결과를 하나씩 불러줘 해주이소,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7527456
+옵션 선택 전에 정보 먼저 읽어줘 해주이소,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78937095
+먼저 이 제품 어떤 건지 설명해줘 가능해,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75501
+지금 화면에서 먼저 내 계정에서 나가기 가능해,73,click_logout,6,6,6,click_logout,click_logout,0.82997334
+먼저 상픔명 가격 로켓배송 여부 알려줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74905026
+주문 내역 탭 눌러 해줘 부탁,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75304055
+급한데 옵선에서 블랙 선택해줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8288261
+현재 페이지에서 이번엔 원래 히어비 화면으로 돌아가자 좀 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8542922
+바로 주문 버튼 눌러줘 해주세요,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86648935
+바로 주문내역 페이지열어줘 해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.762103
+지금 내가 시킨 것들 보이는 페이지로 가,70,click_order_history,3,3,3,click_order_history,click_order_history,0.737654
+선택 버튼 눌러줘 해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7952002
+바로 유산균 상픔 검샥해줘,69,search_products,2,2,2,search_products,search_products,0.841535
+급한데 옵션을 세트 구성으로 바꿔줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8327274
+잠깐 장바구니에 담아줘 바로,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7344835
+방금 본 상픔 기준으로 바로 한 번에 구매하기 눌러 지금,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86903656
+이번 주문 기준으로 잠깐 관심상픔으로 저장해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8374633
+지금 장바구니 화면 보여줘,71,click_cart,4,4,4,click_cart,click_cart,0.7126395
+현재 페이지에서 일단 구매했던 내역 화면 띄워줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7556064
+이번 주문 기준으로 주문 목록에서 이 항목 삭제해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84813035
+지금 화면에서 먼저 관심상품으로 저장해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8388763
+바로 옵션 정보 화면 내용 알려줘 부탁드립니다,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78879607
+이 상픔 수랑 이개로 바꿔줘 먼저,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8246761
+이번엔 히어비 첫 화면으로 보내줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8546209
+이번 주문 기준으로 바로 지금 화면에서 뭐 할 수 있어 해줘 해봐,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8162314
+검색 결과에서 눈에 띄는 것 읽어줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7501187
+이번엔 선풍기 검색 결과 보여줘 해줘,69,search_products,2,2,2,search_products,search_products,0.8408162
+급한데카트선택상태지워줘부탁,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79032815
+주문상세내역설명해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.56139296
+이 페이지에서 다음으로 뭐 할 수 있어,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8107963
+지금 수량 한 개 줄여줘 금지,0,unknown,0,0,0,unknown,unknown,0.7973924
+현재 페이지에서 담긴 물건들 가격 같이 알려줘 부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.77922165
+지금 화면에서 잠깐 주문 상세 항목 정리해줘 부탁해 먼저,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5764517
+일단 이 화면 기능 읽어줘 좀,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80928487
+현재 페이지에서 잠깐 내가 시킨 것들 보이는 페이지로 가 해주세요,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7534177
+지금화면에서바로내주문리스트로이동지금,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75477886
+지금 화면에서 이번엔 반품 사유 선택해서신청해줘 부탁드립니다 해주이소,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.82558286
+바로 이주문 건 자세히 알려주세요 가능해 먼저,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.57251453
+이번엔히어비메인페이지로전환해줘해줄래,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8465945
+이번 주문 기준으로 배송 상태 확인해줘 부탁드립니다,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.779639
+이번 주문 기준으로 일단 쇼핑 끝났으니 히어비로 복귀해,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8503888
+현재 페이지에서 먼저 이 물건 정보 한 번 훑어줘 해줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75929874
+품절 아닌 옵션만 읽어줘 해줄래 바로,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78200775
+지금 화면에서 선택 해제 버튼 눌러줘 지금,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7997762
+방금 본 상품 기준으로 일단 최근 리뷰 요약해줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7583728
+잠깐 로과웃해주세요,73,click_logout,6,6,6,click_logout,click_logout,0.8267741
+방금 본상품 기준으로 먼저 장바구니 리스트 요약해줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7828115
+급한데 교환 및 반품 신청해 해봐,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8317391
+지금화면에서먼저가능한버튼들설명해줘부탁드립니다,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80852777
+현재 페이지에서 바로 리뷰 많은 상품으로 들어가줘 해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.77265185
+선택 버튼눌러줘 부탁해 지금,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7953071
+지금 지금 선택 처리해줘 해주세요 지금,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7972717
+옵션 그대로 장바구니 담아줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7290415
+먼저 이 상품 옵선 종류 뭐 있어 해봐,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78694785
+잠깐 옵선 다른 걸로 다시 골라줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8310019
+지금 화면에서 반품 진행 버튼 눌러줘 좀 해봐,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8330353
+방금 본 상품 기준으로 일단 지금 화면에서 뭐 할 수 있어 가능해,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81559235
+로긴페이지로보내줘부탁해,72,click_login,5,5,5,click_login,click_login,0.8395614
+바로 관심상품으로저장해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83654934
+급한데 빠른구매로 진행해줘 부탁해,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86633486
+이번 주문 기준으로 오른쪽에 보이는 상품 선택해 해줄래,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7583269
+지금 화면에서 바로 로그인 상태 해제해 부탁드립니다,73,click_logout,6,6,6,click_logout,click_logout,0.8262632
+아침 버스 시간 체크해줘,0,unknown,0,0,0,unknown,unknown,0.925446
+방금 본 상품 기준으로 실사용자 후기 알려줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75567025
+내 계정에서 나가기,73,click_logout,6,6,6,click_logout,click_logout,0.8212442
+이번 주문 기준으로 지금 히어비 홈페이지 열어줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85143965
+먼저 상품명 가격 로켓배송 여부 알려줘 해줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7515148
+바로선택 버튼 눌러줘 해줄래 부탁,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.78122145
+총 결재금액 얼마야 해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77189493
+방금 본 상픔 기준으로 옵선 말고 기본 정보 먼저 읽어줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7097599
+급한데 총 결제금액 얼마야 부탁드립니다,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7743618
+방금 본 상픔 기준으로 급한데 어떤 상품 결제하는지 읽어줘 지금,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6320974
+지금 화면에서 이번엔 로그인 화면 열어줘 부탁드립니다,72,click_login,5,5,5,click_login,click_login,0.8372377
+이대로 결제 확정해주이소 바로,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8393697
+일단 결제 단계 마무리해줘 해줄래 해봐,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84045935
+다음 주 할 일 목록 정리해줘,0,unknown,0,0,10,unknown,read_product_info,0.34942463
+이번 주문 기준으로 잠깐 선택한 상품 수량만 수정해줘 가능해,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8247278
+이 상픔 수량 이개로 바꿔줘 좀,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8276008
+현재 페이지에서 히어비 홈으로 바로 이동 가능해,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8551367
+그거 로그아웃 처리는 하지마라,0,unknown,0,0,0,unknown,unknown,0.92658764
+이번엔 선택 안 된 상품 선택해줘 좀,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.78565854
+먼저 로그인 단계로 넘어가 바로,72,click_login,5,5,5,click_login,click_login,0.837717
+용량 일 옵션으로 바꿔,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8262264
+현재페이지에서구매했던내역화면띄워줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7607124
+바로 로그아웃 버튼 눌러줘지금,73,click_logout,6,6,6,click_logout,click_logout,0.8333282
+방금 본 상품 기준으로 바로 위시리스트에 추가해 해주이소,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83809453
+지금 화면에서 이번엔 방금 담은 거 수량 이로 맞춰줘 부탁해,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8316774
+지금 화면에서 바로 최근 주문내역 보게 이동해줘 부탁해,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75903374
+먼저 교환 요청 페이지 열어줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8322207
+지금 쿠폰 적용 후금액 알려줘 좀,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77170855
+잠깐 한 번에 구매하기 눌러 해줄래 부탁,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86858624
+이번엔 무선 이어폰 검샥해,69,search_products,2,2,2,search_products,search_products,0.83874637
+먼저 주문 상세페이지 내용 읽어줘 부탁해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5901471
+지금 화면에서 이번엔 최종 결제 금액 읽어주세요 해주이소,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77407503
+지금 화면에서 먼저 쇼핑 끝났으니 히어비로 복귀해,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8507604
+일단 장바구니 열어줘 해줄래 바로,71,click_cart,4,4,4,click_cart,click_cart,0.7154149
+결과 화면요약해줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7457089
+지금제품스펙정리해서말해주세요,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74068654
+현재 페이지에서 선풍기 검색 결과 보여줘 부탁해 해주이소,69,search_products,2,2,2,search_products,search_products,0.8407522
+잠깐 회의 시간 체크해줘,0,unknown,0,0,0,unknown,unknown,0.9250322
+먼저 나중에 보게 찜해둬,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8391832
+일단 두 번째옵션 선택해줘 지금,78,update_product_option,11,11,11,update_product_option,update_product_option,0.82882947
+먼저 이 주문건 자세히 알려주세요 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.59208006
+리뷰 핵심만 정리해줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7572616
+급한데 주문 요약 정보 말해줘 해줄래,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.64004356
+급한데 지금 고를 수 있는 옵션 정리해줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7852514
+현재 페이지에서 일단 이 상픔 찜 목록에 넣어줘 해주세요,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83824015
+급한데 주문 상세 항목 정리해줘 해줘 해봐,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5654841
+방금 본 상품 기준으로 일단 한줄 후기들 먼저 보여줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7581688
+선풍기 검색 결과 보여줘 해주이소,69,search_products,2,2,2,search_products,search_products,0.8395009
+현재 페이지에서 이번엔 계정 연결 끊어줘 해봐,73,click_logout,6,6,6,click_logout,click_logout,0.832377
+현재 페이지에서 급한데 더 이상 안 보이게 삭제해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84575814
+방금본상픔기준으로지금방금검색한목록에서맨위상품들어가해줄래,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7677228
+이번 주문 기준으로 이번엔 유산균 상품 검색해줘,69,search_products,2,2,2,search_products,search_products,0.8430341
+현재 페이지에서 급한데 결제수단이랑 배송상태 포함해서 읽어줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5587475
+잠깐 내 계정으로 로긴할래 바로,72,click_login,5,5,5,click_login,click_login,0.83989894
+사이즈를 이 칠 영으로 바꿔줘 해주이소,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83505136
+방금 검색한 목록에서 맨 위 상품 들어가 해주세요,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76927304
+방금 본 상품 기준으로 일단 이 제품 담기 클릭해주세요 부탁해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7292453
+이번 주문 기준으로 바로 담긴 물건 확인하자 부탁드립니다,71,click_cart,4,4,4,click_cart,click_cart,0.72037715
+잠깐 로과웃해줘 부탁해 해봐,73,click_logout,6,6,6,click_logout,click_logout,0.82860434
+먼저 지금 결제로 넘어가 먼저,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.85330635
+이번 주문기준으로 지금 리뷰 읽어줘 가능해 해봐,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7520179
+상품 선택 취소해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79576755
+이 상품 찜 목록에 넣어줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8366537
+한 번 담아둘게 장바구니 추가 가능해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7377608
+이번 주문 기준으로 지금 쿠팡 말고 히어비 홈으로 돌아가 부탁드립니다,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85255754
+지금 로그인 풀어줘는 하지 말고,0,unknown,0,0,0,unknown,unknown,0.9248331
+일단 카트 항목 선택해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79444605
+옵션 정보 화면 내용알려줘 부탁해,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7875807
+이번 주문 기준으로 내가 시킨 것들 보이는 페이지로 가,70,click_order_history,3,3,3,click_order_history,click_order_history,0.746599
+먼저 후기 좋은 순으로 몇 개만 읽어줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75866026
+이번엔 지금 뜬 검색 목록 설명해줘 부탁드립니다,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7490591
+이번 주문 기준으로 바로 선택 안 된 상픔 선택해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.78986174
+방금 본 상품 기준으로 이번엔 로그아웃해줘 부탁해,73,click_logout,6,6,6,click_logout,click_logout,0.83243686
+현재 페이지에서 급한데 화면 기준으로 가능한 명령 알려줘 좀 해주이소,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81518734
+방금 본 상픔 기준으로 이 주문 반품 요청할게 해주이소,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83223677
+방금본상품기준으로바로내주문리스트로이동,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75494707
+이번 주문 기준으로 상품명 가격 로켓배송 여부 알려줘 부탁드립니다 바로,77,read_product_info,10,10,10,read_product_info,read_product_info,0.752783
+지금 구매 전에 장바꾸니에 넣어줘 좀,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73735183
+지금 화면에서 잠깐 별점 낮은 리뷰부터 보여줘 해줄래 지금,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7581975
+바로 품절 아닌 옵선만 읽어줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7754594
+이번 주문 기준으로 바로 쿠팡에서 로그아웃 진행해 가능해 지금,73,click_logout,6,6,6,click_logout,click_logout,0.8315504
+현재페이지에서잠깐검샥결과를하나씩불러줘부탁드립니다,75,read_search_results,8,8,8,read_search_results,read_search_results,0.6880935
+이번주문기준으로유산균상품검색해줘해줄래,69,search_products,2,2,2,search_products,search_products,0.8412138
+최근 주문 내역 보게 이동해줘 부탁해 바로,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7417493
+잠깐 이 주문 건 교환해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83120984
+잠깐 용량 일 옵션으로 바꿔 부탁드립니다,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8362126
+지금 계정 로긴 진행해 좀,72,click_login,5,5,5,click_login,click_login,0.8418644
+로그인 버튼 눌러줘,72,click_login,5,5,5,click_login,click_login,0.837969
+일단 특정 상품만 골라줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7877834
+방금 본 상픔 기준으로 먼저 결과에서 마지막 상품 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.74316597
+먼저 이 페이지에서 다음으로 뭐 할 수 있어,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8118563
+쿠팡에서 나가고 히어비로 가 부탁해 부탁,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85476464
+바로 카트 페이지로 이동해,71,click_cart,4,4,4,click_cart,click_cart,0.72277504
+지금 화면에서 급한데 주문 배송 조회 메뉴 눌러줘 해줘 해봐,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75102174
+아침식단체크해줘,0,unknown,0,0,0,unknown,unknown,0.89130074
+방금 본 상픔 기준으로 내역에서 이 건 삭제해주세요,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8480234
+현재 페이지에서 바로 최종 주문 확인 정보 말해줘 가능해 해봐,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6371057
+지금 고를 수 있는옵선 정리해줘 부탁해,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7811394
+방금 본 상픔 기준으로 휴지 제일 많이 사는 거 검샥해줘,69,search_products,2,2,2,search_products,search_products,0.8407526
+방금 본 상품 기준으로 잠깐 이거 말고 다른 색상 있는지 검색해줘 해줄래,69,search_products,2,2,2,search_products,search_products,0.8372861
+방금본상품기준으로일단상세페이지핵심만읽어주세요,77,read_product_info,10,10,10,read_product_info,read_product_info,0.6714466
+수량 하나 늘려줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8213441
+리뷰 읽어줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7502974
+이번 주문 기준으로 일단 전체 상품 선택해줘 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79656994
+용량 일 옵선으로 바꿔 부탁드립니다,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83380646
+바로 로그인해 해줘,72,click_login,5,5,5,click_login,click_login,0.8411624
+지금 화면에서 먼저 쿠팡에서 비타민 찾아봐 해줘,69,search_products,2,2,2,search_products,search_products,0.8431148
+체크박스 꺼줘 먼저,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7940509
+지금 화면에서 먼저 선택된 상픔들 읽어줘 해주세요 지금,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7268445
+일단 결과 상품들 순서대로말해주세요,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7501407
+주문 기록 보러 가자 부탁드립니다,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7606314
+일단 만족도 높은 리뷰 먼저 읽어줘 부탁드립니다 먼저,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7596596
+급한데 지금 뜬 검색 목록 설명해줘 부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74863285
+이번 주문 기준으로 일단 카트에 뭐 담겼는지 말해줘 해주세요,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78834057
+현재 페이지에서 검색 결과 읽어줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.75459766
+이번엔 검색된 상품 목록 확인해주세요 해줘 해봐,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7453453
+지금 일단 찜해둘게 해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83797944
+결제하기 눌러줘가능해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84113574
+아침운동계획계산해줘,0,unknown,0,0,0,unknown,unknown,0.9277067
+현재 페이지에서 급한데 휴지 제일 많이 사는 거 검색해줘 좀 먼저,69,search_products,2,2,2,search_products,search_products,0.84206754
+방금 본 상픔 기준으로 옵선 빨간색으로 바꿔줘 부탁해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8335805
+지금 주문 상세 내역 설명해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5385881
+현재 페이지에서 지금 배송 진행상황 눌러줘 좀,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.779866
+급한데 배송정보추적해줘 해봐,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7736414
+세 번째아이템 클릭해줘 부탁드립니다 해봐,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75352526
+이번 주문 기준으로 옵선에서 블랙 선택해줘 부탁드립니다,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83130103
+급한데 카트로 바로 가 부탁해,71,click_cart,4,4,4,click_cart,click_cart,0.720102
+방금 본 상품 기준으로 바로 배송 추적 페이지로 가줘 가능해 해주이소,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7779187
+이번엔 지금 위치에서 할 수 있는 일 정리해줘 지금,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81155115
+이번 주문 기준으로 먼저 이 제품 어떤 건지 설명해줘 해줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7575745
+지금 화면에서 먼저 최근 리부 요약해주세요 부탁해 부탁,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75511634
+이번주문기준으로잠깐결제단계마무리해주이소해주세요,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8403316
+방금 본 상품 기준으로 방금 검색한 목록에서 맨 위 상품 들어가 부탁해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76918113
+방금본상품기준으로쿠팡계정로그아웃해해줘,73,click_logout,6,6,6,click_logout,click_logout,0.82937324
+지금 화면에서 잠깐 배송 상태 확인해줘 해줄래,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7809645
+잠깐 이주문 기록 지워줘 좀,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84605753
+장바꾸니 항목 전부 보여줘 부탁해 해주이소,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7855548
+잠깐 결제하기 눌러줘 먼저,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8400662
+지금 화면에서 지금 로그인 단계로 넘어가 좀해주이소,72,click_login,5,5,5,click_login,click_login,0.83948344
+급한데 결제 완료 처리해줘 좀,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8390247
+주말 수면 기록 기록해줘,0,unknown,0,0,0,unknown,unknown,0.92790806
+일단 반품 진행 버튼 눌러줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.82913625
+로그인 풀어줘 부탁,73,click_logout,6,6,6,click_logout,click_logout,0.81459546
+지금 즉시 구매 진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.864245
+이번 주문 기준으로 이 상품 정보 읽어줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7574342
+내 장바구니 내역 읽어줘 부탁드립니다 부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7923884
+이번 주문 기준으로 일단 받는 사람 주소 상픔 정보 읽어줘 가능해,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6310209
+먼저 주문 합계 금액 확인해줘 해줄래,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77216303
+바로 이 주문 건 자세히 알려주라 부탁드립니다,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.597814
+지금 화면에서 지금 색상 사이즈 옵션 읽어줘 부탁해 먼저,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7843396
+이번 주문 기준으로 급한데 수량 하나 늘려줘 부탁드립니다 해봐,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8299807
+이번엔 이 항목 주문 수량 조정해줘 해줄래,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82724
+급한데 바로 로긴해 해주이소,72,click_login,5,5,5,click_login,click_login,0.8351401
+지금 화면에서 급한데 내가 담은 거 보자,71,click_cart,4,4,4,click_cart,click_cart,0.7210001
+지금 화면에서 일단 찜해둘게,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83616036
+지금 총 결제금액 얼마야 해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7730109
+지금 화면에서 일단 후기 좋은 순으로 몇 개만 읽어주세요 해줄래,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7568614
+방금 본 상품 기준으로 이번엔 상세페이지 핵심만 읽어줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7348184
+급한데 여기서 지원되는 동작 읽어줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8085985
+급한데 수랑 한 개 줄여줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82686555
+급한데 결제 완료처리해줘 해주세요,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8401498
+지금 화면에서 카트 선택 상태 지워줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7982358
+현재페이지에서먼저선택된상품들읽어줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7841739
+이번 주문 기준으로 바로 로긴해,72,click_login,5,5,5,click_login,click_login,0.84004974
+일단주문조회 페이지 들어가 해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.76092553
+이번엔 한줄 후기들 먼저 보여줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7589033
+잠깐 옵션 빨간색으로 바꿔주라 가능해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8345553
+쿠팡에서로그아웃진행해먼저,73,click_logout,6,6,6,click_logout,click_logout,0.8335873
+쿠폰 적용 후 금액 알려줘 해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7691352
+장바꾸니 리스트 요약해줘 가능해,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7892457
+지금 배송 진행상황 눌러줘 해봐,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7823189
+급한데 여기서 지원되는 동작 읽어줘 좀,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8111708
+일단 지금 보는 상픔 담아줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7357799
+이번주문 기준으로 잠깐 어떤 상품 결제하는지 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62834716
+이번 주문 기준으로 일단 지금 결제 예정 금액 말해주이소 해주세요 해주이소,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77245194
+지금 원래 히어비 화면으로 돌아가자,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8560222
+현재 페이지에서 지금 페이지 안내해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8037803
+이번엔 리뷰 탭 내용 읽어주라 부탁해 먼저,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75716853
+지금 화면에서 검샥 결과 중 할인 붙은 거 골라줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7559582
+이번 주문 기준으로 먼저 카트 상픔명과 수량 읽어줘 지금,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7801426
+이번 주문 기준으로 지금지금 바로 결제 화면 가자 좀,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.85350496
+지금 화면에서 바로 검색 결과에서 두 번째 거 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.73064554
+이번 주 일정 요약해줘,0,unknown,0,0,0,unknown,unknown,0.92514205
+방금본상픔기준으로이주문의금액 배송정보읽어줘해주세요해봐,91,read_order_detail,23,23,20,read_order_detail,read_order_amount,0.4502625
+이번 주문 기준으로 선택 버튼 눌러줘 부탁드립니다 해봐,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7939522
+지금 이 페이지에서 다음으로 뭐 할 수 있어,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81157863
+일단 교환 신청해줘부탁드립니다,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83312887
+지금화면에서바로일인용전기포트검색해해주세요해주이소,69,search_products,2,2,2,search_products,search_products,0.8404661
+지금 여기서 할 수 있는 명령 말해줘 부탁드립니다 부탁,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8103658
+이번엔 배송 상태 확인해줘 해줄래,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7802752
+이번엔 결과에서 마지막 상품 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7379487
+첫 번째 항목 선택 취소해,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79118836
+내일 버스 시간 요약해줘,0,unknown,0,0,0,unknown,unknown,0.9280141
+이 상픔 즉시 주문할래 부탁드립니다 해주이소,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86462355
+먼저 성분 재질 정보 있으면 읽어줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7479467
+현재페이지에서바로지금결제예정금액말해주이소,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.771685
+바로 상픔 상세 설명 알려줘 가능해,77,read_product_info,10,10,10,read_product_info,read_product_info,0.674158
+방금 본 상품 기준으로 용량 일 옵션으로 바꿔,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83441323
+현재 페이지에서 검샥 결과를 하나씩 불러줘 해줄래,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7492654
+여기서 히어비로 이동해줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85442466
+지금 화면에서 지금 키보드 상품 검샥해줘 해주이소,69,search_products,2,2,2,search_products,search_products,0.84054255
+급한데 이 주문 건 교환해줘 해주세요,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83085006
+이번 주문 기준으로 이번엔 카트 선택 상태 지워줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79520386
+방금 본 상품 기준으로 바로 카트에 뭐 담겼는지 말해줘 부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78684914
+검색된 상품 목록 확인해줘 부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7464646
+현재 페이지에서 주문 목록에서 이 항목 삭제해 해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8469618
+교환 처리 시작해줘 해줄래 먼저,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83322114
+이번 주문 기준으로 이번엔 장바구니페이지 열기 가능해,71,click_cart,4,4,4,click_cart,click_cart,0.7047059
+이번 주문 기준으로 삭제 요청 실행해줘 해주세요,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8452711
+먼저 로긴부터 할게 해줘 부탁,72,click_login,5,5,5,click_login,click_login,0.83771026
+이번엔 이 상품체크 해제해줘 바로,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.77167374
+이번엔옵션 로변경해줘가능해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8219572
+방금 본 상품 기준으로 먼저 주문 내역에서 숨겨줘 해줘 해주이소,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8490301
+먼저선풍기검샥결과보여줘,69,search_products,2,2,2,search_products,search_products,0.7216177
+급한데 방금 담은 거 수량 이로 맞춰줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.83149123
+급한데 두 번째 옵션 선택해줘 지금,78,update_product_option,11,11,11,update_product_option,update_product_option,0.834288
+지금 화면에서 급한데 담아둔 상품 보러 가 부탁드립니다,71,click_cart,4,4,4,click_cart,click_cart,0.71866024
+이번 주문 기준으로 이번엔 한줄후기들 먼저 보여줘 해주세요,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7463948
+먼저 카트항목 선택해 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79391134
+장바구니 페이지 열기,71,click_cart,4,4,4,click_cart,click_cart,0.7019548
+잠깐 이 물건 정보 한 번 훑어줘 바로,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75559175
+방금 본 상품 기준으로 지금 수량 변경 적용해주라 부탁드립니다,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.83002436
+급한데 쿠팡에서 나가고히어비로 가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8489027
+지금 휴지 제일 많이 사는 거 검색해줘 해주세요,69,search_products,2,2,2,search_products,search_products,0.8433346
+먼저제품교환접수해주세요,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.82724774
+이번엔주문건세부내용읽어줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5873811
+결과 화면 요약 하면 안돼,0,unknown,0,0,0,unknown,unknown,0.9116287
+현재 페이지에서 옵션 정보 화면 내용 알려줘 해줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78697973
+이번 주문 기준으로 먼저 선택 상태 원래대로 돌려줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7989526
+먼저 로그아웃 처리해줘 해줘,73,click_logout,6,6,6,click_logout,click_logout,0.83292055
+이번엔 이거 장바구니로 보내,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7337993
+이번엔 결재 페이지 주문 내용 알려줘 해봐,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6296715
+이번주문기준으로급한데옵션정보읽어줘좀부탁,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7806446
+이번 주문 기준으로 잠깐최근 리뷰 요약해줘 해주이소,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75269526
+방금 본 상픔 기준으로 두 번째 옵선 선택해줘 해줘 지금,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8347928
+현재 페이지에서 가능한 버튼들 설명해줘 해주세요,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8123538
+일단 찜해둘게,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8299269
+상세페이지 핵심만 읽어줘 좀,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7258318
+사이즈를 이 칠 영으로 바꿔줘 가능해부탁,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8355931
+이번 주문 기준으로 지금 이거 바로 살게 해줄래,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86838603
+주문 내역에서 숨겨줘 부탁해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8458985
+방금본상품기준으로주문정보읽어줘해봐,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.544486
+지금 방금 본 항목 선택 상태로 바꿔 금지,0,unknown,0,0,0,unknown,unknown,0.6925349
+급한데 담긴 물건들 가격 같이 알려줘 먼저,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7781671
+현재 페이지에서 지금 제품 스펙 정리해서 말해줘 해주세요,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7544702
+현재 페이지에서 먼저 이 제품 어떤 건지 설명해줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7548118
+방금본상품기준으로지금배송진행상황눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7760696
+방금 본 상품 기준으로 배송정보 추적해줘 해줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7811192
+이번엔 이 주문 반품 요청할게,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83046275
+방금 본 상픔 기준으로 지금 주문내옉 정리하려고 이거 삭제해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84726304
+현재 페이지에서 먼저 나중에 살 거로 표시해줘 해주세요,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8364439
+현재 페이지에서 급한데 결제 직전 정보 읽어줘 해주이소,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.64686954
+검색 목록에서 이거 눌러 가능해 먼저,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75626177
+주문 상세 항목 정리해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.55130416
+이번엔 상픔금액 플러스 배송비 합계 알려줘 해줘 해봐,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7712125
+방금 본 상픔 기준으로 바로 옵션 이개로 조정해줘 가능해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83692515
+잠깐 상품 개수 마이너스 일 해줘 부탁해지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.83124346
+리부 읽어줘 해줄래,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7443057
+이번엔 선택 버튼 눌러줘 지금,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7924081
+지금 화면에서 일단 찜해둘게 해주세요,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8389223
+장바구니 페이지 열기 부탁해,71,click_cart,4,4,4,click_cart,click_cart,0.71521366
+지금 카트 상품명과 수량 읽어줘 부탁드립니다,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.784912
+별점 낮은 리뷰부터 보여줘 가능해,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7569593
+먼저 로그아웃 처리해줘 부탁,73,click_logout,6,6,6,click_logout,click_logout,0.83147365
+방금 본 상픔 기준으로 방금 본 항목 선택 상태로 바꿔,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79595566
+현재 페이지에서 이번엔 지금 결재 진행해 가능해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84027374
+이번 주문 기준으로 잠깐 주문조회 페이지 들어가,70,click_order_history,3,3,3,click_order_history,click_order_history,0.76350325
+지금 화면에서 급한데 옵션 정보 화면 내용 알려줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7837449
+현재페이지에서급한데옵선정보읽어줘부탁해해주이소,95,read_option_info,27,27,27,read_option_info,read_option_info,0.77713585
+현재 페이지에서 일단 내역에서 이 건 삭제해줘 해주세요 지금,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84859186
+주말버스시간계산해줘,0,unknown,0,0,0,unknown,unknown,0.9272219
+현재 페이지에서 바로 지금 보는 상픔 담아줘 부탁해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7356557
+일단 주문 상세 요약해줘 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.585157
+방금 본 상품 기준으로 이번엔 이 제품 담기 클릭해줘 부탁해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.72248524
+급한데 옵선명이랑 재고 상태 알려주세요,95,read_option_info,27,27,27,read_option_info,read_option_info,0.783969
+지금 화면에서 주문 목록에서 이 항목 삭제해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84690464
+교환 및 반품 신청해 가능해,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8343511
+현재 페이지에서 일단 옵션 정보 화면 내용 알려줘 먼저,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78513855
+방금 본 상품 기준으로 먼저 이 주문 내역 지우기 해줘 해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8494974
+현재 페이지에서 지금 이 상픔 선택해줘 좀 부탁,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7914888
+방금 본 상품 기준으로 결제 진행 버튼 눌러,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84021175
+지금 빠른구매로 진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86457247
+내 장바구니내역 읽어줘 해줄래,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7855691
+현재 페이지에서 바로 배송 단계 확인해주라 좀,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.778699
+로과웃 버튼눌러줘 해주세요,73,click_logout,6,6,6,click_logout,click_logout,0.83173764
+로그인 창 띄워줘 해봐,72,click_login,5,5,5,click_login,click_login,0.838419
+방금 본 상품 기준으로 먼저 이 주문 반품 요청할게,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8312338
+배송 상태 확인해주이소 해주세요,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7768592
+방금 본 상품 기준으로 일단 자동로긴해제하고 로그아웃해 해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8300476
+현재 페이지에서 급한데 리뷰 많은 상픔으로 들어가줘 해주세요,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75828725
+지금 화면에서 지금 이 상품 즉시 주문할래 해주세요 바로,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8636151
+방금 본 상품 기준으로 지금 배송조회 눌러줘 해주세요,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7793017
+교환 반품 접수해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83473825
+급한데 쿠팡 말고 히어비 홈으로 돌아가 해줄래,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85381866
+이번 주문 기준으로 바로 주문서 내용 읽어줘 먼저,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6340582
+결제 요청 보내줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8345412
+지금 화면에서 급한데 담긴 물건들 가격 같이 알려줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7789422
+방금 본 상픔 기준으로 원래 히어비 화면으로 돌아가자 좀,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8549255
+바로 상품 개수 마이너스 일 해줘 해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82733023
+지금담아둔상픔보러가해줄래,71,click_cart,4,4,4,click_cart,click_cart,0.7067933
+지금 알람 하나 맞춰줘,0,unknown,0,0,0,unknown,unknown,0.91306645
+이번 주문 기준으로 이번엔 상픔 선택 취소해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.8025174
+이번 주문 기준으로 오른쪽에 보이는 상픔 선택해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.762804
+현재 페이지에서 이번엔 즉시 구매 진행해주이소,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8676442
+방금 본 상품 기준으로 바로 개수 삼으로 조절해줘 해줘 지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.83075094
+일단 구매자 평가 읽어줘 부탁,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7560527
+오후 식단 알려줘,0,unknown,0,0,0,unknown,unknown,0.9278148
+오늘 식단 확인해줘,0,unknown,0,0,0,unknown,unknown,0.9272715
+지금 화면에서 먼저 내 계정으로 로긴할래 부탁드립니다,72,click_login,5,5,5,click_login,click_login,0.8358859
+바로 결제 단계마무리해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8393207
+이번 주문 기준으로 바로 주문 합계 금액 확인해줘 가능해 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77537376
+방금 본 상품 기준으로 먼저 로긴부터 할게 가능해 해봐,72,click_login,5,5,5,click_login,click_login,0.8377699
+이번엔 구매 단계로 이동해줘 해주세요,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8651641
+바로 해당 주문 기록 제거해줘 해줄래 해주이소,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8489541
+그거 선택 버튼 눌러줘는 안 해,0,unknown,0,0,0,unknown,unknown,0.91517305
+이번주문기준으로바로색상 사이즈옵션읽어줘해줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78961223
+현재 페이지에서 급한데 특정 상품만 골라줘 해줄래 바로,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79040444
+지금 쿠팡 계정 로그아웃해 해주세요 해봐,73,click_logout,6,6,6,click_logout,click_logout,0.83038783
+지금화면에서잠깐지금보이는항목하나열어줘가능해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7537009
+이번엔옵션을세트구성으로바꿔줘가능해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8296506
+이번 주문 기준으로 이번엔 여기서 할 수 있는 명령 말해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8141502
+방금 본 상품 기준으로 급한데 주문한 거 확인하러 가 해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7594107
+먼저 주문번호 기준으로 상세 보여줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.58013827
+먼저 배송정보 추적해줘 부탁해 먼저,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78078115
+급한데 택배 조회 화면 열어줘 부탁드립니다,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7795034
+저녁 버스 시간 알려줘,0,unknown,0,0,0,unknown,unknown,0.9277353
+일단 구매자 평가 읽어줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75509167
+먼저장바구니내용확인해줘부탁드립니다,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7816432
+방금 본 상품 기준으로 결제 완료까지 진행해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8428169
+지금 화면에서 급한데 옵선 로 변경해줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.826175
+방금 본 상품 기준으로 지금 결제 단계 마무리해줘 해봐,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8411768
+아예 장바구니 조회 하지마,0,unknown,0,0,0,unknown,unknown,0.92600733
+방금 본 상품 기준으로 교환 반품 접수해주라,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83451754
+로그인 상태 해제해 좀,73,click_logout,6,6,6,click_logout,click_logout,0.8190917
+이 주문의 금액 배송정보 읽어줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.4932825
+장바구니 항목전부 보여줘 해줄래 해주이소,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7843564
+먼저 배송 진행상황 눌러줘 해주이소,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7817958
+이번엔 주문 합계 금액 확인해주세요 가능해,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7753149
+지금화면에서 이번엔 이 제품 담기 클릭해줘 부탁해 바로,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7214917
+무선 이어폰 검샥해,69,search_products,2,2,2,search_products,search_products,0.83541995
+이번 주 운동 계획 정리해줘,0,unknown,0,0,0,unknown,unknown,0.9269258
+이번엔 이 주문 건 교환해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8311311
+잠깐 일정 기록해줘,0,unknown,0,0,0,unknown,unknown,0.92813754
+먼저교환및반품신청해가능해,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8287688
+지금 화면에서 히어비 홈으로 바로 이동 해주세요 먼저,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85539377
+현재 페이지에서 지금 담아둔 상픔 뭐 있어 해주세요,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78205836
+이번엔 로긴 창 띄워줘 먼저,72,click_login,5,5,5,click_login,click_login,0.8388937
+관심상픔으로저장해줘좀,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.82674485
+내일 식단 체크해줘,0,unknown,0,0,0,unknown,unknown,0.9271474
+실사용자 후기 알려주세요 해줄래,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7566079
+두 번째 옵션 선택해줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8285587
+먼저 사이즈를 이 칠 영으로 바꿔줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8309645
+방금 본 상픔 기준으로 일단 지금 결제 진행해 해봐,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84225094
+이번엔담아둔상품보러가해줄래,71,click_cart,4,4,4,click_cart,click_cart,0.7062641
+바로 계정 연결 끊어줘,73,click_logout,6,6,6,click_logout,click_logout,0.82498056
+방금 본 상품 기준으로 원래 히어비 화면으로 돌아가자 가능해,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85516024
+방금 본 상픔 기준으로 이 상품체크 해제해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79063416
+이번 주문 기준으로 일단 이 페이지 가능한 작업 목록 보여줘 해줄래 바로,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81694436
+지금 화면에서 장바꾸니에 담아줘 부탁,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73489606
+급한데 상품금액 플러스 배송비 합계 알려줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7697114
+검샥 결과에서 두 번째 거 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7544193
+지금 화면에서 지금 로그인 시작해줘,72,click_login,5,5,5,click_login,click_login,0.8403084
+이번엔 이 상품 찜목록에 넣어줘 먼저,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83894086
+일단 주문 기록 보러 가자,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7598204
+바로 선택된 것들 다 풀어줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.80100566
+잠깐내 주문목록으로 가 가능해,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7519601
+할인 적용된 최종 금액 알려주세요,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7708294
+바로검색결과중할인붙은거골라줘해줘해주이소,76,select_search_result,9,9,9,select_search_result,select_search_result,0.724536
+방금본상픔기준으로옵선명이랑재고상태알려줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7754853
+지금 일단 장바구니 추가해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7372003
+지금 화면에서 이번엔 제품 스펙 정리해서 말해줘 부탁해,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7566904
+총 주문 금액 보여줘 바로,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7676898
+이번엔 방금 본 항목 선택 상태로 바꿔,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7924412
+현재페이지에서급한데제품스펙정리해서말해주이소해줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7385769
+현재 페이지에서 지금 주문내역 탭 눌러,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7626442
+방금본항목선택상태로바꿔하면안돼,0,unknown,0,0,0,unknown,unknown,0.90190834
+다음주회의시간확인해줘,0,unknown,0,0,0,unknown,unknown,0.92593926
+급한데 나중에 보게찜해둬,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8366135
+현재 페이지에서 이번엔 지금 장바꾸니 화면 보여줘 해주세요 해주이소,71,click_cart,4,4,4,click_cart,click_cart,0.7197942
+지금 화면에서 바로 개수 삼으로 조절해줘 부탁드립니다 바로,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8304082
+이번 주문 기준으로 급한데 반품 사유 선택해서 신청해줘 해줘 바로,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8299002
+급한데 지금 결재로 넘어가,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8631786
+이번 주문 기준으로 이번엔 지금 검색 결과 몇 개인지랑 같이 읽어줘 가능해 해주이소,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7425706
+잠깐 주문서 내용 읽어줘 부탁해,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.63163286
+지금 네 번째 결과 선택해 가능해 먼저,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75104624
+방금 본 상픔 기준으로 로긴 버튼 눌러줘,72,click_login,5,5,5,click_login,click_login,0.83866364
+지금 첫 번째 상픔 눌러줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.769723
+현재 페이지에서 바로 나중에 보게 찜해둬 부탁,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.84027743
+바로 결재 화면 항목들 설명해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6365803
+먼저 바로 구매해,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86352205
+급한데 내 계정으로 로그인할래,72,click_login,5,5,5,click_login,click_login,0.84259677
+바로 즉시 구매진행해주라 해줄래,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.861012
+선택된것들다풀어줘해봐,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.800356
+급한데 생수 검색해줘 바로,69,search_products,2,2,2,search_products,search_products,0.84282035
+방금 본 상픔 기준으로 먼저 리부 많은 상품으로 들어가줘 부탁해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7623571
+현재 페이지에서 급한데 쿠폰 적용 후 금액 알려줘 먼저,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77078855
+지금화면에서일단주문기록보러가자해봐,70,click_order_history,3,3,3,click_order_history,click_order_history,0.74054104
+이번 주 운동 계획 확인해줘,0,unknown,0,0,0,unknown,unknown,0.92666906
+이번엔 할인 적용된 최종 금액 알려주세요,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7723876
+지금 화면에서 담기 버튼 눌러줘부탁해 해봐,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.71966153
+바로 위시리스트에 추가해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83188653
+일단 히어비로 되돌아가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85106117
+현재 페이지에서 급한데 담아둔 상픔 보러 가 좀 먼저,71,click_cart,4,4,4,click_cart,click_cart,0.72327477
+방금 본 상픔 기준으로 바로 개수 삼으로 조절해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.83053994
+이번엔옵션빨간색으로바꿔줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8206839
+현재 페이지에서 수량 한 개 줄여줘 부탁드립니다,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82741237
+급한데 결과 리스트 간단히 말해줘 부탁드립니다,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74870867
+최근 주문내역 보게 이동해줘 해주세요,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7565316
+먼저 이거 말고 다른 색상 있는지 검색해줘,69,search_products,2,2,2,search_products,search_products,0.8396536
+이번 주문 기준으로 급한데 주문 금액 읽어줘 가능해 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7716113
+일단일단 찜해둘게 좀,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8359412
+방금 본 상품 기준으로 내 주문 배송조회 들어가 먼저,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77866894
+일단 즉시 구매 진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86675316
+지금 화면에서 색상 네이비로 변경해줘 좀,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8360041
+교환 신청해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83335745
+상품 요약해줘 가능해 해봐,77,read_product_info,10,10,10,read_product_info,read_product_info,0.748739
+현재 페이지에서 먼저 내역에서 이 건 삭제해줘 바로,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8462697
+현재 페이지에서 일단 가능한 버튼들 설명해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8115237
+한 번 담아둘게 장바구니 추가,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73982847
+바로 빠른구매로 진행해주세요 좀 바로,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86582834
+현재 페이지에서 주문 배송 조회 메뉴 눌러줘 지금,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7586703
+이번엔 히어비 홈페이지열어줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8536292
+지금 화면에서 먼저 검샥 결과에서 눈에 띄는 것 읽어줘 해줄래,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7479166
+방금 본 상픔 기준으로 먼저 내역에서 이 건 삭제해줘 좀,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8482448
+일단 상세 주문 정보 확인해줘 해줄래,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.58360624
+지금 화면에서 지금 검색 결과에서 두 번째 거 선택해줘 부탁드립니다 먼저,76,select_search_result,9,9,9,select_search_result,select_search_result,0.73750585
+방금 본 상품 기준으로 먼저 장바구니 탭 눌러줘,71,click_cart,4,4,4,click_cart,click_cart,0.72061265
+결제 실행해주라 부탁해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8373488
+결재 요청 보내줘 부탁드립니다 먼저,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8373794
+먼저 나중에 살 거로 표시해줘 해봐,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8373389
+선택 안 된 상품 선택해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.78671116
+잠깐 어떤 상품 결제하는지 읽어줘 해주세요,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6424258
+지금 보이는 항목 하나 열어줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7594567
+옵션 이개로 조정해줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83021486
+지금 화면에서 이번엔 한 번 담아둘게 장바꾸니 추가 가능해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73554575
+선택 상태 원래대로 돌려줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7967509
+장바구니 조회해줘,71,click_cart,4,4,4,click_cart,click_cart,0.7035536
+지금 담아둔 상품 뭐 있어는 하지 말고,0,unknown,0,0,0,unknown,unknown,0.9262144
+내가 담은 거 보자,71,click_cart,4,4,4,click_cart,click_cart,0.7139647
+장바구니 수량 오개로 변경해 가능해,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8290936
+현재 페이지에서 이번엔 제품 스펙 정리해서 말해주이소 해줄래,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7587672
+지금 화면에서 일단 옵션 정보 화면 내용 알려줘 해주세요 해봐,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7866209
+방금 본 상픔 기준으로 일단 구매자 평가 읽어줘 가능해 해봐,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75379115
+현재 페이지에서 장바꾸니 수랑 오개로 변경해 좀 해봐,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82743615
+급한데 결재 실행해줘 가능해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8387061
+결과 화면 요약해줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74638987
+지금 결제로 넘어가,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.85060525
+일단 삭제 요청 실행해줘 해주세요,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84406894
+이번엔 선택한 상픔 수량만 수정해줘 부탁드립니다,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8269115
+이번 주문 기준으로 지금 장바구니 화면 보여줘 해주세요,71,click_cart,4,4,4,click_cart,click_cart,0.70727414
+이번 주문 기준으로 이번엔 해당 주문 기록 제거해주세요 해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8477815
+방금 본 상픔 기준으로 로그인 창 띄워줘 부탁해,72,click_login,5,5,5,click_login,click_login,0.83931494
+이번엔 카트 페이지로 이동해 좀,71,click_cart,4,4,4,click_cart,click_cart,0.7237029
+이번 주문 기준으로 지금 이 상픔 옵션 종류 뭐 있어 바로,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7783534
+이번엔 선택한 상품 해제해줘 먼저,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7986676
+이번엔 특정 상품만 골라줘 부탁해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7920385
+바로 같은 상픔 장바꾸니에 추가해 좀,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73618394
+지금 내가 시킨 것들보이는 페이지로 가 부탁,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7533723
+잠깐 수면 기록 정리해줘,0,unknown,0,0,0,unknown,unknown,0.92754257
+일단 휴지 제일 많이 사는 거 검샥해줘 먼저,69,search_products,2,2,2,search_products,search_products,0.8410482
+방금 본 상픔 기준으로 먼저 검색 결과에서 눈에 띄는 것 읽어줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74714506
+바로 결재할 총액 읽어줘 해줘 해주이소,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7729174
+현재 페이지에서 지금 교환 요청 페이지 열어줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83214474
+환불 반품 신청해줘 해주세요,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.82922244
+방금 본 상픔 기준으로 옵선명이랑 재고 상태 알려주세요,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78487337
+잠깐 결재수단이랑 배송상태 포함해서 읽어줘 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.56895024
+급한데 장바꾸니에서 첫 번째 상픔 체크해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.78139234
+이번주문 기준으로 검색 결과에서 두 번째 거 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7285662
+현재 페이지에서 먼저 지금 담아둔 상품 뭐 있어 해주이소,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7911479
+방금본상품기준으로품절아닌옵션만읽어줘해줄래바로,95,read_option_info,27,27,27,read_option_info,read_option_info,0.75216687
+급한데 이 상품 즉시 주문할래,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8675132
+지금결재로 넘어가 해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8093714
+방금 본 상품 기준으로 지금 이 상품 찜 목록에 넣어줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.84029067
+일단 이 주문 내역 지우기 해주세요 해줄래 해주이소,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.85047066
+지금 선택 처리해줘 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79887944
+방금 본 상품 기준으로 바로 내가 내야 할 돈 얼마인지 말해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7687147
+이번엔 지난 주문 확인 화면으로 이동해 해주세요,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75888693
+지금 보는 상픔 담아줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7333302
+현재 페이지에서 먼저 장바구니 항목 전부 보여줘 해주세요,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7825913
+그거 주문 상세 내역 설명는 안 해,0,unknown,0,0,0,unknown,unknown,0.8865874
+현재 페이지에서잠깐 총 결제금액 얼마야 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77320325
+이번주문기준으로지금이상품옵션종류뭐있어 부탁드립니다,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7850701
+이거 장바구니로 보내 부탁해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.735951
+반품 사유 선택해서 신청해주세요 해주세요,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8282796
+지금 선택한 상품 해제해주라 해줘 지금,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79869527
+급한데 사진 리부 있는지 읽어줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.54035646
+방금 본 상품 기준으로 카트로 바로 가,71,click_cart,4,4,4,click_cart,click_cart,0.71700346
+이번엔 옵션 로 변경해줘 부탁해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8318146
+절대첫번째상품눌러줘하지마,0,unknown,0,0,0,unknown,unknown,0.92201096
+지금 화면에서 지금 배송조회 눌러줘 부탁,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.778685
+급한데 수량 한 개 줄여줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82578313
+이번 주문 기준으로 먼저 주문한 거 확인하러 가,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7560798
+먼저 배송 추적 페이지로 가줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7765512
+주문내옉 정리하려고 이거 삭제해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8475596
+이번 주문 기준으로 일단 장바구니 추가해 해줄래,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7303615
+내일 지하철 시간 체크해줘,0,unknown,0,0,0,unknown,unknown,0.9261847
+담아둔 상품 보러 가,71,click_cart,4,4,4,click_cart,click_cart,0.7162995
+현재 페이지에서 일단 상픔 선택 취소해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.8025638
+바로 총결제금액 얼마야 해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77407557
+현재 페이지에서 나중에 살 거로 표시해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83638144
+바로 결제수단이랑 배송상태 포함해서 읽어줘 해주세요,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5730531
+급한데이 제품 담기 클릭해줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.72639906
+이번 주문 기준으로 배송 진행상황 눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78062564
+먼저 장바꾸니 항목 전부 보여줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7783026
+지금 화면에서 이번엔 전체 선택 해제해줘 해줄래 먼저,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7886994
+지금 화면에서 먼저 교환 처리 시작해줘해주세요 지금,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8330123
+잠깐 다시 히어비 메인으로 가자 지금,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8532038
+현재 페이지에서 이번엔 총 결재금액 얼마야 부탁해 바로,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.772983
+이번 주문 기준으로 급한데 가격 제일 낮은 결과 선택해줘 해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76224595
+지금 카트 항목 선택해 부탁드립니다,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7973769
+방금 본 상픔 기준으로 두 번째 상품만 선택해줘 부탁드립니다,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7827377
+내가 내야 할 돈 얼마인지 말해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.76430595
+먼저 수랑 하나 늘려줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82409453
+이번 주문 기준으로 배송 상태 확인해주이소 해봐,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77941006
+장바꾸니리스트요약해줘부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7365971
+바로 주문 버튼 눌러줘 부탁드립니다,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.864841
+카트 페이지로 이동해,71,click_cart,4,4,4,click_cart,click_cart,0.71751934
+잠깐 주문히스토리에서 빼줘 해봐,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8469972
+이번 주문 기준으로 검색된 상품 목록 확인해주라 해줄래,75,read_search_results,8,8,8,read_search_results,read_search_results,0.75046074
+이번엔 별점 낮은 리뷰부터 보여줘 좀,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7584086
+현재 페이지에서 일단 한 번 담아둘게 장바구니 추가 가능해 먼저,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7348234
+이번 주문 기준으로 급한데 지금 주문 정보 한 번 정리해주세요 지금,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6319109
+이번엔 결제 완료 처리해줘 바로,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84019226
+이번엔 배송 진행상황 눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7806465
+일단 이 계정 종료해줘,73,click_logout,6,6,6,click_logout,click_logout,0.82658756
+지금 장바구니에 담아줘 부탁드립니다,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73757184
+바로 환불 반품 신청해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.82969433
+지금 화면에서 옵션 말고 기본 정보 먼저 읽어줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7451414
+잠깐 로그아웃해주세요 바로,73,click_logout,6,6,6,click_logout,click_logout,0.8270924
+급한데 운송장 흐름 확인해줘 해줄래 지금,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7815358
+카트 항목선택해 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7951574
+리부 탭 내용 읽어줘 좀,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75006795
+지금 화면에서 지금 해당 주문 기록 제거해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84671956
+이번엔 주문 확정하고 결제해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84046775
+쿠팡에서비타민 찾아봐,69,search_products,2,2,2,search_products,search_products,0.83289385
+바로 리뷰에서 단점 위주로알려줘 바로,81,read_reviews,14,14,14,read_reviews,read_reviews,0.74877745
+방금 본 상픔기준으로 주문 금액 읽어줘 부탁드립니다,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7707368
+일단 히어비 홈으로 바로 이동 좀 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8549289
+지금 화면에서 이번엔 로그인 화면 열어줘 부탁,72,click_login,5,5,5,click_login,click_login,0.83778685
+지금 지금 장바구니 화면 보여줘 해주세요 바로,71,click_cart,4,4,4,click_cart,click_cart,0.71492785
+잠깐 최종 결제 금액 읽어줘 해주세요 해주이소,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7719703
+현재 페이지에서 주문조회 페이지 들어가 부탁해 먼저,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7622141
+이주문내역지우기해줘부탁해먼저,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.83978045
+한 번에 구매하기 눌러 해줘 해봐,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86813265
+먼저찜상태로바꿔줘해줄래,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8135915
+받는 사람 주소 상품 정보 읽어줘 해주이소,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62856466
+옵선 그대로 장바꾸니 담아줘 좀,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7378226
+급한데 오른쪽에 보이는 상품 선택해 부탁,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7539337
+상품 선택 취소는 안 해,0,unknown,0,0,0,unknown,unknown,0.9098962
+방금 본 상품 기준으로 선택 버튼 눌러주라 좀,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79638976
+방금 본 상품 기준으로 일단 내 주문 배송조회 들어가 해주세요 해봐,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7809184
+옵선 빨간색으로 바꿔줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.82593703
+잠깐 여기서 히어비로 이동해줘 해줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8534771
+지금 지금 뜬 검샥 목록 설명해줘 부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7411373
+구매자 평가 읽어줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75350136
+먼저상품개수마이너스 일해줘가능해바로,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8070209
+이번엔 같은 상품 장바구니에 추가해 해줄래 부탁,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7383329
+지금 화면에서 지금 내 장바구니 내역 읽어줘 해주세요,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7894223
+급한데 여기서 로그아웃할게,73,click_logout,6,6,6,click_logout,click_logout,0.8301401
+오늘운동계획계산해줘,0,unknown,0,0,0,unknown,unknown,0.927547
+이번 주문 기준으로 바로 로그인 풀어줘 해줘 바로,73,click_logout,6,6,6,click_logout,click_logout,0.83037114
+잠깐 쿠팡 로그인하러 가,72,click_login,5,5,5,click_login,click_login,0.84004855
+방금 본 상품 기준으로 주문번호 기준으로 상세 보여줘 해주이소,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5851801
+방금 본 상품 기준으로 내 장바구니 내역 읽어줘 지금,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7904427
+지금 화면에서 이거 말고 다른 색상 있는지 검샥해줘,69,search_products,2,2,2,search_products,search_products,0.8398032
+바로 반품 신청 진행해줘 먼저,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8312713
+여기서 지원되는 동작 읽어줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8036537
+급한데 주문 상세 페이지 내용 읽어줘 해줄래,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.58941
+찜 등록해줘 해줄래 해주이소,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8396047
+택배 조회 화면 열어줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77564675
+이번엔 결과 리스트 간단히 말해줘 해주세요,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7519076
+현재페이지에서 선택된 상품들 읽어주라 가능해 지금,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7781436
+방금 본 상픔 기준으로 이번엔 장바꾸니에 담긴 상품 읽어줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.766951
+현재 페이지에서 내 주문목록으로 가,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7629255
+이번 주문 기준으로 로긴 창 띄워줘,72,click_login,5,5,5,click_login,click_login,0.83939296
+지금 화면에서 먼저 지금 뜬 검색 목록 설명해줘 좀,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74734735
+옵션에서 대용량으로 바꿔줘 지금,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83349144
+현재 페이지에서 급한데 위시리스트 추가해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83861315
+현재 페이지에서 바로 주문 버튼 눌러줘 지금,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8649321
+지금 로긴 시작해줘 부탁해,72,click_login,5,5,5,click_login,click_login,0.83804864
+현재 페이지에서 내가 시킨 것들 보이는 페이지로 가 부탁드립니다,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7493993
+최종 결재 금액 읽어줘 좀 바로,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7700861
+이 상품 체크 해제는 하지마라,0,unknown,0,0,0,unknown,unknown,0.92450184
+지금검샥결과몇개인지랑같이읽어줘해줄래,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7328687
+바로이상품카트에넣어줘먼저,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7207205
+해당 주문 기록 제거해줘 해주세요 지금,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84722614
+배송 단계 확인해줘 좀 해주이소,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78112763
+급한데 결제수단이랑 배송상태 포함해서 읽어줘 좀,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5728421
+이번 주문 기준으로 잠깐 이 상품 수량 이개로 바꿔줘 해주세요,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8292562
+지금 식단 알려줘,0,unknown,0,0,0,unknown,unknown,0.9189301
+급한데 화면 기준으로 가능한 명령 알려주세요 부탁해,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8146067
+급한데 총 결제금액 얼마야 가능해 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77319664
+잠깐 식단 요약해줘,0,unknown,0,0,0,unknown,unknown,0.9185685
+먼저 이 계정 종료해줘 좀,73,click_logout,6,6,6,click_logout,click_logout,0.8306692
+방금 본 상품 기준으로 이번엔 지금 바로 결제할게 부탁해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8396709
+방금 본 상픔 기준으로 급한데 검색 결과를 하나씩 불러줘 해줄래 지금,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7509795
+이번 주문 기준으로 카트 상품명과 수량 읽어줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7832828
+방금 본 상품 기준으로 네 번째 결과 선택해 해주세요,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76726836
+잠깐 최종 결제 금액 읽어줘 부탁해 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.772187
+바로 상품 개수 플러스 일 해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8233116
+일단 한줄 후기들먼저 보여줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7558266
+어떤 상픔 결재하는지 읽어줘 해줄래,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6449915
+이번엔 내 계정으로 로그인할래,72,click_login,5,5,5,click_login,click_login,0.84259635
+바로 상품금액 플러스 배송비 합계 알려줘 부탁드립니다,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77162486
+급한데 이 페이지에서 다음으로 뭐 할 수 있어 가능해,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81424046
+이번 주문 기준으로 먼저 방금 담은 거 수량 이로 맞춰줘 해줄래 지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.83159477
+이번 주문 기준으로이거 찜 목록에 담아 해주세요 지금,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8400128
+현재 페이지에서 일단 이 페이지 가능한 작업 목록 보여줘 해줄래 먼저,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8152992
+지금 카트 페이지로 이동해,71,click_cart,4,4,4,click_cart,click_cart,0.7204479
+이번 주문 기준으로 검샥 결과에서 두 번째 거 선택해주이소 해주세요,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7616144
+잠깐 카트 선택 상태 지워줘 부탁드립니다 해봐,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7912715
+급한데 로그아웃 처리해줘해봐,73,click_logout,6,6,6,click_logout,click_logout,0.83371943
+지금 개수 삼으로 조절해주라 해주이소,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.83006537
+지금 화면에서 바로 장바구니 리스트 요약해줘 해주세요 해봐,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78859377
+잠깐 첫 번째 항목 선택 취소해,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79658747
+급한데 주문내역 삭제해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8388145
+먼저 로그인 페이지로 보내줘 좀 지금,72,click_login,5,5,5,click_login,click_login,0.8417132
+카트담기 실행해줘 부탁해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.72897977
+잠깐 상품 상세 설명 알려줘 바로,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7359068
+옵션을세트구성으로바꿔줘지금,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8322781
+현재 페이지에서 이번엔 주문번호 기준으로 상세 보여줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.58101875
+이번 주문 기준으로 먼저 지금 검색 결과 몇 개인지랑 같이 읽어줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74822813
+여기서지원되는동작읽어줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.807673
+이번엔 장바꾸니에서 첫 번째 상픔 체크해 해줄래,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7784014
+바로 주문번호 기준으로 상세 보여줘 좀,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.58601916
+먼저원래히어비화면으로돌아가자가능해지금,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.849955
+이번 주문 기준으로 결재 진행버튼 눌러 해줘 부탁,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8400662
+먼저주문요약정보말해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.5261085
+방금 본 상품 기준으로 이번엔 결재 요청 보내줘 좀,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83971137
+로그인 페이지로 보내줘 부탁드립니다,72,click_login,5,5,5,click_login,click_login,0.8407663
+지금 화면에서 일단 지금 선택만 해제해줘 해줄래,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7957876
+현재 페이지에서 급한데 즉시 구매 진행해줘 해주세요,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8660555
+지금 화면에서 잠깐 받는 사람 주소 상픔 정보 읽어줘 좀 부탁,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62809235
+일단 로그아웃 처리해주세요 좀,73,click_logout,6,6,6,click_logout,click_logout,0.8325331
+지금 화면에서 지금 옵션 빨간색으로 바꿔줘 가능해 부탁,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8332693
+제품 교환 접수해주라 부탁해 해봐,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83129716
+지금 화면에서 이번엔 옵션명이랑 재고 상태 알려주라 해줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78739876
+잠깐 선택 버튼 눌러줘 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7951821
+방금 본 상픔 기준으로 제품 스펙 정리해서 말해줘 부탁,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7510083
+급한데 두 번째 옵선 선택해주세요 좀,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83156085
+바로 장바구니에서 첫 번째 상품 체크해 부탁해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.78124934
+현재 페이지에서 먼저 이 주문 기록 지워줘 지금,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.847321
+이번 주문 기준으로 일단 이거 말고 다른 색상 있는지 검샥해줘 해봐,69,search_products,2,2,2,search_products,search_products,0.84099185
+이 주문 기록 지워줘 가능해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8471653
+바로 로그아웃 처리해줘 부탁해 해주이소,73,click_logout,6,6,6,click_logout,click_logout,0.8312728
+급한데 구매했던 내역 화면 띄워줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75538194
+일단 검샥 결과 읽어줘 부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.75141853
+이번엔나중에 살 거로 표시해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83639383
+로그아웃해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8163482
+현재 페이지에서 급한데 주문 상세 페이지 내용 읽어주세요 부탁해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5769996
+주문 목록에서 이항목 삭제해 부탁,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8384206
+방금 본 상픔 기준으로 방금 검샥한 목록에서 맨 위 상품 들어가 좀 먼저,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76590437
+방금 본 상픔 기준으로 바로 배송지랑 결제수단 포함해서 읽어줘 가능해,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.47834533
+현재 페이지에서 잠깐 이 상픔 카트에 넣어줘 부탁,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73652065
+현재 페이지에서 일단 교환 요청 페이지 열어줘 해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8320377
+반품진행 버튼 눌러줘 해주세요,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83147174
+먼저 운송장 흐름 확인해줘 해주이소,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78057665
+오후버스시간기록해줘,0,unknown,0,0,0,unknown,unknown,0.92845833
+방금 본 상품 기준으로 먼저 지금 배송 위치 보여줘 해줘 바로,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7814268
+지금 화면에서 먼저 체크된 거 풀어줘 좀 바로,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79461145
+잠깐 식단 체크해줘,0,unknown,0,0,0,unknown,unknown,0.92738736
+오후 버스 시간 요약해줘,0,unknown,0,0,0,unknown,unknown,0.928611
+배송 상태 확인해줘가능해,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77980036
+바로 이 상품 옵션 종류 뭐 있어,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7840365
+이번 주문 기준으로이번엔 지금 선택만 해제해줘 부탁해 해봐,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79932964
+상픔 개수 플러스 일 해줘 지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8251587
+일단 결과 상품들 순서대로 말해줘 부탁,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7512797
+이번 주문 기준으로 먼저 여기서 지원되는 동작 읽어줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81248134
+일단 옵선 이개로 조정해줘 해줄래,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8305187
+담기 버튼 눌러줘 해줄래,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7256897
+별점낮은리부부터보여줘해줄래바로,81,read_reviews,14,14,14,read_reviews,read_reviews,0.68260074
+먼저이물건정보한번훑어줘해줘지금,77,read_product_info,10,10,10,read_product_info,read_product_info,0.6105837
+잠깐히어비메인페이지로전환해줘해주세요,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8478198
+지금 아기 물티슈찾아줘 부탁해 해주이소,69,search_products,2,2,2,search_products,search_products,0.8414413
+지금 화면에서 일단 최근 리뷰 요약해줘 좀 해주이소,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7550553
+방금 본 상픔 기준으로 잠깐 닭가슴살 찾아줘,69,search_products,2,2,2,search_products,search_products,0.841894
+지금 화면에서 휴지 제일 많이 사는 거 검색해줘,69,search_products,2,2,2,search_products,search_products,0.84086996
+이번 주문 기준으로 색상 사이즈 옵선 읽어줘 부탁해 먼저,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7867776
+배송 단계 확인해줘 해주세요 바로,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7806858
+이 주문 반품 요청할게,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83144104
+방금 본 상품 기준으로 받는 사람 주소 상품 정보 읽어줘 좀 먼저,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.63098437
+급한데 선택 해제 버튼 눌러줘 부탁드립니다 먼저,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79784137
+바로장바구니페이지열기먼저,71,click_cart,4,4,4,click_cart,click_cart,0.7204184
+이번엔 지금 뜬 검샥 목록 설명해줘 부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74088746
+지금 화면에서 먼저 이 상픔 카트에 넣어줘 해주세요 바로,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7350627
+지금화면에서잠깐선택가능한옵션만알려주세요지금,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7819309
+방금 본 상픔 기준으로 받는 사람 주소 상품 정보 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6280569
+방금 본 상품 기준으로 쿠팡 계정 로그아웃해 좀 바로,73,click_logout,6,6,6,click_logout,click_logout,0.8273035
+현재페이지에서 결제 실행해주라 부탁드립니다 해주이소,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8390181
+현재 페이지에서 바로 배송 현황 확인 버튼 눌러주라,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7804707
+이번 주문 기준으로 지금 쿠팡 계정 로가웃해,73,click_logout,6,6,6,click_logout,click_logout,0.8321261
+현재 페이지에서 일단 이 계정 종료해줘,73,click_logout,6,6,6,click_logout,click_logout,0.83080685
+지금 색상 사이즈 옵션 읽어줘 해주이소,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7877921
+잠깐 이 페이지에서 다음으로 뭐 할 수 있어 부탁해,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81420076
+방금 본 상품 기준으로 지금 결제 예정 금액 말해주세요 바로,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7749708
+현재 페이지에서 하트 버튼 눌러줘 해봐,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8238544
+로그인 시작해줘,72,click_login,5,5,5,click_login,click_login,0.8405507
+현재 페이지에서 이 페이지에서 다음으로 뭐 할 수 있어,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80941296
+일단 지금 결제 진행해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83928835
+현재페이지에서이번엔후기좋은순으로몇개만읽어주라바로,81,read_reviews,14,14,14,read_reviews,read_reviews,0.73695296
+방금 본 상품 기준으로이번엔 색상 사이즈 옵션 읽어줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78254205
+이번엔결재 전 주문 내역 확인해줘 먼저,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62526107
+이번 주문 기준으로 바로 장바꾸니에서 첫 번째 상픔 체크해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7713706
+지금 선풍기 검색 결과 보여줘 금지,0,unknown,0,0,0,unknown,unknown,0.9232388
+일단 쿠팡에서 로그아웃 진행해 부탁드립니다,73,click_logout,6,6,6,click_logout,click_logout,0.8340646
+유산균 상품 검색해주세요,69,search_products,2,2,2,search_products,search_products,0.84211534
+현재 페이지에서 계정 로긴 진행해 먼저,72,click_login,5,5,5,click_login,click_login,0.84210813
+이번 주문 기준으로 바로 장바구니에서 첫 번째 상픔 체크해 해주세요,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.77937555
+결제실행해주이소해줄래해주이소,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8374043
+현재 페이지에서 이번엔빠른구매로 진행해줘 부탁드립니다 지금,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86357784
+일단주문상세페이지내용읽어줘좀,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.581888
+잠깐 체크된 거 풀어줘 좀 지금,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7993689
+검샥된 제품 이름만 읽어줘 가능해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74354404
+이번 주문 기준으로 일단 장바구니 수량 오개로 변경해 지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82992995
+교환 요청 페이지 열어줘 해줄래 지금,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.832847
+방금 본 상픔 기준으로 지금 이거 찜 목록에 담아 먼저,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8395319
+먼저 이 상품 옵션 종류 뭐 있어 가능해,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78610563
+이번 주문 기준으로 전체 선택 해제해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7995159
+방금 본 상품 기준으로 장바구니 항목 전부 보여줘 부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78857434
+지금 화면에서 먼저 이거 장바꾸니로 보내 부탁드립니다 부탁,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7347827
+이번주문기준으로급한데주문요약정보말해줘가능해,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.4967392
+지금 화면에서 결재 페이지 주문 내용 알려줘 부탁,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6284363
+교환 반품 접수 하지 말아,0,unknown,0,0,0,unknown,unknown,0.9142719
+급한데 카트 아이콘 눌러줘,71,click_cart,4,4,4,click_cart,click_cart,0.7188946
+방금 본 상품 기준으로 이번엔 결제수단이랑 배송상태 포함해서 읽어줘 좀 부탁,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5554601
+쿠팡 말고 히어비 홈으로 돌아가 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85330486
+이번주문기준으로옵션명이랑재고상태알려줘바로,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78450173
+현재페이지에서택배조회화면열어줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77126825
+이번엔 주문 상세 요약해줘 먼저,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5908336
+이번주문기준으로일단어떤상품결제하는지읽어줘부탁드립니다,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.54546374
+바로 선택 해제 버튼 눌러줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7953839
+이번 주문 기준으로 이번엔 이 주문 건 자세히 알려줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5900207
+바로 구매했던 내역 화면 띄워줘 부탁드립니다 해주이소,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75604767
+현재 페이지에서 먼저 결과 페이지 내용 읽어줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.75050056
+검샥 결과를 하나씩 불러줘 해줄래,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7501488
+히어비 홈 탭으로 넘어가 해줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8539584
+급한데 이 항목 주문 수랑 조정해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8265949
+로그인 시작해주이소 해봐,72,click_login,5,5,5,click_login,click_login,0.8421988
+바로 이 주문의 금액 배송정보 읽어줘 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5047509
+이번엔 결과 리스트 간단히 말해줘 부탁드립니다,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7497053
+일단찜해둘게부탁드립니다부탁,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83461976
+지금 화면에서 개수 삼으로 조절해줘 부탁해,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8284005
+이번주문기준으로상세페이지핵심만읽어줘해줄래바로,77,read_product_info,10,10,10,read_product_info,read_product_info,0.6717002
+상품선택 취소해줘 해주세요,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79805946
+바로 빠른구매로진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86630744
+이번엔 로그인 풀어줘 해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8272582
+지금 화면에서 급한데 교환 처리 시작해줘 해봐,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8326563
+방금 본 상품 기준으로 급한데 여기서 히어비로 이동해줘 해줄래 부탁,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8519481
+결제하기 눌러줘 해줘 해봐,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8408085
+이번엔주문상세정보읽어줘부탁해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5886511
+이번 주문 기준으로 지금 주문 목록에서 이 항목 삭제해 부탁해 바로,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84839267
+방금 본 상품 기준으로 이번엔 체크박스 꺼줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7967516
+잠깐 지금 뜬 검샥 목록 설명해줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7412347
+일단 구매하기눌러줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86848843
+즉시 구매 진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86273235
+방금 본 상품 기준으로 색상 네이비로 변경해줘 먼저,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8360966
+배송정보 추적해줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7786337
+급한데 개수 삼으로 조절해줘 해줄래,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82942605
+지금 화면에서 선택 상태 원래대로 돌려줘 부탁드립니다,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79929537
+지금 화면에서 지금 검색 결과를 하나씩 불러줘 부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7530165
+잠깐 개수 삼으로 조절해주세요 먼저,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8286572
+오른쪽에 보이는 상품 선택해 해주이소,76,select_search_result,9,9,9,select_search_result,select_search_result,0.757451
+일단 상품 개수 플러스 일 해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8258931
+이번 주문 기준으로 급한데 옵션 다른 걸로 다시 골라줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83508337
+바로 별점 낮은 리뷰부터 보여줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75671613
+급한데 개수 삼으로 조절해줘 해주세요 부탁,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82923543
+이번 주문 기준으로 잠깐 히어비 첫 화면으로 보내줘 해주이소,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85431194
+이번 주문 기준으로 일단 이 페이지 가능한 작업 목록 보여줘 좀,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81524956
+전체 선택 해제해줘 부탁,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7974438
+지금 화면에서 잠깐 아기 물티슈 찾아줘 좀,69,search_products,2,2,2,search_products,search_products,0.8419051
+잠깐 주문내역 탭 눌러 해줄래 먼저,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7644238
+먼저 주문내역에서 숨겨줘 부탁,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84962696
+아침 식단 요약해줘,0,unknown,0,0,0,unknown,unknown,0.9280444
+지금이거말고다른색상있는지검색해줘좀,69,search_products,2,2,2,search_products,search_products,0.8392078
+급한데 담기 버튼 눌러줘 바로,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.71724635
+방금 본 상픔 기준으로 수랑 한 개 줄여줘 바로,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82916075
+이상품 옵션 항목 설명해줘 가능해,95,read_option_info,27,27,27,read_option_info,read_option_info,0.77987266
+택배 어디쯤인지 조회해줘 부탁드립니다,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78089666
+이번주문기준으로급한데주문번호기준으로상세보여줘부탁드립니다,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5495507
+먼저 로긴 풀어줘 좀 먼저,73,click_logout,6,6,6,click_logout,click_logout,0.8142563
+지금 화면에서 오른쪽에 보이는 상품선택해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.74739766
+나중에 살 거로 표시해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8346988
+방금 본 상픔 기준으로 지금 체크박스 꺼줘 해줄래,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7981947
+결제수단이랑 배송상태 포함해서 읽어줘 부탁드립니다 지금,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.569514
+현재 페이지에서 검색 결과에서 두 번째 거 선택해줘 해줄래,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7278423
+잠깐 가격이랑배송 정보 같이 읽어줘 좀,77,read_product_info,10,10,10,read_product_info,read_product_info,0.73846096
+주문서 내용 읽어줘 해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.616942
+방금 본 상품 기준으로 선택 가능한 옵션만 알려줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78527766
+현재 페이지에서 지금 결제 진행해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8386706
+주말 날씨 계산해줘,0,unknown,0,0,0,unknown,unknown,0.92870986
+상픔 개수 마이너스 일 해줘 부탁해,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8280155
+지금 화면에서 잠깐 구매 전에 장바구니에 넣어줘 부탁해 먼저,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73467755
+바로 체크박스 눌러서 선택해줘 해줄래,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7943301
+이번 주문 기준으로 일단 이 상품 즉시 주문할래,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8662175
+제품 소개 문구 읽어줘 부탁,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74969536
+내일 식단 알려줘,0,unknown,0,0,0,unknown,unknown,0.92692375
+지금화면에서이번엔실사용자후기알려줘해줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7563412
+이번 주문 기준으로 성분 재질 정보 있으면 읽어줘 부탁,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75145054
+전체 상품 선택해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79310256
+아침일정알려줘,0,unknown,0,0,0,unknown,unknown,0.9266692
+이번 주문 기준으로 이 상픔 체크 해제해줘 해줄래 해봐,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79717344
+지금 화면에서 내 계정으로 로긴할래 해줘,72,click_login,5,5,5,click_login,click_login,0.8364894
+이번 주 식단 확인해줘,0,unknown,0,0,0,unknown,unknown,0.926548
+이번 주문 기준으로 바로 색상 사이즈 옵선 읽어줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7801233
+일단쿠팡계정로그인해줘좀해주이소,72,click_login,5,5,5,click_login,click_login,0.8292852
+급한데 지금 장바구니 화면 보여줘 가능해 해봐,71,click_cart,4,4,4,click_cart,click_cart,0.7103214
+현재 페이지에서 담긴 물건들 가격 같이 알려줘 해주세요,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7743828
+현재 화면 옵션 알려줘 부탁드립니다,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81022924
+이번 주문 기준으로 로긴 시작해줘 부탁드립니다,72,click_login,5,5,5,click_login,click_login,0.839371
+일단하트 버튼 눌러주라 좀 지금,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.42808893
+이번 주문 기준으로 먼저 체크박스 눌러서 선택해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7917138
+급한데 나중에 보게 찜해둬 먼저,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83950675
+현재 페이지에서 일단 장바구니 추가해 해줄래 부탁,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.70019823
+주문내역 탭 눌러 부탁드립니다,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75880986
+지금 화면에서 이번엔 첫 번째 항목 선택 취소해 가능해,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7898012
+이번 주문 기준으로 지금 결제로 넘어가 해봐,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86051685
+쿠팡 계정 로그아웃해 좀,73,click_logout,6,6,6,click_logout,click_logout,0.82380956
+주문 금액 읽어줘 가능해,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7647848
+바로 한 번 담아둘게 장바구니 추가,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7406227
+바로 최종 결재 금액 읽어줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7693094
+방금 본 상픔 기준으로 가격이랑 배송 정보 같이 읽어줘 해주세요,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75334203
+급한데 주문 상세 항목 정리해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5631068
+먼저 주문내역 정리하려고 이거 삭제해 가능해 지금,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84423494
+지금 화면에서 총 결제금액 얼마야 해주세요,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77476287
+이 주문 기록 지워줘 부탁해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84554285
+일단체크박스꺼줘가능해,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.787544
+이번 주문 기준으로 바로 삭제 요청 실행해줘 해줄래,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8453728
+방금본상품기준으로일단제품소개문구읽어줘가능해,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7461144
+급한데 지금 선택만 해제해줘 좀,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7991352
+바로 수랑 하나 늘려줘해주이소,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82648736
+이번 주문 기준으로 지금 지금 담아둔 상픔 뭐 있어 가능해,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78603226
+먼저 고양이 사료 검색해봐 좀 지금,69,search_products,2,2,2,search_products,search_products,0.8424482
+이번 주문 기준으로 지금 지금 결재로 넘어가,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86192197
+가격이랑배송정보같이읽어줘해봐,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74766046
+최근 리뷰 요약해줘 부탁해,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75592536
+바로 용량 일 옵선으로 바꿔 좀,78,update_product_option,11,11,11,update_product_option,update_product_option,0.82711226
+현재 페이지에서 바로 자동로긴 해제하고 로과웃해 좀,73,click_logout,6,6,6,click_logout,click_logout,0.83006394
+지금 화면에서 잠깐 상품 선택 취소해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79467505
+이번 주문 기준으로 이번엔 주문서 내용 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6322607
+일단 가격 제일 낮은 결과 선택해주라 해줄래,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75528216
+리뷰 읽어줘가능해,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7529253
+현재 페이지에서 급한데 내 주문목록으로 가 해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7555369
+일단 수랑 하나 늘려줘해주이소,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.826998
+급한데 상품명 가격 로켓배송 여부 알려줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74754804
+현재페이지에서 바로 이 상픔 체크 해제해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7987762
+방금 본 상품 기준으로 잠깐 이 상품 찜 목록에 넣어줘 해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8403814
+바로 히어비 홈페이지 열어줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8530315
+지금 결제 예정 금액 말해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.771361
+지금 화면에서 리뷰 읽어주라 해줄래,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7556631
+이번 주문 기준으로 바로 나중에 보게 찜해둬,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8405501
+이번 주 날씨 체크해줘,0,unknown,0,0,0,unknown,unknown,0.92498446
+이번 주문 기준으로 바로 로긴 시작해줘,72,click_login,5,5,5,click_login,click_login,0.8409269
+주말 알람 요약해줘,0,unknown,0,0,0,unknown,unknown,0.929227
+먼저 지금 결재로 넘어가 해줘 부탁,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8608512
+먼저 쿠팡에서 나가고 히어비로 가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8546636
+먼저 화면 기준으로 가능한 명령 알려줘 가능해 해봐,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8124884
+일단 이 주문 반품 요청할게 해줄래 해주이소,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.831443
+지금 지하철 시간 알려줘,0,unknown,0,0,0,unknown,unknown,0.92628586
+지금 화면에서 이 상품 카트에 넣어줘 부탁드립니다,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7374779
+방금 본 상픔 기준으로 급한데 히어비 홈 탭으로 넘어가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8534449
+지금 검색 결과 몇 개인지랑 같이 읽어줘 해주세요 부탁,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74320424
+현재 페이지에서 결제 직전 정보 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.64323145
+먼저 바로 로그인해 지금,72,click_login,5,5,5,click_login,click_login,0.8411116
+현재 페이지에서 잠깐 결재 전 주문 내역 확인해줘 해줄래,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6272073
+바로 이 상품 수랑 이개로 바꿔줘 해줄래 먼저,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82868904
+상세페이지 핵심만 읽어줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.71917224
+일단 지금 보이는 항목 하나 열어줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7664264
+지금 결과 페이지 내용 읽어줘 해봐,75,read_search_results,8,8,8,read_search_results,read_search_results,0.75105953
+이 주문 건 자세히 알려줘 해주세요 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.59284407
+이번 주문 기준으로 이번엔 쇼핑 끝났으니 히어비로 복귀해 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85071355
+일단주문상세항목정리해줘해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5543747
+주말 공부 계획 알려줘,0,unknown,0,0,0,unknown,unknown,0.92801756
+주말 식단 알려줘,0,unknown,0,0,0,unknown,unknown,0.92817193
+먼저 장바꾸니 수랑 오개로 변경해 부탁드립니다,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82863396
+이번엔지금선택한옵션취소하고새로선택해줘해줄래,78,update_product_option,11,11,11,update_product_option,update_product_option,0.829919
+로그인 시작해줘 부탁,72,click_login,5,5,5,click_login,click_login,0.8425655
+방금본상픔기준으로먼저쿠팡에서비타민 찾아봐,69,search_products,2,2,2,search_products,search_products,0.83753526
+검색결과에서두번째거선택해줘먼저,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76065433
+일단 장바구니 추가해 바로,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.71720415
+먼저 장바구니 열어줘 해줘,71,click_cart,4,4,4,click_cart,click_cart,0.7099259
+지금 화면에서 교환 신청해줘 지금,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83541673
+지금화면에서색상 사이즈옵션읽어줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78669375
+이거 찜 목록에 담아,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83186877
+이 화면 기능 읽어줘 좀 지금,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80985
+아침버스시간알려줘,0,unknown,0,0,0,unknown,unknown,0.9282369
+이번엔 이 페이지에서 다음으로 뭐 할 수 있어 좀 부탁,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81646395
+방금 본 상품 기준으로 급한데 나중에 보게 찜해둬 먼저,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83964133
+최종결제금액읽어줘부탁해,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7711297
+방금 본 상품 기준으로 원래 히어비 화면으로 돌아가자 해주세요 해봐,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8543944
+지금 화면에서 먼저 가격이랑 배송 정보 같이 읽어줘 해줄래 먼저,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75524104
+방금 본 상픔 기준으로 잠깐 상품 선택 취소해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7981378
+이번 주문 기준으로 잠깐 결제 실행해줘 좀,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84065056
+잠깐 배송 상태 확인해줘 해줄래,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.78030646
+먼저 주문내역 탭 눌러 좀 해봐,70,click_order_history,3,3,3,click_order_history,click_order_history,0.762253
+지금 장바구니 내용 확인해주이소 가능해,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7872792
+지금 화면에서 먼저 로그인 화면 열어줘 부탁해,72,click_login,5,5,5,click_login,click_login,0.8373677
+찜하기 눌러줘해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8363131
+지금 히어비 홈페이지 열어줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85370696
+지금 주문 정보 한 번 정리해줘 좀,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6399517
+현재 페이지에서 지금 선택한 옵션 취소하고 새로 선택해주세요,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83369976
+장바구니 페이지 열기 해줘 바로,71,click_cart,4,4,4,click_cart,click_cart,0.7048325
+상품명 가격 로켓배송 여부 알려줘 하지 말라고,0,unknown,0,0,0,unknown,unknown,0.9248237
+내역에서 이 건 삭제해줘 가능해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8455194
+지금 화면에서 잠깐 주문 기록 삭제 버튼 눌러줘 해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8445015
+이거 말고 다른 색상 있는지 검샥해줘 해줘 부탁,69,search_products,2,2,2,search_products,search_products,0.84008515
+사진리부있는지읽어줘해줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.3196534
+색상 네이비로 변경해줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8282535
+이번엔주문내역에서 숨겨줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84741557
+이번 주문 기준으로 바로 같은 상픔 장바꾸니에 추가해 가능해 해주이소,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7364778
+바로 지난 주문 확인 화면으로 이동해,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75702053
+장바꾸니에서 첫 번째 상픔 체크해 좀,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7812529
+이 상픔 정보 읽어줘 부탁,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7523773
+방금 본 상품 기준으로 바로 가격 제일 낮은 결과 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7610913
+이번 주문 기준으로 바로 닭가슴살 찾아줘,69,search_products,2,2,2,search_products,search_products,0.841207
+방금 본 상품 기준으로 결과 페이지 내용 읽어줘 해줘 해주이소,75,read_search_results,8,8,8,read_search_results,read_search_results,0.752585
+지금 화면에서 검샥 결과 읽어줘 좀 해주이소,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7496874
+다음 주 버스 시간 알려줘,0,unknown,0,0,0,unknown,unknown,0.9266673
+현재 페이지에서 급한데 택배 어디쯤인지 조회해줘 가능해,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7801314
+급한데 배송 추적 페이지로 가줘 지금,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7773199
+방금 본 상품 기준으로 지금 장바구니 조회해줘,71,click_cart,4,4,4,click_cart,click_cart,0.71907187
+검색 결과 중 할인 붙은 거 골라줘 바로,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75461286
+방금 본 상픔 기준으로 일단 이 상품 옵션 항목 설명해줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.784017
+카트 담기 실행해줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73124206
+이번엔 내가시킨 것들 보이는 페이지로 가,70,click_order_history,3,3,3,click_order_history,click_order_history,0.66897357
+아기 물티슈찾아줘 부탁해 바로,69,search_products,2,2,2,search_products,search_products,0.83908063
+잠깐지금고를수있는옵션정리해주세요해줄래부탁,95,read_option_info,27,27,27,read_option_info,read_option_info,0.79214704
+잠깐 방금 본항목 선택 상태로 바꿔 해줘 바로,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7949712
+방금 본 상품 기준으로 여기서 히어비로 이동해줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85319984
+현재페이지에서바로최종주문확인정보말해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.59034306
+방금 본 상픔 기준으로 먼저 어떤 상품 결재하는지 읽어줘 가능해 부탁,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62447435
+바로 교환 처리 시작해줘 부탁,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.833173
+이번엔이항목주문수량조정해줘지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.81465536
+지금 화면에서 상픔명 가격 로켓배송 여부 알려줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74678946
+이번엔 장바구니 말고 바로 주문해 가능해,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86863583
+이번엔 주문 목록에서 이 항목 삭제해 부탁해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84725016
+현재 페이지에서이번엔 히어비 홈 탭으로 넘어가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85351664
+현재 페이지에서 먼저 지금 담아둔 상픔 뭐 있어,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7904597
+이번 주문 기준으로 지금 장바꾸니에 담아줘 지금,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7382676
+일단 이 상품 즉시 주문할래 해봐,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8676273
+일단 지금 검색 결과 몇개인지랑 같이 읽어줘 부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7362289
+현재 페이지에서 급한데 장바꾸니 탭 눌러줘 부탁,71,click_cart,4,4,4,click_cart,click_cart,0.72152853
+여기서 로그아웃할게 좀,73,click_logout,6,6,6,click_logout,click_logout,0.8277817
+이번주문기준으로만족도높은리부먼저읽어주세요해주이소,81,read_reviews,14,14,14,read_reviews,read_reviews,0.63559365
+방금 본 상품 기준으로 먼저 옵선 리스트 위에서부터 읽어줘 해봐,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78134775
+이번엔 장바구니에 담긴 상품 읽어줘 가능해 부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.786191
+주문 합계금액 확인해줘 먼저,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7691912
+먼저지금장바구니화면보여줘해줄래,71,click_cart,4,4,16,click_cart,read_cart_items,0.6410203
+방금 본 상품 기준으로 이 상품 선택해줘 부탁드립니다,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79242194
+먼저 일인용 전기포트 검색해 좀,69,search_products,2,2,2,search_products,search_products,0.8410325
+이번엔 여기서 지원되는 동작 읽어줘 부탁드립니다 해봐,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8133198
+지금 화면에서 일단 수랑 변경 적용해주라 해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8252709
+이 물건 주문 대상으로 선택해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7940368
+쿠팡에서 로그아웃 진행해 먼저,73,click_logout,6,6,6,click_logout,click_logout,0.8306988
+급한데 카트 목록 하나씩 말해줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.79271835
+방금 본 상품 기준으로 지금 반품 진행 버튼 눌러줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83197916
+현재 페이지에서 후기 좋은 순으로 몇 개만 읽어줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7567351
+현재 페이지에서 체크박스 꺼줘 부탁해,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7987437
+지금 리뷰핵심만 정리해줘 바로,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75974053
+일단 무선 이어폰 검샥해 지금,69,search_products,2,2,2,search_products,search_products,0.8389996
+방금 본 상품 기준으로 먼저 반품 신청 진행해줘 좀,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8327247
+바로 나중에 살 거로 표시해줘 부탁드립니다,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83759654
+계정 로긴 진행해,72,click_login,5,5,5,click_login,click_login,0.84040916
+지금 지금 보는 상품담아줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.6884936
+바로 지금 결제 진행해 가능해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8392714
+일단원래히어비화면으로돌아가자,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85209244
+현재 페이지에서 지금 이 주문 반품 요청할게 좀 지금,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8310403
+바로 로긴 풀어줘 해주세요,73,click_logout,6,6,6,click_logout,click_logout,0.81902486
+바로주문상세내역설명해주이소,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.572712
+현재 페이지에서 쿠팡 계정 로그아웃해 해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8313271
+이번 주문 기준으로 잠깐 어떤 상품몇 개 샀는지 알려주라 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5841134
+이번엔 주문 건 세부 내용 읽어줘 부탁해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5863681
+주문 기록 삭제 버튼 눌러줘 해줄래,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84235406
+결제 완료까지 진행해줘 해주세요,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84164125
+내 계정에서 나가기 해주이소,73,click_logout,6,6,6,click_logout,click_logout,0.8310026
+주문 합계 금액확인해줘 먼저,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7713917
+이번 주문 기준으로 담아둔 상픔 보러 가 부탁드립니다 해주이소,71,click_cart,4,4,4,click_cart,click_cart,0.71787685
+용량 일 옵선으로 바꿔 부탁,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83077127
+지금 화면에서 바로 교환 요청 페이지 열어줘 가능해,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8304688
+이번 주문 기준으로 일단 결재 전 주문 내역 확인해줘 부탁드립니다 해봐,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6131361
+이번엔 교환 반품 접수해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8333289
+잠깐 알람 체크해줘,0,unknown,0,0,0,unknown,unknown,0.9263931
+이번엔 상세페이지 핵심만 읽어줘 좀 지금,77,read_product_info,10,10,10,read_product_info,read_product_info,0.73668957
+먼저 검색된 상품 목록 확인해줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74103415
+이번주일정계산해줘,0,unknown,0,0,0,unknown,unknown,0.9189564
+급한데 이 주문의 금액 배송정보 읽어줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5204638
+현재 페이지에서 지금 지금 선택한 옵션 취소하고 새로 선택해줘 바로,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83540046
+지금 화면에서 지금 별점 낮은 리부부터 보여줘 해줄래,81,read_reviews,14,14,14,read_reviews,read_reviews,0.753939
+지금 화면에서 먼저 로긴 창 띄워줘 해주세요,72,click_login,5,5,5,click_login,click_login,0.83802235
+현재 페이지에서 지금 제품 소개 문구 읽어줘 가능해 해주이소,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74473834
+지금 카트 목록 하나씩 말해줘 부탁드립니다 해주이소,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78861916
+지금 화면에서 수량 하나 늘려줘 좀,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82519794
+현재 페이지에서 바로 지금 페이지 안내해줘 해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80714476
+이번 주문 기준으로 지금 두 번째 상품만 선택해줘 해줄래 해봐,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.781594
+잠깐 검샥 결과에서 두 번째 거 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7514664
+바로 오른쪽에 보이는 상품 선택해 해줄래 지금,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7648464
+지금 화면에서 급한데 할인 적용된 최종 금액 알려줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77414286
+급한데 쿠팡에서 비타민 찾아봐 지금,69,search_products,2,2,2,search_products,search_products,0.8427081
+이번 주문 기준으로 이번엔 구매하기 눌러줘 좀,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86931455
+지금 화면에서 이 상픔 옵선 항목 설명해줘 부탁드립니다,95,read_option_info,27,27,27,read_option_info,read_option_info,0.783709
+현재페이지에서로그아웃처리해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8310693
+주문상세내역설명해줘부탁드립니다부탁,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.58931667
+일단 체크박스 꺼줘 부탁해,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.797978
+현재 페이지에서 잠깐 일인용 전기포트 검샥해,69,search_products,2,2,2,search_products,search_products,0.8379174
+받는 사람 주소 상픔 정보읽어주라 해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6230221
+방금 본 상픔 기준으로먼저 상품 요약해주라 바로,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75643927
+방금 본 상픔 기준으로 상품상세 설명 알려줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7068407
+지금 결제수단이랑 배송상태 포함해서 읽어줘 해주세요,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.57541794
+먼저 결재 완료 처리해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8383506
+쇼핑 끝났으니 히어비로 복귀해 부탁해 바로,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8523647
+잠깐이물건정보한번훑어줘해주세요,77,read_product_info,10,10,10,read_product_info,read_product_info,0.5334968
+지금 여기서 로그아웃할게 해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8329265
+방금 본상픔 기준으로 잠깐 수량 한 개 줄여줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8288306
+이번 주문 기준으로 잠깐 카트 페이지로 이동해,71,click_cart,4,4,4,click_cart,click_cart,0.7237121
+일단 수량 하나 늘려줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8245582
+지금결과상픔들순서대로말해줘해줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74929315
+쿠팡에서 로그아웃 진행해,73,click_logout,6,6,6,click_logout,click_logout,0.8294052
+이번 주문 기준으로 지금 배송 위치 보여줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7795644
+먼저 주문 상세 요약해줘 좀 바로,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.59102297
+이 주문 건 자세히 알려줘 해주세요 부탁,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.59127235
+장바꾸니에서 첫 번째 상픔 체크해 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7804644
+급한데 가격 제일 낮은 결과 선택해줘 가능해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75876456
+지금 장바꾸니 항목 전부 보여줘 부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78278196
+일단 상세페이지 핵심만 읽어줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7229958
+바로 내 주문목록으로 가 해주세요,70,click_order_history,3,3,3,click_order_history,click_order_history,0.751717
+바로 결제 직전 정보 읽어줘 해주이소,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.64561844
+구매하기 눌러줘 먼저,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86724764
+일단 로그인 창 띄워줘 해줄래,72,click_login,5,5,5,click_login,click_login,0.8406975
+지금 화면에서 히어비 홈으로 바로 이동 해줄래,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8568497
+이번엔 주문 상세 내역 설명해줘 해주세요,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5797845
+지금 화면에서 지금 용량 일 옵션으로 바꿔,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8328977
+먼저이주문내역지우기해줘해봐,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.846147
+잠깐 지금 보이는 항목 하나 열어줘 해주세요 지금,76,select_search_result,9,9,9,select_search_result,select_search_result,0.77093637
+주문내역에서 숨겨줘 바로,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84656197
+장바구니 리스트 요약해줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7864737
+방금 본 상품 기준으로 이 제품 어떤 건지 설명해줘 가능해,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75547856
+현재 페이지에서 바로 장바구니에 담긴 상품 읽어줘 해주세요,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.785648
+지금 화면에서 현재 페이지에서 가능한 작업 알려줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8107816
+현재 페이지에서 상품 선택 취소해줘 해봐,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79616696
+로그인 단계로 넘어가는 하지마,0,unknown,0,0,0,unknown,unknown,0.9263445
+바로 품절 아닌 옵선만 읽어줘해줄래,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7851056
+현재 페이지에서 급한데 쿠팡에서 나가고 히어비로 가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.84643006
+지금 화면에서 잠깐 담긴 물건 확인하자 좀,71,click_cart,4,4,4,click_cart,click_cart,0.7218084
+급한데 검색 결과에서 눈에 띄는 것 읽어줘 먼저,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74333686
+먼저 관심상픔으로 저장해줘 부탁,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8360155
+방금 본 상픔 기준으로 급한데 총 결재금액 얼마야 좀,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7732972
+현재 페이지에서 지금 고를 수 있는 옵션 정리해줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78663987
+이번 주문 기준으로 바로 수량 변경 적용해줘 해줘 해주이소,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82844365
+지금 화면에서 쇼핑 끝났으니 히어비로 복귀해 해주세요 지금,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85181504
+유산균 상품 검색해줘,69,search_products,2,2,2,search_products,search_products,0.84119546
+잠깐 닭가슴살 찾아줘 부탁해 해봐,69,search_products,2,2,2,search_products,search_products,0.84216934
+이번 주문 기준으로 지금 결과 상픔들 순서대로 말해줘 가능해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.754323
+지금 화면에서 이번엔 지금 바로 결제 화면 가자,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8578783
+이번 주문 기준으로 잠깐 결제 완료까지 진행해주이소 해줘 바로,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84207517
+현재 페이지에서 바로 바로 로그인해 해주이소,72,click_login,5,5,5,click_login,click_login,0.8410001
+먼저 리뷰 핵심만 정리해주세요 해주세요 해봐,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7576729
+이번엔 배송 조회 눌러줘 지금,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7755691
+카트에뭐 담겼는지 말해줘 좀,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7882934
+바로 오른쪽에 보이는 상품 선택해 해봐,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76237965
+먼저 지난 주문 확인 화면으로 이동해 부탁해,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75757676
+이번주문 기준으로 잠깐 주문내역에서 숨겨줘 바로,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84718454
+이번엔장바구니 페이지 열기,71,click_cart,4,4,4,click_cart,click_cart,0.716399
+일단 리뷰 탭 내용 읽어줘 해줘 지금,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7558306
+바로 카트페이지로 이동해 가능해,71,click_cart,4,4,4,click_cart,click_cart,0.7204822
+먼저 총 결제금액 얼마야,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7712149
+지금 선택 상태 원래대로 돌려줘 부탁해 해봐,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7959997
+현재 페이지에서 특정 상품만 골라줘 가능해 바로,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7900639
+먼저 결제하기눌러줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8386016
+잠깐 이대로 결제 확정해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83878565
+현재 페이지에서 상픔명 가격 로켓배송 여부 알려줘 해줘 해봐,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74594444
+먼저 주문 배송 조회 메뉴 눌러줘 부탁해,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7496155
+현재 페이지에서 방금 본 항목 선택 상태로 바꿔,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7928861
+현재 페이지에서 지금 검샥된 상품 목록 확인해줘 부탁드립니다,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7427916
+현재페이지에서결제진행버튼눌러부탁드립니다,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8368522
+가능한 버튼들 설명해줘 좀,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8124223
+현재 페이지에서 이거 찜 목록에 담아 가능해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8377451
+히어비로 되돌아가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85153943
+현재 페이지에서 카트에 뭐 담겼는지 말해줘 부탁드립니다,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7906897
+현재페이지에서구매하기눌러줘해줄래바로,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8636174
+이번엔배송 조희 눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7690969
+잠깐 사이즈를 이 칠 영으로 바꿔줘 좀 해봐,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8340362
+현재페이지에서급한데주문상세내역설명해줘부탁해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5718536
+현재 페이지에서 이번엔 지금 배송 위치 보여줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77816033
+다음 주 식단 체크해줘,0,unknown,0,0,0,unknown,unknown,0.92684704
+방금 본 상품 기준으로 주문 내역 탭 눌러 바로,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7607829
+빠른구매로 진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8646525
+이번 주문 기준으로 급한데지금 선택 처리해줘 해줄래 부탁,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7972545
+바로 내 주문목록으로 가 부탁드립니다,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7531304
+잠깐옵션명이랑재고상태알려줘부탁드립니다,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7822553
+현재 페이지에서 이대로 결재 확정해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8408488
+같은 상품 장바구니에 추가해,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7366861
+방금 본 상품 기준으로 지금 결제 예정 금액 말해줘 좀 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77520925
+방금본상품기준으로일단결과리스트간단히말해줘부탁해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7406193
+리뷰 읽어줘 먼저,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75336516
+이번엔 로그아웃 버튼 눌러줘 가능해 해주이소,73,click_logout,6,6,6,click_logout,click_logout,0.83394086
+이대로 결제 확정해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8383659
+지금 현재 페이지에서 가능한 작업 알려주라 가능해,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8133814
+지금 결제하기 눌러주세요,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8388559
+일단 여기서 지원되는 동작 읽어줘 해주이소,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81015766
+지금 오른쪽에 보이는 상품 선택해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76362324
+방금 본 상픔 기준으로 급한데가격이랑 배송 정보 같이 읽어줘 부탁,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7191833
+일단 이 주문 내역 지우기 해주라 부탁해 해봐,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8494594
+현재 페이지에서계정 로긴 진행해 가능해 먼저,72,click_login,5,5,5,click_login,click_login,0.83971286
+잠깐 여기서 할 수 있는 명령 말해줘 해주세요 해봐,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81264347
+이번 주문 기준으로 지금 검색 결과 몇 개인지랑 같이 읽어줘 지금,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74864197
+아예 선풍기 검색 결과 보여줘 하지 말아,0,unknown,0,0,0,unknown,unknown,0.92463046
+잠깐 해당 주문 기록 제거해줘 해줘 해주이소,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8486139
+방금 본 상품 기준으로 일단 히어비 홈페이지 열어줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.853375
+먼저 장바꾸니에서 첫 번째 상픔 체크해 부탁해 바로,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7747042
+이번 주문 기준으로 먼저 담긴 물건 확인하자,71,click_cart,4,4,4,click_cart,click_cart,0.71499187
+잠깐 쿠팡 계정 로그인해줘 해줄래,72,click_login,5,5,5,click_login,click_login,0.8399845
+지금 화면에서 이번엔 체크박스 눌러서 선택해줘 부탁,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7919958
+현재 페이지에서 바로 결재 버튼 실행해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83860505
+급한데 쇼핑 끝났으니히어비로 복귀해,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8519414
+방금 본 상품 기준으로 잠깐 카트 상품명과 수량 읽어주세요 부탁,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7836222
+현재 페이지에서 지금 주문 요약 정보 말해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62770677
+급한데 더 이상 안 보이게 삭제해줘 부탁해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84382814
+구매자 평가 읽어줘 해줄래 해봐,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7578353
+저녁 식단 기록해줘,0,unknown,0,0,0,unknown,unknown,0.9280805
+현재 페이지에서지금 카트 페이지로 이동해 해봐,71,click_cart,4,4,4,click_cart,click_cart,0.72469676
+이번엔 나중에 살 거로 표시해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8369814
+지금 세 번째 아이템 클릭해줘 부탁드립니다,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7755468
+지금 장바꾸니에 담긴 상픔 읽어줘 해줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7879302
+이번 주문 기준으로 지금 페이지 안내해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8073022
+급한데 선택한 상품 해제해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79510504
+카트 선택 상태 지워줘 좀,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7917591
+지금 화면에서 지금 체크박스 눌러서 선택해줘 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7924894
+일단 지금 선택만 해제해줘,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79842687
+먼저교환신청해줘해봐,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8282135
+지금 화면에서 주문 상세 항목 정리해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5583375
+로그아웃해줘지금,73,click_logout,6,6,6,click_logout,click_logout,0.8261617
+지금 화면에서 이번엔 원래 히어비 화면으로 돌아가자 해주세요,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85361964
+이거 말고 다른 색상 있는지 검색해줘,69,search_products,2,2,2,search_products,search_products,0.8394005
+카트 상품명과 수량 읽어줘 해주이소,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78622866
+먼저 이 상품 카트에 넣어줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7372973
+지금 위시리스트에 추가해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83304715
+현재 페이지에서 바로 결재 직전 정보 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6457022
+이번주문기준으로로긴페이지로보내줘좀부탁,72,click_login,5,5,5,click_login,click_login,0.8345897
+주말 일정 정리해줘,0,unknown,0,0,0,unknown,unknown,0.9284199
+상세 주문 정보 확인해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.564598
+현재페이지에서 급한데 카트 항목 선택해 해주세요,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79159665
+먼저 이 화면 기능 읽어줘 좀,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8102089
+이번 주문기준으로 바로 개수 삼으로 조절해줘 해주이소,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8312407
+반품 신청 진행해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.82991594
+지금 화면에서 일단 찜하기 눌러줘 해줄래,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.838921
+지금 식단 체크해줘,0,unknown,0,0,0,unknown,unknown,0.92677385
+먼저 네 번째 결과 선택해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75022924
+결제 완료까지 진행해줘 해줘 바로,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8418758
+현재 페이지에서 지난 주문 확인 화면으로 이동해 지금,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7532117
+먼저 장바꾸니에 담긴 상픔 읽어줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7850682
+지금 실사용자 후기 알려주라 먼저,81,read_reviews,14,14,14,read_reviews,read_reviews,0.758118
+지금 실사용자후기 알려줘 해봐,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7488566
+먼저 배송 단계 확인해줘 해주세요,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7792793
+잠깐 담기 버튼 눌러줘 부탁드립니다 바로,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.72438306
+방금 본 상픔 기준으로 이번엔 결재하기 눌러줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8408642
+주문 확정하고 결재해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8384601
+이번 주문 기준으로 바로 결과 상품들 순서대로 말해주세요 가능해,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7524306
+지금화면에서일단지금결재로넘어가,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.83156514
+구매하기 눌러줘 좀,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8679563
+급한데 이 물건 주문 대상으로 선택해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7935163
+현재 페이지에서 지금 내 계정에서 나가기 먼저,73,click_logout,6,6,6,click_logout,click_logout,0.82857734
+일단장바구니 항목 전부 보여줘 지금,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.777878
+이번 주문 기준으로 급한데 구매했던 내역 화면 띄워줘 좀,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7550755
+지금 이 물건 정보 한 번 훑어줘 좀,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75132
+지금 지금 페이지 안내해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8013648
+방금 본 상품 기준으로 이번엔 생수 검색해줘,69,search_products,2,2,2,search_products,search_products,0.84263104
+지금 화면에서 선택한 상품 해제해줘 부탁,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79389095
+지금 화면에서 장바구니에 담긴 상품 읽어줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78010005
+방금 본 상품 기준으로 이번엔 옵션 리스트 위에서부터 읽어줘 가능해,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78216267
+지금 선택한 옵션취소하고 새로 선택해줘 좀,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8267556
+이번엔 할인 적용된 최종 금액 알려주라 가능해,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77394456
+지금화면에서 더 이상 안 보이게 삭제해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8452766
+지금화면에서먼저이상픔선택해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7538768
+지금 화면에서 일단 한 번에 구매하기 눌러 바로,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8679232
+이번 주문 기준으로 잠깐 키보드 상픔 검색해줘 부탁해 부탁,69,search_products,2,2,2,search_products,search_products,0.84192085
+전체 선택 해제해줘 부탁해 지금,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79854697
+지금 화면에서 잠깐 로그인 시작해줘 해줘,72,click_login,5,5,5,click_login,click_login,0.8402217
+바로 무선 이어폰 검색해 좀,69,search_products,2,2,2,search_products,search_products,0.8411965
+지금 화면에서 지금 개수 삼으로 조절해줘 부탁드립니다,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8295585
+현재페이지에서일단이상품옵션항목설명해줘부탁해,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7880174
+주말에 볼 영화 추천해줘,0,unknown,0,0,2,unknown,search_products,0.31055534
+이번엔 내 주문목록으로 가 해줄래,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7588602
+현재 페이지에서 바로 구매자 평가 읽어줘 지금,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7535427
+관심상품으로 저장해줘 부탁해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8375517
+방금 본 상품 기준으로 결제 단계 마무리해줘 해줄래,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8412115
+이번 주문 기준으로 이 제품 담기 클릭해줘 부탁,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7183943
+지금 화면에서 이번엔 이거 바로 살게,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8672898
+이번 주문 기준으로 이번엔 이 페이지에서 다음으로 뭐 할 수 있어 먼저,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8163061
+현재 페이지에서 위시리스트 추가해주이소 해줄래,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83921176
+지금 화면에서 이번엔 첫 번째상품 눌러줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.77119416
+옵션 빨간색으로 바꿔줘 부탁해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83101064
+방금 본 상픔 기준으로 구매하기 눌러줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86715084
+이번주문기준으로주문합계금액확인해줘해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7726122
+지금 화면에서 급한데 지금 선택한 옵선 취소하고새로 선택해줘 해줘 바로,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83427083
+이번 주문 기준으로 지금 선택 처리해줘 부탁드립니다 지금,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7983239
+지금 화면에서 지금 상품 상세 설명 알려줘 가능해,77,read_product_info,10,10,10,read_product_info,read_product_info,0.74868757
+바로 두 번째 상품만 선택해줘 해주세요,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7852927
+이번 주문 기준으로 일단 이 페이지에서 다음으로 뭐 할 수 있어 지금,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81677765
+일단 담아둔 상품 보러 가 가능해,71,click_cart,4,4,4,click_cart,click_cart,0.7195651
+주문 금액 읽어줘 부탁드립니다 부탁,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7662191
+이번엔 주문번호 기준으로 상세 보여줘 해줘 해주이소,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.59502363
+현재 페이지에서 지금 장바구니 내용 확인해줘 좀,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78525543
+방금 본 상픔 기준으로 닭가슴살 찾아줘 좀,69,search_products,2,2,2,search_products,search_products,0.8420491
+급한데 키보드 상픔 검색해줘 바로,69,search_products,2,2,2,search_products,search_products,0.8419794
+현재 페이지에서 바로 이거 장바구니로 보내 해줄래,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7367668
+관심상품으로 저장해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83510137
+잠깐 주문내역 정리하려고 이거 삭제해 해봐,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8452001
+급한데 자동로긴 해제하고 로가웃해 지금,73,click_logout,6,6,6,click_logout,click_logout,0.8313619
+현재 페이지에서 지금 결제할 총액 읽어줘 해줘 지금,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77462316
+지금화면에서 급한데 옵션 선택 전에 정보 먼저 읽어줘 부탁드립니다 바로,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7896684
+급한데옵션별가격차이있으면같이알려줘먼저,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78906417
+이번주문기준으로네번째결과선택해지금,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75090677
+바로 결제 요청 보내줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83775
+급한데 내역에서 이 건 삭제해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84631747
+현재 페이지에서 먼저 담긴 물건들 가격 같이 알려줘 먼저,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.77714586
+방금 본 상픔 기준으로 주문내역 정리하려고 이거 삭제해 가능해바로,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.83988094
+방금 본 상픔 기준으로 먼저 이 상품 옵션 항목 설명해줘 부탁드립니다,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78588325
+방금 본 상품 기준으로 일단 이 페이지에서 다음으로 뭐 할 수 있어 좀,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8155678
+잠깐선택한상품해제해줘부탁드립니다바로,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7953977
+이번 주문 기준으로 고양이 사료 검색해봐,69,search_products,2,2,2,search_products,search_products,0.841973
+이번 주문 기준으로 지금 로그아웃 처리해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8343613
+방금 본 상품 기준으로 먼저 지금 결제 진행해 부탁해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84143037
+잠깐 지하철 시간 알려줘,0,unknown,0,0,0,unknown,unknown,0.92703426
+방금본상픔기준으로바로지금보는상품담아줘좀,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.6288014
+이번엔 옵션 다른 걸로 다시 골라줘 해줄래,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8350702
+방금 본 상픔 기준으로 일단 첫 번째 항목 선택 취소해 해줄래,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.78549874
+이번 주문 기준으로 상픔 요약해줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7136991
+급한데 히어비 메인 페이지로 전환해줘,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8550441
+현재페이지에서결제실행해줘해주세요,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8400076
+먼저 주문 요약 정보 말해줘 해주세요,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.638894
+이번엔 상픔 개수 플러스 일 해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8236403
+이번 주문 기준으로 검샥 결과 읽어줘 해주세요,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7517245
+지금 화면에서 빠른구매로 진행해줘,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8655852
+지금 화면에서 지금 장바꾸니 화면 보여줘 해봐,71,click_cart,4,4,4,click_cart,click_cart,0.71990323
+이번 주문 기준으로 바로 전체 상픔 선택해줘 가능해,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7963444
+지금 버스 시간 계산해줘,0,unknown,0,0,0,unknown,unknown,0.9255874
+저녁 알람 정리해줘,0,unknown,0,0,0,unknown,unknown,0.9286513
+이번 주문 기준으로 지금 바로 결재할게 해줄래,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83972514
+잠깐 상세페이지 핵심만 읽어줘 해주세요,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7367445
+선택 버튼 눌러줘 부탁드립니다,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.7947672
+검샥목록에서 이거 눌러 부탁해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.77005816
+지금화면에서잠깐주문정보읽어줘먼저,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.5733239
+이번 주문 기준으로 먼저 용량 일 옵션으로 바꿔 해주세요 먼저,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83730745
+이번엔 주문내역 탭 눌러 부탁해,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7591535
+지금 이 주문 반품 요청할게 좀 해봐,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83115417
+장바구니 항목 전부 보여줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78183573
+잠깐 이 주문 기록 지워줘 해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8480566
+지금 이거 장바꾸니로 보내 바로,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7027905
+바로 결제 화면 항목들 설명해줘 부탁해,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6372888
+장바구니 말고 바로 주문해 해줄래,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86812305
+결제 실행해줘 부탁해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83689785
+이 상픔 옵션 종류 뭐 있어,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7787522
+이번 주문 기준으로 이번엔 검색 결과에서 두 번째 거 선택해줘,76,select_search_result,9,9,9,select_search_result,select_search_result,0.72738814
+반품 진행 버튼 눌러줘 부탁해,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8278023
+이번 주문 기준으로 배송조회 눌러줘 해줄래,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7797753
+리부에서 단점 위주로 알려줘 해주이소,81,read_reviews,14,14,14,read_reviews,read_reviews,0.742215
+로그아웃 처리해줘 좀 해봐,73,click_logout,6,6,6,click_logout,click_logout,0.83156604
+지금 현재 페이지에서 가능한 작업 알려주라 해줄래 먼저,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8163439
+검색 결과 중 할인 붙은 거 골라줘 해주세요,76,select_search_result,9,9,9,select_search_result,select_search_result,0.75869423
+이번 주 알람 정리해줘,0,unknown,0,0,0,unknown,unknown,0.9275107
+계정 로긴 진행해 좀,72,click_login,5,5,5,click_login,click_login,0.8425507
+방금 본 상품 기준으로 구매자 평가 읽어줘 해주이소,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7544119
+바로 가능한 버튼들 설명해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81089413
+이번엔 최종 결재 금액 읽어줘 좀,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77057844
+바로 관심상픔으로저장해주라,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8295298
+바로 주문 확정하고 결제해줘,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84004533
+장바구니 내용 확인해주세요 가능해,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7901474
+이번 주문 기준으로 지금 선택한 옵션 취소하고 새로 선택해줘 해줘 해주이소,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83546656
+먼저 주문 히스토리에서 빼줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84365386
+선풍기 검색 결과 보여줘 해주세요,69,search_products,2,2,2,search_products,search_products,0.838892
+이번 주문 기준으로 지금 결제 예정 금액 말해줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.77388126
+바로교환처리시작해줘가능해,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.81450844
+현재 페이지에서 이번엔 키보드 상품 검색해줘 해줄래 부탁,69,search_products,2,2,2,search_products,search_products,0.8381068
+히어비 홈으로 바로 이동,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85556555
+이번 주문 기준으로 이 상품 체크 해제해줘 부탁드립니다,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7962955
+먼저고양이사료검샥해봐먼저,69,search_products,2,2,2,search_products,search_products,0.84147966
+일단 운송장 흐름 확인해줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7787469
+쿠팡말고히어비홈으로돌아가,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85063666
+일단 결제 완료 처리해줘 부탁드립니다 해봐,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8397055
+급한데 할인 적용된 최종 금액 알려줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7727046
+먼저선택해제버튼눌러주세요부탁드립니다,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7938621
+오늘 버스 시간 기록해줘,0,unknown,0,0,0,unknown,unknown,0.9282028
+지금 교환 및 반품 신청해 해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8348401
+먼저 지금 결제 진행해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83930707
+방금본상품기준으로최근주문내역보게이동해줘해줄래,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7418095
+만족도 높은 리뷰 먼저 읽어줘 가능해,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7573333
+절대 장바구니에서 첫 번째 상품 체크해는 하지 말고,0,unknown,0,0,0,unknown,unknown,0.9217495
+이번 달 지출 합계 계산해줘,0,unknown,0,0,20,unknown,read_order_amount,0.7193036
+이번 주문 기준으로 이번엔 지금 결재로 넘어가부탁,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86359984
+지금 화면에서 네 번째 결과 선택해,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76031023
+바로 로그인 페이지로보내줘 해줄래,72,click_login,5,5,5,click_login,click_login,0.8414892
+지금 화면에서 바로 바로 구매해 해주이소,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8676143
+방금 본 상픔 기준으로 급한데 검샥 결과 중 할인 붙은 거 골라줘 해줄래 해봐,76,select_search_result,9,9,9,select_search_result,select_search_result,0.76749444
+상위 검샥 결과 알려줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74310887
+방금 본 상품 기준으로 최종 결재 금액 읽어주세요 해주이소,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7737259
+지금날씨체크해줘,0,unknown,0,0,0,unknown,unknown,0.92528826
+지금 화면에서 색상 사이즈 옵션 읽어줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78155345
+급한데 찜 등록해주이소 부탁해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8390541
+주문 히스토리에서 빼줘 부탁해,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84331834
+지금 화면에서 주문 금액 읽어줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.76663494
+옵션 빨간색으로 바꿔줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.82883507
+이번 주문기준으로 검색 결과 읽어줘 해줘 먼저,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7545221
+이번 주문 기준으로 일단 검색 결과에서 눈에 띄는 것 읽어줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.747505
+이번엔 바로 주문 버튼 눌러줘 좀 먼저,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86685055
+이번엔 현재 화면 옵션 알려줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80915564
+방금 본 상품 기준으로 장바구니 목록으로 이동 해줘 바로,71,click_cart,4,4,4,click_cart,click_cart,0.71588826
+두 번째 상품만 선택해줘 먼저,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.785788
+배송비 포함 금액 읽어줘 가능해 바로,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7697024
+주문 기록 보러 가자 해주세요,70,click_order_history,3,3,3,click_order_history,click_order_history,0.76272345
+방금본상픔기준으로잠깐수랑한개줄여줘해줘,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82197475
+현재 페이지에서 이번엔 쿠팡에서 로그아웃 진행해 해주세요,73,click_logout,6,6,6,click_logout,click_logout,0.832464
+현재 페이지에서 바로 결제수단이랑 배송상태 포함해서 읽어줘 부탁해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.56770307
+급한데 원래 히어비 화면으로 돌아가자 해줄래,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8550668
+아침운동계획기록해줘,0,unknown,0,0,0,unknown,unknown,0.9271501
+급한데 관심상픔으로 저장해줘 좀,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8376185
+절대 총 결제금액 얼마야는 하지마,0,unknown,0,0,0,unknown,unknown,0.9261585
+바로 휴지 제일 많이 사는 거 검색해줘 먼저,69,search_products,2,2,2,search_products,search_products,0.84161186
+지금 화면에서 히어비 메인 페이지로 전환해주세요,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85415983
+지금 계정 로그인 진행해 지금,72,click_login,5,5,5,click_login,click_login,0.841026
+현재 페이지에서 먼저 선택 버튼 눌러줘 지금,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79282653
+먼저 장바꾸니에 담긴 상품 읽어줘 부탁드립니다,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.77670115
+운송장 흐름 확인해주세요 가능해,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7800916
+이번 주문 기준으로 바로 성분 재질 정보 있으면 읽어줘 좀,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7525915
+이번 주문 기준으로 바로 카트로 바로 가 해주세요,71,click_cart,4,4,4,click_cart,click_cart,0.7146747
+카트에 뭐 담겼는지 말해줘,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.78663355
+먼저현재페이지에서가능한작업알려줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80963695
+아침 수면 기록 체크해줘,0,unknown,0,0,0,unknown,unknown,0.9268245
+일단 여기서 할 수 있는 명령 말해줘 해줄래 해주이소,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81294763
+옵션 선택 전에 정보 먼저읽어줘 부탁해 해주이소,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7912033
+원래 히어비 화면으로 돌아가자,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8550352
+잠깐 로그인 화면 열어줘,72,click_login,5,5,5,click_login,click_login,0.84166014
+지금 화면에서 지금 후기 좋은 순으로 몇 개만 읽어줘 해줄래,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75579107
+아예 첫 번째 상품 눌러줘 하지 말라고,0,unknown,0,0,0,unknown,unknown,0.9148395
+이번 주문 기준으로 급한데 카트에 뭐 담겼는지 말해주이소 해봐,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7879167
+이번엔결제하기눌러줘지금,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83487487
+내일지하철시간기록해줘,0,unknown,0,0,0,unknown,unknown,0.9285455
+현재 페이지에서 반품 진행 버튼 눌러줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83223933
+아예 장바구니 탭 눌러줘는 하지마라,0,unknown,0,0,0,unknown,unknown,0.9266726
+방금 본 상품 기준으로 이번엔 내 주문목록으로 가 해주이소,70,click_order_history,3,3,3,click_order_history,click_order_history,0.7604829
+지금화면에서이번엔받는사람 주소 상픔정보읽어줘해봐,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6089296
+방금 본 상픔 기준으로 지금 지금 주문 정보 한 번 정리해줘 해주세요,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.63092387
+잠깐 수량을 일개로 되돌려줘 바로,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82747906
+이번 주문 기준으로 이번엔 결제 전주문 내역 확인해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6113708
+카트 페이지로 이동해 부탁해 바로,71,click_cart,4,4,4,click_cart,click_cart,0.72055507
+이번엔 주문내역 탭 눌러 해봐,70,click_order_history,3,3,3,click_order_history,click_order_history,0.76112723
+방금 본 상품 기준으로 지금 선택한 상품 수량만 수정해줘 바로,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82833654
+옵선 그대로 장바꾸니 담아줘,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73799616
+일단 하트 버튼 눌러줘 가능해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8206689
+지금 화면에서 옵션 그대로 장바구니 담아줘 가능해 지금,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.73548126
+지금 화면에서 색상 사이즈 옵션 읽어줘 부탁드립니다,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78565985
+바로 상픔 개수 마이너스 일 해줘 해주세요 지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82860565
+주문내역에서 숨겨줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.8462299
+바로 주문내역페이지 열어줘 해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.75724596
+로그인 단계로 넘어가,72,click_login,5,5,5,click_login,click_login,0.83417165
+지금 화면에서 한 번 담아둘게 장바구니 추가 가능해 해봐,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7367893
+현재 페이지에서 급한데 옵선 빨간색으로 바꿔줘 부탁해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8297618
+먼저 어떤 상픔 결재하는지 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.63712496
+아예 반품 신청 진행는 하지 말고,0,unknown,0,0,0,unknown,unknown,0.92574525
+결제하기 눌러줘 부탁해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.8388475
+옵선 말고 기본 정보 먼저 읽어줘 부탁드립니다,77,read_product_info,10,10,10,read_product_info,read_product_info,0.71265996
+지금 주문서 내용 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.62657493
+방금 본 상품 기준으로 지금 상품 개수 플러스 일 해줘 가능해 지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82607806
+먼저 이대로 결제 확정해줘 부탁해,89,submit_payment,22,22,22,submit_payment,submit_payment,0.84013134
+상품 개수 플러스 일해줘 좀 지금,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8256287
+바로 현재 화면 옵선 알려줘 해봐,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.7976011
+지금 화면에서 급한데 장바구니 열어줘,71,click_cart,4,4,4,click_cart,click_cart,0.71838033
+방금 본 상품 기준으로 교환 신청해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83414274
+오늘 공부 계획 정리해줘,0,unknown,0,0,0,unknown,unknown,0.9282325
+제품 스펙 정리해서 말해줘 해줘,77,read_product_info,10,10,10,read_product_info,read_product_info,0.7498781
+현재 페이지에서 주문 건 세부 내용 읽어줘 해주이소,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.57584643
+나중에살거로표시해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8252897
+리뷰 많은 상품으로들어가줘 부탁드립니다,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7479157
+현재페이지에서먼저선택한상픔수랑만수정해줘먼저,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82462287
+이번 주문 기준으로 이번엔 지금 바로 결제 화면 가자 부탁드립니다,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.85120016
+잠깐 이 주문 내역 지우기 해주라,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84893715
+현재 페이지에서이번엔 리뷰에서 단점 위주로 알려줘 좀 해봐,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75616294
+급한데 로그아웃 처리해줘 지금,73,click_logout,6,6,6,click_logout,click_logout,0.8331246
+방금 본 상품 기준으로 급한데 위시리스트 추가해줘 부탁드립니다,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8385222
+최근 주문내옉 보게 이동해줘,70,click_order_history,3,3,3,click_order_history,click_order_history,0.71079403
+현재 페이지에서먼저 나중에 보게 찜해둬 좀,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.84031725
+급한데 이 화면 기능 읽어줘 부탁,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.80749404
+현재 페이지에서 카트로 바로 가 지금,71,click_cart,4,4,4,click_cart,click_cart,0.7201653
+현재 페이지에서 잠깐 내가 담은 거 보자,71,click_cart,4,4,4,click_cart,click_cart,0.7223752
+지금 화면에서 이번엔 상세 주문 정보 확인해줘 가능해,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.5910648
+방금 본 상품 기준으로 로그아웃 처리해줘,73,click_logout,6,6,6,click_logout,click_logout,0.8336487
+바로 최종 주문 확인 정보 말해줘 해주이소,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6392424
+방금 본 상품 기준으로 바로 환불 반품 신청해주라 해줘 바로,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8318053
+잠깐 이 페이지에서 다음으로 뭐 할 수 있어 해주세요,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81144947
+받는 사람 주소 상품 정보 읽어줘 지금,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6226404
+이번 주문 기준으로 급한데 원래 히어비 화면으로 돌아가자 먼저,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.8541956
+이번 주문 기준으로 먼저 옵션 정보 화면 내용 알려줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78326
+지금 바로 구매해 부탁드립니다 지금,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8666603
+급한데 지금 위치에서 할 수 있는 일 정리해줘 해줄래 해주이소,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81712407
+잠깐 옵션 그대로 장바구니 담아줘 지금,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7341407
+지금 선택한 상품 해제해줘 해줄래,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79754215
+지금 화면에서 배송 현황 확인 버튼눌러줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7779113
+아예 결제 페이지 주문 내용 알려줘 금지,0,unknown,0,0,0,unknown,unknown,0.92195445
+바로구매자평가읽어줘해줄래,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7507253
+이번 주문 기준으로 옵션 그대로 장바구니 담아줘 해줄래 부탁,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7358436
+찜 상태로 바꿔줘 해주세요,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8373933
+제품 교환 접수해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8331866
+이번엔 상픔 요약해줘 해줄래 해봐,77,read_product_info,10,10,10,read_product_info,read_product_info,0.749582
+현재 페이지에서 옵션 로 변경해줘 부탁드립니다,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83547306
+현재 페이지에서 잠깐 옵션에서 블랙 선택해주라 부탁드립니다먼저,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8383542
+방금 본 상픔 기준으로 일단 카트 목록 하나씩 말해줘 가능해,83,read_cart_items,16,16,16,read_cart_items,read_cart_items,0.7899524
+이번 주문 기준으로 먼저 이 화면 기능 읽어줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.81153166
+지금 결제 실행해줘 좀,89,submit_payment,22,22,22,submit_payment,submit_payment,0.83893275
+방금 본 상픔 기준으로 이 주문의 금액 배송정보 읽어줘 좀,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.48507294
+이번 주문 기준으로 상품명 가격 로켓배송 여부 알려주세요 부탁드립니다,77,read_product_info,10,10,10,read_product_info,read_product_info,0.75107056
+잠깐 배송 상태 확인해줘,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.77809393
+이번엔 이 상픔 체크 해제해줘 해줄래,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79685724
+주문 상세 내역 설명해주이소 해줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.56790257
+담긴 물건 확인하자 가능해,71,click_cart,4,4,4,click_cart,click_cart,0.71606517
+방금본상픔기준으로후기좋은순으로몇개만읽어줘해줄래부탁,81,read_reviews,14,14,14,read_reviews,read_reviews,0.72480017
+방금본상픔기준으로잠깐더이상안보이게삭제해줘지금,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.84539944
+지금화면에서바로반품사유선택해서신청해주이소해줘,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.79069656
+지금 페이지 안내해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.79648393
+이번엔 환불 반품 신청해줘 좀,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.82821614
+바로 구매해부탁드립니다,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86411065
+현재 페이지에서 이번엔 전체 상품 선택해주이소 가능해 부탁,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79337406
+이번엔 결제 화면 항목들 설명해줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6386942
+방금 본 상픔 기준으로 잠깐 즉시 구매 진행해줘 부탁,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.86724997
+이 계정 종료해줘 바로,73,click_logout,6,6,6,click_logout,click_logout,0.82584655
+이번엔 원래 히어비 화면으로 돌아가자 해주세요,68,go_hearbe,1,1,1,go_hearbe,go_hearbe,0.85329616
+이 상품 옵선 종류 뭐 있어 지금,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7817148
+이번 주문 기준으로 실사용자 후기 알려줘 해줄래 해봐,81,read_reviews,14,14,14,read_reviews,read_reviews,0.75908613
+방금 본 상픔 기준으로 지금 바로 로긴해 해주세요,72,click_login,5,5,5,click_login,click_login,0.8360367
+방금 본 상품 기준으로 먼저 받는 사람 주소 상품 정보 읽어주세요 부탁드립니다,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.63075596
+이번 주문 기준으로 바로 쿠팡에서 비타민 찾아봐,69,search_products,2,2,2,search_products,search_products,0.8420902
+잠깐 검색된 제품 이름만 읽어주세요 바로,75,read_search_results,8,8,8,read_search_results,read_search_results,0.74990267
+일단 옵션 빨간색으로 바꿔줘 부탁드립니다 지금,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83572274
+일단 받는 사람 주소 상픔 정보 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.6283891
+방금 본 상품 기준으로 내 주문 배송조회 들어가 해주세요,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7814686
+지금 화면에서 바로 카트 담기 실행해주이소,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7315534
+급한데 결재 직전 정보 읽어줘 좀 먼저,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.64618224
+급한데 검색 결과 중 할인 붙은 거 골라줘 부탁드립니다,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7619295
+잠깐 첫 번째 상픔 눌러줘 좀,76,select_search_result,9,9,9,select_search_result,select_search_result,0.7729651
+방금 본 상픔 기준으로 지금 수랑 하나 늘려줘 좀,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.8286624
+방금 본 상픔 기준으로 잠깐 카트 담기 실행해줘 부탁해 먼저,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7338222
+바로반품신청진행해줘부탁해,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.7987265
+바로 내 주문 배송조회 들어가 해주세요,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7797188
+지금 선택한 옵선 취소하고 새로 선택해줘 가능해,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8320313
+급한데 옵션 이개로 조정해줘,78,update_product_option,11,11,11,update_product_option,update_product_option,0.8314233
+로긴 창 띄워줘 해줘해봐,72,click_login,5,5,5,click_login,click_login,0.838397
+지금 장바구니 목록으로 이동 해주이소,71,click_cart,4,4,4,click_cart,click_cart,0.7166396
+이번 주문 기준으로 잠깐 배송 현황 확인 버튼 눌러줘 해줘 해주이소,92,click_track_delivery,24,24,24,click_track_delivery,click_track_delivery,0.7808256
+현재 페이지에서 장바구니 목록으로 이동,71,click_cart,4,4,4,click_cart,click_cart,0.7192406
+일단 담아둔 상품 보러 가 해줘,71,click_cart,4,4,4,click_cart,click_cart,0.72080386
+지금 화면에서 지금 보는 상픔 담아줘 해봐,79,click_add_to_cart,12,12,12,click_add_to_cart,click_add_to_cart,0.7247872
+이번주문기준으로옵션정보화면내용알려줘,95,read_option_info,27,27,27,read_option_info,read_option_info,0.7829475
+지금 화면에서 이번엔 관심상품으로 저장해줘 해줘,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.83903575
+이번엔 반품 신청 진행해줘 해주세요,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.83063006
+바로 주문 합계 금액 확인해줘 부탁드립니다 해주이소,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7736314
+제품 교환 접수해줘 먼저,93,request_exchange_return,25,25,25,request_exchange_return,request_exchange_return,0.8336529
+지금 화면에서 구매 단계로 이동해줘 먼저,80,click_buy_now,13,13,13,click_buy_now,click_buy_now,0.8656746
+일단 지금 선택 처리해줘,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79732496
+이번 주문 기준으로이번엔 방금 본 항목 선택 상태로 바꿔 부탁드립니다 해봐,84,select_cart_item,17,17,17,select_cart_item,select_cart_item,0.79261625
+이번 주문 기준으로 배송지랑 결제수단 포함해서 읽어줘,88,read_payment_order_info,21,21,21,read_payment_order_info,read_payment_order_info,0.47799644
+먼저주문내역에서숨겨줘해줘,94,delete_order_history,26,26,26,delete_order_history,delete_order_history,0.83676404
+현재 페이지에서 급한데 검색 결과를 하나씩 불러줘,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7530284
+내 계정으로 로그인할래 부탁드립니다,72,click_login,5,5,5,click_login,click_login,0.84280264
+잠깐 선택한 상품 해제해줘 해줘 해주이소,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.7960229
+급한데 결제수단이랑 배송상태 포함해서 읽어줘,91,read_order_detail,23,23,23,read_order_detail,read_order_detail,0.570683
+선택한상품 해제해줘 부탁해,85,unselect_cart_item,18,18,18,unselect_cart_item,unselect_cart_item,0.79852265
+이번 주문 기준으로 검샥 결과를 하나씩불러줘 좀,75,read_search_results,8,8,8,read_search_results,read_search_results,0.7100654
+이번 주문 기준으로 현재 페이지에서 가능한 작업 알려줘 해줘,74,read_current_page_actions,7,7,7,read_current_page_actions,read_current_page_actions,0.8154794
+쿠폰 적용 후 금액 알려줘,87,read_order_amount,20,20,20,read_order_amount,read_order_amount,0.7679779
+지금 화면에서 옵션 빨간색으로 바꿔줘 바로,78,update_product_option,11,11,11,update_product_option,update_product_option,0.83262163
+위시리스트에추가해,82,click_wishlist,15,15,15,click_wishlist,click_wishlist,0.8302637
+현재 페이지에서 바로 상위 검색 결과 알려줘 해줄래,75,read_search_results,8,8,8,read_search_results,read_search_results,0.750193
+지금 버스 시간 요약해줘,0,unknown,0,0,0,unknown,unknown,0.92665386
+이번엔 이 상품 수량 이개로 바꿔줘부탁드립니다,86,adjust_item_quantity,19,19,19,adjust_item_quantity,adjust_item_quantity,0.82915175
+로그인 화면 열어줘,72,click_login,5,5,5,click_login,click_login,0.84011215
+먼저 한줄 후기들 먼저 보여줘,81,read_reviews,14,14,14,read_reviews,read_reviews,0.7578409
+일단 아기 물티슈 찾아줘,69,search_products,2,2,2,search_products,search_products,0.8398393
+이번 주문 기준으로 이번엔 담긴 물건 확인하자 부탁,71,click_cart,4,4,4,click_cart,click_cart,0.7170948
+옵션 선택 전에 정보 먼저 읽어줘 해봐,95,read_option_info,27,27,27,read_option_info,read_option_info,0.78768504
